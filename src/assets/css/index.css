@@ -46,14 +46,26 @@ h1 {
 .header {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.search {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding-left: 8px;
+  min-width: calc(120px + 10vw);
+  color: white;
+  border: none;
+  height: 40px;
+
+}
 
 /*    text styles     */
 
 
 .blue {
-  color: #61dafb;
+  color: #393a3a;
 }
 
 .text-shadow, h1 {
