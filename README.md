@@ -1,4 +1,16 @@
-# Getting Started with Create React App
+# General Overview
+
+- Connect to server
+```
+ssh root@143.110.153.76
+```
+
+- Project Directory
+```
+cd /var/www/asleepace.com
+```
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
