@@ -1,4 +1,87 @@
-# Getting Started with Create React App
+# General Overview
+
+- [Installation](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04)
+- [Ubuntu 20.0.4](https://releases.ubuntu.com/20.04/)
+- [UFW Firewall](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-18-04)
+- [NGINX](https://www.nginx.com/resources/wiki/?_bt=541137080527&_bk=&_bm=b&_bn=g&_bg=125748574545&gclid=CjwKCAjw4KyJBhAbEiwAaAQbE6ZBE80EtqlFLNQ4UHlTNbyCw0tTxKhCbFsAVgTbiHZWxbExVTAasRoCoJIQAvD_BwE)
+- [IPV4 Adress](198.199.98.58)
+- [SSH Keys](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)
+- [UFW Firewall](https://github.com/soladex/web/blob/main/docs/ufw.md)
+- [OpenSSL](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04)
+- [Parse](https://www.digitalocean.com/community/tutorials/how-to-run-parse-server-on-ubuntu-14-04)
+
+# Getting Started
+
+- Conecting to server
+```
+ssh root@143.110.153.76
+```
+        
+- Starting NGINX
+```
+systemctl status nginx
+```
+
+- Project Location
+```
+cd /var/www/asleepace.com
+```
+
+# NGINX
+
+Managing the Nginx Process and basic management commands [source](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04)
+
+- ### NGINX Configuration
+
+      sudo nano /etc/nginx/nginx.conf
+
+- ### Soldaex Configuration
+
+      sudo nano /etc/nginx/sites-available/soladex
+
+- ### Configration File
+      
+      server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/soladex/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name soladex.co www.soladex.co;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+      }
+
+
+- ### Stop Server
+
+      sudo systemctl stop nginx
+ 
+- ### Start Server
+
+      sudo systemctl start nginx
+
+- ### Restart Server
+
+      sudo systemctl restart nginx
+ 
+- ### Reload Config
+
+      sudo systemctl reload nginx
+ 
+- ### Disable Autoboot
+
+      sudo systemctl disable nginx
+ 
+- ### Enable Autoboot (default)
+
+      sudo systemctl enable nginx
+
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
