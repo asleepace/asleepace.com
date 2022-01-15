@@ -9,10 +9,10 @@
  src: url('put_the_location_to_your_font.ttf or .otf');
 }
 
-:root {
-  --card-height: 90vh;
+/* :root {
+  --card-height: 90%;
   --card-width: 90vh;
-}
+} */
 
 
 body {
@@ -30,8 +30,8 @@ body {
 
 .card {
   background: #191c29;
-  width: var(--card-width);
-  height: var(--card-height);
+  width: 90%;
+  aspect-ratio: 1;
   padding: 3px;
   position: relative;
   border-radius: 6px;
