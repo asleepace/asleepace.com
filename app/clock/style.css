@@ -28,12 +28,13 @@ body {
 
 h1 {
   aspect-ratio: auto;
+  font-size: 14px;
 }
 
 
 .card {
   background: #191c29;
-  width: 90vh;
+  width: 80vh;
   aspect-ratio: 1;
   padding: 3px;
   position: relative;
