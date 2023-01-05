@@ -27,6 +27,8 @@
     "paths": {
       "@styles/*": ["styles/*"],
       "@components/*": ["components/*"],
+      "@features/*": ["features/*"],
+      "@images/*": ["images/*"],
       "@hooks/*": ["hooks/*"],
     }
   },

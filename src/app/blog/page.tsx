@@ -6,49 +6,7 @@ import Navigation from '@components/navigation'
 import HeaderImage from '../../images/background.png'
 import { Varela_Round } from '@next/font/google'
 
-const inter = Inter({ subsets: ['latin'] })
-
-const customFont = Varela_Round({ subsets: ['latin'], weight: '400' })
-
-function ArticleHeader() {
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-black pb-1">My First Blog Post</h1>
-      <h2 className="text-black/50">Wednesday Jan. 4th, 2022</h2>
-      <h3 className="text-black/50">By Colin Teahan</h3>
-    </div>
-  )
-}
-
-function ArticleImage() {
-  return (
-    <Image src={HeaderImage} alt='Blog image' className='rounded-3xl overflow-none' style={{
-      objectFit: 'cover',
-      height: '340px',
-      width: '100%',
-    }} />
-  )
-}
-
-function ArticleBody() {
-  return (
-    <div className="p-6">
-      <p>This is an example of what a blog post can look like! This text will fill up the screen and contain various html elements which can be parsed, the idea is to make it look pretty!</p>
-    </div>
-  )
-}
-
-interface ArticleProps {
-  children: React.ReactNode
-}
-
-function Article({ children }: ArticleProps) {
-  return (
-    <div className={`w-4/6 mt-12 ${inter.className} bg-white p-4 px-8 rounded-xl`}>
-      { children }
-    </div>
-  )
-}
+import Article from '@features/article'
 
 export default function BlogPage() {
   return (
@@ -60,11 +18,7 @@ export default function BlogPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Article>
-          <ArticleHeader />
-          <ArticleImage />
-          <ArticleBody />
-        </Article>
+        <Article />
       </main>
     </>
   )
