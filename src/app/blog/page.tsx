@@ -22,9 +22,9 @@ function ArticleHeader() {
 
 function ArticleImage() {
   return (
-    <Image src={HeaderImage} alt='Blog image' className='rounded-3xl overflow-none w-full h-100' style={{
+    <Image src={HeaderImage} alt='Blog image' className='rounded-3xl overflow-none' style={{
       objectFit: 'cover',
-      height: '200px',
+      height: '340px',
       width: '100%',
     }} />
   )
