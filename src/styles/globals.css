@@ -44,11 +44,11 @@
   --card-border-rgb: 131, 134, 135;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-start-rgb: 255, 255, 255;
+    --background-end-rgb: 255, 255, 255;
 
     --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
     --secondary-glow: linear-gradient(
@@ -91,12 +91,7 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: rgba(255, 255, 255, 1);
 }
 
 a {
@@ -104,12 +99,26 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
 }
 
-h1 {
-  font-family: Inter;
+navigation > * {
+  font-feature-settings: "rlig" 1, "calt" 0;
+  color-scheme: light;
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  color: var(--geist-foreground);
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-align: center;
+  box-sizing: border-box;
+  font-weight: 800;
+  margin: 0 0 30px;
+  letter-spacing: -0.05em;
+  font-size: 100px;
+  line-height: 1;
+  margin: 0px 0px;
 }
