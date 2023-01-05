@@ -6,7 +6,14 @@ import Navigation from '@components/navigation'
 import HeaderImage from '../../images/background.png'
 import { Varela_Round } from '@next/font/google'
 
-import Article from '@features/article'
+import Article from '@components/article'
+
+const myArticle = {
+  title: "My First Article",
+  name: "Colin Teahan",
+  date: Date(),
+  children: "This is my first article!"
+}
 
 export default function BlogPage() {
   return (
@@ -18,7 +25,7 @@ export default function BlogPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Article />
+        <Article {...myArticle} />
       </main>
     </>
   )

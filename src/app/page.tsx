@@ -3,8 +3,17 @@ import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import Navigation from '@components/navigation'
+import Article from '@components/article'
 
 const inter = Inter({ subsets: ['latin'] })
+
+
+const myArticle = {
+  title: "My First Article",
+  name: "Colin Teahan",
+  date: new Date(),
+  children: "This is my first article!"
+}
 
 export default function Home() {
   return (
@@ -16,7 +25,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        
+        <Article {...myArticle} />
       </main>
     </>
   )
