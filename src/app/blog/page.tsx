@@ -13,7 +13,7 @@ const customFont = Varela_Round({ subsets: ['latin'], weight: '400' })
 function ArticleHeader() {
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-black">My First Blog Post</h1>
+      <h1 className="text-3xl font-black pb-1">My First Blog Post</h1>
       <h2 className="text-black/50">Wednesday Jan. 4th, 2022</h2>
       <h3 className="text-black/50">By Colin Teahan</h3>
     </div>
