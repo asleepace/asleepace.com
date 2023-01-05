@@ -2,22 +2,9 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
+import Navigation from '@components/navigation'
 
 const inter = Inter({ subsets: ['latin'] })
-
-function Navigation() {
-  return (
-    <div className='absolute left-0 right-0 top-0 flex flex-row justify-between p-8'>
-      <button className='font-bold'>Asleepace</button>
-      <div className='flex-row space-between'>
-        <button className='px-4'>Blog</button>
-        <button className='px-4'>Docs</button>
-        <button className='px-4'>Tools</button>
-        <button className='px-4'>About</button>
-      </div>
-    </div>
-  )
-}
 
 export default function Home() {
   return (
