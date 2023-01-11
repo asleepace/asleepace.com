@@ -23,7 +23,7 @@ export default function Article({ title, date, name, children }: ArticleProps) {
     day: 'numeric',
   })
 
-  const ArticleImage = useCallback(( ) =>      
+  const ArticleImage = useCallback(() =>      
     <Image src={defaultImage} alt='Blog image' className='rounded-3xl overflow-none' style={{
       objectFit: 'cover',
       height: '340px',
@@ -31,7 +31,7 @@ export default function Article({ title, date, name, children }: ArticleProps) {
   }} />, [])
 
   return (
-    <div className={`w-4/6 mt-12 bg-white p-4 px-8 rounded-xl ${inter.className}`}>
+    <div className={`w-full mt-12 bg-white p-4 px-8 rounded-xl ${inter.className}`}>
       <div className="p-6">
         <h1 className="text-3xl font-black pb-1">{title}</h1>
         <h2 className="text-black/50">{dateString}</h2>

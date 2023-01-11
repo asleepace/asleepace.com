@@ -1,6 +1,6 @@
 import '@styles/globals.css'
 import Navigation from '@components/navigation'
-import Container from '@components/container'
+
 interface LayoutProps {
   children?: React.ReactNode
 }
@@ -11,7 +11,9 @@ export default function RootLayout({ children }: LayoutProps) {
       <head />
       <body>
         <Navigation />
-        {children}
+        <div className='w-full items-center justify-center flex'>
+          {children}
+        </div>
       </body>
     </html>
   )

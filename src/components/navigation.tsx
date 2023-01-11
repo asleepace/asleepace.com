@@ -24,7 +24,7 @@ export default function Navigation() {
   return (
     <div className={navigationStyles.join(' ')}>
       <div className="flex flex-row items-center p-1">
-        <Image src={WebsiteLogo} alt="Asleepace.com" className='w-[50px] mr-2' />
+        <Image src={WebsiteLogo} alt="Asleepace.com" className='w-[30px] mr-2' />
         <button className='font-bold'><h1 className="text-white text-xl">Asleepace</h1></button>
       </div>
       <div className='flex-row space-between pr-8'>
