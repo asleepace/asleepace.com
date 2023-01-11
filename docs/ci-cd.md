@@ -1,10 +1,12 @@
 # CI/CD Pipeline
 
+![](https://cache.desktopnexus.com/thumbseg/1597/1597813-bigthumbnail.jpg)
+
 This document outlines how to setup, operate, maintain and troubleshoot our continuous delivery and integration pipeline. Our pipeline consists of three main components:
 
-1. <b>Fastlane</b>: handles building, signing and deploying the mobile application to their respective app store.
-2. <b>Saucelabs</b>: our e2e real device cloud service where automated tests are run on physical devices.
-3. <b>CircleCI</b>: our cloud service on which we build, test and deploy our apps on remote machines.
+1. **Fastlane**: handles building, signing and deploying the mobile application to their respective app store.
+2. **Saucelabs**: our e2e real device cloud service where automated tests are run on physical devices.
+3. **CircleCI**: our cloud service on which we build, test and deploy our apps on remote machines.
 
 ## Quick Setup
 

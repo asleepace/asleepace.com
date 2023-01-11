@@ -1,0 +1,91 @@
+.article {
+  /* border: 8px dashed greenyellow; */
+
+  width: min(100%, 840px);
+  margin: 50px auto;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: auto auto;
+  grid-gap: 1rem;
+
+  /* font styling */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  color: rgba(201, 209, 217);
+  overflow-wrap: break-word;
+  text-size-adjust: 100%;
+  letter-spacing: 0.2px;
+  line-height: 21px;
+  font-size: 14px;
+}
+
+/* article content container  */
+.article article {
+  /* border: 8px dashed red; */
+  padding: 10px;
+  width: auto;
+}
+
+/* article sidebar container */
+.article-side {
+  /* border: 8px dashed blue; */
+  margin-top: 10%;
+  width: auto;
+}
+
+/* article basic font */
+
+.article img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.article h1,
+h2 {
+  font-weight: 300;
+  letter-spacing: 0.1rem;
+  font-size: 3rem;
+  text-size-adjust: 100%;
+  color: white;
+}
+
+.article h1,
+h2,
+p,
+li,
+pre,
+code {
+  margin: 24px 0px;
+}
+
+.article h2 {
+  font-size: 2rem;
+}
+
+.article h3 {
+  font-size: 1.6rem;
+}
+
+.article ol {
+  list-style-type: disc;
+  list-style-position: outside;
+  padding-inline-start: 16px;
+  margin-left: 16px;
+}
+
+/* code snippet styling */
+
+.article pre {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 10px 10px;
+}
+
+.article p > code {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 4px;
+}

@@ -4,18 +4,25 @@ import fs from 'fs'
 export type File = {
   name: string
   path: string
-  get(): string
+  content: string
 }
 
-export const getDirectory = (path: string) => join(process.cwd(), path)
+export const getDirectoryPath = (path: string) => join(process.cwd(), path)
 
-export const getFilesInDirectory = async (path: string): Promise<File[]> => {
-  const files = await fs.readdirSync(getDirectory(path))
+export const getFileFromPath = (path: string) => {
+
+  const directory = getDirectoryPath(path)
+
+}
+
+export const getFilesInDirectory = async (directory: string): Promise<File[]> => {
+  const path = getDirectoryPath(directory)
+  const files = await fs.readdirSync(path)
   return files.map((name) => {
-    const path = getDirectory(name)
-    const get = () => fs.readFileSync(path, 'utf-8')
+    const filePath = join(path, name)
+    const content = fs.readFileSync(filePath, 'utf-8')
     return {
-      name, path, get
+      name, path: filePath, content
     }
   })
 }

@@ -11,9 +11,9 @@ export default function RootLayout({ children }: LayoutProps) {
       <head />
       <body>
         <Navigation />
-        <div className='w-full items-center justify-center flex'>
+        <main>
           {children}
-        </div>
+        </main>
       </body>
     </html>
   )

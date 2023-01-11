@@ -9,10 +9,6 @@ export default function Navigation() {
   const navigationStyles = [
     varela.className,
     'text-white',
-    'absolute',
-    'right-0',
-    'left-0',
-    'top-0',
     'flex',
     'flex-row',
     'justify-between',

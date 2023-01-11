@@ -1,6 +1,12 @@
 import Head from 'next/head'
 import Article from '@components/article'
 import { getFilesInDirectory } from '../logic/fileSystem'
+import { getHtmlFromMarkdown } from '../logic/getHtmlFromMarkdown'
+import matter from 'gray-matter';
+import { remark } from 'remark';
+import html from 'remark-html';
+
+import '@styles/article.css'
 
 const myArticle = {
   title: "My First Article",
@@ -11,8 +17,8 @@ const myArticle = {
 
 export default async function Home() {
 
-  const files = await getFilesInDirectory('docs')
-  console.log(files)
+  const file = await getFilesInDirectory('docs')
+  const html = await getHtmlFromMarkdown(file[1].content)
 
   return (
     <>
@@ -22,9 +28,14 @@ export default async function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="lg:w-3/6 min-w-600">
-        <Article {...myArticle} />
-      </main>
+        <div className="article">
+          <article>
+            <div dangerouslySetInnerHTML={{ __html: html }} />
+          </article>
+          <div className="article-side">
+            <h3>On this page</h3>
+          </div>
+        </div>
     </>
   )
 }
