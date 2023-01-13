@@ -1,7 +1,5 @@
 # CI/CD Pipeline
 
-![](https://cache.desktopnexus.com/thumbseg/1597/1597813-bigthumbnail.jpg)
-
 This document outlines how to setup, operate, maintain and troubleshoot our continuous delivery and integration pipeline. Our pipeline consists of three main components:
 
 1. **Fastlane**: handles building, signing and deploying the mobile application to their respective app store.
@@ -26,7 +24,7 @@ bundle install
 
 Then in Xcode make sure that for each target under the signing & capabilities tab that <b>Signing (Debug)</b> is set to `match Development ...` and <b>Signing (Release)</b> is set to `match Appstore ...` as outlined below:
 
-<img width="1181" alt="singing_and_caps" src="https://user-images.githubusercontent.com/10716803/176782248-9d5c43d4-50cc-4be0-bd8e-1e0cd2c12e61.png">
+![xcode](https://user-images.githubusercontent.com/10716803/176782248-9d5c43d4-50cc-4be0-bd8e-1e0cd2c12e61.png)
 
 ## Pipeline Overview
 
@@ -37,7 +35,7 @@ The main goal of our CI/CD pipeline is to create a standardized process for buil
 3. Once the builds are finished it will upload them to saucelabs for e2e testing.
 4. CircleCI will report the results back to GitHub once finished.
 
-<img width="1020" alt="pipeline_overview" src="https://user-images.githubusercontent.com/10716803/176953930-2543a539-765b-4b6a-ada9-8b8b42ba3422.png">
+![xcode](https://user-images.githubusercontent.com/10716803/176953930-2543a539-765b-4b6a-ada9-8b8b42ba3422.png)
 
 ## CircleCI
 

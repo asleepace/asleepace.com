@@ -1,29 +1,61 @@
+:root {
+  --color-border-muted: #21262d;
+  --color-link: #58a6ff;
+  /* --color-text: rgba(201, 209, 217); */
+
+  --border-color: rgba(0, 0, 0, 0.1);
+
+  --code-background: rgba(246, 246, 246);
+  --code-foreground: rgba(0, 0, 0, 0.7);
+
+  --color-text: rgb(35, 38, 41);
+  --font-size: 16px;
+  --line-height: 24px;
+}
+
 .article {
   /* border: 8px dashed greenyellow; */
 
-  width: min(100%, 840px);
-  margin: 50px auto;
   padding: 10px;
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  /* grid-template-columns: 2fr 1fr;
   grid-template-rows: auto auto;
-  grid-gap: 1rem;
+  grid-gap: 1rem; */
 
   /* font styling */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Ubuntu,
     Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  color: rgba(201, 209, 217);
+  color: var(--color-text);
   overflow-wrap: break-word;
   text-size-adjust: 100%;
   letter-spacing: 0.2px;
-  line-height: 21px;
-  font-size: 14px;
+  line-height: var(--line-height);
+  font-size: var(--font-size);
+
+  /* overflow: hidden; */
+}
+
+@media (max-width: 840px) {
+  .article {
+    max-width: min(100vw, 840px);
+    /* width: auto; */
+    margin: auto auto;
+  }
+}
+
+@media (min-width: 841px) {
+  .article {
+    max-width: min(100vw, auto);
+    /* width: auto; */
+    margin: auto auto;
+  }
 }
 
 /* article content container  */
-.article article {
+div.article article {
   /* border: 8px dashed red; */
+  border-radius: 4px;
   padding: 10px;
   width: auto;
 }
@@ -31,61 +63,86 @@
 /* article sidebar container */
 .article-side {
   /* border: 8px dashed blue; */
+  border-left: 1px solid var(--border-color);
+  padding: 16px;
   margin-top: 10%;
-  width: auto;
+  width: 100%;
 }
 
 /* article basic font */
 
-.article img {
-  width: 100%;
+div.article a {
+  color: var(--color-link);
+}
+
+div.article img {
+  width: auto;
   object-fit: cover;
   border-radius: 8px;
 }
 
-.article h1,
+div.article h1,
 h2 {
+  padding-top: 24px;
+  padding-bottom: 24px;
+
+  border-bottom: 1px solid var(--border-color);
+
   font-weight: 300;
   letter-spacing: 0.1rem;
   font-size: 3rem;
   text-size-adjust: 100%;
-  color: white;
+  color: black;
 }
 
-.article h1,
-h2,
-p,
-li,
-pre,
-code {
+div.article p,
+div.article ul,
+div.article ol,
+div.article img,
+div.article pre,
+div.article code {
   margin: 24px 0px;
 }
 
-.article h2 {
+div.article h2 {
   font-size: 2rem;
 }
 
-.article h3 {
+div.article h3 {
   font-size: 1.6rem;
 }
 
-.article ol {
+/* ordered list styling */
+div.article ol {
   list-style-type: disc;
   list-style-position: outside;
   padding-inline-start: 16px;
   margin-left: 16px;
 }
 
-/* code snippet styling */
+div.article ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  padding-inline-start: 16px;
+  margin-left: 16px;
+}
 
-.article pre {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+div.article li {
+  margin: 8px 0px;
+}
+
+/* code snippet styling */
+div.article pre {
+  background-color: var(--code-background);
+  color: var(--code-foreground);
+  border-radius: 8px;
   padding: 10px 10px;
 }
 
-.article p > code {
-  background-color: rgba(255, 255, 255, 0.1);
+/* inline code styling */
+div.article p > code {
+  background-color: var(--code-background);
+  color: var(--code-foreground);
   border-radius: 4px;
-  padding: 4px 4px;
+  padding: 2px 4px;
 }

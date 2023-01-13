@@ -8,6 +8,7 @@ export default function Navigation() {
 
   const navigationStyles = [
     varela.className,
+    'navigation',
     'text-white',
     'flex',
     'flex-row',
