@@ -1,15 +1,24 @@
 #!/usr/bin/env bash
 
-echo("[deploy] starting...")
+# Define ANSI escape codes for colors
+RESET="\033[0m"
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+BLUE="\033[34m"
+MAGENTA="\033[35m"
+CYAN="\033[36m"
+WHITE="\033[37m"
+
+
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  starting...\n\n"
 
 set -e
 
-echo("[deploy] building...")
-
 npm run build
 
-echo("[deploy] restarting...")
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  restarting...\n\n"
 
 pm2 restart "asleepace-web-app"
 
-echo("[deploy] done!")
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  done!${RESET}\n\n"
