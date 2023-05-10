@@ -10,15 +10,24 @@ MAGENTA="\033[35m"
 CYAN="\033[36m"
 WHITE="\033[37m"
 
-
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  starting...\n\n"
-
 set -e
+
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  fetching updates...\n\n"
+
+git fetch origin
+git checkout master
+git pull
+
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  installing node modules...\n\n"
+
+npm install
+
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  building application...\n\n"
 
 npm run build
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  restarting...\n\n"
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  restarting server...\n\n"
 
 pm2 restart "asleepace-web-app"
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  done!${RESET}\n\n"
+echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  success!${RESET}\n\n"
