@@ -91,8 +91,8 @@ The are also specific CircleCI commands that are run such as `add_ssh_keys` and 
 - add_ssh_keys:
     fingerprints:
       # make sure these match the SSH keys under project settings!
-      - "dc:45:f5:50:bf:04:29:ea:fd:58:b5:3a:ab:48:dc:5b"
-      - "8a:3a:53:3f:ef:0e:c4:fe:f6:a8:97:6a:56:e4:3d:40"
+      - "ac:45:f3:50:bf:04:f6:ea:fd:58:b5:3a:ab:48:dc:6d"
+      - "9a:3a:54:3f:ef:0e:c5:fe:f6:a8:97:6a:56:e4:3d:41"
 ```
 
 After each command the current working directory will be reset back to the projects root `./rn-mobile-app`.
