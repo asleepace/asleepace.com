@@ -15,7 +15,7 @@ const myArticle = {
 export default async function Home() {
 
   const file = await getFilesInDirectory('docs')
-  const html = await getHtmlFromMarkdown(file[1].content)
+  const html = await getHtmlFromMarkdown(file[3].content)
   console.log(html.match(/<h2>(.*)<\/h2>/g))
 
   return (
