@@ -10,24 +10,31 @@ MAGENTA="\033[35m"
 CYAN="\033[36m"
 WHITE="\033[37m"
 
+# early exit if any command fails
 set -e
 
-echo -e "\n\n> ${MAGENTA}deploy${WHITE}\t-  fetching updates...\n${CLEAR}"
+# pretty print function for output
+pretty_print() {
+  local text="$1"
+  echo -e "\n\n${MAGENTA} • deploy ${RESET}  -  ${WHITE}${text}${RESET}\n\n"
+}
+
+pretty_print "fetching latest changes from git..."
 
 git fetch origin
 git checkout main
 git pull
 
-echo -e "\n\n> ${MAGENTA}deploy${WHITE}\t-  installing node modules...\n${CLEAR}"
+pretty_print "installing node modules..."
 
 npm install
 
-echo -e "\n\n> ${MAGENTA}deploy${WHITE}\t-  building application...\n${CLEAR}"
+pretty_print "building application..."
 
 npm run build
 
-echo -e "\n> ${MAGENTA}deploy${WHITE}\t-  restarting server...\n${CLEAR}"
+pretty_print "restarting server..."
 
 pm2 restart "asleepace-web-app"
 
-echo -e "\n> ${MAGENTA}deploy${WHITE}\t-  success!\n${CLEAR}"
+pretty_print "success!"
