@@ -58,6 +58,7 @@ div.article article {
   border-radius: 4px;
   padding: 10px;
   width: auto;
+  margin: auto;
 }
 
 /* article sidebar container */
@@ -93,6 +94,11 @@ h2 {
   font-size: 3rem;
   text-size-adjust: 100%;
   color: black;
+}
+
+div.article h1 {
+  font-weight: 600;
+  color: #21262d;
 }
 
 div.article p,

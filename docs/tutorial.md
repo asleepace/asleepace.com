@@ -3,6 +3,14 @@ title: Custom Server
 slug: /server
 ---
 
+# Custom Server
+
+This guide outlines how to setup a simple server running the following:
+
+- Ubuntu
+- Next.js
+- Nginx
+
 ## Connect
 
 SSH into the remote server with the following command:

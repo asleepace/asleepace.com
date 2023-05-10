@@ -1,4 +1,4 @@
-import WebsiteLogo from '../images/asleepace-light.png'
+import WebsiteLogo from '../images/asleepace.png'
 import Image from 'next/image'
 import { Varela_Round } from '@next/font/google'
 
@@ -20,15 +20,14 @@ export default function Navigation() {
 
   return (
     <div className={navigationStyles.join(' ')}>
-      <div className="flex flex-row items-center p-1">
-        <Image src={WebsiteLogo} alt="Asleepace.com" className='w-[30px] mr-2' />
+      <div className="flex flex-row space-between py-1 px-4">
+        <Image src={WebsiteLogo} alt="Asleepace.com" className='w-[30px] ml-4 mr-4' />
         <button className='font-bold'><h1 className="text-white text-xl">Asleepace</h1></button>
       </div>
       <div className='flex-row space-between pr-8'>
-        <button className='px-4'>Blog</button>
-        <button className='px-4'>Docs</button>
-        <button className='px-4'>Tools</button>
-        <button className='px-4'>About</button>
+        <button className='font-thin text-sm px-4'>Home</button>
+        <button className='font-thin text-sm px-4'>Tools</button>
+        <button className='font-thin text-sm px-4'>About</button>
       </div>
     </div>
   )
