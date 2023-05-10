@@ -12,22 +12,22 @@ WHITE="\033[37m"
 
 set -e
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  fetching updates...\n\n"
+echo -e "\n${MAGENTA}deploy${WHITE}\t-  fetching updates...\n${CLEAR}"
 
 git fetch origin
 git checkout main
 git pull
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  installing node modules...\n\n"
+echo -e "\n${MAGENTA}deploy${WHITE}\t-  installing node modules...\n${CLEAR}"
 
 npm install
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  building application...\n\n"
+echo -e "\n${MAGENTA}deploy${WHITE}\t-  building application...\n${CLEAR}"
 
 npm run build
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  restarting server...\n\n"
+echo -e "\n${MAGENTA}deploy${WHITE}\t-  restarting server...\n${CLEAR}"
 
 pm2 restart "asleepace-web-app"
 
-echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  success!${RESET}\n\n"
+echo -e "\n${MAGENTA}deploy${WHITE}\t-  success!\n${CLEAR}"
