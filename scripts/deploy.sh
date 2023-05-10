@@ -15,7 +15,7 @@ set -e
 echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  fetching updates...\n\n"
 
 git fetch origin
-git checkout master
+git checkout main
 git pull
 
 echo -e "\n\n${MAGENTA}deploy${WHITE}\t-  installing node modules...\n\n"
