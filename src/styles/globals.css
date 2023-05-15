@@ -3,15 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --max-width: 1100px;
+  --max-width: 100vw;
   --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+  /* --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+    "Fira Mono", "Droid Sans Mono", "Courier New", monospace; */
+
+  --font-mono: "Work Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial,
+    sans-serif;
 
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: #485563;
+  --background-end-rgb: #29323c;
 
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,
@@ -44,7 +47,7 @@
   --card-border-rgb: 131, 134, 135;
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 255, 255, 255;
@@ -85,18 +88,28 @@
 
 html,
 body {
+  margin: 0;
+  padding: 0;
   max-width: 100vw;
   overflow-x: hidden;
-  background-color: "white";
+
+  font-family: "Work Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial,
+    sans-serif;
 }
 
 body {
-  color: rgba(0, 0, 0, 0.9);
-  background-color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    27deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(25, 26, 35, 1) 100%
+  );
+  background-attachment: fixed;
 }
 
 main {
-  margin-top: 100px;
+  /* background-image: linear-gradient(to right, #243949 0%, #517fa4 100%); */
 }
 
 a {
@@ -110,42 +123,7 @@ a {
   }
 }
 
-div.navigation * {
-  font-feature-settings: "rlig" 1, "calt" 0;
-  color-scheme: light;
-  font-family: var(--font-sans);
-  text-rendering: optimizeLegibility;
-  color: var(--geist-foreground);
-  text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  text-align: center;
-  box-sizing: border-box;
-  font-weight: 300;
-  margin: 0 0 30px;
-  letter-spacing: -0.02em;
-  font-size: 16px;
-  line-height: 1;
-  margin: 0px 0px;
-}
-
-.navigation {
-  position: fixed;
-  width: 100%;
-  top: 0px;
-  /* padding: 8px; */
-  color: black;
-  padding: 8px;
-  /* From https://css.glass */
-  background: rgba(255, 255, 255, 0.02);
-  /* border-radius: 16px; */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(12.8px);
-  -webkit-backdrop-filter: blur(12.8px);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
 /* scroll bar  */
-
 ::-webkit-scrollbar {
   background-color: transparent;
   width: 20px;
