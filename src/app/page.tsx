@@ -1,16 +1,10 @@
 import Head from 'next/head'
 import { getFilesInDirectory } from '../logic/fileSystem'
 import { getHtmlFromMarkdown } from '../logic/getHtmlFromMarkdown'
-
+import Article from '@components/article'
 
 import '@styles/article.css'
 
-const myArticle = {
-  title: "My First Article",
-  name: "Colin Teahan",
-  date: new Date(),
-  children: "This is my first article!"
-}
 
 export default async function Home() {
 
@@ -27,9 +21,7 @@ export default async function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
         <div className="article">
-          <article>
-            <div dangerouslySetInnerHTML={{ __html: html }} />
-          </article>
+          <Article markdown={file[4].content} />
         </div>
     </>
   )

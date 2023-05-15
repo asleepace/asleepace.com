@@ -1,27 +1,46 @@
 
+import React from 'react'
 import Image, { StaticImageData } from 'next/image'
 import defaultImage from '@images/background.png'
 // import { Inter } from '@next/font/google'
 import { useCallback } from 'react'
 import { Work_Sans } from '@next/font/google'
+import Markdoc from '@markdoc/markdoc'
+import { CodeBlock as Fence } from './code-block'
 
 const inter = Work_Sans({ subsets: ['latin'] })
 
 export interface ArticleProps {
-  title: string
-  date: Date
-  name: string
-  children: React.ReactNode
+  markdown: string;
 }
 
-export default function Article({ title, date, name, children }: ArticleProps) {
+export default function Article({ markdown }: ArticleProps) {
 
-  const nameString = `By ${name}`
-  const dateString = date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    year: 'numeric',
-    day: 'numeric',
+  console.log({ markdown})
+
+  const ast = Markdoc.parse(markdown);
+
+  console.log({ ast })
+
+  const fence = {
+    render: 'Fence',
+    attributes: {
+      language: {
+        type: String
+      }
+    }
+  };
+  
+  const content = Markdoc.transform(ast, {
+    nodes: {
+      fence
+    }
+  });
+
+  const html = Markdoc.renderers.react(content, React, {
+    components: {
+      Fence
+    }
   })
 
   const ArticleImage = useCallback(() =>      
@@ -32,16 +51,11 @@ export default function Article({ title, date, name, children }: ArticleProps) {
   }} />, [])
 
   return (
-    <div className={`w-full mt-12 bg-black p-4 px-8 rounded-xl ${inter.className}`}>
-      <div className="p-6">
-        <h1 className="text-3xl font-black pb-1">{title}</h1>
-        <h2 className="text-black/50">{dateString}</h2>
-        <h3 className="text-black/50">{nameString}</h3>
-      </div>
-      <ArticleImage />
-      <div className="p-6">
-        {children}
-      </div>
-    </div>
+    <article>
+      {/* <ArticleImage /> */}
+      {
+        html
+      }
+    </article>
   )
 }

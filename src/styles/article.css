@@ -150,7 +150,7 @@ div.article li {
 /* code snippet styling */
 div.article pre {
   background-color: var(--code-background);
-  color: var(--code-foreground);
+  /* color: var(--code-foreground); */
   border-radius: 8px;
   padding: 10px 10px;
   font-size: 16px;
