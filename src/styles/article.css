@@ -11,8 +11,8 @@
   --code-background: rgba(255, 225, 255, 0.1);
 
   --color-text: white;
-  --font-size: 16px;
-  --line-height: 24px;
+  --font-size: 22px;
+  --line-height: 32px;
 
   /** bright yellow **/
   --color-yellow: #ffd200;
@@ -82,7 +82,8 @@ div.article article {
 /* article basic font */
 
 div.article a {
-  color: var(--color-link);
+  text-decoration: underline;
+  /* color: var(--color-purple); */
 }
 
 div.article img {
@@ -98,7 +99,7 @@ h2 {
 
   border-bottom: 1px solid var(--border-color);
 
-  font-weight: 300;
+  font-weight: 600;
   letter-spacing: 0.1rem;
   font-size: 3rem;
   text-size-adjust: 100%;
@@ -106,7 +107,7 @@ h2 {
 }
 
 div.article h1 {
-  color: var(--color-purple);
+  color: var(--color-yellow);
   font-weight: 600;
 }
 
@@ -152,6 +153,7 @@ div.article pre {
   color: var(--code-foreground);
   border-radius: 8px;
   padding: 10px 10px;
+  font-size: 16px;
 }
 
 /* inline code styling */
@@ -159,5 +161,5 @@ div.article p > code {
   background-color: var(--code-background);
   color: var(--code-foreground);
   border-radius: 4px;
-  padding: 2px 4px;
+  padding: 4px 4px;
 }

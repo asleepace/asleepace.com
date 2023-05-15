@@ -103,13 +103,19 @@ body {
   background: linear-gradient(
     27deg,
     rgba(0, 0, 0, 1) 0%,
+    rgba(13, 17, 23, 1) 75%,
     rgba(25, 26, 35, 1) 100%
   );
   background-attachment: fixed;
 }
 
 main {
-  /* background-image: linear-gradient(to right, #243949 0%, #517fa4 100%); */
+  background-image: radial-gradient(#000 20%, transparent 20%),
+    radial-gradient(#000 20%, transparent 20%);
+  background-position: 0 0, 16px 16px;
+  background-size: 16px 16px;
+  height: 100%;
+  width: 100%;
 }
 
 a {
@@ -126,11 +132,15 @@ a {
 /* scroll bar  */
 ::-webkit-scrollbar {
   background-color: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  top: 0;
   width: 20px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: transparent;
+  background-color: rgba(13, 17, 23, 1);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -143,7 +153,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #d6dee1;
+  background-color: rgba(25, 26, 35, 1);
   border-radius: 20px;
   border: 6px solid transparent;
   background-clip: content-box;

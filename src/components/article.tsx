@@ -1,10 +1,11 @@
 
 import Image, { StaticImageData } from 'next/image'
 import defaultImage from '@images/background.png'
-import { Inter } from '@next/font/google'
+// import { Inter } from '@next/font/google'
 import { useCallback } from 'react'
+import { Work_Sans } from '@next/font/google'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Work_Sans({ subsets: ['latin'] })
 
 export interface ArticleProps {
   title: string
