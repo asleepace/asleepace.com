@@ -3,7 +3,7 @@ title: Custom Server
 slug: /home
 ---
 
-# Welcome!
+# How to setup a backend server using NGINX, Next, Mongo
 
 This site is a collection of everything & everything I've found on the web!
 

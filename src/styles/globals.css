@@ -105,11 +105,11 @@ body {
   background: rgb(0, 0, 0);
   background: linear-gradient(
     27deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(13, 17, 23, 1) 75%,
+    /* rgba(0, 0, 0, 1) 0%, */ rgba(13, 17, 23, 1) 75%,
     rgba(25, 26, 35, 1) 100%
   );
   background-attachment: fixed;
+  height: 100%;
 }
 
 main {

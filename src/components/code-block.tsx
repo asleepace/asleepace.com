@@ -3,6 +3,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import * as styles from 'react-syntax-highlighter/dist/esm/styles/prism';
 
+import { Lobster_Two } from '@next/font/google';
+
 // import * as styles from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 /**
