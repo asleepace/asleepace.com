@@ -16,11 +16,7 @@ export interface ArticleProps {
 
 export default function Article({ markdown }: ArticleProps) {
 
-  console.log({ markdown})
-
   const ast = Markdoc.parse(markdown);
-
-  console.log({ ast })
 
   const fence = {
     render: 'Fence',
@@ -52,10 +48,7 @@ export default function Article({ markdown }: ArticleProps) {
 
   return (
     <article>
-      {/* <ArticleImage /> */}
-      {
-        html
-      }
+      {html}
     </article>
   )
 }
