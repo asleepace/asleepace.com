@@ -115,7 +115,7 @@ body {
 main {
   background-image: radial-gradient(#000 20%, transparent 20%),
     radial-gradient(#000 20%, transparent 20%);
-  background-position: 0 0, 16px 16px;
+  background-position: 0 0, 24px 24px;
   background-size: 16px 16px;
   height: 100%;
   width: 100%;
