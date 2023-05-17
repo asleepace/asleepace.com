@@ -1,13 +1,14 @@
-import matter from 'gray-matter'
-import { remark } from 'remark'
-import html from 'remark-html'
+
+
+import Markdoc from '@markdoc/markdoc';
+
 
 export const getHtmlFromMarkdown = async (markdown: string): Promise<string> => {
-  const matterResult = matter(markdown)
+
+  const ast = Markdoc.parse(markdown);
+  const content = Markdoc.transform(ast, /* config */);
+  const html = Markdoc.renderers.html(content);
+
   
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content)
-  
-  return processedContent.toString()
+  return html;
 }

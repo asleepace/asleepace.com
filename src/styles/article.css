@@ -5,12 +5,18 @@
 
   --border-color: rgba(0, 0, 0, 0.1);
 
-  --code-background: rgba(246, 246, 246);
-  --code-foreground: rgba(0, 0, 0, 0.7);
+  /** light mode code-styling **/
+  /* --code-background: rgba(246, 246, 246); */
+  --code-foreground: rgba(255, 255, 255, 0.75);
+  --code-background: rgba(255, 225, 255, 0.1);
 
-  --color-text: rgb(35, 38, 41);
-  --font-size: 16px;
-  --line-height: 24px;
+  --color-text: white;
+  --font-size: 22px;
+  --line-height: 32px;
+
+  /** bright yellow **/
+  --color-yellow: #ffd200;
+  --color-purple: #7300ff;
 }
 
 .article {
@@ -23,15 +29,20 @@
   grid-gap: 1rem; */
 
   /* font styling */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Ubuntu,
-    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif; */
+
+  font-family: "Work Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial,
+    sans-serif;
   color: var(--color-text);
   overflow-wrap: break-word;
   text-size-adjust: 100%;
   letter-spacing: 0.2px;
   line-height: var(--line-height);
   font-size: var(--font-size);
+
+  max-width: min(100vw, 840px);
 
   /* overflow: hidden; */
 }
@@ -73,7 +84,8 @@ div.article article {
 /* article basic font */
 
 div.article a {
-  color: var(--color-link);
+  text-decoration: underline;
+  /* color: var(--color-purple); */
 }
 
 div.article img {
@@ -89,16 +101,17 @@ h2 {
 
   border-bottom: 1px solid var(--border-color);
 
-  font-weight: 300;
+  font-weight: 600;
   letter-spacing: 0.1rem;
   font-size: 3rem;
   text-size-adjust: 100%;
-  color: black;
+  color: var(--color-yellow);
 }
 
 div.article h1 {
+  color: white;
   font-weight: 600;
-  color: #21262d;
+  line-height: 60px;
 }
 
 div.article p,
@@ -107,7 +120,7 @@ div.article ol,
 div.article img,
 div.article pre,
 div.article code {
-  margin: 24px 0px;
+  margin: 24px 8px;
 }
 
 div.article h2 {
@@ -139,10 +152,18 @@ div.article li {
 
 /* code snippet styling */
 div.article pre {
-  background-color: var(--code-background);
-  color: var(--code-foreground);
+  /* background-color: var(--code-background); */
+  /* color: var(--code-foreground); */
   border-radius: 8px;
   padding: 10px 10px;
+  font-size: 16px;
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* inline code styling */
@@ -150,5 +171,5 @@ div.article p > code {
   background-color: var(--code-background);
   color: var(--code-foreground);
   border-radius: 4px;
-  padding: 2px 4px;
+  padding: 4px 4px;
 }
