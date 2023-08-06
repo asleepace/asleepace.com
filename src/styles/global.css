@@ -152,3 +152,9 @@ hr {
 	/* added line to stop words getting smushed together (as they go onto seperate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
+
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
