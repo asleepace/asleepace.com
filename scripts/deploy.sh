@@ -27,7 +27,7 @@ git pull
 
 pretty_print "installing node modules..."
 
-npm install
+yarn install
 
 pretty_print "building application..."
 
@@ -35,6 +35,6 @@ yarn build
 
 pretty_print "restarting server..."
 
-pm2 restart "asleepace-web-app"
+pm2 restart "asleepace.com"
 
 pretty_print "success!"

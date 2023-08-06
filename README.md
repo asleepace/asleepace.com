@@ -1,3 +1,26 @@
+# Asleepace.com
+
+My person website & playground.
+
+# Server Commands
+
+Connect to the server via SSH
+```
+ssh root@192.241.216.26
+```
+
+Build the website from scratch
+```
+yarn install
+yarn build
+```
+
+Start the process with **pm2** run the following commands
+```
+pm2 stop --all
+pm2 start ./dist/server/entry.mjs --name asleepace.com
+```
+
 # Astro Starter Kit: Blog
 
 ```
