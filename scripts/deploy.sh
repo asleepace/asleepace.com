@@ -31,7 +31,7 @@ npm install
 
 pretty_print "building application..."
 
-npm run build
+yarn build
 
 pretty_print "restarting server..."
 
