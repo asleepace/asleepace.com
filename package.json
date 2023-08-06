@@ -1,6 +1,7 @@
 {
   "name": "asleepace.com",
   "description": "a collection of me",
+  "license": "MIT",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -8,6 +9,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "deploy": "./scripts/deploy.sh",
     "astro": "astro"
   },
   "dependencies": {
