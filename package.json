@@ -1,5 +1,6 @@
 {
   "name": "asleepace.com",
+  "description": "a collection of me",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -11,6 +12,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^0.19.7",
+    "@astrojs/node": "^5.3.2",
     "@astrojs/rss": "^2.4.3",
     "@astrojs/sitemap": "^2.0.1",
     "astro": "^2.10.1"

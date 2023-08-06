@@ -27,4 +27,4 @@ jobs:
           SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
 
       - name: Stop the server
-        run: ssh staging 'cd asleepace.com && npm run deploy'
+        run: ssh staging 'cd asleepace.com && yarn deploy'
