@@ -19,3 +19,7 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# backend files
+backend/target/
+backend/Cargo.lock
