@@ -5,21 +5,29 @@ My person website & playground.
 # Server Commands
 
 Connect to the server via SSH
-```
+```bash
 ssh root@192.241.216.26
 ```
 
 Build the website from scratch
-```
+```bash
 yarn install
 yarn build
 ```
 
 Start the process with **pm2** run the following commands
-```
+```bash
 pm2 stop --all
 pm2 start ./dist/server/entry.mjs --name asleepace.com
 ```
+
+Use the following command to restart the postgres server
+
+```bash
+sudo systemctl restart postgresql
+```
+
+- [Expose postgres server to external host](https://www.bigbinary.com/blog/configure-postgresql-to-allow-remote-connection)
 
 # Astro Starter Kit: Blog
 
