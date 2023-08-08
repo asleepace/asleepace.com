@@ -1,5 +1,5 @@
-mod cornucopia;
 mod auth;
+mod cornucopia;
 mod db;
 
 use crate::cornucopia::queries;
@@ -9,7 +9,7 @@ use warp::Filter;
 #[tokio::main]
 async fn main() {
     // create a route to fetch all users
-    let fetch_users = warp::get().and_then(test);
+    let fetch_users = warp::get().and_then(create_user);
     let route_users = warp::path("test").and(fetch_users);
 
     println!("\nListening on http://127.0.0.1:3030/test\n");
@@ -23,6 +23,30 @@ pub async fn test() -> Result<impl warp::Reply, warp::Rejection> {
     let result = queries::users::fetch_users().bind(&client).all().await;
     match result {
         Ok(users) => Ok(warp::reply::json(&users)),
+        Err(_err) => Err(warp::reject::not_found()),
+    }
+}
+
+pub async fn create_user() -> Result<impl warp::Reply, warp::Rejection> {
+    let client = db::connect().await.unwrap();
+    let salt = auth::generate_salt();
+    let pass = auth::hash_password("!Purple123", &salt);
+
+    let result = queries::users::create_user()
+        .bind(
+            &client,
+            &"asleepace",
+            &pass,
+            &salt,
+            &"colin_teahan@yahoo.com",
+            &"Colin",
+            &"Teahan",
+            &"https://asleepace.com/about-me.jpeg",
+        )
+        .await;
+
+    match result {
+        Ok(id) => Ok(warp::reply::json(&id)),
         Err(_err) => Err(warp::reject::not_found()),
     }
 }

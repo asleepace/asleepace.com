@@ -8,6 +8,11 @@ publish = false
 cornucopia = "0.9.0"
 dotenv = "0.15.0"
 
+# For Hashing
+bcrypt = "0.9"
+rand = "0.8"
+base64 = "0.13"
+
 # Required
 postgres-types = { version = "*", features = ["derive"] }
 

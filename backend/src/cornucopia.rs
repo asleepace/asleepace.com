@@ -14,10 +14,27 @@ pub mod queries {
         use cornucopia_async::GenericClient;
         use futures;
         use futures::{StreamExt, TryStreamExt};
+        #[derive(Debug)]
+        pub struct CreateUserParams<
+            T1: cornucopia_async::StringSql,
+            T2: cornucopia_async::StringSql,
+            T3: cornucopia_async::StringSql,
+            T4: cornucopia_async::StringSql,
+            T5: cornucopia_async::StringSql,
+            T6: cornucopia_async::StringSql,
+            T7: cornucopia_async::StringSql,
+        > {
+            pub username: T1,
+            pub pass: T2,
+            pub salt: T3,
+            pub email: T4,
+            pub first_name: T5,
+            pub last_name: T6,
+            pub avatar: T7,
+        }
         #[derive(serde::Serialize, Debug, Clone, PartialEq)]
         pub struct FetchUsers {
             pub username: String,
-            pub password: String,
             pub email: String,
             pub avatar: String,
             pub id: i32,
@@ -26,7 +43,6 @@ pub mod queries {
         }
         pub struct FetchUsersBorrowed<'a> {
             pub username: &'a str,
-            pub password: &'a str,
             pub email: &'a str,
             pub avatar: &'a str,
             pub id: i32,
@@ -37,7 +53,6 @@ pub mod queries {
             fn from(
                 FetchUsersBorrowed {
                     username,
-                    password,
                     email,
                     avatar,
                     id,
@@ -47,7 +62,6 @@ pub mod queries {
             ) -> Self {
                 Self {
                     username: username.into(),
-                    password: password.into(),
                     email: email.into(),
                     avatar: avatar.into(),
                     id,
@@ -112,7 +126,9 @@ pub mod queries {
             }
         }
         pub fn fetch_users() -> FetchUsersStmt {
-            FetchUsersStmt(cornucopia_async :: private :: Stmt :: new("SELECT username, password, email, avatar, id, created_at::text, updated_at::text FROM users"))
+            FetchUsersStmt(cornucopia_async::private::Stmt::new(
+                "SELECT username, email, avatar, id, created_at::text, updated_at::text FROM users",
+            ))
         }
         pub struct FetchUsersStmt(cornucopia_async::private::Stmt);
         impl FetchUsersStmt {
@@ -126,15 +142,95 @@ pub mod queries {
                     stmt: &mut self.0,
                     extractor: |row| FetchUsersBorrowed {
                         username: row.get(0),
-                        password: row.get(1),
-                        email: row.get(2),
-                        avatar: row.get(3),
-                        id: row.get(4),
-                        created_at: row.get(5),
-                        updated_at: row.get(6),
+                        email: row.get(1),
+                        avatar: row.get(2),
+                        id: row.get(3),
+                        created_at: row.get(4),
+                        updated_at: row.get(5),
                     },
                     mapper: |it| <FetchUsers>::from(it),
                 }
+            }
+        }
+        pub fn create_user() -> CreateUserStmt {
+            CreateUserStmt(cornucopia_async::private::Stmt::new(
+                "INSERT INTO users (username, pass, salt, email, first_name, last_name, avatar)
+VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            ))
+        }
+        pub struct CreateUserStmt(cornucopia_async::private::Stmt);
+        impl CreateUserStmt {
+            pub async fn bind<
+                'a,
+                C: GenericClient,
+                T1: cornucopia_async::StringSql,
+                T2: cornucopia_async::StringSql,
+                T3: cornucopia_async::StringSql,
+                T4: cornucopia_async::StringSql,
+                T5: cornucopia_async::StringSql,
+                T6: cornucopia_async::StringSql,
+                T7: cornucopia_async::StringSql,
+            >(
+                &'a mut self,
+                client: &'a C,
+                username: &'a T1,
+                pass: &'a T2,
+                salt: &'a T3,
+                email: &'a T4,
+                first_name: &'a T5,
+                last_name: &'a T6,
+                avatar: &'a T7,
+            ) -> Result<u64, tokio_postgres::Error> {
+                let stmt = self.0.prepare(client).await?;
+                client
+                    .execute(
+                        stmt,
+                        &[username, pass, salt, email, first_name, last_name, avatar],
+                    )
+                    .await
+            }
+        }
+        impl<
+                'a,
+                C: GenericClient + Send + Sync,
+                T1: cornucopia_async::StringSql,
+                T2: cornucopia_async::StringSql,
+                T3: cornucopia_async::StringSql,
+                T4: cornucopia_async::StringSql,
+                T5: cornucopia_async::StringSql,
+                T6: cornucopia_async::StringSql,
+                T7: cornucopia_async::StringSql,
+            >
+            cornucopia_async::Params<
+                'a,
+                CreateUserParams<T1, T2, T3, T4, T5, T6, T7>,
+                std::pin::Pin<
+                    Box<
+                        dyn futures::Future<Output = Result<u64, tokio_postgres::Error>>
+                            + Send
+                            + 'a,
+                    >,
+                >,
+                C,
+            > for CreateUserStmt
+        {
+            fn params(
+                &'a mut self,
+                client: &'a C,
+                params: &'a CreateUserParams<T1, T2, T3, T4, T5, T6, T7>,
+            ) -> std::pin::Pin<
+                Box<dyn futures::Future<Output = Result<u64, tokio_postgres::Error>> + Send + 'a>,
+            > {
+                Box::pin(self.bind(
+                    client,
+                    &params.username,
+                    &params.pass,
+                    &params.salt,
+                    &params.email,
+                    &params.first_name,
+                    &params.last_name,
+                    &params.avatar,
+                ))
             }
         }
     }
