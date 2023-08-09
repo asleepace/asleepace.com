@@ -13,7 +13,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	<body>
 		<Header title={SITE_TITLE} />
 		<main>
-			<h1>Howdy, Friend 👋 </h1>
+			<h1 hx-boost="false" hx-get="http://localhost:3030/htmx">Howdy, Friend 👋 </h1>
 			<p>
 				Welcome to my personal website, here you can find a wide array of random and unique content
         from unhinged internet ramblings to in-depth technical blog posts! If it's about Asleepace,

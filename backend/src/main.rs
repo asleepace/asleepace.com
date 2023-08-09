@@ -8,14 +8,23 @@ use warp::Filter;
 
 #[tokio::main]
 async fn main() {
-    // create a route to fetch all users
-    let fetch_users = warp::get().and_then(create_user);
-    let route_users = warp::path("test").and(fetch_users);
+    let cors = warp::cors()
+        .allow_origin("http://localhost:3000")
+        .allow_methods(vec!["GET", "POST", "DELETE"])
+        .allow_headers(vec!["Content-Type", "hx-current-url", "hx-request"]);
 
-    println!("\nListening on http://127.0.0.1:3030/test\n");
+    // create a route to fetch all users
+    let fetch_users = warp::get().and_then(htmx).with(cors);
+    let route_users = warp::path("htmx").and(fetch_users);
+
+    println!("\nListening on http://127.0.0.1:3030/htmx\n");
 
     // start the server on port 3030
     warp::serve(route_users).run(([127, 0, 0, 1], 3030)).await;
+}
+
+pub async fn htmx() -> Result<impl warp::Reply, warp::Rejection> {
+    Ok(warp::reply::html("<h1>Hello, world!</h1>"))
 }
 
 pub async fn test() -> Result<impl warp::Reply, warp::Rejection> {
