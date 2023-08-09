@@ -33,8 +33,11 @@ pretty_print "building application..."
 
 yarn build
 
+pretty_print "building backend application"
+
 pretty_print "restarting server..."
 
 pm2 restart "asleepace.com"
+pm2 restart "asleepace-backend"
 
 pretty_print "success!"
