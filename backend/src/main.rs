@@ -17,7 +17,7 @@ async fn main() {
     let fetch_users = warp::get().and_then(htmx).with(cors);
     let route_users = warp::path("api").and(fetch_users);
 
-    println!("\nListening on http://127.0.0.1:3030/htmx\n");
+    println!("\nListening on http://127.0.0.1:3030/api/\n");
 
     // start the server on port 3030
     warp::serve(route_users).run(([127, 0, 0, 1], 3030)).await;
