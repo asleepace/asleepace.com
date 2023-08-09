@@ -15,7 +15,7 @@ async fn main() {
 
     // create a route to fetch all users
     let fetch_users = warp::get().and_then(htmx).with(cors);
-    let route_users = warp::path("htmx").and(fetch_users);
+    let route_users = warp::path("api").and(fetch_users);
 
     println!("\nListening on http://127.0.0.1:3030/htmx\n");
 
