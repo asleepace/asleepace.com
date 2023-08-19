@@ -9,31 +9,35 @@ use warp::Filter;
 #[tokio::main]
 async fn main() {
     let cors = warp::cors()
-        .allow_origin("http://localhost:3000")
-        .allow_methods(vec!["GET", "POST", "DELETE"])
-        .allow_headers(vec!["Content-Type", "hx-current-url", "hx-request"]);
+        // .allow_origin("http://localhost:3000")
+        .allow_any_origin()
+        .allow_methods(vec!["GET", "POST", "DELETE", "OPTIONS", "PUT"])
+        .allow_headers(vec![
+            "Content-Type",
+            "hx-current-url",
+            "hx-request",
+            "hx-post",
+        ]);
 
     // create root /api/ path
-    let route = warp::path("api");
+    let route = warp::any().map(warp::reply).with(cors).with(warp::log("warp"));
+    // let api = warp::path("api");
 
-    let base = warp::path::end().map(|| warp::reply::json(&"Hello, world!"));
+    // let base = warp::path::end().map(|| warp::reply::json(&"Hello, world!"));
 
     // auth route
-    let auth = route.and(
-        warp::post()
-            .and(warp::path("auth"))
-            .and(warp::body::json())
-            .map(|name: String| warp::reply::json(&name))
-            .with(cors),
-    );
+    // let auth = api
+    //     .and(warp::post().and(warp::path("auth")).and(warp::body::json()))
+    //     .map(|_| warp::reply::html)
+    //     .with(&route);
 
     // all routes together
-    let routes = route.and(base).or(auth);
+    //let routes = route.and(base).or(auth);
 
     println!("\nListening on http://127.0.0.1:3030/api/\n");
 
     // start the server on port 3030
-    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
+    warp::serve(route).run(([127, 0, 0, 1], 3030)).await;
 }
 
 pub async fn htmx() -> Result<impl warp::Reply, warp::Rejection> {
