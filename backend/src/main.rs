@@ -13,14 +13,27 @@ async fn main() {
         .allow_methods(vec!["GET", "POST", "DELETE"])
         .allow_headers(vec!["Content-Type", "hx-current-url", "hx-request"]);
 
-    // create a route to fetch all users
-    let fetch_users = warp::get().and_then(htmx).with(cors);
-    let route_users = warp::path("api").and(fetch_users);
+    // create root /api/ path
+    let route = warp::path("api");
+
+    let base = warp::path::end().map(|| warp::reply::json(&"Hello, world!"));
+
+    // auth route
+    let auth = route.and(
+        warp::post()
+            .and(warp::path("auth"))
+            .and(warp::body::json())
+            .map(|name: String| warp::reply::json(&name))
+            .with(cors),
+    );
+
+    // all routes together
+    let routes = route.and(base).or(auth);
 
     println!("\nListening on http://127.0.0.1:3030/api/\n");
 
     // start the server on port 3030
-    warp::serve(route_users).run(([127, 0, 0, 1], 3030)).await;
+    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }
 
 pub async fn htmx() -> Result<impl warp::Reply, warp::Rejection> {
