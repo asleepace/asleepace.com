@@ -45,3 +45,9 @@ Incredible. During the installation process **Postfix** asks the following:
 > Mailbox size limit: This can be used to limit the size of messages. Setting it to 0 disables any size restriction.
 
 For which I had put `1000000` (bytes) thinking this might mitigate would be attackers from flooding my server with garbage, and to some extent I was right it had... I guess the only thing worse than preventing myself from setting this up in the first place would be to openly blog about the implementation details online 😬
+
+```
+sudo dpkg-reconfigure postfix
+```
+
+And the problem was solved, yay email!
