@@ -15,9 +15,8 @@ export const get: APIRoute = async ({ params, request }) => {
 
   const cookie = request.headers.get('cookie');
 
-
   console.log('[auth.ts] params:', params)
-  console.log('[auth.ts] redirect:', request)
+  console.log('[auth.ts] request:', request)
   console.log('[auth.ts] credentials:', request.credentials)
   console.log('[auth.ts] body:', request.body)
   console.log('[auth.ts] text:', request.text)
