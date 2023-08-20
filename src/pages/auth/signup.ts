@@ -1,44 +1,53 @@
 import type { APIRoute } from 'astro';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { c } from '../../../dist/server/chunks/astro.88a96b72.mjs';
 
 // server-side rendering
 export const prerender = false;
+const saltRounds = 10;
 
 // handle auth requests
-export const get: APIRoute = async ({ params, request }) => {
+export const post: APIRoute = async ({ params, request }) => {
 
   const { body, credentials, headers, formData } = request
-  console.log('[signup.ts] formData:', formData)
+  console.log('[signup.ts] headers:', headers)
+  console.log('[signup.ts] credentials:', credentials)
+  console.log('[signup.ts] formData:', params)
   console.log('[signup.ts] body:', body)
 
-  const password = "test"
+  // extract the data from the request
+  const data = await request.formData()
+  console.log('[signup.ts] data:', data)
+  const email = String(data.get("email"))
+  const username = String(data.get("username"))
+  const password = String(data.get("password"))
+
+  // check if we have valid form data
+  if (!email || !username || !password) return new Response(JSON.stringify({ error: "Invalid form data." }), {
+    status: 200,
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
 
   // generate random salt and then hash the password
-  const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds)
   const hash = bcrypt.hashSync(password, salt)
 
   // create the user in the database
-  // const prisma = new PrismaClient();
-  // const user = await prisma.user.create({
-  //   data: {
-  //     username: "",
-  //     email: "",
-  //     hash,
-  //     salt,
-  //   },
-  // });
+  const prisma = new PrismaClient();
+  const user = await prisma.user.create({
+    data: {
+      username,
+      email,
+      hash,
+      salt,
+    },
+  });
 
-
-  return new Response(JSON.stringify({
-    hash,
-    salt,
-    body,
-    credentials,
-    headers,
-    formData,
-  }), {
+  // return the user as a json response
+  return new Response(JSON.stringify({ user }), {
     status: 200,
     headers: {
       'content-type': 'application/json',

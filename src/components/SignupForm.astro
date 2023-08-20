@@ -1,0 +1,77 @@
+---
+const FORM_EMOJI = "🔐";
+const FORM_TITLE = "Signup";
+const FORM_BUTTON_TEXT = "register";
+const FORM_FORGOT_PASSWORD_TEXT = "already have an account?";
+const FROM_TARGET = "/auth/signup";
+---
+
+<form id="signup-form" hx-post={FROM_TARGET} hx-target="this" hx-boost="false">
+  <h3>{FORM_EMOJI}</h3>
+  <h1>{FORM_TITLE}</h1>
+  <input type="email" id="email" name="email" placeholder="email address" />
+  <input type="text" id="username" name="username" placeholder="username" />
+  <input type="password" id="password" name="password" placeholder="password" />
+  <button type="submit">{FORM_BUTTON_TEXT}</button>
+  <a href="/login">{FORM_FORGOT_PASSWORD_TEXT}</a>
+</form>
+<style>
+  form {
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding: 2rem;
+    margin: 3rem;
+    border-radius: 6px;
+    min-width: 340px;
+  }
+
+  form * {
+    width: 100%;
+    text-align: center;
+  }
+
+  form h3 {
+    margin-top: 1rem;
+    padding: 0;
+  }
+
+  form h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    margin-top: 0;
+  }
+
+  form input {
+    text-align: center;
+    font-size: large;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+    min-height: 38px;
+  }
+
+  form button {
+    color: white;
+    font-weight: bold;
+    background-color: #ffac1c;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 6px;
+    outline: none;
+    border: none;
+    min-height: 44px;
+  }
+
+  form a {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: small;
+  }
+</style>
