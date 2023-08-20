@@ -6,7 +6,7 @@ const FORM_FORGOT_PASSWORD_TEXT = "forgot username or password";
 const FROM_TARGET = "/auth/login";
 ---
 
-<form id="login-form" hx-get={FROM_TARGET} hx-target="this" hx-boost="false">
+<form id="login-form" hx-post={FROM_TARGET} hx-target="this" hx-boost="false">
   <h3>{FORM_EMOJI}</h3>
   <h1>{FORM_TITLE}</h1>
   <input type="email" id="email" name="email" placeholder="email address" />

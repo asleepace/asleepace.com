@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { b } from '../../../dist/server/chunks/astro.88a96b72.mjs';
+import { Config } from '../../config';
 
 // server-side rendering
 export const prerender = false;
@@ -18,18 +19,32 @@ const Errors = {
 }
 
 // handle auth requests
-export const get: APIRoute = async ({ params, request }) => {
+export const post: APIRoute = async ({ params, request }) => {
 
   const { body, credentials, headers, formData } = request
   console.log('[login.ts] formData:', formData)
   console.log('[login.ts] body:', body)
 
+  // extract the data from the request
+  const data = await request.formData()
+  const email = String(data.get("email"))
+  const password = String(data.get("password"))
+
+  // check if we have valid form data
+  if (!email) return new Response(Errors.InvalidEmail, {
+    status: 200,
+    headers,
+  })
+
+  if (!password) return new Response(Errors.InvalidPassword, {
+    status: 200,
+    headers,
+  })
+
   // check if the user exists in the database
   const prisma = new PrismaClient();
   const user = await prisma.user.findFirst({
-    where: {
-      email: ""
-    }
+    where: { email }
   })
 
   // if the user doesn't exist, return an error
@@ -39,7 +54,6 @@ export const get: APIRoute = async ({ params, request }) => {
   })
 
   // check if the password is correct
-  const password = "test"
   const hashPassword = bcrypt.hashSync(password, user.salt)
   const isPasswordCorrect = bcrypt.compareSync(hashPassword, user.hash)
 

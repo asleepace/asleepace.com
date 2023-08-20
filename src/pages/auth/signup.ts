@@ -1,11 +1,10 @@
-import type { APIRoute } from 'astro';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import { c } from '../../../dist/server/chunks/astro.88a96b72.mjs';
+import type { APIRoute } from 'astro'
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+import { Config } from '../../config'
 
 // server-side rendering
 export const prerender = false;
-const saltRounds = 10;
 
 // handle auth requests
 export const post: APIRoute = async ({ params, request }) => {
@@ -32,7 +31,7 @@ export const post: APIRoute = async ({ params, request }) => {
   })
 
   // generate random salt and then hash the password
-  const salt = bcrypt.genSaltSync(saltRounds)
+  const salt = bcrypt.genSaltSync(Config.SaltRounds)
   const hash = bcrypt.hashSync(password, salt)
 
   // create the user in the database
