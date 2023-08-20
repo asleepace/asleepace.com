@@ -40,6 +40,7 @@ uuid = "*"
 eui48 = "*"
 rust_decimal = { version = "*", features = ["db-postgres"] }
 warp = "0.3.5"
+dbus-tokio = "0.7.6"
 
 [build-dependencies]
 # Cornucopia library to automatically

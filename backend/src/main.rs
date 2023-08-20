@@ -3,87 +3,128 @@ mod cornucopia;
 mod db;
 
 use crate::cornucopia::queries;
+use dbus_tokio::connection;
 // use auth::verify_token;
 use warp::Filter;
 
 #[tokio::main]
 async fn main() {
-    let cors = warp::cors()
-        // .allow_origin("http://localhost:3000")
-        .allow_any_origin()
-        .allow_methods(vec!["GET", "POST", "DELETE", "OPTIONS", "PUT"])
-        .allow_headers(vec![
-            "Content-Type",
-            "hx-current-url",
-            "hx-request",
-            "hx-post",
-        ]);
+    // Connect to the D-Bus session bus (this is blocking, unfortunately).
+    let (resource, c) = connection::new_session_sync()?;
 
-    // create root /api/ path
-    let route = warp::any().map(warp::reply).with(cors).with(warp::log("warp"));
-    // let api = warp::path("api");
+    // The resource is a task that should be spawned onto a tokio compatible
+    // reactor ASAP. If the resource ever finishes, you lost connection to D-Bus.
+    //
+    // To shut down the connection, both call _handle.abort() and drop the connection.
+    let _handle = tokio::spawn(async {
+        let err = resource.await;
+        panic!("Lost connection to D-Bus: {}", err);
+    });
 
-    // let base = warp::path::end().map(|| warp::reply::json(&"Hello, world!"));
+    // Let's request a name on the bus, so that clients can find us.
+    c.request_name("com.example.dbustest", false, true, false)
+        .await?;
 
-    // auth route
-    // let auth = api
-    //     .and(warp::post().and(warp::path("auth")).and(warp::body::json()))
-    //     .map(|_| warp::reply::html)
-    //     .with(&route);
+    // Create a new crossroads instance.
+    // The instance is configured so that introspection and properties interfaces
+    // are added by default on object path additions.
+    let mut cr = Crossroads::new();
 
-    // all routes together
-    //let routes = route.and(base).or(auth);
+    // Enable async support for the crossroads instance.
+    cr.set_async_support(Some((
+        c.clone(),
+        Box::new(|x| {
+            tokio::spawn(x);
+        }),
+    )));
 
-    println!("\nListening on http://127.0.0.1:3030/api/\n");
+    // Let's build a new interface, which can be used for "Hello" objects.
+    let iface_token = cr.register("com.example.dbustest", |b| {
+        // This row is just for introspection: It advertises that we can send a
+        // HelloHappened signal. We use the single-tuple to say that we have one single argument,
+        // named "sender" of type "String".
+        b.signal::<(String,), _>("HelloHappened", ("sender",));
+        // Let's add a method to the interface. We have the method name, followed by
+        // names of input and output arguments (used for introspection). The closure then controls
+        // the types of these arguments. The last argument to the closure is a tuple of the input arguments.
+        b.method_with_cr_async(
+            "Hello",
+            ("name",),
+            ("reply",),
+            |mut ctx, cr, (name,): (String,)| {
+                let hello: &mut Hello = cr.data_mut(ctx.path()).unwrap(); // ok_or_else(|| MethodErr::no_path(ctx.path()))?;
+                                                                          // And here's what happens when the method is called.
+                println!("Incoming hello call from {}!", name);
+                hello.called_count += 1;
+                let s = format!(
+                    "Hello {}! This API has been used {} times.",
+                    name, hello.called_count
+                );
+                async move {
+                    // Let's wait half a second just to show off how async we are.
+                    sleep(Duration::from_millis(500)).await;
+                    // The ctx parameter can be used to conveniently send extra messages.
+                    let signal_msg = ctx.make_signal("HelloHappened", (name,));
+                    ctx.push_msg(signal_msg);
+                    // And the return value is a tuple of the output arguments.
+                    ctx.reply(Ok((s,)))
+                    // The reply is sent when ctx is dropped / goes out of scope.
+                }
+            },
+        );
+    });
 
-    // start the server on port 3030
-    warp::serve(route).run(([127, 0, 0, 1], 3030)).await;
+    // Let's add the "/hello" path, which implements the com.example.dbustest interface,
+    // to the crossroads instance.
+    cr.insert("/hello", &[iface_token], Hello { called_count: 0 });
+
+    // We add the Crossroads instance to the connection so that incoming method calls will be handled.
+    c.start_receive(
+        MatchRule::new_method_call(),
+        Box::new(move |msg, conn| {
+            cr.handle_message(msg, conn).unwrap();
+            true
+        }),
+    );
+
+    // Run forever.
+    future::pending::<()>().await;
+    unreachable!()
 }
 
-pub async fn htmx() -> Result<impl warp::Reply, warp::Rejection> {
-    Ok(warp::reply::html("<h1>Hello, world!</h1>"))
-}
+// pub async fn htmx() -> Result<impl warp::Reply, warp::Rejection> {
+//     Ok(warp::reply::html("<h1>Hello, world!</h1>"))
+// }
 
-pub async fn test() -> Result<impl warp::Reply, warp::Rejection> {
-    let client = db::connect().await.unwrap();
-    let result = queries::users::fetch_users().bind(&client).all().await;
-    match result {
-        Ok(users) => Ok(warp::reply::json(&users)),
-        Err(_err) => Err(warp::reject::not_found()),
-    }
-}
-
-pub async fn create_user() -> Result<impl warp::Reply, warp::Rejection> {
-    let client = db::connect().await.unwrap();
-    let salt = auth::generate_salt();
-    let pass = auth::hash_password("!Purple123", &salt);
-
-    let result = queries::users::create_user()
-        .bind(
-            &client,
-            &"asleepace",
-            &pass,
-            &salt,
-            &"colin_teahan@yahoo.com",
-            &"Colin",
-            &"Teahan",
-            &"https://asleepace.com/about-me.jpeg",
-        )
-        .await;
-
-    match result {
-        Ok(id) => Ok(warp::reply::json(&id)),
-        Err(_err) => Err(warp::reject::not_found()),
-    }
-}
-
-// fetch all users from the database and return the resulting array as json
-// if the query fails, return a 404
-// pub async fn get_users() -> Result<impl warp::Reply, warp::Rejection> {
-//     let client = db::connect().await.unwrap ();
-//     let result = queries::users::user_basic().bind(&client).all().await;
+// pub async fn test() -> Result<impl warp::Reply, warp::Rejection> {
+//     let client = db::connect().await.unwrap();
+//     let result = queries::users::fetch_users().bind(&client).all().await;
 //     match result {
 //         Ok(users) => Ok(warp::reply::json(&users)),
+//         Err(_err) => Err(warp::reject::not_found()),
+//     }
+// }
+
+// pub async fn create_user() -> Result<impl warp::Reply, warp::Rejection> {
+//     let client = db::connect().await.unwrap();
+//     let salt = auth::generate_salt();
+//     let pass = auth::hash_password("!Purple123", &salt);
+
+//     let result = queries::users::create_user()
+//         .bind(
+//             &client,
+//             &"asleepace",
+//             &pass,
+//             &salt,
+//             &"colin_teahan@yahoo.com",
+//             &"Colin",
+//             &"Teahan",
+//             &"https://asleepace.com/about-me.jpeg",
+//         )
+//         .await;
+
+//     match result {
+//         Ok(id) => Ok(warp::reply::json(&id)),
 //         Err(_err) => Err(warp::reject::not_found()),
 //     }
 // }
