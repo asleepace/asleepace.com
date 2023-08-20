@@ -58,7 +58,7 @@ While I intuitively knew **NextAuth.js** was well, for **Next.js**, I had this i
 
 > Can I use NextAuth.js with a framework different than Next.js?
 
-It was not looking good for the kid. Then I remembered a valuable lesson I learned as a younger developer. RTFM. Luckily, this time I was in luck
+It was not looking good for the kid. Then I remembered a valuable lesson I learned as a younger developer. RTFM. Luckily, this time I was in luck [?]
 
 > NextAuth.js was originally designed for use with Next.js and Serverless. However, today you could use the NextAuth.js core with any other framework. Checkout the examples for Gatsby and SvelteKit. If you would add another integration with other frameworks, feel free to work on it and send a pull request. Make sure to check if there's any on-going work before opening a new issue.
 
