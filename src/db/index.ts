@@ -1,4 +1,4 @@
-import { PrismaClient, OauthAccessToken, OauthApplication } from "@prisma/client"
+import { PrismaClient, OauthAccessToken, OauthApplication, Prisma } from "@prisma/client"
 import { OAuth2Server } from "oauth2-server"
 import type {
   User,
@@ -14,7 +14,6 @@ import type {
   ExtensionModel,
   Falsey
 } from "oauth2-server"
-import { a } from "../../dist/server/chunks/astro.88a96b72.mjs";
 
 // oauth2-server types
 
@@ -40,6 +39,8 @@ export const prisma = new PrismaClient()
 
 
 const isTokenExpired = (expiration: Date | Falsey): boolean => Boolean(expiration && expiration < new Date())
+
+const arrayOfTokenScopes = ({ scope = [] }: Token): Prisma.InputJsonValue => Array.isArray(scope) ? scope : [scope]
 
 /** * * oauth2 methods * * */
 
@@ -104,7 +105,21 @@ const getRefreshToken = async (refreshToken: string) => {
 
 
 const saveToken = async (token: Token, client: Client, user: User): Oauth2SaveTokenResponse => {
-  return true
+  const scopes = arrayOfTokenScopes(token)
+  await prisma.oauthAccessToken.create({
+    data: {
+      application: { connect: { id: client.id } },
+      user: { connect: { id: user.id } },
+      token: token.accessToken,
+      refreshToken: token.refreshToken,
+      tokenExpiresAt: token.accessTokenExpiresAt,
+      createdAt: new Date().toISOString(),
+      refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+      scopes,
+    },
+  })
+
+  return ({ ...token, client, user })
 }
 
 const revokeToken = async ({ token }: Token | RefreshToken): Oauth2RevokeTokenResponse => {
