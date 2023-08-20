@@ -123,11 +123,48 @@ const saveToken = async (token: Token, client: Client, user: User): Oauth2SaveTo
 }
 
 const revokeToken = async ({ token }: Token | RefreshToken): Oauth2RevokeTokenResponse => {
-  return false
+  const accessToken = await prisma.oauthAccessToken.findUnique({
+    where: { token },
+  })
+  if (!accessToken) return false
+  const result = await prisma.oauthAccessToken.delete({
+    where: { id: accessToken.id },
+  })
+  return !!result
 }
 
 const getAuthorizationCode = async (code: string): Oauth2AuthorizationCodeResponse => {
-  return false
+  const accessGrant = await prisma.oauthAccessGrant.findUnique({
+    where: { token: code },
+    include: { user: true, application: true },
+  });
+
+  if (!accessGrant) return false
+
+  const [scope] = accessGrant.scopes as string[]
+  const grants = accessGrant.application.grants as string[]
+  const result: AuthorizationCode = {
+    code: accessGrant.token,
+    authorizationCode: accessGrant.token,
+    expiresAt: accessGrant.expiresAt,
+    scope,
+    redirectUri: accessGrant.redirectUri,
+    client: {
+      id: accessGrant.applicationId,
+      grants,
+    },
+    user: accessGrant.user,
+  };
+
+  const codeChallenge = accessGrant.codeChallenge ?? result.codeChallenge
+  const codeChallengeMethod = accessGrant.codeChallengeMethod ?? result.codeChallengeMethod
+
+  if (isTokenExpired(accessGrant.expiresAt)) {
+    await revokeAuthorizationCode(result)
+    return false
+  }
+
+  return ({ ...result, codeChallenge, codeChallengeMethod })
 }
 
 const saveAuthorizationCode = async (
