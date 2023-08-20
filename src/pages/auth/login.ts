@@ -55,9 +55,8 @@ export const post: APIRoute = async ({ params, request }) => {
   })
 
   // check if the password is correct
-  const hashPassword = bcrypt.hashSync(password, user.salt)
-  const isPasswordCorrect = bcrypt.compareSync(hashPassword, user.hash)
 
+  const isPasswordCorrect = bcrypt.compareSync(password, user.hash)
   console.log('[login.ts] isPasswordCorrect:', isPasswordCorrect)
 
   // if the password dont't match, return an error
