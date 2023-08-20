@@ -1,17 +1,16 @@
 import type { APIRoute } from 'astro';
-
-// import NextAuth from "next-auth";
-// import Providers from "next-auth/providers";
-// import Adapters from "next-auth/adapters";
-// import { getSession } from "next-auth/client";
-
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 // server-side rendering
 export const prerender = false;
 
 // handle auth requests
 export const get: APIRoute = async ({ params, request }) => {
+
+
+  // connect to prisma database
+  const prisma = new PrismaClient();
+
 
   const cookie = request.headers.get('cookie');
 
@@ -34,7 +33,7 @@ export const get: APIRoute = async ({ params, request }) => {
     method: request.method,
     integrity: request.integrity,
     cookie,
-   });
+  });
 
   return new Response(body, {
     status: 200,

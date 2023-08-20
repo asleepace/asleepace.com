@@ -1,5 +1,4 @@
 import { sequence } from "astro/middleware";
-import { PrismaClient } from "@prisma/client";
 import { defineMiddleware } from "astro/middleware";
 
 export const prerender = false;
