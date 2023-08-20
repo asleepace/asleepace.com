@@ -29,6 +29,18 @@ sudo systemctl restart postgresql
 
 - [Expose postgres server to external host](https://www.bigbinary.com/blog/configure-postgresql-to-allow-remote-connection)
 
+# Oauth 2.0 Service
+
+- [Oauth 2.0 Service NodeJS](https://github.com/oauthjs/node-oauth2-server)
+
+Start the oauth service
+
+```bash
+yarn authServer  # start production
+yarn authDev     # start dev (hot-reloading)
+```
+
+
 # Astro Starter Kit: Blog
 
 ```

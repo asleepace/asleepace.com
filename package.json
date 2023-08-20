@@ -20,10 +20,12 @@
     "@astrojs/sitemap": "^2.0.1",
     "@prisma/client": "5.1.1",
     "astro": "^2.10.1",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "oauth2-server": "^3.1.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/oauth2-server": "^3.0.13",
     "prisma": "^5.1.1"
   }
 }
