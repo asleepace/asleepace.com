@@ -1,41 +1,152 @@
-import crypto from 'crypto'
+import { PrismaClient, OauthAccessToken, OauthApplication } from "@prisma/client"
+import { OAuth2Server } from "oauth2-server"
+import type {
+  User,
+  Token,
+  Client,
+  RefreshToken,
+  ServerOptions,
+  PasswordModel,
+  AuthorizationCode,
+  RefreshTokenModel,
+  AuthorizationCodeModel,
+  ClientCredentialsModel,
+  ExtensionModel,
+  Falsey
+} from "oauth2-server"
 
-export function generateSalt() {
-  return crypto.randomBytes(16).toString('hex')
+// oauth2-server types
+
+export type Oauth2ServerModel = AuthorizationCodeModel
+  | ClientCredentialsModel
+  | RefreshTokenModel
+  | PasswordModel
+  | ExtensionModel;
+
+export type PrismaRefreshToken = OauthAccessToken & OauthApplication
+
+export type Oauth2AccessTokenResponse = Promise<Token | Falsey>
+export type Oauth2RefreshTokenResponse = Promise<RefreshTokenModel | Falsey>
+export type Oauth2AuthorizationCodeResponse = Promise<AuthorizationCode | Falsey>
+export type Oauth2RevokeTokenResponse = Promise<boolean>
+export type Oauth2SaveTokenResponse = Promise<Token>
+export type Oauth2SaveAuthorizationCodeResponse = Promise<AuthorizationCode | Falsey>
+export type Oauth2RevokeAuthorizationCodeResponse = Promise<boolean>
+
+// prisma client integration
+
+export const prisma = new PrismaClient()
+
+
+const isTokenExpired = (expirey: Date | Falsey): boolean => {
+  return Boolean(expirey && expirey < new Date())
 }
 
-export function generateHash(password: string, salt: string) {
-  return crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`)
+/** * * oauth2 methods * * */
+
+const getAccessToken = async (token: string): Oauth2AccessTokenResponse => {
+  const result = await prisma.oauthAccessToken.findUnique({
+    where: { token }
+  })
+  if (!result) return false
+  if (isTokenExpired(result.tokenExpiresAt)) {
+    await revokeToken(result)
+    return false
+  }
+
+  return ({
+    accessToken: result.token,
+    accessTokenExpiresAt: result.tokenExpiresAt ?? undefined,
+    refreshToken: result.refreshToken ?? undefined,
+    refreshTokenExpiresAt: result.refreshTokenExpiresAt ?? undefined,
+    client: {
+      id: result.applicationId,
+      grants: [],
+    },
+    user: {
+      id: result.userId,
+    },
+  })
 }
 
-export function compareHash(password: string, salt: string, hash: string) {
-  return hash === generateHash(password, salt)
+const getRefreshToken = async (refreshToken: string) => {
+  const result = await prisma.oauthAccessToken.findUnique({
+    where: { refreshToken },
+    include: { application: true },
+  });
+
+  if (!result) return false
+  if (!result.refreshToken) return false
+  if (isTokenExpired(result.refreshTokenExpiresAt)) {
+    await revokeToken({ token: refreshToken })
+    return false
+  }
+
+  const { token, userId, application, applicationId } = result
+  const id = applicationId as string
+  const grants = application.grants as string[]
+  const redirectUris = application.redirectUris as string[]
+  const output = {
+    token,
+    refreshToken,
+    client: {
+      id,
+      grants,
+      redirectUris,
+    },
+    user: {
+      id: userId,
+    },
+  }
+
+  return output
 }
 
-export function generateToken() {
-  return crypto.randomBytes(32).toString('hex')
+const saveToken = async (token: Token, client: Client, user: User): Oauth2SaveTokenResponse => {
+  return true
 }
 
-export function generateRefreshToken() {
-  return crypto.randomBytes(32).toString('hex')
+const revokeToken = async ({ token }: Token | RefreshToken): Oauth2RevokeTokenResponse => {
+  return false
 }
 
-export function generateAccessToken() {
-  return crypto.randomBytes(32).toString('hex')
+const getAuthorizationCode = async (code: string): Oauth2AuthorizationCodeResponse => {
+  return false
 }
 
-export function generateSessionId() {
-  return crypto.randomBytes(32).toString('hex')
+const saveAuthorizationCode = async (
+  code: AuthorizationCode,
+  client: Client,
+  user: User,
+): Oauth2SaveAuthorizationCodeResponse => {
+  return false
 }
 
-export function generateVerificationCode() {
-  return crypto.randomBytes(8).toString('hex')
+const revokeAuthorizationCode = async ({ code }: AuthorizationCode): Oauth2RevokeAuthorizationCodeResponse => {
+  return false
 }
 
-export function generateVerificationToken() {
-  return crypto.randomBytes(32).toString('hex')
+const getClient = async (clientId: string, clientSecret: string): Promise<Client | Falsey> => {
+  return false
 }
 
-export function generateResetPasswordToken() {
-  return crypto.randomBytes(32).toString('hex')
+const verifyScope = async (token: Token, scope: string | string[]): Promise<boolean> => {
+  return false
 }
+
+
+// oauth2-server model
+export const model: Oauth2ServerModel = {
+  getClient,
+  verifyScope,
+  getAccessToken,
+  getRefreshToken,
+  saveToken,
+  revokeToken,
+  getAuthorizationCode,
+  saveAuthorizationCode,
+  revokeAuthorizationCode,
+}
+
+// oauth2-server instance
+export const oauth = new OAuth2Server({ model })
