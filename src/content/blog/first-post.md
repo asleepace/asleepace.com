@@ -9,9 +9,9 @@ After fidgeting around for too long trying to implement a Rust based micro-servi
 
 First things first, I briefly checked on what Postgres solution for Typescript already existed, but then quickly realized that it was 2023 and I could probably just daisy chain random words from a dictionary appended with `.js` to just get something accomplished. This lead me to a [Prisma](https://www.prisma.io/) video from [Fireship](https://www.youtube.com/@Fireship) which had me sold in **100 seconds**, damn that guy is good. I'll leave the video below for anyone interested.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/rLRIB6AF2Dg" title="Prisma in 100 seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe style="aspect-ratio: 16/9; border-radius: 8px;" width="100%" height="auto" src="https://www.youtube.com/embed/rLRIB6AF2Dg" title="Prisma in 100 seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-I already had a Postgres instance running on my "production" server and was quickly able to connect and `DROP tables`, finally something I'm actually good at doing! Luckily, I think only one user will be affected, and this way I was able to switch to the mich more simple & concise `prisma.schema`!
+I already had a Postgres instance running on my "production" server and was quickly able to connect and `DROP tables`, finally something I'm actually good at doing! Luckily, I think only one user will be affected, and this way I was able to switch to the mich more simple & concise `prisma.schema`
 
 ```prisma
 model User {
@@ -23,4 +23,9 @@ model User {
 }
 ```
 
-Coming from a mobile and react-native background the simple, understandable and type-safe syntac was a huge bonus for me –– reminiscent of a long forgotten love named *Parse...*
+Coming from an **iOS** & **react-native** background this incredibly simple, understandable and type-safe syntax was a huge bonus for me — reminiscent of a long forgotten love named *Parse...*
+
+## User Authentication & SMTP
+
+The next things on my todo list was to prove the naysayers wrong and roll [my own crypto](https://github.com/asleepace/csa) solution for user auth ([*call me SBF*](https://en.wikipedia.org/wiki/Sam_Bankman-Fried)), but it was getting late and I wanted at least something done before I went back to playing video games. I had heard good things about **NextAuth.js** and that it worked well with **Prisma**, so I performed a quick & dirty Google search, blindly clicked the first relevent looking [link](https://dev.to/prisma/passwordless-authentication-with-next-js-prisma-and-next-auth-5g8g) and copypasta'd some random schema into my `prisma.schema` file and voila! Next I added "full-stack developer" to my LinkedIn profile and then proceeded to go -13k/d in ranked Halo.
+
