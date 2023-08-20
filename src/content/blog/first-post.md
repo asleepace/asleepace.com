@@ -51,3 +51,15 @@ sudo dpkg-reconfigure postfix
 ```
 
 And the problem was solved, yay email!
+
+### Conecting to NextAuth.js
+
+While I intuitively knew **NextAuth.js** was well, for **Next.js**, I had this inclination in my mind that I was just build different and would make it work one way or another. To my dismay I found this GitHub [discussion](https://github.com/nextauthjs/next-auth/discussions/3462)...
+
+> Can I use NextAuth.js with a framework different than Next.js?
+
+It was not looking good for the kid. Then I remembered a valuable lesson I learned as a younger developer. RTFM. Luckily, this time I was in luck
+
+> NextAuth.js was originally designed for use with Next.js and Serverless. However, today you could use the NextAuth.js core with any other framework. Checkout the examples for Gatsby and SvelteKit. If you would add another integration with other frameworks, feel free to work on it and send a pull request. Make sure to check if there's any on-going work before opening a new issue.
+
+#### LFG.
