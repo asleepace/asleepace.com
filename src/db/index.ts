@@ -14,6 +14,7 @@ import type {
   ExtensionModel,
   Falsey
 } from "oauth2-server"
+import { a } from "../../dist/server/chunks/astro.88a96b72.mjs";
 
 // oauth2-server types
 
@@ -38,9 +39,7 @@ export type Oauth2RevokeAuthorizationCodeResponse = Promise<boolean>
 export const prisma = new PrismaClient()
 
 
-const isTokenExpired = (expirey: Date | Falsey): boolean => {
-  return Boolean(expirey && expirey < new Date())
-}
+const isTokenExpired = (expiration: Date | Falsey): boolean => Boolean(expiration && expiration < new Date())
 
 /** * * oauth2 methods * * */
 
@@ -49,12 +48,8 @@ const getAccessToken = async (token: string): Oauth2AccessTokenResponse => {
     where: { token }
   })
   if (!result) return false
-  if (isTokenExpired(result.tokenExpiresAt)) {
-    await revokeToken(result)
-    return false
-  }
 
-  return ({
+  const accessToken = {
     accessToken: result.token,
     accessTokenExpiresAt: result.tokenExpiresAt ?? undefined,
     refreshToken: result.refreshToken ?? undefined,
@@ -66,41 +61,47 @@ const getAccessToken = async (token: string): Oauth2AccessTokenResponse => {
     user: {
       id: result.userId,
     },
-  })
+  }
+
+  if (isTokenExpired(accessToken.accessTokenExpiresAt)) {
+    await revokeToken(accessToken)
+    return false
+  }
+
+  return accessToken
 }
 
+
 const getRefreshToken = async (refreshToken: string) => {
-  const result = await prisma.oauthAccessToken.findUnique({
+  const token = await prisma.oauthAccessToken.findUnique({
     where: { refreshToken },
     include: { application: true },
   });
 
-  if (!result) return false
-  if (!result.refreshToken) return false
-  if (isTokenExpired(result.refreshTokenExpiresAt)) {
-    await revokeToken({ token: refreshToken })
+  if (!token) return false
+  if (!token.refreshToken) return false
+
+  const newRefreshToken = {
+    token: token.token,
+    refreshToken: token.refreshToken,
+    client: {
+      id: token.applicationId as string,
+      grants: token.application.grants as string[],
+      redirectUris: token.application.redirectUris as string[]
+    },
+    user: {
+      id: token.userId,
+    },
+  }
+
+  if (isTokenExpired(token.refreshTokenExpiresAt)) {
+    await revokeToken(newRefreshToken)
     return false
   }
 
-  const { token, userId, application, applicationId } = result
-  const id = applicationId as string
-  const grants = application.grants as string[]
-  const redirectUris = application.redirectUris as string[]
-  const output = {
-    token,
-    refreshToken,
-    client: {
-      id,
-      grants,
-      redirectUris,
-    },
-    user: {
-      id: userId,
-    },
-  }
-
-  return output
+  return newRefreshToken
 }
+
 
 const saveToken = async (token: Token, client: Client, user: User): Oauth2SaveTokenResponse => {
   return true
