@@ -1,0 +1,38 @@
+---
+
+export type YoutubePlayerOptions = 'accelerometer' | 'autoplay' | 'clipboard-write' | 'encrypted-media' | 'gyroscope' | 'picture-in-picture' | 'web-share'
+
+
+export type Props = {
+  url: string
+  title?: string
+  width?: string
+  height?: string
+  style?: string
+  options?: YoutubePlayerOptions[]
+}
+
+const defaultOptions = ['accelerometer', 'autoplay', 'clipboard-write', 'encrypted-media', 'gyroscope', 'picture-in-picture', 'web-share']
+
+const { title, url, width = '100%', height = 'auto', style, options = defaultOptions } = Astro.props;
+
+const optionsString = options.join('; ')
+
+---
+<iframe
+  class="youtube-player"
+  style={style}
+  width={width}
+  height={height}
+  src={url}
+  title={title}
+  allow={optionsString}
+  allowfullscreen></iframe>
+<style>
+  .youtube-player {
+    border: none;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+  }
+</style>

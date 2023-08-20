@@ -64,3 +64,5 @@ It was not looking good for the kid. Then I remembered a valuable lesson I learn
 
 #### LFG.
 
+The celebration was short lived. After trying to wrangle `@next/auth` & `@auth/core` into my **Astro** project all night, it is now the next day, and I'm still without an auth solution. It appears there are plans for a NextAuth-Astro adaptor, but I'm not holding my breath. Perhaps, after I am done getting my simple website working I can finally contribute to some open-source.
+
