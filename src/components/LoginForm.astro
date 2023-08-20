@@ -2,7 +2,8 @@
 const FORM_EMOJI = "🔐";
 const FORM_TITLE = "Login";
 const FORM_BUTTON_TEXT = "Login";
-const FORM_FORGOT_PASSWORD_TEXT = "forgot username or password";
+const FORM_BUTTON_FORGOT = "forgot username or password";
+const FORM_BUTTON_SIGNUP = "sign up";
 const FROM_TARGET = "/auth/login";
 ---
 
@@ -12,7 +13,8 @@ const FROM_TARGET = "/auth/login";
   <input type="email" id="email" name="email" placeholder="email address" />
   <input type="password" id="password" name="password" placeholder="password" />
   <button type="submit">{FORM_BUTTON_TEXT}</button>
-  <a href="/register">{FORM_FORGOT_PASSWORD_TEXT}</a>
+  <a href="/forgot">{FORM_BUTTON_FORGOT}</a>
+  <a href="/signup">{FORM_BUTTON_SIGNUP}</a>
 </form>
 <style>
   form {
@@ -66,11 +68,11 @@ const FROM_TARGET = "/auth/login";
     outline: none;
     border: none;
     min-height: 44px;
+    margin-bottom: 1rem;
   }
 
   form a {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
     font-size: small;
+    text-decoration: none;
   }
 </style>

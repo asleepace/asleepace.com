@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { b } from '../../../dist/server/chunks/astro.88a96b72.mjs';
 import { Config } from '../../config';
 
 // server-side rendering
@@ -22,13 +21,13 @@ const Errors = {
 export const post: APIRoute = async ({ params, request }) => {
 
   const { body, credentials, headers, formData } = request
-  console.log('[login.ts] formData:', formData)
-  console.log('[login.ts] body:', body)
 
   // extract the data from the request
   const data = await request.formData()
   const email = String(data.get("email"))
   const password = String(data.get("password"))
+
+  console.log('[login.ts] email:', email, 'password:', password)
 
   // check if we have valid form data
   if (!email) return new Response(Errors.InvalidEmail, {
@@ -47,6 +46,8 @@ export const post: APIRoute = async ({ params, request }) => {
     where: { email }
   })
 
+  console.log('[login.ts] user:', user)
+
   // if the user doesn't exist, return an error
   if (!user) return new Response(Errors.NotFound, {
     status: 200,
@@ -56,6 +57,8 @@ export const post: APIRoute = async ({ params, request }) => {
   // check if the password is correct
   const hashPassword = bcrypt.hashSync(password, user.salt)
   const isPasswordCorrect = bcrypt.compareSync(hashPassword, user.hash)
+
+  console.log('[login.ts] isPasswordCorrect:', isPasswordCorrect)
 
   // if the password dont't match, return an error
   if (!isPasswordCorrect) return new Response(Errors.NotFound, {

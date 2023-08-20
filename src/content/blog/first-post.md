@@ -46,7 +46,7 @@ Incredible. During the installation process **Postfix** asks the following:
 
 For which I had put `1000000` (bytes) thinking this might mitigate would be attackers from flooding my server with garbage, and to some extent I was right it had... I guess the only thing worse than preventing myself from setting this up in the first place would be to openly blog about the implementation details online 😬
 
-```
+```bash
 sudo dpkg-reconfigure postfix
 ```
 
@@ -64,5 +64,5 @@ It was not looking good for the kid. Then I remembered a valuable lesson I learn
 
 #### LFG.
 
-The celebration was short lived. After trying to wrangle `@next/auth` & `@auth/core` into my **Astro** project all night, it is now the next day, and I'm still without an auth solution. It appears there are plans for a NextAuth-Astro adaptor, but I'm not holding my breath. Perhaps, after I am done getting my simple website working I can finally contribute to some open-source.
+The celebration was short lived. After trying to wrangle `@next/auth` & `@auth/core` into my **Astro** project all night, it is now the next day, and I'm still without an auth solution. It appears there are plans for a NextAuth-Astro adaptor, but I'm not holding my breath. Perhaps, after I am done getting my simple website working I can finally contribute to some open-source...
 
