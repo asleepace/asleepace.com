@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { Config } from '../../config';
+import { Config } from '@asleepace/config'
+
 
 // server-side rendering
 export const prerender = false;

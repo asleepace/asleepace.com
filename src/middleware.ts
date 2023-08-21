@@ -4,6 +4,11 @@ import { defineMiddleware } from "astro/middleware";
 // server-side rendering
 export const prerender = false;
 
+const handleLogging = defineMiddleware((context, next) => {
+  // console.log("[middleware] logging context:", context)
+  return next()
+})
+
 // handle processing form data
 const handleFormData = defineMiddleware(async (context, next) => {
   // if (context.request.method !== 'POST') return next()
@@ -22,4 +27,4 @@ const handleAuthentication = defineMiddleware(async (context, next) => {
   return next()
 })
 
-export const onRequest = sequence(handleFormData, handleAuthentication);
+export const onRequest = sequence(handleLogging, handleFormData, handleAuthentication);
