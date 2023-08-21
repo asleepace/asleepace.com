@@ -4,8 +4,8 @@ import { defineMiddleware } from "astro/middleware";
 // server-side rendering
 export const prerender = false;
 
-const handleLogging = defineMiddleware((context, next) => {
-  // console.log("[middleware] logging context:", context)
+const handleLogging = defineMiddleware(({ cookies }, next) => {
+  console.log("[middleware] cookies:", cookies)
   return next()
 })
 

@@ -1,0 +1,24 @@
+---
+import SiteContainer from '../layouts/SiteContainer.astro'
+
+export const authenticated = true
+export const prerender = false
+
+const cookie = Astro.cookies.get('cookie').json() ?? 'null'
+console.log('[profile] cookie', cookie)
+
+---
+
+<SiteContainer title="Profile" description="Your personal dashboard">
+  <main class="profile-content">
+    <h1>Hello, World!</h1>
+    <p>You are now logged in!</p>
+    <b>Cookie</b>
+    <pre>{cookie.accessToken}</pre>
+  </main>
+</SiteContainer>
+<style>
+ main {
+    height: calc(100vh - 78px);
+ }
+ </style>

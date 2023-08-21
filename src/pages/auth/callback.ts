@@ -14,16 +14,12 @@ export const prerender = false;
 
 export type Oauth2CallbackRoute = APIRoute
 
-export const get: Oauth2CallbackRoute = async (context) => {
+export const get: Oauth2CallbackRoute = async ({ url, cookies, redirect }) => {
 
-  const { url, request, props, redirect, params } = context
   const accessCode = url.searchParams.get('code')
   const scope = url.searchParams.get('scope')
 
-  console.log('[auth/callback.ts] accessCode:', accessCode)
-  console.log('[auth/callback.ts] scope:', scope)
-
-  if (!accessCode) return new Response('access_code not found', { status: 500 })
+  if (!accessCode) return new Response('code not found', { status: 500 })
 
   const response = await exchangeCodeForAccessToken(accessCode)
 
@@ -35,11 +31,21 @@ export const get: Oauth2CallbackRoute = async (context) => {
     }
   })
 
-  return new Response(JSON.stringify(response), {
-    status: 200,
-    headers: {
-      'content-type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    }
+  // set astro cookie
+  console.log('[auth/callback.ts] setting cookie:', response.access_token)
+  cookies.set('cookie', { accessToken: response.access_token }, {
+    secure: false,
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7,
+    path: '/',
   })
+
+  if (cookies.has('cookie')) {
+    console.log('[auth/callback.ts] cookie set!')
+  } else {
+    console.log('[auth/callback.ts] cookie not set!')
+  }
+
+
+  return redirect('/profile')
 }
