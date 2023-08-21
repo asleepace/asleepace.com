@@ -4,7 +4,10 @@ import { defineMiddleware } from "astro/middleware";
 // server-side rendering
 export const prerender = false;
 
-const handleLogging = defineMiddleware(({ cookies }, next) => {
+const handleLogging = defineMiddleware((context, next) => {
+  const { cookies: astroCookies, request } = context
+  const cookies = request.headers.get('cookie')
+  console.log("[middleware] astroCookies:", astroCookies)
   console.log("[middleware] cookies:", cookies)
   return next()
 })
