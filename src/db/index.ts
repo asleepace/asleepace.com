@@ -14,6 +14,8 @@ import type {
   ExtensionModel,
   Falsey
 } from "oauth2-server"
+import crypto from "crypto"
+import bcrypt from "bcryptjs"
 
 // oauth2-server types
 
@@ -40,7 +42,7 @@ export const prisma = new PrismaClient()
 
 const isTokenExpired = (expiration: Date | Falsey): boolean => Boolean(expiration && expiration < new Date())
 
-const arrayOfTokenScopes = ({ scope = [] }: Token): Prisma.InputJsonValue => Array.isArray(scope) ? scope : [scope]
+const arrayOfTokenScopes = ({ scope = [] }: Token | AuthorizationCode): Prisma.InputJsonValue => Array.isArray(scope) ? scope : [scope]
 
 /** * * oauth2 methods * * */
 
@@ -172,33 +174,108 @@ const saveAuthorizationCode = async (
   client: Client,
   user: User,
 ): Oauth2SaveAuthorizationCodeResponse => {
-  return false
+  const scopes = arrayOfTokenScopes(code)
+  const data: Prisma.OauthAccessGrantCreateArgs['data'] = {
+    application: { connect: { id: client.id } },
+    user: { connect: { id: user.id } },
+    token: code.authorizationCode,
+    expiresAt: code.expiresAt,
+    createdAt: new Date().toISOString(),
+    redirectUri: code.redirectUri,
+    scopes
+  }
+  const codeChallenge = code.codeChallenge ?? data.codeChallenge
+  const codeChallengeMethod = code.codeChallengeMethod ?? data.codeChallengeMethod
+  await prisma.oauthAccessGrant.create({
+    data,
+  })
+  const result: AuthorizationCode = code
+  return ({ ...result, client, user, codeChallenge, codeChallengeMethod })
 }
+
 
 const revokeAuthorizationCode = async ({ code }: AuthorizationCode): Oauth2RevokeAuthorizationCodeResponse => {
-  return false
+  if (!code) return false
+  const accessGrant = await prisma.oauthAccessGrant.findUnique({
+    where: { token: code },
+  })
+  if (!accessGrant) return false
+  await prisma.oauthAccessGrant.delete({
+    where: { id: accessGrant.id },
+  })
+  return true
 }
 
-const getClient = async (clientId: string, clientSecret: string): Promise<Client | Falsey> => {
-  return false
+// clientSecret can be undefined when grant type does not require client secret
+const getClient = async (clientId: string, clientSecret?: string): Promise<Client | Falsey> => {
+  if (!clientId) return
+  const application = await prisma.oauthApplication.findUnique({
+    where: { clientId },
+  })
+
+  if (!application) return false
+  if (clientSecret && application.clientSecret.length !== clientSecret.length) return false
+  if (clientSecret && !crypto.timingSafeEqual(
+    Buffer.from(application.clientSecret),
+    Buffer.from(clientSecret),
+  )
+  ) return false;
+
+  return {
+    id: application.id,
+    grants: application.grants as string[],
+    redirectUris: application.redirectUris as string[],
+    scopes: application.scopes as string[],
+  }
+}
+
+const getUser = async (username: string, password: string) => {
+  if (!username || !password) return false
+  const user = await prisma.user.findUnique({
+    where: { email: username.toLowerCase() },
+  })
+  if (!user) return false
+  if (!user.encryptedPassword) return false
+  const isValidPassword = await bcrypt.compare(
+    password,
+    user.encryptedPassword,
+  )
+  return isValidPassword ? user : false
 }
 
 const verifyScope = async (token: Token, scope: string | string[]): Promise<boolean> => {
-  return false
+  return true
 }
+
+const validateScope = async (
+  user: User,
+  client: Client,
+  scope: string | string[],
+) => {
+  if (client.scopes === undefined) return []
+  if (!client.scopes.length) return client.scopes
+  if (!client.scopes.includes(scope)) return false
+  return client.scopes
+};
 
 
 // oauth2-server model
 export const model: Oauth2ServerModel = {
+  getUser,
   getClient,
-  verifyScope,
-  getAccessToken,
-  getRefreshToken,
+
   saveToken,
   revokeToken,
+
+  getAccessToken,
+  getRefreshToken,
+
   getAuthorizationCode,
   saveAuthorizationCode,
   revokeAuthorizationCode,
+
+  verifyScope,
+  validateScope,
 }
 
 // oauth2-server instance
