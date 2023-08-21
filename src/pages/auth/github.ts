@@ -4,7 +4,7 @@ import process from 'process'
 export const prerender = false;
 
 export type GitHubAPIRoute = APIRoute
-export type GitHubScope = 'repo' | 'user'
+export type GitHubScope = 'repo' | 'user' | 'read:user'
 export type GitHubRedirectUri = string
 
 export const GITHUB_OAUTH_URL = 'https://github.com/login/oauth/authorize'
@@ -15,7 +15,7 @@ export const get: GitHubAPIRoute = async ({ redirect }) => {
   console.log('[auth/github.ts] GitHub Oauth2 flow starting...')
   if (!GITHUB_CLIENT_ID) return new Response('GITHUB_CLIENT_ID not found', { status: 500 })
   const redirectUri: GitHubRedirectUri = GITHUB_CALLBACK_URL
-  const scope: GitHubScope = 'user'
+  const scope: GitHubScope = 'read:user'
   const oauth2Flow = new URL(GITHUB_OAUTH_URL)
   oauth2Flow.searchParams.append('client_id', GITHUB_CLIENT_ID)
   // oauth2Flow.searchParams.append('redirect_uri', redirectUri)

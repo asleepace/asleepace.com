@@ -1,4 +1,6 @@
 ---
+import { GITHUB_OAUTH_URL } from "../pages/auth/github";
+
 const FORM_EMOJI = "🔐";
 const FORM_TITLE = "Login";
 const FORM_BUTTON_TEXT = "Login";
@@ -7,16 +9,31 @@ const FORM_BUTTON_SIGNUP = "sign up";
 const FROM_TARGET = "/auth/login";
 ---
 
-<form id="login-form" hx-post={FROM_TARGET} hx-target="this" hx-boost="false">
-  <h3>{FORM_EMOJI}</h3>
-  <h1>{FORM_TITLE}</h1>
-  <input type="email" id="email" name="email" placeholder="email address" />
-  <input type="password" id="password" name="password" placeholder="password" />
-  <button type="submit">{FORM_BUTTON_TEXT}</button>
+<div>
+  <form id="login-form" hx-post={FROM_TARGET} hx-target="this" hx-boost="false">
+    <h3>{FORM_EMOJI}</h3>
+    <h1>{FORM_TITLE}</h1>
+    <input type="email" id="email" name="email" placeholder="email address" />
+    <input
+      type="password"
+      id="password"
+      name="password"
+      placeholder="password"
+    />
+    <a href="/auth/github">
+      <button id="github-login" type="button">login with github</button>
+    </a>
+    <button type="submit">{FORM_BUTTON_TEXT}</button>
+  </form>
   <a href="/forgot">{FORM_BUTTON_FORGOT}</a>
   <a href="/signup">{FORM_BUTTON_SIGNUP}</a>
-</form>
+</div>
 <style>
+  #github-login {
+    background-color: black;
+    color: white;
+  }
+
   form {
     display: flex;
     background-color: white;
