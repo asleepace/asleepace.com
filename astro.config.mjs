@@ -10,7 +10,7 @@ import node from "@astrojs/node";
 // https://astro.build/config
 export default defineConfig({
   integrations: [mdx(), sitemap()],
-  site: 'https://example.com',
+  site: 'https://asleepace.com',
   adapter: node({
     mode: "standalone"
   }),
