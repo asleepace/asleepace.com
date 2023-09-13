@@ -7,11 +7,13 @@ heroImage: '/blog-placeholder-4.jpg'
 ---
 
 
-This article will show you how to create a simple website using [Bun](https://bun.sh/docs/installation), [Elysia](https://elysiajs.com/) and [React](https://react.dev/) server-side rendering.
+This article will show you how to create a simple website using [Bun](https://bun.sh/docs/installation), [Elysia](https://elysiajs.com/) and [React](https://react.dev/) with support for server-side rendering.
 
 - **Bun** the JS/TS bundler, runtime & package manager
 - **Elysia** a web framework for building performant web applications
 - **React** a JavaScript library for building user interfaces
+
+Source code [here on GitHub](https://github.com/asleepace/bun-elysia-react-srr-example).
 
 ### Pre-requisites
 
@@ -397,6 +399,6 @@ hydrateRoot(document, <App />)
 }
 ```
 
-Working example on https://github.com/asleepace/bun-elysia-react-srr-example
+https://github.com/asleepace/bun-elysia-react-srr-example
 
-**Thanks for reading!**
+<h1>🥳</h1>
