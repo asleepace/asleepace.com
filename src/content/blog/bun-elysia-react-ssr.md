@@ -1,5 +1,5 @@
 ---
-title: 'Bun, Elysia & React SSR'
+title: 'SSR with Bun, Elysia & React'
 description: 'How to build a simple website using React, Bun and Elysia with server-side rendering in 2023.'
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
@@ -10,10 +10,10 @@ heroImage: '/bun-elysia-react-banner.png'
 This article will show you how to create a simple website using [Bun](https://bun.sh/docs/installation), [Elysia](https://elysiajs.com/) and [React](https://react.dev/) with support for server-side rendering.
 
 - **Bun** the JS/TS bundler, runtime & package manager
-- **Elysia** a web framework for building performant web applications
+- **Elysia** a framework for building performant web applications
 - **React** a JavaScript library for building user interfaces
 
-Source code [here on GitHub](https://github.com/asleepace/bun-elysia-react-srr-example).
+Original source code here on [GitHub](https://github.com/asleepace/bun-elysia-react-srr-example).
 
 ### Pre-requisites
 
@@ -78,6 +78,7 @@ bun add @elysiajs/static
 This will allow the client to request static files from our server such as images, css, js, etc. Now replace the contents of your `src/index.ts` file with
 
 ```ts
+// src/index.ts
 import { Elysia } from "elysia";
 import { staticPlugin } from '@elysiajs/static'
 
@@ -400,5 +401,7 @@ hydrateRoot(document, <App />)
 ```
 
 https://github.com/asleepace/bun-elysia-react-srr-example
+
+By [Colin Teahan](https://www.linkedin.com/in/colin-teahan/?lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BeM7QoEWiSIOwjiKXlYu0VA%3D%3D)
 
 <h1>🥳</h1>
