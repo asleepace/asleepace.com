@@ -3,7 +3,7 @@ title: 'Bun, Elysia & React SSR'
 description: 'How to build a simple website using React, Bun and Elysia with server-side rendering in 2023.'
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
-heroImage: '/blog-placeholder-4.jpg'
+heroImage: '/bun-elysia-react-banner.png'
 ---
 
 
