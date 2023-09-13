@@ -256,7 +256,7 @@ The following links are helpful resources for learning more about the technologi
 - [How to bundle assets with Bun documentation](https://bun.sh/docs/bundler)
 - [How to render react on the server](https://react.dev/reference/react-dom/server/renderToReadableStream)
 
-If you have any additional questions feel free to reach out to me on [Twitter](https://twitter.com/asleepace) or dropping me an email at colin_teahan@yahoo.com
+If you have any additional questions feel free to reach out to me on [Twitter](https://twitter.com/asleepace) or dropping me an [email](mailto:colin@asleepace.com).
 
 ## TL;DR
 
@@ -400,8 +400,6 @@ hydrateRoot(document, <App />)
 }
 ```
 
-https://github.com/asleepace/bun-elysia-react-srr-example
-
-By [Colin Teahan](https://www.linkedin.com/in/colin-teahan/?lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BeM7QoEWiSIOwjiKXlYu0VA%3D%3D)
+Article and [source code](https://github.com/asleepace/bun-elysia-react-srr-example) by [Colin Teahan](https://www.linkedin.com/in/colin-teahan/?lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BeM7QoEWiSIOwjiKXlYu0VA%3D%3D)
 
 <h1>🥳</h1>
