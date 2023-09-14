@@ -29,6 +29,13 @@ sudo systemctl restart postgresql
 
 - [Expose postgres server to external host](https://www.bigbinary.com/blog/configure-postgresql-to-allow-remote-connection)
 
+## MongoDB
+
+Access mongo shell
+```bash
+mongosh
+```
+
 # Astro Starter Kit: Blog
 
 ```
@@ -97,3 +104,4 @@ Check out [our documentation](https://docs.astro.build) or jump into our [Discor
 ## Credit
 
 This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+
