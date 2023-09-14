@@ -188,7 +188,7 @@ const app = new Elysia()
   .listen(3000)
 ```
 
-Make sure your local dev server is still running if you closed your IDE earlier by running the following from the project root
+Make sure your local dev server is still running if you closed your IDE earlier by running the following from your project root
 
 ```bash
 bun run dev
@@ -227,7 +227,7 @@ await Bun.build({
 });
 ```
 
-Now our **React** code will be automatically bundled each time we start our server! You can verify this by checking if the `./public/index.js` file exists. Make sure that this file patch matches the `bootstrapScripts` option in our `./src/index.ts` file.
+Now our **React** code will be automatically bundled each time we start our server! You can verify this by checking if the `./public/index.js` file exists. Make sure that this file path matches the `bootstrapScripts` option in your `./src/index.ts` file.
 
 ```ts
 // Make sure the bootstrapScripts matches the output
@@ -245,7 +245,7 @@ Congratulations you have just created a simple website using Bun, Elysia and Rea
 
 If you have any additional questions feel free to reach out to me on [Twitter](https://twitter.com/asleepace) or dropping me an email at colin@asleepace.com :)
 
-**Recommended Reading**
+**Next Recommended Reading**
 
 - [React Readable Streams](https://react.dev/reference/react/Suspense)
 - [React Suspense](https://react.dev/reference/react/Suspense)
