@@ -213,7 +213,18 @@ hydrateRoot(document, <App />)
 ```
 Normally this is where we would call `createRoot`, but since the root will be created on the server, all we need to do is hydrate the client after the initial load. This will attach event listeners to the server-generated HTML and make it interactive.
 
-[How to add DOM types in Bun](https://bun.sh/docs/runtime/typescript#add-dom-types)
+[React Hydrate Documentation](https://react.dev/reference/react-dom/client/hydrateRoot)
+
+```ts
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+```
+
+Note these two lines above are not comments, but rather [Triple-Slash Directives](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html). These are used to tell the TypeScript compiler how to handle certain files. In this case, we are telling the compiler to include the DOM types in our project. This is necessary because the `hydrateRoot` function requires the DOM types to be present (i.e. `document`).
+
+If you wish to access DOM elements (`window`, `document`, etc.)  in another file just add these directives at the top of the file.
+
+[How to add DOM types in Bun](https://stackoverflow.com/a/75726039/4326715)
 
 ## Bundle Client JS
 
@@ -226,6 +237,7 @@ await Bun.build({
   outdir: './public',
 });
 ```
+<div style="text-align: center;"><sub>That's right top level await!</sub></div>
 
 Now our **React** code will be automatically bundled each time we start our server! You can verify this by checking if the `./public/index.js` file exists. Make sure that this file path matches the `bootstrapScripts` option in your `./src/index.ts` file.
 
