@@ -1,16 +1,85 @@
 ---
-title: 'First post'
-description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 08 2022'
+title: 'Clever Extract & Replace Algorithm'
+description: 'A simple algorithm for extracting strings and replacing values written in TypeScript.'
+pubDate: 'Dec 16 2022'
 heroImage: '/blog-placeholder-3.jpg'
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+> A simple algorithm which recursively extracts specified keys from arbitrary data as a flat array, and can then replace those keys when called with another flat array of strings.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+```ts
+export type ExtractAndReplaceProps = (
+  data: unknown,
+  keys: Set<string>,
+  replace?: string[]
+) => string[]
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+export const extar: ExtractAndReplaceProps = (data, keys, replace) =>
+  Object.entries(data).reduce((previous, [key, value]) => {
+    if (typeof value === 'object') return previous.concat(extar(value, keys, replace))
+    if (typeof value === 'string' && keys.has(key)) {
+      if (replace) data[key] = replace.shift() // replace that element if specified
+      return previous.concat(value) // always extract original element
+    }
+    return previous
+  }, [] as string[])
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+```
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+The other day my colleague was working on a translation micro-service and was contemplating on how to best extract specific strings from arbitrary JSON data to send to the translation API. The translation API only accepts a flat array of strings, and would return the same translated. He was tinkering with several approaches, but to be honest they were all needlessly complex and over-engineered.
+
+For the next couple of days this problem lingered in the back of my mind, festering, begging for a simple and elegant solution. Finally, I decided to take a stab at the problem and was quite happy with the solution (simplified above). First, things first let's map out the requirements:
+
+- a function which takes arbitrary and possibly nested JSON data
+- a set of keys which we would like to extract
+- returns a flat array of strings
+- a way to map these values back to the original data
+
+The data would be fairly uniform, but could have several layers of nesting along with arbitrary keys, so my first step was just to traverse the data recursively. I remember from implementing a deep copy function in TypeScript in the past we would need something like the following:
+
+```ts
+function traverse(data: unknown) {
+  if (typeof data !== 'object') return
+  if (Array.isArray(data)) {
+    for (const value of data) {
+      traverse(value)
+    }
+  } else {
+    for (const key in data) {
+      traverse(data[key])
+    }
+  }
+}
+```
+
+Basically, the idea is to recursively traverse any array elements and objects values. Since the `typeof` operator returns `'object'` for both arrays and objects, we also need to perform an additional check to see if the value is an array. 
+
+However, I was not happy with this approach as it felt a bit too clunky and verbose. Sometimes I really wish the `typeof` operator would return `'array'` for arrays, but then I remembered that arrays are objects in TypeScript, and that I could use this to my advantage.
+
+```ts
+function traverse(data: unknown) {
+  if (typeof data !== 'object') return
+  for (const keyOrIndex in data) {
+    traverse(data[keyOrIndex])
+  }
+}
+```
+
+Sweet! The **for...in** loop will return **0, 1, 2, 3...** for arrays and **key1**, **key2**, **key3**... for objects. Not exactly groundbreaking, but this was a step in the right direction! The next step was to extract specific string values from the data. Since this data would be subject to change over time, one of the requirements was to be able to pass a list of strings which we wanted to extract. This would be a perfect place for a `Set<string>`!
+
+```ts
+function extract(data: unknown, keys: Set<string>): string[] {
+  if (typeof data !== 'object') return []
+  let extracted: string[] = []
+  for (const keyOrIndex in data) {
+    const value = data[keyOrIndex]
+    if (typeof value === 'string' && keys.has(keyOrIndex)) {
+      extracted.push(value)
+    } else {
+      const subValuesExtracted = extract(value, keys)
+      extracted = extracted.concat(subValuesExtracted)
+    }
+  }
+  return extracted
+}
+```
