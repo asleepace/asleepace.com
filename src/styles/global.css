@@ -131,10 +131,22 @@ pre > code {
 }
 blockquote {
 	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
+  padding-left: 1rem;
+  padding-right: 1rem;
 	margin: 0px;
-	font-size: 1.333em;
+	font-size: 1.6rem;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background-color: white;
+  box-shadow: var(--box-shadow);
 }
+
+blockquote > p {
+  margin-bottom: 0em;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 hr {
 	border: none;
 	border-top: 1px solid rgb(var(--gray-light));
@@ -166,6 +178,8 @@ hr {
 	white-space: nowrap;
 }
 
+/* Custom Designed Elements */
+
 .title-and-logo {
   display: flex;
   flex-direction: row;
@@ -174,4 +188,11 @@ hr {
 
 .beara-banner {
   text-align: center;
+}
+
+.stock-chart {
+  box-shadow: var(--box-shadow);
+  background-color: #000;
+  border-radius: 16px;
+  overflow: hidden;
 }
