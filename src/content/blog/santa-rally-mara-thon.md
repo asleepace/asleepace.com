@@ -1,18 +1,17 @@
 ---
-title: 'Santa Rally Mara-thon'
-description: 'Marathon Digital (MARA) rallies 52% in one week in the wake of Bitcoin.'
-pubDate: 'December 22 2023'
-heroImage: '/santa-rally.png'
+title: "Santa Rally Mara-thon"
+description: "Marathon Digital (MARA) rallies 52% in one week in the wake of Bitcoin."
+pubDate: "Dec 22 2023"
+heroImage: "/santa-rally.png"
+author: "Colin Teahan"
 ---
 
-With only one trading day left before Christmas, it appears that Santa may have come early this year! At the time of writing [Marathon Digital (MARA)](https://www.mara.com/) is flirting with the $27.00 price point and up over 52% this week alone! 
+With only one trading day left before Christmas, it appears that Santa may have come early this year! At the time of writing [Marathon Digital (MARA)](https://www.mara.com/) is flirting with the **$27.00** price point and up over **52%** this week alone!
 
 <!-- TradingView Widget BEGIN -->
-<div style="440px">
-<!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
+<div style="440px; border-radius:4px; overflow:none;">
+<div class="tradingview-widget-container; corner-radius:8px;">
   <div class="tradingview-widget-container__widget"></div>
-  <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
   <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
   {
   "width": "100%",
@@ -20,8 +19,8 @@ With only one trading day left before Christmas, it appears that Santa may have 
   "symbol": "NASDAQ:MARA",
   "interval": "D",
   "timezone": "Etc/UTC",
-  "theme": "light",
-  "style": "2",
+  "theme": "dark",
+  "style": "3",
   "locale": "en",
   "enable_publishing": false,
   "hide_top_toolbar": true,
@@ -31,13 +30,13 @@ With only one trading day left before Christmas, it appears that Santa may have 
 }
   </script>
 </div>
-<!-- TradingView Widget END -->
+<div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="orange-text">Track all markets on TradingView</span></a></div>
 </div>
 <!-- TradingView Widget END -->
 
 I’ve been following this stock along with her little brother [Riot Platforms (RIOT)](https://www.riotplatforms.com/) since the height of the pandemic, and after what can only be described as a boring year for trading all around, I’m finally starting to feel excited again!
 
-For those who are unfamiliar [Marathon Digital](https://www.mara.com/) is a bitcoin mining company with a focus on blockchain technologies and various digital assets. While crypto has definitely fallen out of favor in recent memory, it appears that things might be changing... 
+For those who are unfamiliar [Marathon Digital](https://www.mara.com/) is a bitcoin mining company with a focus on blockchain technologies and various digital assets. While crypto has definitely fallen out of favor in recent memory, it appears that things might be changing...
 
 > Before market open, Marathon shook up the crypto miner scene by announcing that it had agreed to acquire a pair of Bitcoin (CRYPTO: BTC) mining sites. It bought the pair from subsidiaries of finance company Generate Capital at a price of $178.6 million. This purchase price is to be paid entirely in cash. [Source](https://finance.yahoo.com/news/why-marathon-digital-other-crypto-235300345.html)
 
@@ -47,4 +46,4 @@ Along with this the Fed has taken a less hawkish stance as inflation has retreat
 
 Couple this with the yearly Santa Rally after a long year of dismal returns and a new generation of retail options trader, it’s possible we may have the perfect ingredients for a real Christmas miracle!
 
-**NOTE**: *This is not financial advice and I am currently holding 100 Shares along with several options contracts for 12/29*
+**NOTE**: _This is not financial advice and I am currently holding 100 Shares along with several options contracts for 12/29_
