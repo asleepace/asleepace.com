@@ -1,6 +1,6 @@
 ---
 title: "Santa Rally Mara-thon"
-description: "Marathon Digital (MARA) rallies 52% in one week in the wake of Bitcoin."
+description: "Marathon Digital soars over 51% this past week as inflation cools and speculation around a Bitcoin ETF rises, all in time for the holidays!"
 pubDate: "Dec 22 2023"
 heroImage: "/santa-rally.png"
 author: "Colin Teahan"
@@ -9,15 +9,15 @@ author: "Colin Teahan"
 With only one trading day left before Christmas, it appears that Santa may have come early this year! At the time of writing [Marathon Digital (MARA)](https://www.mara.com/) is flirting with the **$27.00** price point and up over **52%** this week alone!
 
 <!-- TradingView Widget BEGIN -->
-<div style="440px; border-radius:4px; overflow:none;">
+<div class="stock-chart" style="440px; border-radius:4px; overflow:none;">
 <div class="tradingview-widget-container; corner-radius:8px;">
   <div class="tradingview-widget-container__widget"></div>
   <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
   {
   "width": "100%",
-  "height": "610",
+  "height": "440",
   "symbol": "NASDAQ:MARA",
-  "interval": "D",
+  "interval": "H",
   "timezone": "Etc/UTC",
   "theme": "dark",
   "style": "3",
