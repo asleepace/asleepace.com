@@ -2,7 +2,7 @@
 title: 'Implementing a range in TypeScript without a loop'
 description: 'How to implement a range sequence using generators in TypeScript for fun!'
 pubDate: 'Feb 13, 2024'
-heroImage: '/blog-placeholder-2.jpg'
+heroImage: '/generator-cover.png'
 ---
 
 The other day I was browsing [LinkedIn](https://www.linkedin.com/in/colin-teahan/) and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
