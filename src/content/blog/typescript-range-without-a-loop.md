@@ -23,7 +23,12 @@ However, this was widely **boring** and **severely unambitious**; No, what I nee
 
 ## Generator Experiments
 
-Then it hit me! Let's use that thing I always want to use, but literally can never find a good enough reason. That's right, the good 'ol **[Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)**. It had been a while since I last touched these pointy starred wonders, and so I got to experimenting to refresh my memory.
+Then it hit me! Let's use that thing I always want to use, but literally can never find a good enough reason. That's right, the good 'ol **[Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)**.
+
+> The Generator object is returned by a generator function and it conforms to both the iterable protocol and the iterator protocol.
+> Generator is a subclass of the hidden Iterator class. [Source](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)
+
+It had been a while since I last touched these pointy starred wonders, and so I got to experimenting to refresh my memory.
 
 ```ts
 function* range() {
@@ -47,7 +52,7 @@ function* range(a: number, b: number) {
 }
 ```
 
-Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the type God's and a couple <strike>minutes</strike> hours later I had finished at last, and was eagerly awaiting to dunk on the **LinkedIn** n00bs!
+Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the **TypeGod's** and a couple <strike>minutes</strike> hours later I had finished at last, and was eagerly awaiting to dunk on the **LinkedIn** n00bs!
 
 ```ts
 type RangeIterator = Generator<number, void, undefined>
@@ -65,11 +70,11 @@ console.log(...range(1, 5)) // 1, 2, 3, 4, 5
 
 ## How it works?
 
-While the above code may look foreign to the unsuspecting LinkedIn denizen, it actually isn't all that complicated. The key takeaway here is how we can abuse the `...` operator to spread them cheeks.
+While the above code may look foreign to the unsuspecting LinkedIn denizen, it actually isn't all that complicated. The key takeaway here is how we can abuse the spread `...` operator to *spread* them cheeks.
 
 Let's take a look at the execution flow starting from `console.log(...range(1, 5))`
 
-0. We call `range(1, 5)` which creates our generator
+0. We call `range(1, 5)` which creates our iterator
 1. The `...` operator does the dirty work of iterating
 2. The iterator will continue until `return` has been called
 3. The first pass `a = 1` and `b = 5`
@@ -86,19 +91,21 @@ Let's take a look at the execution flow starting from `console.log(...range(1, 5
 
 Or an even more simplified way to think about this
 
-- `yield` appends a value to an iterator
-- `yield*` appends values from an iterator to another iterator
+- `yield` pauses / resumes the iterator and returns a value to the caller
+- `yield*` delegate to another iterable object, such as a Generator.
 - `return` tells the iterator we are done
 
 ## Final thoughts
 
-While this code would most certainly be rejected on any production pull request, it was a fun example of leveraging some seldom used parts TypeScript which are quite cool, and this is just the surface!
+While this code would most certainly be rejected on any production pull request, it was a fun example of leveraging some seldom used parts [TypeScript](https://www.typescriptlang.org/) which are quite cool, *and this is just the surface*!
 
-The way I like to think about generators is that they are functions with state, which can pause execution and even have values passed back-in from the caller. They are used quite heavily in libraries like `react-redux` and also have support for `async` via the `AsyncGenerator`. You can learn more about them here or feel free to ask me any questions!
+The way I like to think about generators is that they are functions with state, which can pause /resume execution and even have values passed back-in from the caller. They are used quite heavily in libraries like `react-redux` and also have support for `async` via the `AsyncGenerator`. You can learn more about them here or feel free to ask me any questions!
 
 - [Mozilla Docs: Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)
 - [Mozilla Docs: AsyncGenerator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
 - [Mozilla Docs: Spread Syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
+- [Mozilla Docs: Yield](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield)
+- [Mozilla Docs: Yield*](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield*)
 
 **Happy coding!**
 
