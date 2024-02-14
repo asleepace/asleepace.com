@@ -123,22 +123,23 @@ Now this solution warrants a new blog post, but for now I'll leave you with this
 ## YCombinator + Generators
 
 ```ts
-type Fx = (next: Fx) => (x: number, y: number) => Generator
+type Y = (next: Y) => (x: number, y: number) => Generator
 
-function YCombinator(f: Fx) {
-    return ((g: Fx) => g(g))((g: Fx) => f(() => (x: number, y: number) => g(g)(x, y)))
+function YCombinator(f: Y) {
+    return ((g: Y) => g(g))((g: Y) => f(() => (x: number, y: number) => g(g)(x, y)))
 }
 
-const example = YCombinator((next: Fx) => function* (x: number, y: number) {
+const range = YCombinator((next: Y) => function* (x: number, y: number) {
     if (x > y) return
     yield x
     yield* next(next)(x + 1, y)
 })
 
-const output = example(7, 20)
 
-console.log(...output)  // 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+console.log(...range(7, 21))
 ```
+
+[Try it on the TypeScript playground!](https://www.typescriptlang.org/play?module=1&ssl=14&ssc=29&pln=1&pc=1#code/C4TwDgpgBAmlC8UAUA7CAPYAuWBKBAfMujigK4C2ARhAE4A0UIplNt+8RA4hGrQIbAA9rQBQogGZkUAY2ABLISlgBhIdXkpBIpBJwx8Ab1FRTUWhGBlaypEgDm+jkXsPcuO47yEoEu8+IWajpGZihyYPYfV3sPdFD3XFEAX3EZJQBnYHN+FHtoRBg1DS1hWjs0TCcfKVkFJQAqQPDWEKYgtiMTM3kJYigiEHwLKxtu0xB5CAAbABModHGmKbmmyuBUDGA4qABqKABGBJSktMyhaYgAOmmhVyuHgTyIJAB2RgAmA-dRIA)
 
 **Happy coding!**
 
