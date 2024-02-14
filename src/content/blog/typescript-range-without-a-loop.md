@@ -122,8 +122,11 @@ Now this solution warrants a new blog post, but for now I'll leave you with this
 
 ## YCombinator + Generators
 
-Some of you may be familiar with the name **YCombinator** as it is indeed the same as the venture capital firm, but did you know that it also has a deeper meaning? I present to you a solution which doesn't use loops or recursion:
+Some of you may be familiar with the name **YCombinator** as it is indeed the same as the venture capital firm, but did you know that it also has a deeper meaning? 
 
+The **YCombinator** is a higher-order function which allows you to write recursive functions without using recursion. It is a concept from the field of computer science and is often used in functional programming languages.
+
+Equipped with this we now have everything we need to implement a solution without loops or recursion! Feast your eyes...
 
 ```ts
 type Y = (next: Y) => (x: number, y: number) => Generator
