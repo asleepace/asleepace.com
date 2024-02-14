@@ -1,15 +1,15 @@
 ---
-title: 'Implementing a range in TypeScript without a loop'
+title: 'Implementing a range in TypeScript without loops*'
 description: 'How to implement a range sequence using generators in TypeScript for fun!'
 pubDate: 'Feb 13, 2024'
 heroImage: '/generator-cover.png'
 ---
 
-The other day I was browsing [LinkedIn](https://www.linkedin.com/in/colin-teahan/) and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
+The other day I was browsing **LinkedIn** and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
 
 > 👌 A common coding question in Javascript interview: Write a function that implements range WITHOUT using loop?
 
-Unable to resist the urge to write some needlessly complex and over-engineered solution, I began weighing my options. Initially, my mind went to recursion. Then to recursion, then to recursion...
+Unable to resist the urge to write some needlessly complex and over-engineered code, I began weighing my options. Initially, my mind went to recursion. Then to recursion, then to recursion...
 
 ```ts
 function range(a: number, b: number): number[] {
@@ -34,10 +34,10 @@ function* range() {
   yield 5
 }
 
-console.log(...range()) // [1, 2, 3, 4, 5]
+console.log(...range()) // 1, 2, 3, 4, 5
 ```
 
-Yup, still got it! However, then it dawned on me. Normally I use a loop inside a generator, so the solution would have to bring back our old friend recursion, recursion, recursion!
+Yup, still got it 😉! But, then it dawned on me... normally I use a loop inside a generator, so the solution would have to bring back our old friend recursion, recursion, recursion!
 
 ```ts
 function* range(a: number, b: number) {
@@ -47,7 +47,7 @@ function* range(a: number, b: number) {
 }
 ```
 
-Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the type God and a couple minutes later I had finished at last, and was eagerly awaiting to dunk on the LinkedIn n00bs!
+Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the type God's and a couple <strike>minutes</strike> hours later I had finished at last, and was eagerly awaiting to dunk on the **LinkedIn** n00bs!
 
 ```ts
 type RangeIterator = Generator<number, void, undefined>
@@ -75,14 +75,14 @@ Let's take a look at the execution flow starting from `console.log(...range(1, 5
 3. The first pass `a = 1` and `b = 5`
    - Since `a > b` is `false` we continue
    - Next we `yield a` which is `1` to the output
-   - Next we `yield*` which returns another generator
+   - Next we `yield*` which returns another generator (step #4)
 4. The second pass `a = 2` and `b = 5`
    - Since `a > b` is `false` we continue
    - Next we `yield a` which is `2` to the output
-   - Next we `yield*` which returns another generator
-4. This continues until `a > b` and `return`
-5. This tells the iterator we are done!
-6. Leaving us with `1, 2, 3, 4, 5`
+   - Next we `yield*` which returns another generator ()
+5. This continues until `a > b` and `return`
+6. This tells the iterator we are done!
+7. Leaving us with `1, 2, 3, 4, 5`
 
 Or an even more simplified way to think about this
 
@@ -100,4 +100,8 @@ The way I like to think about generators is that they are functions with state, 
 - [Mozilla Docs: AsyncGenerator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
 - [Mozilla Docs: Spread Syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
 
-Happy coding!
+**Happy coding!**
+
+<img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWdwMGZ1d2I4bWs2Zmgxb2VqMXR2OWQ3bjJ6aXc4M3B1a2w3czc3NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BPJmthQ3YRwD6QqcVD/giphy.gif" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="Generator Cheers" width="100%" />
+
+[Colin Teahan](https://www.linkedin.com/in/colin-teahan/)
