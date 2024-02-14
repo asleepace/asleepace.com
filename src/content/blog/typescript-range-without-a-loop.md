@@ -5,10 +5,9 @@ pubDate: 'Feb 13, 2024'
 heroImage: '/blog-placeholder-2.jpg'
 ---
 
-The other day I came across this question on LinkedIn which stated the following:
+The other day I was browsing LinkedIn and came across the following post
 
-> 👌 A common coding question in Javascrip interview
-Write a function that implements range WITHOUT using loop?
+> 👌 A common coding question in Javascript interview: Write a function that implements range WITHOUT using loop?
 
 Unable to resist the urge to write some needlesly complex and over-engineered solution, I began weighing my options. Initially, my mind went to recursion. Then to recursion, then to recursion...
 
@@ -96,5 +95,8 @@ Or an even more simplified way to think about this
 While this code would most certainly be rejected on any production pull request, it was a fun example of leveraging some seldom used parts TypeScript which are quite cool, and this is just the surface!
 
 The way I like to think about generators is that they are functions with state, which can pause execution and even have values passed back-in from the caller. They are used quite heavily in libraries like `react-redux` and also have support for `async` via the `AsyncGenerator`. You can learn more about them here or feel free to ask me any questions!
+
+- [Mozilla Docs: Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)
+- [Mozilla Docs: AsyncGenerator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
 
 Happy coding!
