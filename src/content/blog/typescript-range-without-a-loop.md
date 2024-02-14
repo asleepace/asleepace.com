@@ -107,6 +107,39 @@ The way I like to think about generators is that they are functions with state, 
 - [Mozilla Docs: Yield](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield)
 - [Mozilla Docs: Yield*](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield*)
 
+## Update
+
+My original post succeeded in stirring up quite the controversy from folks all across the software engineering spectrum, and one comment caught my attention in particular:
+
+> Everything uses a loop under the hood, unless it's using tensors
+> ~ Some AI Engineer
+
+While this is undoubtedly correct, it still bothered me that the iterator solution was not much different from the original recursive solution. What if we change the problem slightly to include the following:
+
+> Write a function that implements range WITHOUT using a loop or recursion?
+
+Now this solution warrants a new blog post, but for now I'll leave you with this:
+
+## YCombinator + Generators
+
+```ts
+type Fx = (next: Fx) => (x: number, y: number) => Generator
+
+function YCombinator(f: Fx) {
+    return ((g: Fx) => g(g))((g: Fx) => f(() => (x: number, y: number) => g(g)(x, y)))
+}
+
+const example = YCombinator((next: Fx) => function* (x: number, y: number) {
+    if (x > y) return
+    yield x
+    yield* next(next)(x + 1, y)
+})
+
+const output = example(7, 20)
+
+console.log(...output)  // 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+```
+
 **Happy coding!**
 
 <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWdwMGZ1d2I4bWs2Zmgxb2VqMXR2OWQ3bjJ6aXc4M3B1a2w3czc3NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BPJmthQ3YRwD6QqcVD/giphy.gif" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="Generator Cheers" width="100%" />
