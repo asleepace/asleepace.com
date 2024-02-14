@@ -122,6 +122,9 @@ Now this solution warrants a new blog post, but for now I'll leave you with this
 
 ## YCombinator + Generators
 
+Some of you may be familiar with the name **YCombinator** as it is indeed the same as the venture capital firm, but did you know that it also has a deeper meaning? I present to you a solution which doesn't use loops or recursion:
+
+
 ```ts
 type Y = (next: Y) => (x: number, y: number) => Generator
 
@@ -140,6 +143,8 @@ console.log(...range(7, 21))
 ```
 
 [Try it on the TypeScript playground!](https://www.typescriptlang.org/play?module=1&ssl=14&ssc=29&pln=1&pc=1#code/C4TwDgpgBAmlC8UAUA7CAPYAuWBKBAfMujigK4C2ARhAE4A0UIplNt+8RA4hGrQIbAA9rQBQogGZkUAY2ABLISlgBhIdXkpBIpBJwx8Ab1FRTUWhGBlaypEgDm+jkXsPcuO47yEoEu8+IWajpGZihyYPYfV3sPdFD3XFEAX3EZJQBnYHN+FHtoRBg1DS1hWjs0TCcfKVkFJQAqQPDWEKYgtiMTM3kJYigiEHwLKxtu0xB5CAAbABModHGmKbmmyuBUDGA4qABqKABGBJSktMyhaYgAOmmhVyuHgTyIJAB2RgAmA-dRIA)
+
+ If you want to lean more about the YCombinator, check out the following [blog post](https://lucasfcosta.com/2018/05/20/Y-The-Most-Beautiful-Idea-in-Computer-Science.html) which does an excellent idea of breaking it down and explaining it step by step!
 
 **Happy coding!**
 
