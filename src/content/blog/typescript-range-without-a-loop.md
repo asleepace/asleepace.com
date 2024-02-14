@@ -52,7 +52,7 @@ function* range(a: number, b: number) {
 }
 ```
 
-Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the type God's and a couple <strike>minutes</strike> hours later I had finished at last, and was eagerly awaiting to dunk on the **LinkedIn** n00bs!
+Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the **TypeGod's** and a couple <strike>minutes</strike> hours later I had finished at last, and was eagerly awaiting to dunk on the **LinkedIn** n00bs!
 
 ```ts
 type RangeIterator = Generator<number, void, undefined>
@@ -70,7 +70,7 @@ console.log(...range(1, 5)) // 1, 2, 3, 4, 5
 
 ## How it works?
 
-While the above code may look foreign to the unsuspecting LinkedIn denizen, it actually isn't all that complicated. The key takeaway here is how we can abuse the `...` operator to spread them cheeks.
+While the above code may look foreign to the unsuspecting LinkedIn denizen, it actually isn't all that complicated. The key takeaway here is how we can abuse the spread `...` operator to *spread* them cheeks.
 
 Let's take a look at the execution flow starting from `console.log(...range(1, 5))`
 
@@ -97,9 +97,9 @@ Or an even more simplified way to think about this
 
 ## Final thoughts
 
-While this code would most certainly be rejected on any production pull request, it was a fun example of leveraging some seldom used parts TypeScript which are quite cool, and this is just the surface!
+While this code would most certainly be rejected on any production pull request, it was a fun example of leveraging some seldom used parts [TypeScript](https://www.typescriptlang.org/) which are quite cool, *and this is just the surface*!
 
-The way I like to think about generators is that they are functions with state, which can pause execution and even have values passed back-in from the caller. They are used quite heavily in libraries like `react-redux` and also have support for `async` via the `AsyncGenerator`. You can learn more about them here or feel free to ask me any questions!
+The way I like to think about generators is that they are functions with state, which can pause /resume execution and even have values passed back-in from the caller. They are used quite heavily in libraries like `react-redux` and also have support for `async` via the `AsyncGenerator`. You can learn more about them here or feel free to ask me any questions!
 
 - [Mozilla Docs: Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)
 - [Mozilla Docs: AsyncGenerator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
