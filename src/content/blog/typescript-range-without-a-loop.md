@@ -5,7 +5,7 @@ pubDate: 'Feb 13, 2024'
 heroImage: '/blog-placeholder-2.jpg'
 ---
 
-The other day I was browsing LinkedIn and came across the following post
+The other day I was browsing [LinkedIn](https://www.linkedin.com/in/colin-teahan/) and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
 
 > 👌 A common coding question in Javascript interview: Write a function that implements range WITHOUT using loop?
 
@@ -23,7 +23,7 @@ However, this was widely **boring** and **severly unambitios**; No, what I neede
 
 ## Generator Expiraments
 
-Then it hit me! Let's use that thing I always want to use, but literally can never find a good enough reason. That's right, the goold 'ol Generator. It had been a while since I last touched these pointy starred wonders, and so I got to expiramenting to refresh my memory.
+Then it hit me! Let's use that thing I always want to use, but literally can never find a good enough reason. That's right, the goold 'ol **[Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)**. It had been a while since I last touched these pointy starred wonders, and so I got to expiramenting to refresh my memory.
 
 ```ts
 function* range() {
@@ -98,5 +98,6 @@ The way I like to think about generators is that they are functions with state, 
 
 - [Mozilla Docs: Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)
 - [Mozilla Docs: AsyncGenerator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
+- [Mozilla Docs: Spread Syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
 
 Happy coding!
