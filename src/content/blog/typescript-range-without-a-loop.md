@@ -1,5 +1,5 @@
 ---
-title: 'Implementing a range in TypeScript without loops*'
+title: 'Implement a range in TypeScript without loops*'
 description: 'How to implement a range sequence using generators in TypeScript for fun!'
 pubDate: 'Feb 13, 2024'
 heroImage: '/generator-cover.png'
@@ -7,7 +7,7 @@ heroImage: '/generator-cover.png'
 
 The other day I was browsing **LinkedIn** and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
 
-> 👌 A common coding question in Javascript interview: Write a function that implements range WITHOUT using loop?
+> 👌 A common coding question in Javascript interviews: Write a function that implements range WITHOUT using loops?
 
 Unable to resist the urge to write some needlessly complex and over-engineered code, I began weighing my options. Initially, my mind went to recursion. Then to recursion, then to recursion...
 
@@ -42,7 +42,7 @@ function* range() {
 console.log(...range()) // 1, 2, 3, 4, 5
 ```
 
-Yup, still got it 😉! But, then it dawned on me... normally I use a loop inside a generator, so the solution would have to bring back our old friend recursion, recursion, recursion!
+But, then it dawned on me that I normally use a **loop** inside a generator! The solution would have to bring back our old friend recursion, recursion, recursion!
 
 ```ts
 function* range(a: number, b: number) {
@@ -73,6 +73,69 @@ console.log(...range(1, 5)) // 1, 2, 3, 4, 5
 While the above code may look foreign to the unsuspecting LinkedIn denizen, it actually isn't all that complicated. The key takeaway here is how we can abuse the spread `...` operator to *spread* them cheeks.
 
 Let's take a look at the execution flow starting from `console.log(...range(1, 5))`
+
+```ts
+
+range(1, 5) // Step 1: called (move inside context)
+
+if (a > b) return      // (1 > 5) is false so we continue
+yield a                // pause execution, return (1) to the caller, then resume
+yield* range(a + 1, b) // pause execution, return iteration from range(2, 5), then resume
+
+range(2, 5) // Step 2: called (move inside context)
+
+if (a > b) return      // (2 > 5) is false so we continue
+yield a                // pause execution, return (2) to the caller, then resume
+yield* range(a + 1, b) // pause execution, return iteration from range(3, 5), then resume
+
+range(3, 5) // Step 3: called (move inside context)
+
+if (a > b) return      // (3 > 5) is false so we continue
+yield a                // pause execution, return (3) to the caller, then resume
+yield* range(a + 1, b) // pause execution, return iteration from range(4, 5), then resume
+
+range(4, 5) // Step 4: called (move inside context)
+
+if (a > b) return      // (4 > 5) is false so we continue
+yield a                // pause execution, return (4) to the caller, then resume
+yield* range(a + 1, b) // pause execution, return iteration from range(5, 5), then resume
+
+range(5, 5) // Step 5: called (move inside context)
+
+if (a > b) return      // (5 > 5) is false so we continue
+yield a                // pause execution, return (5) to the caller, then resume
+yield* range(a + 1, b) // pause execution, return iteration from range(6, 5), then resume
+
+range(6, 5) // Step 6: called (move inside context)
+
+if (a > b) return      // (6 > 5) is true so we return which ends the iterator
+
+// Moving backwards through the call stack we get
+//
+// [1, [2, [3, [4, [5]]]]]
+// [1, [2, [3, [4, 5]]]]
+// [1, [2, [3, 4, 5]]]
+// [1, [2, 3, 4, 5]]
+// [1, 2, 3, 4, 5]
+
+// Which more or less simplifies to the following expression, note the
+// star (*) operator is used to spread the values from the iterator,
+// just omitting here the the sake of brevity
+
+function* range(1, 5) {
+  yield (((((yield 1), yield 2), yield 3), yield 4), yield 5)
+}
+
+// Then back in Step 1: context
+
+yield* [1, 2, 3, 4, 5]
+
+// Which returns 1, 2, 3, 4, 5 to the caller (...)
+
+console.log(...[1, 2, 3, 4, 5])
+
+// 1, 2, 3, 4, 5
+```
 
 0. We call `range(1, 5)` which creates our iterator
 1. The `...` operator does the dirty work of iterating
@@ -107,18 +170,33 @@ The way I like to think about generators is that they are functions with state, 
 - [Mozilla Docs: Yield](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield)
 - [Mozilla Docs: Yield*](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield*)
 
-## Update
+## That's cool, but can you?
 
 My original post succeeded in stirring up quite the controversy from folks all across the software engineering spectrum, and one comment caught my attention in particular:
 
-> Everything uses a loop under the hood, unless it's using tensors
-> ~ Some AI Engineer
+> Everything uses a loop under the hood, unless it's using tensors.
+> <div style="text-align: right">— Some AI Engineer</div>
 
-While this is undoubtedly correct, it still bothered me that the iterator solution was not much different from the original recursive solution. What if we change the problem slightly to include the following:
+While this is probably unavoidable to some degree, one thing that still bothered me was that the iterator solution was not all that much different from the original recursive solution. What if we change the problem slightly to include the following:
 
-> Write a function that implements range WITHOUT using a loop or recursion?
+<h3 style="text-align: center">Implement a range WITHOUT using loops or recursion.</h3>
 
-Now this solution warrants a new blog post, but for now I'll leave you with this:
+Now things are getting interesting! Just to add a little more context, the comment section had already ruled out using the usual higher order functional such as `.forEach`, `.map`, `.filter`, `.reduce`, etc.
+
+```ts
+Array.from({ length: finish - start + 1 }, (_, i) => start + i + 1)
+
+// or
+
+[...Array(finish - start + 1)].map((_, i) => start + i)]
+```
+
+While these are short and concise solutions, they are still using loops under the hood. So, I decided to take it a step further and see if I could implement a solution without using loops or recursion. 
+
+<img src="/ah-shit-here-we-go-again.gif" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="Ah shit here we go again..." width="100%" />
+
+<br>
+<br>
 
 ## YCombinator + Generators
 
@@ -142,15 +220,25 @@ const range = YCombinator((next: Y) => function* (x: number, y: number) {
 })
 
 
-console.log(...range(7, 21))
+console.log(...range(3, 9)) // 3, 4, 5, 6, 7, 8, 9
 ```
 
 [Try it on the TypeScript playground!](https://www.typescriptlang.org/play?module=1&ssl=14&ssc=29&pln=1&pc=1#code/C4TwDgpgBAmlC8UAUA7CAPYAuWBKBAfMujigK4C2ARhAE4A0UIplNt+8RA4hGrQIbAA9rQBQogGZkUAY2ABLISlgBhIdXkpBIpBJwx8Ab1FRTUWhGBlaypEgDm+jkXsPcuO47yEoEu8+IWajpGZihyYPYfV3sPdFD3XFEAX3EZJQBnYHN+FHtoRBg1DS1hWjs0TCcfKVkFJQAqQPDWEKYgtiMTM3kJYigiEHwLKxtu0xB5CAAbABModHGmKbmmyuBUDGA4qABqKABGBJSktMyhaYgAOmmhVyuHgTyIJAB2RgAmA-dRIA)
 
- If you want to lean more about the YCombinator, check out the following [blog post](https://lucasfcosta.com/2018/05/20/Y-The-Most-Beautiful-Idea-in-Computer-Science.html) which does an excellent idea of breaking it down and explaining it step by step!
+ If you want to lean more about the **YCombinator** I recommend checking out the following [blog post](https://lucasfcosta.com/2018/05/20/Y-The-Most-Beautiful-Idea-in-Computer-Science.html) which does an excellent job of breaking it down and explaining it step by step!
 
-**Happy coding!**
+
+## Notable Mentions?
+
+```ts
+// the changes are slim, but not zero...
+const sequence = String(Math.random())
+const regex = new RegExp(`^(?=\d{4}$)0?1?2?3?4?5?6?7?8?9?`)
+sequence.match()
+```
+
 
 <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWdwMGZ1d2I4bWs2Zmgxb2VqMXR2OWQ3bjJ6aXc4M3B1a2w3czc3NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BPJmthQ3YRwD6QqcVD/giphy.gif" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="Generator Cheers" width="100%" />
 
-[Colin Teahan](https://www.linkedin.com/in/colin-teahan/)
+<h2 style="text-align: center; margin-top: 16px">Happy coding!</h2>
+<h4 style="text-align: center;">~Colin Teahan</h4>
