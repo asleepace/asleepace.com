@@ -9,7 +9,7 @@ The other day I was browsing [LinkedIn](https://www.linkedin.com/in/colin-teahan
 
 > 👌 A common coding question in Javascript interview: Write a function that implements range WITHOUT using loop?
 
-Unable to resist the urge to write some needlesly complex and over-engineered solution, I began weighing my options. Initially, my mind went to recursion. Then to recursion, then to recursion...
+Unable to resist the urge to write some needlessly complex and over-engineered solution, I began weighing my options. Initially, my mind went to recursion. Then to recursion, then to recursion...
 
 ```ts
 function range(a: number, b: number): number[] {
@@ -19,11 +19,11 @@ function range(a: number, b: number): number[] {
 
 [Try it on the TypeScript playground!](https://www.typescriptlang.org/play?module=1#code/GYVwdgxgLglg9mABAJwIZgOYFMAUqBciYIAtgEZbIA0iZhx5lAlPaRcgNoC6iA3gFCIUWKCGRJUiADy1EAfkQdUNAHRq0mXJIDUiAIw0yTHoQ5ku-AL79+AeluIsAD1QkADgBssiEAGdU2PwQCL5wXioecBg4Gtg4BvoADExMQA)
 
-However, this was widely **boring** and **severly unambitios**; No, what I needed was something with a bit more *spice*...
+However, this was widely **boring** and **severely unambitious**; No, what I needed was something with a bit more *spice*...
 
-## Generator Expiraments
+## Generator Experiments
 
-Then it hit me! Let's use that thing I always want to use, but literally can never find a good enough reason. That's right, the goold 'ol **[Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)**. It had been a while since I last touched these pointy starred wonders, and so I got to expiramenting to refresh my memory.
+Then it hit me! Let's use that thing I always want to use, but literally can never find a good enough reason. That's right, the good 'ol **[Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator)**. It had been a while since I last touched these pointy starred wonders, and so I got to experimenting to refresh my memory.
 
 ```ts
 function* range() {
@@ -37,7 +37,7 @@ function* range() {
 console.log(...range()) // [1, 2, 3, 4, 5]
 ```
 
-Yup, still got it! However, then it dawned on me. Normally I use a loop inside a generator, so the solution would have to bring back our old friend recursion, recursion, recuriosn!
+Yup, still got it! However, then it dawned on me. Normally I use a loop inside a generator, so the solution would have to bring back our old friend recursion, recursion, recursion!
 
 ```ts
 function* range(a: number, b: number) {
@@ -47,7 +47,7 @@ function* range(a: number, b: number) {
 }
 ```
 
-Hmmmmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the type God and a couple minutes later I had finished at last, and was eagerly awaiting to dunk on the LinkedIn n00bs!
+Hmmm.... the code was working, but TypeScript wasn't pleased. A few prayers to the type God and a couple minutes later I had finished at last, and was eagerly awaiting to dunk on the LinkedIn n00bs!
 
 ```ts
 type RangeIterator = Generator<number, void, undefined>
