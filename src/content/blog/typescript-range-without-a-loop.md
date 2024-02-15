@@ -230,6 +230,36 @@ console.log(...range(3, 9)) // 3, 4, 5, 6, 7, 8, 9
  If you want to lean more about the **YCombinator** I recommend checking out the following [blog post](https://lucasfcosta.com/2018/05/20/Y-The-Most-Beautiful-Idea-in-Computer-Science.html) which does an excellent job of breaking it down and explaining it step by step!
 
 
+## Happily ever after?
+
+As you can imagine I was riding pretty high after writing potentially the most needlessly complex and over-engineered code to dunk on Jr. devs on LinkedIn when the unthinkable happened...
+
+<img src="/challenger.jpeg" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="A new challenger approaches" width="100%" />
+
+> Interesting approach. <br>
+> Unfortunately, you can easily encounter: <br>
+> [ERR]: Maximum call stack size exceeded <br>
+> Be careful with recursion in Javascript. <br>
+> <div style="text-align: right">— Principal Software Engineer at Microsoft</div>
+
+And just like that my reality was shattered.
+
+All the new found joy of working through the mind-boggling intricacies of implementing the Y-Combinator for the first time quickly evaporated. Someone had come along a blew the stack off my code by creating a range over **9,000**. At this moment I remembered the wise words once told to me long ago
+
+*"For thou who hath not been dunked on, let him cast the first lineth of code"*
+~ Ancient Proverbs
+
+## The Correct Way?
+
+The Microsoft engineer then proceeded to drop this magnificent specimen of code, which could not only easily handle **9,000**+ iterations, but relied solely on the built-in mechanics of iterables.
+
+<img src="/iterator-solution.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="The correct way." width="100%" />
+
+> In Javascript, an Iterable can be ...spread or used in a for loop. It implements a method named by Symbol.iterator, returning an Iterator. Iterator implements a method next, returning an object containing a value property and a done property, used to control the loop.
+> <cite>[Jaime Leonardo Pinheiro](https://www.linkedin.com/in/ACoAABFt5Z0BH8hw7mI-T2JCW2Gw-BoOePePUdg?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3BUZ%2FiBARFQzKowiXCf9skRw%3D%3D)</cite>
+
+It just goes to show there's always someone out there who knows more than you, and that's okay! It's all part of the learning process. I'm grateful for the opportunity to learn from others and to be able to share my own knowledge with the community.
+
 ## Notable Mentions?
 
 ```ts
