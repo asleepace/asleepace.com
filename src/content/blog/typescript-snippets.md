@@ -9,6 +9,8 @@ heroImage: '/blog-placeholder-3.jpg'
 
 The following snippet creates a typed object by progressively adding properties, this can be useful for defining different errors in an application.
 
+**CAVEAT**: In order for the `this` in `register()` method to work correctly, the definition cannot use an arrow function.
+
 ```ts
 type ErrorRegistry<T extends string> = Record<T, number> & {
     register<K extends string>(error: K, code: number): ErrorRegistry<K | T>
