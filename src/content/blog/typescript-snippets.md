@@ -36,3 +36,29 @@ const output = createErrorRegistry('app')
 ```
 
 [Typescript Playground Link](https://www.typescriptlang.org/play/?target=99#code/C4TwDgpgBAogTnA9nAShA5gSwM7DiAHgBUoIAPYCAOwBNspc5Mr0A+KAXijQGNkbiAGihUArgFsARhDjsAZFADeAKChqocDDkpwCAaVIVqdBnmZsAFDKRwAXFD3C+NCPbFSZASnvwbaLIyEBgA+UESsygC+ysoAZqJUPMCYiFRQPJoAhpS+yP7a+MSGlLT0jOasFjSI4pnM9kSeSqrqfFS4pAh5WoGczeoDGj06+sXG9OFWXXYOTogubhLScE0qg+tDwKJwaWsb+wB0R8AAFjiCLfvrANrWyAC69s4Ql1eRUJn0uajDhSShenYrwG0RBHy+03ygWIEQGmi2O06fl+ICiMTaHUQomAYGxfQyEGyEG+ULwIAsAHJMmAwBTPK8DpoAjpKQAbZgAa3MFOEAEYAAz8+kDRnDGSUySYVnslg8qAAJkFwvUouZ4op2G2sUyPAgcsVQvRqWwiFZEAOrMQ6AsWJx2KaAHoHVAgA)
+
+### Branded Types
+
+The following snippet defines a utility type `Brand<any, string>` which can be used to create an alias of an existing type, which is more strict than the original type.
+
+```ts
+declare const BrandSymbol: unique symbol
+
+type Brand<T, Description extends string> = T & {
+    [BrandSymbol]: Description
+}
+
+// example usage
+
+type UserId = Brand<number, 'UserId'>
+
+function trackUser(userId: UserId) {
+    console.log('user:', userId)
+}
+
+const userOne = 123 as UserId
+const userTwo = 123
+
+trackUser(userOne) // ok
+trackUser(userTwo) // error
+```
