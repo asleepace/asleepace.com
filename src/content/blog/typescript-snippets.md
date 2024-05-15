@@ -62,3 +62,5 @@ const userTwo = 123
 trackUser(userOne) // ok
 trackUser(userTwo) // error
 ```
+
+[Typescript Playground Link](https://www.typescriptlang.org/play/?target=99#code/FAEwpgxgNghgTmABBA9gOwM4BdECE4xogDKAngLYBGKUAXIgK5oCWAjg0hhdVMMFqQAOSfIRAAeACoAaRABEwGCHGaCszdIjAAPLGCIZE2FWgDmAPkQBeRJMQAyRAG9giN4gDaoomSo0AuvQKSipqGmjAAL58APQxWtow5IJQSAwYMKZgfALCiACqGGBwAJIg1ngEROJoDFTFsgDkhcVljeZ8AGZMEOqaWAQQANYtcAAU6a0g9KNlAJTOru6omDRgAHRQKKZjjZNwtI2y+-NRfCvYjEVwAPJoSDYAjABMAMyIMIazIMAXOPuSADuKAqL1eOUGI2uE2udzACziiBQQ34kNGMOKQJQCPixTgKDgfCAA)
