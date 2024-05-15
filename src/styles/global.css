@@ -196,3 +196,8 @@ hr {
   border-radius: 16px;
   overflow: hidden;
 }
+
+.blog-card-image {
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
