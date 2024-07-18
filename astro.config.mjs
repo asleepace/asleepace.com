@@ -1,12 +1,19 @@
 import { defineConfig } from 'astro/config'
 import sitemap from '@astrojs/sitemap'
+import react from '@astrojs/react'
+import node from '@astrojs/node'
 import mdx from '@astrojs/mdx'
 
-// https://docs.astro.build/en/guides/server-side-rendering/
-import node from '@astrojs/node'
-import react from '@astrojs/react'
+/**
+ *  Astro Configuration
+ *
+ *  This is the where the typescript application is configured.
+ *
+ *  - https://astro.build/config
+ *  - https://docs.astro.build/en/recipes/bun/
+ *  - https://docs.astro.build/en/guides/server-side-rendering/
+ */
 
-// https://astro.build/config
 export default defineConfig({
   integrations: [mdx(), sitemap(), react()],
   prefetch: true,
