@@ -5,8 +5,11 @@
   "editor.quickSuggestions": {
     "strings": true
   },
+  "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.format.semicolons": "remove",
+  "prettier.semi": false,
   "editor.formatOnSave": true,
   "cSpell.ignoreWords": [
     "astrojs",
@@ -26,5 +29,6 @@
     "tsconfigs",
     "htmx",
     "rngs",
+    "consts",
   ]
 }
