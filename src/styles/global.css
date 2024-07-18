@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /*
   The CSS in this style tag is based off of Bear Blog's default CSS.
   https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
@@ -67,9 +71,11 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: Atkinson, sans-serif;
   margin: 0 0 0.5rem 0;
   color: rgb(var(--black));
   line-height: 1.2;
+  font-weight: bold;
 }
 h1 {
   font-size: 3.052em;
@@ -100,6 +106,7 @@ p {
   margin-bottom: 1em;
 }
 .prose p {
+  margin-top: 1em;
   margin-bottom: 2em;
 }
 textarea {
@@ -121,14 +128,35 @@ code {
   padding: 2px 5px;
   background-color: rgb(var(--gray-light));
   border-radius: 2px;
+  font-size: 0.78em;
 }
 pre {
   padding: 1.5em;
   border-radius: 8px;
+  font-size: 0.78em;
 }
 pre > code {
   all: unset;
 }
+
+ul {
+  tab-size: 4;
+  margin-block-start: 0em;
+  margin-block-end: 1.2em;
+  padding-inline-start: 1.2em;
+}
+
+li {
+  border: none;
+  color: rgb(34, 41, 57);
+  list-style-type: disc;
+  font-family: Atkinson, sans-serif;
+  padding-inline-start: 0.4em;
+  padding-inline-end: 1.2em;
+  line-height: 34px;
+  font-size: 1em;
+}
+
 blockquote {
   border-left: 4px solid var(--accent);
   padding-left: 1rem;
@@ -176,6 +204,23 @@ hr {
   clip-path: inset(50%);
   /* added line to stop words getting smushed together (as they go onto seperate lines and some screen readers do not understand line feeds as a space */
   white-space: nowrap;
+}
+
+/* Blog Specific Styles */
+
+.blog-title {
+  color: rgb(15, 18, 25);
+  font-size: 1.563em;
+  line-height: 1.2;
+  margin: 0;
+  font-family: Atkinson, sans-serif;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  unicode-bidi: isolate;
+  font-weight: bold;
+}
+
+.blog-text {
 }
 
 /* Custom Designed Elements */
