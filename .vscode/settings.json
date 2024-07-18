@@ -7,5 +7,24 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "cSpell.ignoreWords": [
+    "astrojs",
+    "asleepace",
+    "classNames",
+    "Astro",
+    "frontmatter",
+    "preact",
+    "tailwindcss",
+    "Elysia",
+    "mkdir",
+    "elysiajs",
+    "outdir",
+    "Codespaces",
+    "rgba",
+    "rgb",
+    "tsconfigs",
+    "htmx",
+    "rngs",
+  ]
 }
