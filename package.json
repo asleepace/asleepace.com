@@ -6,7 +6,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "bunx --bun astro dev",
-    "start": "bunx --bun astro dev",
+    "start": "bunx --bun astro preview",
     "build": "bunx --bun astro build",
     "preview": "bunx --bun astro preview",
     "deploy": "./scripts/deploy.sh",
