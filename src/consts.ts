@@ -3,3 +3,4 @@
 
 export const SITE_TITLE = 'Asleepace'
 export const SITE_DESCRIPTION = 'a random collection of internet treasures'
+export const SITE_URL = 'https://asleepace.com'

@@ -4,6 +4,18 @@ import react from '@astrojs/react'
 import node from '@astrojs/node'
 import mdx from '@astrojs/mdx'
 
+
+/**
+ *  Site-map Configuration
+ *
+ *  https://docs.astro.build/en/guides/integrations-guide/sitemap/
+ */
+const sitemapConfig = sitemap({
+  changefreq: 'weekly',  
+  lastmod: new Date(),
+  priority: 0.7,
+})
+
 /**
  *  Astro Configuration
  *
@@ -13,9 +25,8 @@ import mdx from '@astrojs/mdx'
  *  - https://docs.astro.build/en/recipes/bun/
  *  - https://docs.astro.build/en/guides/server-side-rendering/
  */
-
 export default defineConfig({
-  integrations: [mdx(), sitemap(), react()],
+  integrations: [mdx(), sitemapConfig, react()],
   prefetch: true,
   site: 'https://asleepace.com',
   adapter: node({

@@ -49,6 +49,9 @@
     ],
     "@styles/*": [
       "./src/styles/*"
+    ],
+    "@constants": [
+      "./src/consts.ts"
     ]
   }
 }
