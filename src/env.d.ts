@@ -1,7 +1,6 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
-
 declare const DATABASE_URL: string
 declare const SECRET: string
 declare const SMTP_HOST: string

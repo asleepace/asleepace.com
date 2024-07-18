@@ -1,56 +1,55 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from '../components/BaseHead.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header title={SITE_TITLE} />
-		<main>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header title={SITE_TITLE} />
+    <main>
       <div class="beara-banner">
         <img src="/beara.png" width="400px" alt="Beara" />
       </div>
-			<h1 hx-boost="false" hx-get="/api/">Howdy, Friend 👋 </h1>
-			<p>
-				Welcome to my personal website, here you can find a wide array of random and unique content
-        from unhinged internet ramblings to in-depth technical blog posts! If it's about Asleepace,
-        then you're sure to find it here!
-			</p>
-			<b>
-				Who is Asleepace?
-      </b>
-			<p>
-        Well for starters my name is Colin Teahan, but my friends call me Ballin and when I
-        was a young boy of about 13 years of age I created my first Xbox Live account which I tried 
-        naming "Ace", unfortunately that was taken and instead I was bestown the name "Asleepace" by
-        the internet Gods! (aka some random name generator). At least it's always available. 😅
-      </p>
-      <b>
-				What can I find on this website?
-      </b>
+      <h1 hx-boost="false" hx-get="/api/">Howdy, Friend 👋</h1>
       <p>
-        Pretty much everything & anything. I've been meaning to make a personal blog for quite some time
-        now, but I've always dreamed of something greater. Instead you can think of this place as my personal
-        playground, a place to expirament new technologies, deploy cool tools, test my code, and also a blog.
-        Below is a list which more accurately describes what you may find in the depths...
+        Welcome to my personal website, here you can find a wide array of random
+        and unique content from unhinged internet ramblings to in-depth
+        technical blog posts! If it's about Asleepace, then you're sure to find
+        it here!
       </p>
-			<ul>
-				<li>Unhinged internet ramblings</li>
-				<li>Half-baked and un-safe development tools</li>
-				<li>Narcissistic vanity multi-media</li>
-				<li>The worst financial advice</li>
-				<li>Random memes</li>
-			</ul>
-			<p>
-				Have fun, and enter at your own risk!
-			</p>
-		</main>
-		<Footer />
-	</body>
+      <b> Who is Asleepace? </b>
+      <p>
+        Well for starters my name is Colin Teahan, but my friends call me Ballin
+        and when I was a young boy of about 13 years of age I created my first
+        Xbox Live account which I tried naming "Ace", unfortunately that was
+        taken and instead I was bestown the name "Asleepace" by the internet
+        Gods! (aka some random name generator). At least it's always available.
+        😅
+      </p>
+      <b> What can I find on this website? </b>
+      <p>
+        Pretty much everything & anything. I've been meaning to make a personal
+        blog for quite some time now, but I've always dreamed of something
+        greater. Instead you can think of this place as my personal playground,
+        a place to expirament new technologies, deploy cool tools, test my code,
+        and also a blog. Below is a list which more accurately describes what
+        you may find in the depths...
+      </p>
+      <ul>
+        <li>Unhinged internet ramblings</li>
+        <li>Half-baked and un-safe development tools</li>
+        <li>Narcissistic vanity multi-media</li>
+        <li>The worst financial advice</li>
+        <li>Random memes</li>
+      </ul>
+      <p>Have fun, and enter at your own risk!</p>
+    </main>
+    <Footer />
+  </body>
 </html>

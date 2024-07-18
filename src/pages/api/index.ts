@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro"
+import type { APIRoute } from 'astro'
 
 /**
  * TypeScript API
@@ -9,12 +9,12 @@ import type { APIRoute } from "astro"
  * documentation: https://docs.astro.build/en/guides/endpoints/
  */
 export const GET: APIRoute = async ({ params, request }) => {
-  console.log("[api] params:", params)
-  console.log("[api] request:", request)
+  console.log('[api] params:', params)
+  console.log('[api] request:', request)
   return new Response(
     JSON.stringify({
-      name: "Astro",
-      url: "https://astro.build/",
+      name: 'Astro',
+      url: 'https://astro.build/',
     })
   )
 }
