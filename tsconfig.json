@@ -4,5 +4,7 @@
     "strictNullChecks": true,
     "target": "ESNext",
     "module": "ESNext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }
