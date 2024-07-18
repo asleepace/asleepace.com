@@ -2,7 +2,7 @@
 // use tokio_postgres::Client;
 
 // /**
-//  * This function is used to verify on oauth token for a specfied resource owner id.
+//  * This function is used to verify on oauth token for a specified resource owner id.
 //  */
 // pub async fn verify_token(client: Client, oauth_token: String, owner_id: &i64) -> bool {
 //     let mut statement = queries::auth::verify_token();
