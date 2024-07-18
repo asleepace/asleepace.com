@@ -50,7 +50,7 @@ pub async fn create_user() -> Result<impl warp::Reply, warp::Rejection> {
             &"colin_teahan@yahoo.com",
             &"Colin",
             &"Teahan",
-            &"https://asleepace.com/about-me.jpeg",
+            &"https://asleepace.com/images/about-me.jpeg",
         )
         .await;
 

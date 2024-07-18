@@ -2,7 +2,7 @@
 title: 'Typescript Snippets'
 description: 'Useful TypeScript snippets for everyday use which can be easily copied and pasted.'
 pubDate: 'May 14 2024'
-heroImage: '/typescript-banner.png'
+heroImage: '/images/typescript-banner.png'
 ---
 
 ### Typed Builder Pattern

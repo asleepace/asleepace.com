@@ -3,7 +3,7 @@ title: 'SSR with Bun, Elysia & React'
 description: 'How to build a simple website using React, Bun and Elysia with server-side rendering in 2023.'
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
-heroImage: '/bun-elysia-react-banner.png'
+heroImage: '/images/bun-elysia-react-banner.png'
 ---
 
 This article will show you how to create a simple website using [Bun](https://bun.sh/docs/installation), [Elysia](https://elysiajs.com/) and [React](https://react.dev/) with support for server-side rendering.
@@ -194,7 +194,7 @@ bun run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser and you should see the following
 
-<img src="/ssr-example.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%" />
+<img src="/images/ssr-example.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%" />
 
 However, you may notice that pressing the button doesn't increment the counter. This is because we haven't added any client-side code yet. Let's go ahead and do that now. Create a new file called `index.tsx` in your `./react/` folder with the following code
 

@@ -2,7 +2,7 @@
 title: 'Implement a range in TypeScript without loops*'
 description: 'How to implement a range sequence using generators in TypeScript for fun!'
 pubDate: 'Feb 13, 2024'
-heroImage: '/generator-cover.png'
+heroImage: '/images/generator-cover.png'
 ---
 
 The other day I was browsing **LinkedIn** and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
@@ -194,7 +194,7 @@ Array.from({ length: finish - start + 1 }, (_, i) => start + i + 1)
 
 While these are short and concise solutions, they are still using loops under the hood. So, I decided to take it a step further and see if I could implement a solution without using loops or recursion.
 
-<img src="/ah-shit-here-we-go-again.gif" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="Ah shit here we go again..." width="100%" />
+<img src="/images/ah-shit-here-we-go-again.gif" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="Ah shit here we go again..." width="100%" />
 
 <br>
 <br>
@@ -236,7 +236,7 @@ If you want to lean more about the **YCombinator** I recommend checking out the 
 
 As you can imagine I was riding pretty high after writing potentially the most needlessly complex and over-engineered code to dunk on Jr. devs on LinkedIn when the unthinkable happened...
 
-<img src="/challenger.jpeg" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="A new challenger approaches" width="100%" />
+<img src="/images/challenger.jpeg" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="A new challenger approaches" width="100%" />
 
 > Interesting approach. <br>
 > Unfortunately, you can easily encounter: <br> > [ERR]: Maximum call stack size exceeded <br>
@@ -255,7 +255,7 @@ _"For thou who hath not been dunked on, let him cast the first lineth of code"_
 
 The Microsoft engineer then proceeded to drop this magnificent specimen of code, which could not only easily handle **9,000**+ iterations, but relied solely on the built-in mechanics of iterables.
 
-<img src="/iterator-solution.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="The correct way." width="100%" />
+<img src="/images/iterator-solution.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="The correct way." width="100%" />
 
 > In Javascript, an Iterable can be ...spread or used in a for loop. It implements a method named by Symbol.iterator, returning an Iterator. Iterator implements a method next, returning an object containing a value property and a done property, used to control the loop.
 > <cite>[Jaime Leonardo Pinheiro](https://www.linkedin.com/in/ACoAABFt5Z0BH8hw7mI-T2JCW2Gw-BoOePePUdg?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3BUZ%2FiBARFQzKowiXCf9skRw%3D%3D)</cite>
