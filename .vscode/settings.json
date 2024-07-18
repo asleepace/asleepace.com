@@ -9,6 +9,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.format.semicolons": "remove",
+  "prettier.singleQuote": true,
   "prettier.semi": false,
   "editor.formatOnSave": true,
   "cSpell.ignoreWords": [
@@ -30,5 +31,6 @@
     "htmx",
     "rngs",
     "consts",
+    "bunx"
   ]
 }
