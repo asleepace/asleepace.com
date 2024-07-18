@@ -48,7 +48,7 @@ And the following when you visit [http://localhost:3000](http://localhost:3000)
 Next lets go ahead and define two more folders in our project which will hold our static files and react code.
 
 ```bash
-mdkir public
+mkdir public
 mkdir src/react
 ```
 
@@ -196,7 +196,7 @@ bun run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser and you should see the following
 
-<img src="/ssr-exmaple.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%" />
+<img src="/ssr-example.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%" />
 
 However, you may notice that pressing the button doesn't increment the counter. This is because we haven't added any client-side code yet. Let's go ahead and do that now. Create a new file called `index.tsx` in your `./react/` folder with the following code
 
