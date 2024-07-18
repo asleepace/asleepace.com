@@ -1,19 +1,18 @@
-import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
-import mdx from '@astrojs/mdx';
+import { defineConfig } from 'astro/config'
+import sitemap from '@astrojs/sitemap'
+import mdx from '@astrojs/mdx'
 
 // https://docs.astro.build/en/guides/server-side-rendering/
-import nodejs from '@astrojs/node';
-
-import node from "@astrojs/node";
+import node from '@astrojs/node'
+import react from '@astrojs/react'
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap(), react()],
   prefetch: true,
   site: 'https://asleepace.com',
   adapter: node({
-    mode: "standalone"
+    mode: 'standalone',
   }),
-  output: 'hybrid'
-});
+  output: 'hybrid',
+})
