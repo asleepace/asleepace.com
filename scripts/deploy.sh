@@ -27,11 +27,11 @@ git pull
 
 pretty_print "installing node modules..."
 
-yarn install
+bun run install
 
 pretty_print "building application..."
 
-yarn build
+bun run build
 
 pretty_print "building backend application"
 
