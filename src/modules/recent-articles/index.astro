@@ -7,5 +7,9 @@ interface Props {
 
 const numberToDisplay = Astro.props.numberToDisplay ?? 3
 
+const articles = await fetch('/blog')
 ---
 
+<div class="recent-articles">
+  <h2>Recent Articles</h2>
+</div>
