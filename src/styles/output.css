@@ -809,7 +809,7 @@ ul {
   padding-inline-start: 1.2em;
 }
 
-li {
+article > li {
   border: none;
   color: rgb(34, 41, 57);
   list-style-type: disc;
