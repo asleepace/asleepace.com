@@ -27,6 +27,28 @@ Use the following command to restart the postgres server
 sudo systemctl restart postgresql
 ```
 
+Renew SSL certificates
+
+```bash
+# View existing certificates
+sudo certbot certificates
+
+# Renew all certificates
+sudo certbot renew
+
+# Renew specific certificate
+sudo certbot renew --cert-name example.com
+
+# Request a new certificate
+sudo certbot --nginx -d example.com -d www.example.com
+
+# Delete a certificate
+sudo certbot delete --cert-name example.com
+
+# Test automatic renewal
+sudo certbot renew --dry-run
+```
+
 - [Expose postgres server to external host](https://www.bigbinary.com/blog/configure-postgresql-to-allow-remote-connection)
 
 # Astro Starter Kit: Blog
