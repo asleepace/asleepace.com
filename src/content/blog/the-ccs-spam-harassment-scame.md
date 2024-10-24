@@ -10,6 +10,8 @@ Their stack:
 
 # Email Contact
 
+https://ficoforums.myfico.com/t5/General-Credit-Topics/E-mail-Contact-for-CCS-Credit-Collection-Services-Needham-MA/td-p/65507
+
 ```txt
 Administrative Contact:
 The CCS Companies, Inc
