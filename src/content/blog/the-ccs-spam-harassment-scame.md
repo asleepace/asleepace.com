@@ -8,6 +8,8 @@ Their stack:
 - https://www.linkedin.com/company/the-ccs-companies/ (LinkedIn)
 - https://www.paycomonline.net/v4/ats/web.php/jobs?clientkey=DB7B3459593528CD2AB20F3D8CB2B13B (Job Page)
 
+Seems they also have a host of people in the dominican republic, perhaps this is how they get around the laws.
+
 # Email Contact
 
 https://ficoforums.myfico.com/t5/General-Credit-Topics/E-mail-Contact-for-CCS-Credit-Collection-Services-Needham-MA/td-p/65507
@@ -23,7 +25,11 @@ Phone: 617-965-2000
 Email: pcoyle@ccsusa.com
 ```
 
-# Who are they?
+## Interesting Articles
+
+https://money.com/how-to-remove-ccs-offices-from-your-credit-report/
+
+## Who are they?
 
 While their website does do a good job of concealing any personally identifiable information about who these people are, 
 it doesn't change the fact that people are still people, and nobody wants to explain a long gap on their resume...
