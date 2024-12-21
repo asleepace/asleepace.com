@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 import { http } from '@/lib/http'
+import type { ApiProxyResponse } from './proxy'
 
 export const prerender = false
 
@@ -11,9 +12,33 @@ export const prerender = false
  *
  * documentation: https://docs.astro.build/en/guides/endpoints/
  */
-export const GET: APIRoute = async ({ params, request }) => {
-  console.log('[api] params:', params)
-  console.log('[api] request:', request)
+export const GET: APIRoute = async ({ request }) => {
+  const redirectToProxy = http
+    .parse(request)
+    .getSearchParam('uri')
+    .decodeURIComponent()
 
-  return http.success({ message: 'Hello from TypeScript API!' })
+  console.log('[api/exec] redirecting to:', redirectToProxy)
+
+  const proxyResponse = await fetch(
+    `http://localhost:4321/api/proxy?uri=${encodeURIComponent(redirectToProxy)}`
+  ).catch((e) => {
+    console.error('[api/exec] failed to fetch:', e)
+    return http.failure(500, 'Failed to fetch')
+  })
+
+  const proxy: ApiProxyResponse = await proxyResponse.json()
+  console.log('[api/exec] response:', proxy)
+  const output = await safeEval(proxy.data)
+  return http.success({ output, status: proxy.status })
+}
+
+async function safeEval(code: string): Promise<unknown | null> {
+  try {
+    const result = await eval(code)
+    return result ?? null
+  } catch (e) {
+    console.error('[api/exec] failed to evaluate:', e)
+    return null
+  }
 }

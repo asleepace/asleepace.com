@@ -17,6 +17,7 @@ export const http = {
   failure,
   response,
   parse,
+  get,
 }
 
 /**
@@ -100,4 +101,17 @@ function parse(request: Request) {
   }
 
   return { url, headers, contentType, body, searchParams, getSearchParam }
+}
+
+/**
+ * GET data from a URL.
+ */
+function get(uri: string) {
+  return fetch(uri, {
+    method: 'GET',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  })
 }

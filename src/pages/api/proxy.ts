@@ -18,8 +18,9 @@ export type ApiProxyResponse = {
  * @returns {ApiProxyResponse}
  *
  */
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ request }) => {
   const uri = http.parse(request).getSearchParam('uri').decodeURIComponent()
+  console.log('[api/proxy] fetching:', uri)
   const proxyResponse = await fetch(uri)
   const proxyStatus = proxyResponse.status as HttpStatus
   const proxyContentType = proxyResponse.headers.get('content-type')

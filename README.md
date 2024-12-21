@@ -5,17 +5,20 @@ My person website & playground.
 # Server Commands
 
 Connect to the server via SSH
+
 ```bash
 ssh root@192.241.216.26
 ```
 
 Build the website from scratch
+
 ```bash
 yarn install
 yarn build
 ```
 
 Start the process with **pm2** run the following commands
+
 ```bash
 pm2 stop --all
 pm2 start ./dist/server/entry.mjs --name asleepace.com
@@ -28,6 +31,13 @@ sudo systemctl restart postgresql
 ```
 
 - [Expose postgres server to external host](https://www.bigbinary.com/blog/configure-postgresql-to-allow-remote-connection)
+
+# API Documentation
+
+All the API endpoints can be found in the `src/api` directory, and each should include a `HEAD` method which will return the schema of the endpoint.
+
+- `api/proxy` - fetches content from external sources and returns it to the client
+- `api/exec` - fetches & executes content from external sources and returns it to the client
 
 # Astro Starter Kit: Blog
 
