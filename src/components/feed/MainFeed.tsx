@@ -1,24 +1,23 @@
 import FeedPost from "./FeedPost"
 
 export type FeedData = {
-  title: string;
+  content: string;
   author: string;
   createdAt: Date;
   category: string;
-  content?: string;
   likes?: number;
   comments?: number;
 }
 
 const data: FeedData[] = [
   {
-    title: 'Stock market bounces on positive PCE data after tumultuous Fed meeting',
+    content: 'Stock market bounces on positive PCE data after tumultuous Fed meeting',
     author: '@asleepace',
     createdAt: new Date(),
-    category: 'Finance'
+    category: 'Finance',
   },
   {
-    title: 'Stock market bounces on positive PCE data after tumultuous Fed meeting',
+    content: 'Stock market bounces on positive PCE data after tumultuous Fed meeting',
     author: '@asleepace',
     createdAt: new Date(),
     category: 'Finance'
