@@ -3,7 +3,6 @@ import BaseHead from '../components/BaseHead.astro'
 import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
-import { RecentBlogs } from '../components/RecentBlogs'
 import MainFeed from '../components/feed/MainFeed'
 import Showcase from '@/components/showcase/Showcase'
 
@@ -25,7 +24,7 @@ const showcaseUrls = [
   </head>
   <body class="min-h-screen flex flex-col">
     <Header title={SITE_TITLE} />
-    <main class="flex-grow max-w-screen-lg mx-auto px-4">
+    <main class="flex flex-col flex-grow max-w-screen-lg mx-auto px-4">
       <Showcase urls={showcaseUrls} client:load />
       <MainFeed />
     </main>

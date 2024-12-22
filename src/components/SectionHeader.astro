@@ -1,0 +1,18 @@
+---
+import { Newspaper } from 'lucide-react'
+
+interface Props {
+  title: string
+  description: string
+}
+
+const { title, description } = Astro.props
+
+---
+<div class="text-center flex flex-col items-center gap-y-2">
+  <Newspaper className="text-7xl text-gray-300" size={96} />
+  <h1 class="text-7xl font-bold">{title}</h1>
+  <p class="text-lg text-gray-500">
+    {description}
+  </p>
+</div>

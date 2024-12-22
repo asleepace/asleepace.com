@@ -1,0 +1,36 @@
+---
+import { type AstroBlogData } from '@/types'
+import FormattedDate from '@/components/FormattedDate.astro'
+
+// ==============================
+//
+//  BlogPreviewItem.astro
+// 
+//  This component is used to render a preview of a blog post in the blog index page.
+//  components should be stack horizontally in full screen and vertically in smaller screens.
+//
+// ==============================
+
+
+interface Props {
+  data: AstroBlogData
+  slug: string
+}
+
+const { data, slug } = Astro.props
+
+---
+<li class="w-full xl:h-64 rounded-xl hover:pop bg-white shadow-xl overflow-clip">
+  <a href={`/blog/${slug}/`} class="flex xl:flex-row flex-col h-full">
+    <div class="flex w-full sm:h-64 bg-cover bg-center xl:basis-5/12" style=`background-image: url('${data.heroImage}')` />
+    <div class="p-4 flex flex-col justify-between w-full">
+      <p class="font-bold text-3xl xl:text-4xl">{data.title}</p>
+      <div class="flex flex-col flex-1 py-4">
+        <p class="text-gray-500 text-sm xl:text-base">{data.description}</p>
+      </div>
+      <p class="text-gray-500 text-xs xl:text-sm">
+        {"Created on "}<FormattedDate date={data.pubDate} />{" •  By "}<span class="font-semibold">{"@asleepace"}</span>
+      </p>
+    </div>
+  </a>
+</li>

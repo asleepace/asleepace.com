@@ -20,7 +20,7 @@ function Showcase({ urls }: ShowcaseProps) {
         </p>
       </div>
       <div className="w-full h-0.5 bg-gray-200" />
-      <div className="grid flex-wrap justify-between grid-cols-3 gap-x-4 gap-y-4 items-center">
+      <div className="grid flex-wrap justify-between grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-4 my-8 items-center">
         {urls.map((url, index) => (
           <ShowcaseItem key={index} url={url} />
         ))}

@@ -54,14 +54,14 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props
     </style>
   </head>
 
-  <body>
+  <body class="w-full">
     <Header />
-    <main>
-      <article>
+    <main class="flex flex-col bg-red-200 items-center">
+      <article class="flex flex-col max-w-screen-md">
         <div class="hero-image">
           {
             heroImage && (
-              <img width={1020} height={510} src={heroImage} alt="" />
+              <img width={'100%'} height={"auto"} src={heroImage} alt="" />
             )
           }
         </div>
