@@ -1,4 +1,10 @@
-export type HttpStatus = 200 | 201 | 204 | 400 | 401 | 403 | 404 | 500
+import config from './config'
+
+// ================================================
+// Types
+// ================================================
+
+export type HttpStatus = 200 | 201 | 204 | 400 | 401 | 403 | 404 | 500 | number
 
 export type HttpResponseParams = {
   data: any
@@ -6,6 +12,10 @@ export type HttpResponseParams = {
   statusText?: string
   headers?: Record<string, string>
 } & ResponseInit
+
+// ================================================
+// Module
+// ================================================
 
 /**
  * @module http - this module provides a set of utilities for creating HTTP responses,
@@ -18,16 +28,29 @@ export const http = {
   response,
   parse,
   get,
+  host,
+}
+
+// ================================================
+// Helpers
+// ================================================
+
+function host(path: string, searchParams?: Record<string, any>): URL {
+  const url = new URL(path, config.baseUrl)
+  if (searchParams) {
+    url.search = new URLSearchParams(searchParams).toString()
+  }
+  return url
 }
 
 /**
- * Encode data to JSON, returning null if the encoding fails.
+ * Encode data to JSON, returning null if the encoding fails.t
  */
-function encodeSafe(data: any): string | null {
+function encodeSafe<T extends object>(data: T): string | null {
   try {
     return JSON.stringify(data)
   } catch (e) {
-    console.warn(`Failed to encode body JSON:`, e)
+    console.warn('[http] failed to encode JSON:', e)
     return null
   }
 }
@@ -109,9 +132,9 @@ function parse(request: Request) {
 function get(uri: string) {
   return fetch(uri, {
     method: 'GET',
-    headers: { 
+    headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
     },
   })
 }

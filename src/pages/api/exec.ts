@@ -1,44 +1,44 @@
 import type { APIRoute } from 'astro'
 import { http } from '@/lib/http'
 import type { ApiProxyResponse } from './proxy'
+import { safeEval } from '@/lib/safeEval'
 
 export const prerender = false
 
 /**
- * TypeScript API
  *
- * This page contains the entry point for the typescript application programming interface (API).
- * Request can be handled here or by the Rust backend as well.
+ *  GET /api/exec?uri={uri}
  *
- * documentation: https://docs.astro.build/en/guides/endpoints/
+ *  Fetches JavaScript code from a remote URI and evaluates it in a safe context,
+ *  returning the result to the client. The search parameters will be passed to the
+ *  code as an object.
+ *
+ *  e.g. https://raw.githubusercontent.com/asleepace/snips/refs/heads/main/index.js
+ *
  */
 export const GET: APIRoute = async ({ request }) => {
-  const redirectToProxy = http
-    .parse(request)
-    .getSearchParam('uri')
-    .decodeURIComponent()
+  const { searchParams } = http.parse(request)
+  const { uri } = searchParams
 
-  console.log('[api/exec] redirecting to:', redirectToProxy)
+  if (!uri) return http.failure(400, 'Missing URI parameter')
 
-  const proxyResponse = await fetch(
-    `http://localhost:4321/api/proxy?uri=${encodeURIComponent(redirectToProxy)}`
-  ).catch((e) => {
-    console.error('[api/exec] failed to fetch:', e)
-    return http.failure(500, 'Failed to fetch')
+  const proxy = http.host('api/proxy', {
+    uri: encodeURIComponent(uri),
   })
 
-  const proxy: ApiProxyResponse = await proxyResponse.json()
-  console.log('[api/exec] response:', proxy)
-  const output = await safeEval(proxy.data)
-  return http.success({ output, status: proxy.status })
-}
+  const sourceCode = await fetch(proxy)
+    .then((res) => res.json() as Promise<ApiProxyResponse>)
+    .catch((er) => er as Error)
 
-async function safeEval(code: string): Promise<unknown | null> {
-  try {
-    const result = await eval(code)
-    return result ?? null
-  } catch (e) {
-    console.error('[api/exec] failed to evaluate:', e)
-    return null
+  if (sourceCode instanceof Error) {
+    return http.failure(500, 'Failed to fetch remote code')
   }
+
+  const output = await safeEval(sourceCode.data, {
+    ...searchParams, // exec args
+  })
+
+  return output instanceof Error
+    ? http.failure(500, output.message)
+    : http.success({ output, source: uri })
 }

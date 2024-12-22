@@ -10,12 +10,13 @@ export type ApiProxyResponse = {
 }
 
 /**
- * GET /api/proxy?uri={uri}
+ *  
+ *  GET /api/proxy?uri={uri}
  *
- * This endpoint will decode the URI parameter and fetch the resource, returning
- * the response to the client.
+ *  This endpoint will decode the URI parameter and fetch the resource, returning
+ *  the response to the client.
  *
- * @returns {ApiProxyResponse}
+ *  @returns {ApiProxyResponse}
  *
  */
 export const GET: APIRoute = async ({ request }) => {
@@ -36,6 +37,13 @@ export const GET: APIRoute = async ({ request }) => {
   })
 }
 
+/**
+ * 
+ *  HEAD /api/proxy
+ * 
+ *  This endpoint will return the API route documentation.
+ * 
+ */
 export const HEAD: APIRoute = async () =>
   http.success({
     route: 'GET /api/proxy?uri={uri}',
