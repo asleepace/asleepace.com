@@ -10,11 +10,11 @@ interface Props {
 const { title, description, icon: SectionIcon = Lucide.FileWarning } = Astro.props
 
 ---
-<section class="flex flex-col gap-y-16 py-16">
+<section class="flex flex-col gap-y-8 py-16">
   <div class="text-center flex flex-col items-center">
     <SectionIcon className="text-7xl text-gray-300" size={96} />
     <h1 class="text-7xl font-bold my-4">{title}</h1>
-    <p class="text-base text-gray-500">
+    <p class="text-lg text-gray-500">
       {description}
     </p>
   </div>
