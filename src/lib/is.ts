@@ -23,6 +23,10 @@ export function isString(value: unknown): value is string {
   return typeof value === 'string'
 }
 
+export function isSet<T extends unknown>(value: T | null | never): value is T {
+  return isNonNull(value)
+}
+
 export function is<T>(value: unknown, type: string): value is T {
   return typeof value === type
 }

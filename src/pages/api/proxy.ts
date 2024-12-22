@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
-import { http, type HttpStatus } from '@/lib/http'
+import { http } from '@/lib/http'
 import { endpoint, Exception } from '.'
-import { isResponse, isURL } from '@/lib/is'
+import { isResponse, isURL, isSet } from '@/lib/is'
 
 class UserAgents {
   static MICROSOFT =
@@ -32,7 +32,7 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
   const { searchParams } = await http.parse(request)
   const { uri } = searchParams
 
-  Exception.assert(uri, 400, 'Missing URI parameter')
+  Exception.assert(isSet(uri), 400, 'Missing URI parameter')
   Exception.assert(isURL(uri), 400, 'Invalid URI parameter')
 
   const headers = new Headers(request.headers)
