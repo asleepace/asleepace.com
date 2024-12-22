@@ -22,7 +22,7 @@ const showcaseUrls = [
   </head>
   <body class="min-h-screen flex flex-col">
     <Header title={SITE_TITLE} />
-    <main>
+    <main class="flex-grow max-w-screen-lg mx-auto px-4">
       <Showcase urls={showcaseUrls} client:load />
       <MainFeed />
     </main>

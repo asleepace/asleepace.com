@@ -11,6 +11,7 @@ type ShowcaseMetadata = {
   title?: string | null
   description?: string | null
   image?: string | null
+  themeColor?: string | null
 }
 
 export default function Showcase({ urls }: ShowcaseProps) {
@@ -41,10 +42,26 @@ async function getMetadata(url: string): Promise<ShowcaseMetadata> {
       const description = doc
         .querySelector('meta[name="description"]')
         ?.getAttribute('content')
-      const image = doc
+      const imagePath = doc
         .querySelector('meta[property="og:image"]')
         ?.getAttribute('content')
-      return { title, description, image}
+
+      const themeColor = doc
+        .querySelector('meta[name="theme-color"]')
+        ?.getAttribute('content')
+
+      console.log(
+        '[Showcase] Parsed metadata for',
+        doc.querySelector('meta[property="og:image"]')
+      )
+
+      const image = imagePath?.startsWith('http')
+        ? imagePath
+        : new URL(String(imagePath), url).href
+
+      console.log('[Showcase] image', image)
+
+      return { title, description, image, themeColor }
     })
 }
 
@@ -63,15 +80,27 @@ function ShowcaseItem(props: { url: string }) {
       )
   }, [props.url])
 
-  const background = metadata.image ? `url(${metadata.image})` : '#ededed'
+  const backgroundImage = metadata.image ? `url(${metadata.image})` : undefined
+  const backgroundColor = metadata.themeColor || '#ededed'
 
   return (
     <div
-      className="flex flex-1 flex-grow min-h-48 items-center rounded-lg p-4 bg-white shadow-md"
-      style={{ minHeight: 200, background }}
+      className="flex flex-col rounded-xl basis-1/3 hover:shadow-xl hover:animate-bounce aspect-square shadow-lg overflow-clip"
+      style={{ backgroundColor }}
     >
-      <h2 className="text-lg font-bold">{metadata.title}</h2>
-      <p className="text-sm">{metadata.description}</p>
+      <div
+        className="flex flex-1 w-full aspect-square h-64 flex-grow min-h-48 items-center p-4 bg-white shadow-md"
+        style={{
+          backgroundImage,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor,
+        }}
+      ></div>
+      <div className="flex flex-col gap-y-2 p-4 bg-white shadow-md">
+        <h2 className="text-lg font-bold">{metadata.title}</h2>
+        <p className="text-sm text-ellipsis line-clamp-2">{metadata.description}</p>
+      </div>
     </div>
   )
 }

@@ -35,10 +35,36 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
   Exception.assert(isSet(uri), 400, 'Missing URI parameter')
   Exception.assert(isURL(uri), 400, 'Invalid URI parameter')
 
+  const spoofedHost = new URL(uri).host
+
+  // Pass through headers to the remote server
   const headers = new Headers(request.headers)
   headers.has('user-agent') || headers.set('user-agent', UserAgents.APPLE)
   headers.has('accept') || headers.set('accept', '*/*')
-  headers.set('accept-encoding', 'identity') // request no compression
+
+  // Remove potentially identifying headers
+  headers.delete('cookie')
+  headers.delete('accept-language')
+  headers.delete('sec-ch-ua')
+  headers.delete('sec-ch-ua-mobile')
+  headers.delete('sec-ch-ua-platform')
+
+  // Remove forwarding headers
+  headers.delete('x-forwarded-for')
+  headers.delete('x-forwarded-host')
+  headers.delete('x-forwarded-proto')
+  headers.delete('forwarded')
+  headers.delete('via')
+
+  // Disable compression to simplify response handling
+  headers.set('accept-encoding', 'identity')
+
+  // Spoof headers to prevent blocking
+  headers.set('x-forwarded-host', spoofedHost)
+  headers.set('x-forwarded-for', '127.0.0.1')
+  headers.set('host', spoofedHost)
+  headers.set('referer', uri)
+  headers.set('origin', uri)
 
   const response = await fetch(uri, {
     method: 'GET',
