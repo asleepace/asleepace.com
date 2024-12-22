@@ -5,7 +5,7 @@ import FeedPostAvatar from './FeedPostAvatar'
 
 export default function FeedPost(props: FeedData) {
   return (
-    <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
+    <div className="bg-white border w-full rounded-lg shadow-sm p-4 mb-4">
       <div className="flex items-start justify-center space-x-3">
         {/* User Avatar Placeholder */}
         <FeedPostAvatar author={props.author} />

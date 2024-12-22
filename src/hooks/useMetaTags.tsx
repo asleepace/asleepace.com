@@ -28,10 +28,15 @@ const findMetaTag = (doc: Document, name: string): string | undefined => {
 
 const metaTags = (data: string, url: string): ShowcaseMetadata => {
   const doc = parseHtmlDocument(data)
-  const title = findMetaTag(doc, 'title')
+
+  // extract meta tags
   const description = findMetaTag(doc, 'description')
-  const imagePath = findMetaTag(doc, 'image')
   const themeColor = findMetaTag(doc, 'theme-color')
+  const imagePath = findMetaTag(doc, 'image')
+  const titleTag = findMetaTag(doc, 'title')
+
+  // site title or fallback to the URL hostname
+  const title = titleTag || new URL(url).hostname
 
   // transform relative image paths to absolute URLs
   const image = imagePath
@@ -56,13 +61,13 @@ const getMetadata = (url: string): Promise<ShowcaseMetadata> =>
  */
 export default function useMetaTags(uri: string) {
   const [metadata, setMetadata] = useState<ShowcaseMetadata>({})
-  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | undefined>()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     getMetadata(uri)
-      .then((data) => setMetadata(data))
-      .catch((err) => setError(err as Error))
+      .then((res) => setMetadata(res))
+      .catch((er) => setError(er as Error))
       .finally(() => setIsLoading(false))
   }, [uri])
 

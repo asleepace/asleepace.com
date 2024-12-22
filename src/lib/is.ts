@@ -37,5 +37,6 @@ export default {
   isError,
   isNonNull,
   isString,
+  isSet,
   is,
 }
