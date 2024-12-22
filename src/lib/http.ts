@@ -97,18 +97,21 @@ function failure(
     code: status,
   }
 ) {
+  console.warn('[http] failure:', data)
   return response({ data, status, statusText })
 }
 
 /**
  * Parse incoming request data.
  */
-function parse(request: Request) {
+async function parse(request: Request) {
   const url = new URL(request.url)
   const searchParams = Object.fromEntries(url.searchParams.entries())
   const headers = Object.fromEntries(request.headers.entries())
-  const contentType = headers['content-type'] || 'application/json'
-  const body = headers['method'] === 'GET' ? {} : request.json()
+  const contentType = request.headers.get('content-type')
+  const contentLength = Number(request.headers.get('content-length'))
+
+  const body = request.body && contentLength ? request.body: null
 
   const getSearchParam = (key: string) => {
     const value = searchParams[key]
@@ -123,7 +126,14 @@ function parse(request: Request) {
     }
   }
 
-  return { url, headers, contentType, body, searchParams, getSearchParam }
+  return {
+    url,
+    headers,
+    contentType,
+    body,
+    searchParams,
+    getSearchParam,
+  }
 }
 
 /**

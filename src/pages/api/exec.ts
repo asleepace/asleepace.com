@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro'
 import { http } from '@/lib/http'
 import type { ApiProxyResponse } from './proxy'
 import { safeEval } from '@/lib/safeEval'
+import { Exception } from '.'
+import { endpoint } from './index'
 
 export const prerender = false
 
@@ -16,31 +18,35 @@ export const prerender = false
  *  e.g. https://raw.githubusercontent.com/asleepace/snips/refs/heads/main/index.js
  *
  */
-export const GET: APIRoute = async ({ request }) => {
-  const { searchParams } = http.parse(request)
+export const GET: APIRoute = endpoint(async ({ request }) => {
+  const { searchParams } = await http.parse(request)
   const { uri } = searchParams
 
-  if (!uri) return http.failure(400, 'Missing URI parameter')
+  Exception.assert(uri, 400, 'Missing URI parameter')
 
   const proxy = http.host('api/proxy', {
-    uri: encodeURIComponent(uri),
+    uri,
   })
 
   // fetch remote code via the proxy endpoint
-  
-  const sourceCode = await fetch(proxy)
-    .then((res) => res.json() as Promise<ApiProxyResponse>)
+
+  const source = await fetch(proxy)
+    .then(async (res) => ({
+      code: await res.text(),
+      status: res.status,
+      headers: Object.fromEntries(res.headers),
+    }))
     .catch((er) => er as Error)
 
-  if (sourceCode instanceof Error) {
-    return http.failure(500, 'Failed to fetch remote code')
-  }
+  const isSourceValid = source instanceof Error === false
 
-  const output = await safeEval(sourceCode.data, {
+  Exception.assert(isSourceValid, 500, 'Failed to fetch remote code')
+
+  const output = await safeEval(source.code, {
     ...searchParams, // exec args
   })
 
   return output instanceof Error
     ? http.failure(500, output.message)
     : http.success({ output, source: uri })
-}
+})
