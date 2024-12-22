@@ -22,11 +22,12 @@ export const GET: APIRoute = async ({ request }) => {
 
   if (!uri) return http.failure(400, 'Missing URI parameter')
 
-  // fetch remote code via the proxy endpoint
   const proxy = http.host('api/proxy', {
     uri: encodeURIComponent(uri),
   })
 
+  // fetch remote code via the proxy endpoint
+  
   const sourceCode = await fetch(proxy)
     .then((res) => res.json() as Promise<ApiProxyResponse>)
     .catch((er) => er as Error)
