@@ -1,22 +1,24 @@
+# Asleepace.com
+
+My personal website and digital playground, where I like to tinker with and explore different technologies!
+
 <div align="center">
   <img
     style="border-radius: 10px; border: 1px solid #ddd; padding: 5px;"
     src="https://github.com/user-attachments/assets/25c8baf2-90e6-47e2-b730-f0302232099f" />
 </div>
 
-# Asleepace.com
-
-My personal website and digital playground, where I like to tinker with and explore different technologies!
-
-| Service | Version | About |
-|---------|---------|------------------------|
-| [ASDF](https://asdf-vm.com/guide/introduction.html) | `0.14.1`| Tool version manager.  |
-| [Astro](https://astro.build/)   | `5.1.1` | Web framework |
-| [Bun](https://bun.sh/) | `1.1.42`| JavaScript runtime |
-| [PM2](https://pm2.keymetrics.io/) | `5.3.0` | Daemon process manager |
-| [React](https://react.dev/)   | `19.0.0`| Frontend library |
+| Service                                             | Version  | About                  |
+| --------------------------------------------------- | -------- | ---------------------- |
+| [ASDF](https://asdf-vm.com/guide/introduction.html) | `0.14.1` | Tool version manager.  |
+| [Astro](https://astro.build/)                       | `5.1.1`  | Web framework          |
+| [Bun](https://bun.sh/)                              | `1.1.42` | JavaScript runtime     |
+| [PM2](https://pm2.keymetrics.io/)                   | `5.3.0`  | Daemon process manager |
+| [React](https://react.dev/)                         | `19.0.0` | Frontend library       |
 
 ## Quick Start
+
+The following is mainly just a reference for myself, but feel free to use it if you find it helpful!
 
 ```bash
 # use this to login to the remote server
@@ -42,9 +44,50 @@ sudo systemctl restart nginx
 sudo systemctl reload nginx
 ```
 
+# Installation
+
+If you are interested in running this project locally, you can follow the steps below to get started. **NOTE**: You can skip installing ASDF and PM2 as they are mainly used for managing several tool versions in a server environment.
+
+```bash
+# install Bun (JavaScript runtime)
+curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
+
+# install ASDF (tool version manager)
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.15.0
+
+# add the following to your shell profile (bash or zsh)
+echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
+echo '. "$HOME/.asdf/asdf.sh"' >> ~/.zshrc
+
+# source your shell profile (bash or zsh)
+source ~/.bashrc
+source ~/.zshrc
+
+# add ASDF plugins (from .tool-versions)
+cut -d' ' -f1 .tool-versions | xargs -I {} asdf plugin add {}
+
+# install ASDF plugins
+asdf install
+
+# download the project
+git clone git@github.com:asleepace/asleepace.com.git
+cd asleepace.com
+
+# install, check, and run the project
+bun i
+bun run check
+bun run build:tailwind
+bun run dev
+
+# build project for production
+bun run build:tailwind
+bun run build
+bun run preview
+```
+
 # Getting Started
 
-This website is deployed on a linux machine which contains several other projects which also use Bun. I recommend using ASDF to handle managing pacakge versions, here is the current config returned by running `asdf info`. 
+This website is deployed on a linux machine which contains several other projects which also use Bun. I recommend using ASDF to handle managing pacakge versions, here is the current config returned by running `asdf info`.
 
 ```
 OS:
