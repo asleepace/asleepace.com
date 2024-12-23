@@ -2,6 +2,19 @@
 
 My person website & playground.
 
+
+```bash
+# use this to login to the remote server
+ssh root@192.241.216.26
+
+# flow for updating on the site
+bun i
+bun run check
+bun run build:tailwind
+bun run build
+bun run preview
+```
+
 # Server Commands
 
 Connect to the server via SSH
