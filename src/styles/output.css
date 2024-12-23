@@ -987,6 +987,10 @@ video {
   background-image: radial-gradient(circle,rgba(0,0,0,0.08),rgba(255,255,255,1));
 }
 
+.bg-\[radial-gradient\(circle\2c rgba\(0\2c 0\2c 0\2c 0\.02\)\2c rgba\(255\2c 255\2c 255\2c 1\)\)\] {
+  background-image: radial-gradient(circle,rgba(0,0,0,0.02),rgba(255,255,255,1));
+}
+
 .bg-cover {
   background-size: cover;
 }
