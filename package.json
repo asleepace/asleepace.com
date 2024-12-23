@@ -3,7 +3,7 @@
   "description": "a collection of me by me.",
   "license": "MIT",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "check": "bun --bun astro check",
     "dev": "bunx --bun astro dev",
@@ -11,7 +11,8 @@
     "build": "bunx --bun astro build",
     "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
     "preview": "bunx --bun astro preview",
-    "build:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css --watch",
+    "build:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css",
+    "watch:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css --watch",
     "deploy": "./scripts/deploy.sh",
     "astro": "bunx --bun astro",
     "util:upgrade": "bun upgrade",
@@ -32,12 +33,11 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
     "react": "^19.0.0",
-    "react-compiler-runtime": "^19.0.0-beta-b2e8e9c-20241220",
     "react-dom": "^19.0.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.5.3"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.6"
+    "@types/bun": "^1.1.14"
   }
 }
