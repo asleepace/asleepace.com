@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import node from '@astrojs/node';
-import mdx from '@astrojs/mdx';
+// import mdx from '@astrojs/mdx';
 
 /**
  *  Site-map Configuration
@@ -28,11 +28,15 @@ const sitemapConfig = sitemap({
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [mdx(), sitemapConfig, react(), tailwind()],
+  integrations: [/*mdx(),*/ sitemapConfig, react(), tailwind()],
   prefetch: true,
   site: 'https://asleepace.com',
   adapter: node({
     mode: 'standalone'
   }),
-  output: 'hybrid'
+  // output: 'server',
+  // output: 'hybrid'
+  legacy: {
+    collections: true,
+  }
 });
