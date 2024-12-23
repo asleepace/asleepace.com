@@ -7,7 +7,7 @@
   "scripts": {
     "check": "bun --bun astro check",
     "dev": "bunx --bun astro dev",
-    "start": "bunx --bun astro build --port 4000 && bunx --bun astro preview --port 4000",
+    "start": "bunx --bun astro build --port 4321 && bunx --bun astro preview --port 4321",
     "build": "bunx --bun astro build",
     "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
     "preview": "bunx --bun astro preview",
@@ -15,7 +15,8 @@
     "deploy": "./scripts/deploy.sh",
     "astro": "bunx --bun astro",
     "util:upgrade": "bun upgrade",
-    "util:check": "bunx --bun astro check"
+    "util:check": "bunx --bun astro check",
+    "run:server": "bun ./dist/server/entry.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
