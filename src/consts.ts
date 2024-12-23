@@ -15,6 +15,6 @@ export const siteData = {
     'https://polyblog.net',
     'https://patrick-teahan.com',
     'https://lams-kitchen.com',
-    'https://dlabs.me',
+    'https://stockindx.com',
   ],
 }
