@@ -14,7 +14,7 @@ import { Newspaper } from 'lucide-react'
 
 const blog = await getCollection('blog')
 const posts = blog.sort(
-  (a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 )
 
 ---

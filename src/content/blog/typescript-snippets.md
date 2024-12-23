@@ -5,7 +5,9 @@ pubDate: 'May 14 2024'
 heroImage: '/images/typescript-banner.png'
 ---
 
-### Typed Builder Pattern
+This document contains a collection of useful, interesting and sometimes quirky snippets of TypeScript I've gathered over the years. Some of these patterns are not unique to TypeScript, but in these examples they should be also type-safe (hopefully).
+
+### Builder Pattern
 
 The following snippet creates a typed object by progressively adding properties, this can be useful for defining different errors in an application.
 
@@ -64,7 +66,7 @@ trackUser(userTwo) // error
 
 [Typescript Playground Link](https://www.typescriptlang.org/play/?target=99#code/FAEwpgxgNghgTmABBA9gOwM4BdECE4xogDKAngLYBGKUAXIgK5oCWAjg0hhdVMMFqQAOSfIRAAeACoAaRABEwGCHGaCszdIjAAPLGCIZE2FWgDmAPkQBeRJMQAyRAG9giN4gDaoomSo0AuvQKSipqGmjAAL58APQxWtow5IJQSAwYMKZgfALCiACqGGBwAJIg1ngEROJoDFTFsgDkhcVljeZ8AGZMEOqaWAQQANYtcAAU6a0g9KNlAJTOru6omDRgAHRQKKZjjZNwtI2y+-NRfCvYjEVwAPJoSDYAjABMAMyIMIazIMAXOPuSADuKAqL1eOUGI2uE2udzACziiBQQ34kNGMOKQJQCPixTgKDgfCAA)
 
-### Types Monad\*
+### Monad\*
 
 The following is a monad-like type which has support for operatings over elements of an array, or the array itself.
 
