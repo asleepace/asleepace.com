@@ -1,6 +1,5 @@
 import { memo } from 'react'
 import ShowcaseItem from './ShowcaseItem'
-import { Boxes } from 'lucide-react'
 
 export const prerender = false
 

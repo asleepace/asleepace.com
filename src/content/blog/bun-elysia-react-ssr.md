@@ -4,6 +4,7 @@ description: 'How to build a simple website using React, Bun and Elysia with ser
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
 heroImage: '/images/bun-elysia-react-banner.png'
+slug: 'ssr-with-bun-elysia-react'
 ---
 
 This article will show you how to create a simple website using [Bun](https://bun.sh/docs/installation), [Elysia](https://elysiajs.com/) and [React](https://react.dev/) with support for server-side rendering.

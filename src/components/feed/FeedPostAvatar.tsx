@@ -2,7 +2,8 @@ import { User } from 'lucide-react'
 import type { FeedData } from './MainFeed'
 import { useState } from 'react'
 
-export const getProfilePic = (author: string) => `/images/profile_${author.replace('@', '')}.jpg`
+export const getProfilePic = (author: string) =>
+  `/images/profile_${author.replace('@', '')}.jpg`
 
 /**
  * Attempts to display the profile image of the post author, which can be found

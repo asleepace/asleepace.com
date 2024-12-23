@@ -1,5 +1,4 @@
-import React from 'react'
-import { User, Clock, Tag } from 'lucide-react'
+import { Tag } from 'lucide-react'
 import type { FeedData } from './MainFeed'
 import FeedPostAvatar from './FeedPostAvatar'
 

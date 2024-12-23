@@ -1,8 +1,10 @@
 ---
 title: 'Clever Extract & Replace Algorithm'
 description: 'A simple algorithm for extracting strings and replacing values written in TypeScript.'
+author: 'Colin Teahan'
 pubDate: 'Dec 16 2022'
 heroImage: '/images/blog-placeholder-3.jpg'
+slug: 'clever-extract-replace-algorithm'
 ---
 
 > A simple algorithm which recursively extracts specified keys from arbitrary data as a flat array, and can then replace those keys when called with another flat array of strings.

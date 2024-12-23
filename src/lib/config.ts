@@ -15,12 +15,12 @@ export type Config = {
   baseUrl: URL
 }
 
-function isValidProtocol(protocol: string | null): protocol is HttpProtocol {
+export function isValidProtocol(protocol: string | null): protocol is HttpProtocol {
   if (!protocol) return false
   return (protocol === 'http' || protocol === 'https')
 }
 
-function isValidScheme(scheme: string): scheme is HttpScheme {
+export function isValidScheme(scheme: string): scheme is HttpScheme {
   return scheme === 'http://' || scheme === 'https://'
 }
 

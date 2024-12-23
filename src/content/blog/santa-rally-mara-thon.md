@@ -4,6 +4,7 @@ description: 'Marathon Digital soars over 51% this past week as inflation cools 
 pubDate: 'Dec 22 2023'
 heroImage: '/images/santa-rally.png'
 author: 'Colin Teahan'
+slug: 'santa-rally-mara-thon'
 ---
 
 With only one trading day left before Christmas, it appears that Santa may have come early this year! At the time of writing [Marathon Digital (MARA)](https://www.mara.com/) is flirting with the **$27.00** price point and up over **52%** this week alone!
