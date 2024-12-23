@@ -25,6 +25,10 @@ git fetch origin
 git checkout main
 git pull
 
+pretty_print "installing ASDF plugins..."
+
+asdf install
+
 pretty_print "installing node modules..."
 
 bun run install
