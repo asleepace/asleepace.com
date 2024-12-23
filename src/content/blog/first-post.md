@@ -1,6 +1,7 @@
 ---
 title: 'Clever Extract & Replace Algorithm'
 description: 'A simple algorithm for extracting strings and replacing values written in TypeScript.'
+author: 'Colin Teahan'
 pubDate: 'Dec 16 2022'
 heroImage: '/images/blog-placeholder-3.jpg'
 ---
