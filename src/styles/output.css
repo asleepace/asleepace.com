@@ -778,10 +778,6 @@ video {
   align-items: center;
 }
 
-.justify-start {
-  justify-content: flex-start;
-}
-
 .justify-center {
   justify-content: center;
 }
@@ -965,6 +961,10 @@ video {
   padding-bottom: 2rem;
 }
 
+.pb-24 {
+  padding-bottom: 6rem;
+}
+
 .pl-8 {
   padding-left: 2rem;
 }
@@ -975,14 +975,6 @@ video {
 
 .pt-16 {
   padding-top: 4rem;
-}
-
-.pb-16 {
-  padding-bottom: 4rem;
-}
-
-.pb-24 {
-  padding-bottom: 6rem;
 }
 
 .text-center {
@@ -1276,7 +1268,17 @@ hr {
     display: block;
   }
   h2 {
-    font-size: 2.441em;
+    font-size: 2.5em;
+    margin-top: var(--padding-lg);
+  }
+  h3 {
+    font-size: 2em;
+    margin-top: var(--padding-lg);
+    margin-bottom:  -8px;
+  }
+  p {
+    padding: 0 var(--padding-sm);
+    margin: 0;
   }
   a {
     color: black;
@@ -1290,18 +1292,6 @@ hr {
   }
   strong {
     font-weight: 550;
-  }
-  h2 {
-    font-size: 1.75em;
-    margin-top: var(--padding-lg);
-  }
-  h3 {
-    font-size: 1.5em;
-    margin-top: var(--padding-lg);
-  }
-  p {
-    padding: 0 var(--padding-sm);
-    margin: 0;
   }
   /* reset default styles */
   pre > code {
@@ -1456,11 +1446,6 @@ hr {
   .sm\:w-full {
     width: 100%;
   }
-
-  .sm\:py-0 {
-    padding-top: 0px;
-    padding-bottom: 0px;
-  }
 }
 
 @media (min-width: 768px) {
@@ -1492,11 +1477,6 @@ hr {
 
   .lg\:rounded-3xl {
     border-radius: 1.5rem;
-  }
-
-  .lg\:py-16 {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
   }
 
   .lg\:pt-16 {

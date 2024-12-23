@@ -150,7 +150,19 @@ hr {
   }
 
   h2 {
-    font-size: 2.441em;
+    font-size: 2.5em;
+    margin-top: var(--padding-lg);
+  }
+
+  h3 {
+    font-size: 2em;
+    margin-top: var(--padding-lg);
+    margin-bottom:  -8px;
+  }
+
+  p {
+    padding: 0 var(--padding-sm);
+    margin: 0;
   }
 
   a {
@@ -167,21 +179,6 @@ hr {
 
   strong {
     font-weight: 550;
-  }
-
-  h2 {
-    font-size: 1.75em;
-    margin-top: var(--padding-lg);
-  }
-
-  h3 {
-    font-size: 1.5em;
-    margin-top: var(--padding-lg);
-  }
-
-  p {
-    padding: 0 var(--padding-sm);
-    margin: 0;
   }
 
   /* reset default styles */
