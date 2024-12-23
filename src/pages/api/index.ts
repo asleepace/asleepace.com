@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro'
 import { http } from '@/lib/http'
 
+export const prerender = false;
+
 export class Exception extends Error {
   /**
    *  Create a new Exception from an unknown error.
@@ -101,3 +103,7 @@ export function endpoint(route: APIRoute): APIRoute {
     }
   }
 }
+
+export const GET: APIRoute = endpoint((ctx) => {
+  return http.success('online')
+})
