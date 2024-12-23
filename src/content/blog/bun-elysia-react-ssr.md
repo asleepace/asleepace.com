@@ -3,9 +3,8 @@ title: 'SSR with Bun, Elysia & React'
 description: 'How to build a simple website using React, Bun and Elysia with server-side rendering in 2023.'
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
-heroImage: '/bun-elysia-react-banner.png'
+heroImage: '/images/bun-elysia-react-banner.png'
 ---
-
 
 This article will show you how to create a simple website using [Bun](https://bun.sh/docs/installation), [Elysia](https://elysiajs.com/) and [React](https://react.dev/) with support for server-side rendering.
 
@@ -33,7 +32,7 @@ cd your-project-name
 bun run dev
 ```
 
-[Elysia installation documentation](https://elysiajs.com/quick-start.html) 
+[Elysia installation documentation](https://elysiajs.com/quick-start.html)
 
 You should see the following in your terminal
 
@@ -48,7 +47,7 @@ And the following when you visit [http://localhost:3000](http://localhost:3000)
 Next lets go ahead and define two more folders in our project which will hold our static files and react code.
 
 ```bash
-mdkir public
+mkdir public
 mkdir src/react
 ```
 
@@ -58,7 +57,7 @@ You project structure should now look like this
 ├── ./your-project-name
 │   ├── node_modules
 │   ├── public            # client-side static files
-│   ├── src 
+│   ├── src
 │   │   ├── react         # react code
 │   │   └── index.ts      # server-side entry point
 │   ├── .gitignore
@@ -79,7 +78,7 @@ This will allow the client to request static files from our server such as image
 
 ```ts
 // src/index.ts
-import { Elysia } from "elysia";
+import { Elysia } from 'elysia'
 import { staticPlugin } from '@elysiajs/static'
 
 const app = new Elysia()
@@ -89,6 +88,7 @@ const app = new Elysia()
   })
   .listen(3000)
 ```
+
 The static plugin default folder is public, and registered with `/public` prefix. [Click here to learn more](https://elysiajs.com/plugins/static.html)
 
 ## React Setup
@@ -103,10 +103,10 @@ Next let's create our React application by adding a file called `App.tsx` in our
 
 ```tsx
 // src/react/App.tsx
-import React, { useState } from "react";
+import React, { useState } from 'react'
 
 export default function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
   return (
     <html>
       <head>
@@ -120,7 +120,7 @@ export default function App() {
         <button onClick={() => setCount(count + 1)}>Increment</button>
       </body>
     </html>
-  );
+  )
 }
 ```
 
@@ -134,7 +134,6 @@ import App from './react/App'
 ```
 
 Don't worry if you see a type error, we will fix in the next section.
-
 
 ## Fixing Type Errors
 
@@ -150,11 +149,11 @@ Next let's specify how the project should handle **JSX** by opening our `./tscon
 {
   "jsx": "react",
   "jsxFactory": "React.createElement",
-  "jsxFragmentFactory": "React.Fragment",
+  "jsxFragmentFactory": "React.Fragment"
 }
 ```
 
-For more information refer to the [Bun JSX documentation](https://bun.sh/docs/runtime/jsx). The type errors should now be gone, but sometimes you need to restart your IDE for the changes to take effect; *looking at you VSCode*...
+For more information refer to the [Bun JSX documentation](https://bun.sh/docs/runtime/jsx). The type errors should now be gone, but sometimes you need to restart your IDE for the changes to take effect; _looking at you VSCode_...
 
 ## React SSR
 
@@ -162,27 +161,26 @@ Now back in our `./src/index.ts` let's go ahead and render our React component b
 
 ```ts
 // src/index.ts
-import { Elysia } from "elysia";
+import { Elysia } from 'elysia'
 import { staticPlugin } from '@elysiajs/static'
 import { renderToReadableStream } from 'react-dom/server'
-import { createElement } from "react";
+import { createElement } from 'react'
 import App from './react/App'
 
 const app = new Elysia()
   .use(staticPlugin())
   .get('/', async () => {
-
     // create our react App component
     const app = createElement(App)
 
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {
-      bootstrapScripts: ['/public/index.js']
+      bootstrapScripts: ['/public/index.js'],
     })
 
     // output the stream as the response
     return new Response(stream, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 'Content-Type': 'text/html' },
     })
   })
   .listen(3000)
@@ -196,7 +194,7 @@ bun run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser and you should see the following
 
-<img src="/ssr-exmaple.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%" />
+<img src="/images/ssr-example.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%" />
 
 However, you may notice that pressing the button doesn't increment the counter. This is because we haven't added any client-side code yet. Let's go ahead and do that now. Create a new file called `index.tsx` in your `./react/` folder with the following code
 
@@ -211,6 +209,7 @@ import App from './App.js'
 
 hydrateRoot(document, <App />)
 ```
+
 Normally this is where we would call `createRoot`, but since the root will be created on the server, all we need to do is hydrate the client after the initial load. This will attach event listeners to the server-generated HTML and make it interactive.
 
 [React Hydrate Documentation](https://react.dev/reference/react-dom/client/hydrateRoot)
@@ -222,7 +221,7 @@ Normally this is where we would call `createRoot`, but since the root will be cr
 
 Note these two lines above are not comments, but rather [Triple-Slash Directives](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html). These are used to tell the TypeScript compiler how to handle certain files. In this case, we are telling the compiler to include the DOM types in our project. This is necessary because the `hydrateRoot` function requires the DOM types to be present (i.e. `document`).
 
-If you wish to access DOM elements (`window`, `document`, etc.)  in another file just add these directives at the top of the file.
+If you wish to access DOM elements (`window`, `document`, etc.) in another file just add these directives at the top of the file.
 
 [How to add DOM types in Bun](https://stackoverflow.com/a/75726039/4326715)
 
@@ -235,8 +234,9 @@ We are almost there! The last step is to bundle our `react` code which will be l
 await Bun.build({
   entrypoints: ['./src/react/index.tsx'],
   outdir: './public',
-});
+})
 ```
+
 <div style="text-align: center;"><sub>That's right top level await!</sub></div>
 
 Now our **React** code will be automatically bundled each time we start our server! You can verify this by checking if the `./public/index.js` file exists. Make sure that this file path matches the `bootstrapScripts` option in your `./src/index.ts` file.
@@ -245,7 +245,7 @@ Now our **React** code will be automatically bundled each time we start our serv
 // Make sure the bootstrapScripts matches the output
 // file path in your ./public folder
 const stream = await renderToReadableStream(app, {
-  bootstrapScripts: ['/public/index.js']  
+  bootstrapScripts: ['/public/index.js'],
 })
 ```
 
@@ -261,7 +261,6 @@ If you have any additional questions feel free to reach out to me on [Twitter](h
 
 - [React Readable Streams](https://react.dev/reference/react/Suspense)
 - [React Suspense](https://react.dev/reference/react/Suspense)
-
 
 ## Helpful Resources
 
@@ -287,7 +286,7 @@ Here is the final code from the article, you can also view this project on [GitH
 │   ├── node_modules
 │   ├── public              # client-side static files
 │   │   └── index.js        # generated client bundle
-│   ├── src 
+│   ├── src
 │   │   ├── react
 │   │   │   ├── App.tsx     # react application
 │   │   │   └── index.tsx   # client-side entry point
@@ -302,34 +301,33 @@ Here is the final code from the article, you can also view this project on [GitH
 
 ```ts
 // src/index.ts
-import { Elysia } from "elysia";
+import { Elysia } from 'elysia'
 import { staticPlugin } from '@elysiajs/static'
 import { renderToReadableStream } from 'react-dom/server'
-import { createElement } from "react";
+import { createElement } from 'react'
 import App from './react/App'
 
 // bundle client side react-code
 await Bun.build({
   entrypoints: ['./src/react/index.tsx'],
   outdir: './public',
-});
+})
 
 // start a new Elysia server on port 3000
 const app = new Elysia()
   .use(staticPlugin())
   .get('/', async () => {
-
     // create our react App component
     const app = createElement(App)
 
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {
-      bootstrapScripts: ['/public/index.js']
+      bootstrapScripts: ['/public/index.js'],
     })
 
     // output the stream as the response
     return new Response(stream, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 'Content-Type': 'text/html' },
     })
   })
   .listen(3000)
@@ -339,10 +337,10 @@ const app = new Elysia()
 
 ```tsx
 // src/react/App.tsx
-import React, { useState } from "react";
+import React, { useState } from 'react'
 
 export default function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
   return (
     <html>
       <head>
@@ -356,7 +354,7 @@ export default function App() {
         <button onClick={() => setCount(count + 1)}>Increment</button>
       </body>
     </html>
-  );
+  )
 }
 ```
 

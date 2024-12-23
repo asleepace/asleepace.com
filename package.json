@@ -1,22 +1,61 @@
 {
   "name": "asleepace.com",
-  "description": "a collection of me",
+  "description": "a collection of me by me.",
   "license": "MIT",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
+    "dev": "bunx --bun astro dev",
+    "start": "bunx --bun astro build --port 4000 && bunx --bun astro preview --port 4000",
+    "build": "bunx --bun astro build",
+    "preview": "bunx --bun astro preview",
+    "build:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css --watch",
     "deploy": "./scripts/deploy.sh",
-    "astro": "astro"
+    "astro": "bunx --bun astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^0.19.7",
-    "@astrojs/node": "^5.3.2",
-    "@astrojs/rss": "^2.4.3",
-    "@astrojs/sitemap": "^2.0.1",
-    "astro": "^2.10.1"
+    "@astrojs/check": "^0.8.2",
+    "@astrojs/mdx": "^3.1.2",
+    "@astrojs/node": "^8.3.2",
+    "@astrojs/react": "^3.6.0",
+    "@astrojs/rss": "^4.0.7",
+    "@astrojs/sitemap": "^3.1.6",
+    "@astrojs/tailwind": "^5.1.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.11.6",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.469.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.6",
+    "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.6"
+  },
+  "baseUrl": ".",
+  "paths": {
+    "@/*": [
+      "./src/*"
+    ],
+    "@components/*": [
+      "./src/components/*"
+    ],
+    "@content/*": [
+      "./src/content/*"
+    ],
+    "@layouts/*": [
+      "./src/layouts/*"
+    ],
+    "@pages/*": [
+      "./src/pages/*"
+    ],
+    "@styles/*": [
+      "./src/styles/*"
+    ],
+    "@constants": [
+      "./src/consts.ts"
+    ]
   }
 }

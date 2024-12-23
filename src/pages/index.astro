@@ -1,56 +1,47 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from '@/components/astro/BaseHead.astro'
+import Header from '@/components/astro/Header.astro'
+import Footer from '@/components/astro/Footer.astro'
+import { siteData } from '@/consts'
+import MainFeed from '@/components/feed/MainFeed'
+import Showcase from '@/components/showcase/Showcase'
+import Section from '@/components/astro/Section.astro'
+import { Boxes, BellRing } from 'lucide-react'
+import { getCollection } from 'astro:content'
+import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
+
+// =====================================
+// Home Page
+// =====================================
+
+const blog = await getCollection('blog')
+const posts = blog.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+).slice(0, 3)
+
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header title={SITE_TITLE} />
-		<main>
-      <div class="beara-banner">
-        <img src="/beara.png" width="400px" alt="Beara" />
-      </div>
-			<h1 hx-boost="false" hx-get="/api/">Howdy, Friend 👋 </h1>
-			<p>
-				Welcome to my personal website, here you can find a wide array of random and unique content
-        from unhinged internet ramblings to in-depth technical blog posts! If it's about Asleepace,
-        then you're sure to find it here!
-			</p>
-			<b>
-				Who is Asleepace?
-      </b>
-			<p>
-        Well for starters my name is Colin Teahan, but my friends call me Ballin and when I
-        was a young boy of about 13 years of age I created my first Xbox Live account which I tried 
-        naming "Ace", unfortunately that was taken and instead I was bestown the name "Asleepace" by
-        the internet Gods! (aka some random name generator). At least it's always available. 😅
-      </p>
-      <b>
-				What can I find on this website?
-      </b>
-      <p>
-        Pretty much everything & anything. I've been meaning to make a personal blog for quite some time
-        now, but I've always dreamed of something greater. Instead you can think of this place as my personal
-        playground, a place to expirament new technologies, deploy cool tools, test my code, and also a blog.
-        Below is a list which more accurately describes what you may find in the depths...
-      </p>
-			<ul>
-				<li>Unhinged internet ramblings</li>
-				<li>Half-baked and un-safe development tools</li>
-				<li>Narcissistic vanity multi-media</li>
-				<li>The worst financial advice</li>
-				<li>Random memes</li>
-			</ul>
-			<p>
-				Have fun, and enter at your own risk!
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={siteData.title} description={siteData.description} />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Header title={siteData.title} />
+    <main class="flex flex-col flex-grow max-w-screen-lg mx-auto px-4">
+      <!-- recent articles (3 most recent) -->
+      <Section title="Articles" description="Blog posts, tutorials and more." icon={Boxes}>
+        <BlogPreviewList posts={posts} />
+      </Section>
+      <!-- website show case section -->
+      <Section title="Showcase" description="A collection of various projects I've done over the years." icon={Boxes}>
+        <Showcase urls={siteData.showcaseLinks} client:load />
+      </Section>
+      <!-- recent activity section -->
+      <Section title="Recent Activity" description="Recent activity on this site." icon={BellRing}>
+        <MainFeed />
+      </Section>
+    </main>
+    <Footer />
+  </body>
 </html>

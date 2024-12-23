@@ -1,0 +1,22 @@
+---
+import { clsx } from 'clsx'
+import '@/styles/global.css'
+
+// ===============================
+//  Prose
+//
+//  A container for text content which handles spacing and typography,
+//  making it easier to write and style text content.
+//
+// ============================
+
+interface Props {
+  className?: string
+}
+
+const { className } = Astro.props
+
+---
+<div id="prose" class={clsx("flex flex-col gap-y-1 w-full", className)}>
+  <slot />
+</div>

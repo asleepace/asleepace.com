@@ -2,7 +2,7 @@
 title: 'Clever Extract & Replace Algorithm'
 description: 'A simple algorithm for extracting strings and replacing values written in TypeScript.'
 pubDate: 'Dec 16 2022'
-heroImage: '/blog-placeholder-3.jpg'
+heroImage: '/images/blog-placeholder-3.jpg'
 ---
 
 > A simple algorithm which recursively extracts specified keys from arbitrary data as a flat array, and can then replace those keys when called with another flat array of strings.
@@ -16,14 +16,14 @@ export type ExtractAndReplaceProps = (
 
 export const extar: ExtractAndReplaceProps = (data, keys, replace) =>
   Object.entries(data).reduce((previous, [key, value]) => {
-    if (typeof value === 'object') return previous.concat(extar(value, keys, replace))
+    if (typeof value === 'object')
+      return previous.concat(extar(value, keys, replace))
     if (typeof value === 'string' && keys.has(key)) {
       if (replace) data[key] = replace.shift() // replace that element if specified
       return previous.concat(value) // always extract original element
     }
     return previous
   }, [] as string[])
-
 ```
 
 The other day my colleague was working on a translation micro-service and was contemplating on how to best extract specific strings from arbitrary JSON data to send to the translation API. The translation API only accepts a flat array of strings, and would return the same translated. He was tinkering with several approaches, but to be honest they were all needlessly complex and over-engineered.
@@ -52,7 +52,7 @@ function traverse(data: unknown) {
 }
 ```
 
-Basically, the idea is to recursively traverse any array elements and objects values. Since the `typeof` operator returns `'object'` for both arrays and objects, we also need to perform an additional check to see if the value is an array. 
+Basically, the idea is to recursively traverse any array elements and objects values. Since the `typeof` operator returns `'object'` for both arrays and objects, we also need to perform an additional check to see if the value is an array.
 
 However, I was not happy with this approach as it felt a bit too clunky and verbose. Sometimes I really wish the `typeof` operator would return `'array'` for arrays, but then I remembered that arrays are objects in TypeScript, and that I could use this to my advantage.
 

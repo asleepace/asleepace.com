@@ -1,0 +1,13 @@
+---
+
+interface Props {
+  src?: string
+  alt?: string
+}
+
+const { src, alt } = Astro.props
+
+---
+<div class="flex flex-1 items-center justify-center w-full">
+  <img src={src} alt={alt} class="lg:rounded-3xl lg:shadow-2xl aspect-video lg:max-w-screen-md" />
+</div>

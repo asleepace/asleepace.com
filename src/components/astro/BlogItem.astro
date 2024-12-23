@@ -1,0 +1,41 @@
+---
+import { type AstroBlogData } from '@/types'
+import FormattedDate from '@/components/astro/FormattedDate.astro'
+
+// ==============================
+//
+//  BlogPreviewItem.astro
+// 
+//  This component is used to render a preview of a blog post in the blog index page.
+//  components should be stack horizontally in full screen and vertically in smaller screens.
+//
+// ==============================
+
+
+interface Props {
+  data: AstroBlogData
+  slug: string
+}
+
+const { data, slug } = Astro.props
+
+const bgImage = data?.heroImage || '/images/placeholder-5.jpg'
+const blogTitle = data?.title || 'Blog 404'
+const blogDescription = data?.description || 'This blog post does not exist.'
+const blogDate = data?.pubDate || new Date()
+
+---
+<li class="w-full xl:h-64 rounded-2xl hover:pop hover:shadow-lg bg-white hover:shadow-gray-300 hover:from-white hover:to-yellow-100 transition-all duration-300 shadow-xl hover:bg-gradient-to-br border-[1px] hover:border-none border-solid border-gray-100 overflow-clip">
+  <a href={`/blog/${slug}/`} class="flex lg:flex-row flex-col h-full">
+    <div class="flex w-full bg-cover bg-center md:aspect-square aspect-video" style=`background-image: url('${bgImage}')` />
+    <div class="py-8 pl-8 pr-3 flex flex-col justify-between w-full">
+      <p class="font-bold text-3xl xl:text-4xl">{blogTitle}</p>
+      <div class="flex flex-col flex-1 py-4">
+        <p class="text-gray-500 text-sm xl:text-base">{blogDescription}</p>
+      </div>
+      <p class="text-gray-400 text-xs xl:text-sm flex items-center">
+        {"Created on "}<FormattedDate date={blogDate} /><span class="mx-2">{" • "}</span><span class="font-semibold">{"@asleepace"}</span>
+      </p>
+    </div>
+  </a>
+</li>
