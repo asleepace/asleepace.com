@@ -11,7 +11,7 @@ interface Props {
 const { title, anchorTag, description, icon: SectionIcon = Lucide.FileWarning } = Astro.props
 
 ---
-<section class="flex flex-col gap-y-16 py-16" id={anchorTag}>
+<section class="flex flex-col gap-y-16 pt-16" id={anchorTag}>
   <div class="text-center flex flex-col items-center">
     <SectionIcon className="text-7xl text-gray-300" size={96} />
     <h1 class="text-7xl font-bold my-4">{title}</h1>
@@ -19,9 +19,7 @@ const { title, anchorTag, description, icon: SectionIcon = Lucide.FileWarning } 
       {description}
     </p>
   </div>
-  <div class="h-[1px] bg-gray-200 w-full" />
-  <div class="px-2">
+  <div class="flex flex-col py-16 border-[1px] border-gray-200 border-r-transparent border-l-transparent flex-grow bg-[radial-gradient(circle,rgba(0,0,0,0.08),rgba(255,255,255,1))] after:blur-[20px]">
     <slot />
   </div>
-  <div class="h-[1px] bg-gray-200 w-full" />
 </section>
