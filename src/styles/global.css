@@ -220,11 +220,27 @@ hr {
     width: 100%;
   }
 
-  ul {
+  ul, ol {
     tab-size: 4;
-    margin-block-start: 0em;
+    margin-left: var(--padding-sm);
+    margin-block-start: var(--padding-sm);
     margin-block-end: 1.2em;
-    padding-inline-start: 1.2em;
+    padding-inline-start: var(--box-shadow-lg);
+    list-style-position: inside;
+  }
+
+  ul > li {
+    list-style-type: disc;
+    font-family: Atkinson, sans-serif;
+    line-height: 34px;
+    font-size: 1em;
+  }
+
+  ol > li {
+    list-style-type: decimal;
+    font-family: Atkinson, sans-serif;
+    line-height: 34px;
+    font-size: 1em;
   }
 
   article > li {
@@ -238,10 +254,18 @@ hr {
     font-size: 1em;
   }
 
+  img {
+    overflow: hidden;
+    border-radius: 4px;
+  }
+
   blockquote {
     display: flex;
+    justify-content: space-between;
+    align-items: end;
     border-left: 4px solid var(--accent);
-    padding: 0;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
     margin: 0;
     font-size: 1rem;
     border-top-right-radius: 8px;
