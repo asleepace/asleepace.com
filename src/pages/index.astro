@@ -10,19 +10,16 @@ import { Boxes, BellRing } from 'lucide-react'
 import { getCollection } from 'astro:content'
 import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
 
+export const prerender = true;
+
 // =====================================
 // Home Page
 // =====================================
-
-console.log('[index.astro] rendering homepage...')
 
 const blog = await getCollection('blog')
 const posts = blog.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 ).slice(0, 3)
-
-
-export const prerender = true;
 
 ---
 

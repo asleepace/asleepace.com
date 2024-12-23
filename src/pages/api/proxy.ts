@@ -75,22 +75,3 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
 
   return response.clone()
 })
-
-/**
- *
- *  HEAD /api/proxy
- *
- *  This endpoint will return the API route documentation.
- *
- */
-// export const HEAD: APIRoute = async () =>
-//   http.success({
-//     route: 'GET /api/proxy?uri={uri}',
-//     parameters: {
-//       uri: 'The URI to fetch and return to the client.',
-//     },
-//     description:
-//       'This endpoint will decode the URI parameter and fetch the resource, returning the response to the client.',
-//     methods: ['GET'],
-//     responseType: 'any',
-//   })
