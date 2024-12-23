@@ -1,6 +1,22 @@
+<div align="center">
+  <img
+    style="border-radius: 10px; border: 1px solid #ddd; padding: 5px;"
+    src="https://github.com/user-attachments/assets/25c8baf2-90e6-47e2-b730-f0302232099f" />
+</div>
+
 # Asleepace.com
 
-My person website & playground.
+My personal website and digital playground, where I like to tinker with and explore different technologies!
+
+| Service | Version | About |
+|---------|---------|------------------------|
+| [ASDF](https://asdf-vm.com/guide/introduction.html) | `0.14.1`| Tool version manager.  |
+| [Astro](https://astro.build/)   | `5.1.1` | Web framework |
+| [Bun](https://bun.sh/) | `1.1.42`| JavaScript runtime |
+| [PM2](https://pm2.keymetrics.io/) | `5.3.0` | Daemon process manager |
+| [React](https://react.dev/)   | `19.0.0`| Frontend library |
+
+## Quick Start
 
 ```bash
 # use this to login to the remote server
@@ -24,6 +40,40 @@ sudo ln -s /etc/nginx/sites-available/asleepace.com /etc/nginx/sites-enabled/asl
 sudo nginx -t
 sudo systemctl restart nginx
 sudo systemctl reload nginx
+```
+
+# Getting Started
+
+This website is deployed on a linux machine which contains several other projects which also use Bun. I recommend using ASDF to handle managing pacakge versions, here is the current config returned by running `asdf info`. 
+
+```
+OS:
+Linux asleepace-droplet 6.5.0-44-generic #44-Ubuntu SMP PREEMPT_DYNAMIC Fri Jun  7 15:10:09 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+
+SHELL:
+GNU bash, version 5.2.15(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+BASH VERSION:
+5.2.15(1)-release
+
+ASDF VERSION:
+v0.14.1-f00f759
+
+ASDF INTERNAL VARIABLES:
+ASDF_DEFAULT_TOOL_VERSIONS_FILENAME=.tool-versions
+ASDF_DATA_DIR=/root/.asdf
+ASDF_DIR=/root/.asdf
+ASDF_CONFIG_FILE=/root/.asdfrc
+
+ASDF INSTALLED PLUGINS:
+bun                          https://github.com/cometkim/asdf-bun.git main 019058c
+nodejs                       https://github.com/asdf-vm/asdf-nodejs.git master 93bd217
+yarn                         https://github.com/twuni/asdf-yarn.git main 376c540
 ```
 
 # Server Commands
