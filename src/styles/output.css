@@ -848,6 +848,10 @@ video {
   margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
+.self-stretch {
+  align-self: stretch;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -999,6 +1003,14 @@ video {
 
 .pr-2 {
   padding-right: 0.5rem;
+}
+
+.pt-16 {
+  padding-top: 4rem;
+}
+
+.pt-24 {
+  padding-top: 6rem;
 }
 
 .text-center {
