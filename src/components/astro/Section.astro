@@ -8,8 +8,9 @@ interface Props {
   anchorTag?: string
 }
 
-const { title, anchorTag, description, icon: SectionIcon = Lucide.FileWarning } = Astro.props
+console.log('[Section.astro] rendering section...')
 
+const { title, anchorTag, description, icon: SectionIcon = Lucide.FileWarning } = Astro.props
 ---
 <section class="flex flex-col gap-y-16 pt-16" id={anchorTag}>
   <div class="text-center flex flex-col items-center">

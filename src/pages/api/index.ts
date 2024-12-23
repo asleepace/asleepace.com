@@ -104,6 +104,6 @@ export function endpoint(route: APIRoute): APIRoute {
   }
 }
 
-export const GET: APIRoute = endpoint((ctx) => {
-  return http.success('online')
+export const GET: APIRoute = endpoint(() => {
+  return http.success({ status: 'online' })
 })

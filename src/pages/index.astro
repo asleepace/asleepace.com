@@ -21,6 +21,9 @@ const posts = blog.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 ).slice(0, 3)
 
+
+export const prerender = true;
+
 ---
 
 <!doctype html>

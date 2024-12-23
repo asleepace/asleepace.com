@@ -5,58 +5,38 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
+    "check": "bun --bun astro check",
     "dev": "bunx --bun astro dev",
     "start": "bunx --bun astro build --port 4000 && bunx --bun astro preview --port 4000",
     "build": "bunx --bun astro build",
+    "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
     "preview": "bunx --bun astro preview",
     "build:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css --watch",
     "deploy": "./scripts/deploy.sh",
-    "astro": "bunx --bun astro"
+    "astro": "bunx --bun astro",
+    "util:upgrade": "bun upgrade",
+    "util:check": "bunx --bun astro check"
   },
   "dependencies": {
-    "@astrojs/check": "0.9.4",
+    "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "4.0.3",
     "@astrojs/node": "9.0.0",
     "@astrojs/react": "4.1.2",
     "@astrojs/rss": "4.0.10",
     "@astrojs/sitemap": "3.2.1",
     "@astrojs/tailwind": "5.1.4",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
     "astro": "5.1.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
-    "react": "^18.3.1",
+    "react": "^19.0.0",
     "react-compiler-runtime": "^19.0.0-beta-b2e8e9c-20241220",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.6",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.5.3"
   },
   "devDependencies": {
     "@types/bun": "^1.1.6"
-  },
-  "baseUrl": ".",
-  "paths": {
-    "@/*": [
-      "./src/*"
-    ],
-    "@components/*": [
-      "./src/components/*"
-    ],
-    "@content/*": [
-      "./src/content/*"
-    ],
-    "@layouts/*": [
-      "./src/layouts/*"
-    ],
-    "@pages/*": [
-      "./src/pages/*"
-    ],
-    "@styles/*": [
-      "./src/styles/*"
-    ],
-    "@constants": [
-      "./src/consts.ts"
-    ]
   }
 }

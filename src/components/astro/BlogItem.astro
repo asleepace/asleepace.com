@@ -1,5 +1,5 @@
 ---
-import { type AstroBlogData } from '@/types'
+import { type Blog } from '@/types'
 import FormattedDate from '@/components/astro/FormattedDate.astro'
 
 // ==============================
@@ -13,7 +13,7 @@ import FormattedDate from '@/components/astro/FormattedDate.astro'
 
 
 interface Props {
-  data: AstroBlogData
+  data: Blog['data']
   slug: string
 }
 
