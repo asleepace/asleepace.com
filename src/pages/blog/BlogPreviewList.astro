@@ -9,7 +9,7 @@ interface Props {
 const { posts } = Astro.props
 
 ---
-<ul class="flex flex-col flex-1 max-w-screen-xl gap-8 bg-red-200">
+<ul class="flex flex-col flex-1 max-w-screen-xl gap-8">
   {
     posts.map(({ slug, data }) => (
       <BlogItem data={data} slug={slug} />

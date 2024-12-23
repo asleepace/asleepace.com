@@ -8,6 +8,10 @@ import Section from '@/components/astro/Section.astro'
 import BlogPreviewList from './BlogPreviewList.astro'
 import { Newspaper } from 'lucide-react'
 
+// =====================================
+// Blog Page
+// =====================================
+
 const blog = await getCollection('blog')
 const posts = blog.sort(
   (a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
