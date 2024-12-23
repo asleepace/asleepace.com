@@ -2,7 +2,6 @@
 
 My person website & playground.
 
-
 ```bash
 # use this to login to the remote server
 ssh root@192.241.216.26
@@ -13,6 +12,18 @@ bun run check
 bun run build:tailwind
 bun run build
 bun run preview
+
+# save the process with pm2
+pm2 start --name "asleepace.com" --watch --interpreter $(which bun) dist/server/entry.mjs
+
+# NGINX Configuration
+sudo nano /etc/nginx/sites-available/asleepace.com
+sudo ln -s /etc/nginx/sites-available/asleepace.com /etc/nginx/sites-enabled/asleepace.com
+
+# Test the NGINX configuration
+sudo nginx -t
+sudo systemctl restart nginx
+sudo systemctl reload nginx
 ```
 
 # Server Commands
@@ -26,15 +37,16 @@ ssh root@192.241.216.26
 Build the website from scratch
 
 ```bash
-yarn install
-yarn build
+bun i
+bun run build:tailwind
+bun run build
 ```
 
-Start the process with **pm2** run the following commands
+Start the process with **pm2** run the following commands, since the application now uses ASDF we need to specify the path to the bun executable.
 
 ```bash
-pm2 stop --all
-pm2 start ./dist/server/entry.mjs --name asleepace.com
+pm2 stop asleepace.com
+pm2 start --name "asleepace.com" --watch --interpreter $(which bun) dist/server/entry.mjs
 ```
 
 Use the following command to restart the postgres server
