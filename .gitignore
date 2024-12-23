@@ -24,3 +24,6 @@ src/env.d.ts
 # backend files
 backend/target/
 backend/Cargo.lock
+
+# generated files
+src/styles/output.css

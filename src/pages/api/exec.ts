@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro'
 import { http } from '@/lib/http'
-import type { ApiProxyResponse } from './proxy'
 import { safeEval } from '@/lib/safeEval'
 import { Exception } from '.'
 import { endpoint } from './index'

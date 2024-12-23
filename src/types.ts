@@ -1,12 +1,3 @@
-export type AstroBlogItem = {
-  slug: string
-  data: AstroBlogData
-}
+import { type CollectionEntry } from 'astro:content'
 
-export type AstroBlogData = {
-  title: string
-  pubDate: Date
-  description: string
-  heroImage?: string | undefined
-  updatedDate?: Date | undefined
-}
+export type Blog = CollectionEntry<'blog'>

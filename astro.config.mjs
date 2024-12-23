@@ -1,20 +1,21 @@
-import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
-import react from '@astrojs/react';
-import node from '@astrojs/node';
-// import mdx from '@astrojs/mdx';
+// @ts-check
+import { defineConfig } from 'astro/config'
+import sitemap from '@astrojs/sitemap'
+import react from '@astrojs/react'
+import node from '@astrojs/node'
+import mdx from '@astrojs/mdx'
 
 /**
  *  Site-map Configuration
  *
  *  https://docs.astro.build/en/guides/integrations-guide/sitemap/
  */
-import tailwind from "@astrojs/tailwind";
+import tailwind from '@astrojs/tailwind'
 const sitemapConfig = sitemap({
   changefreq: 'weekly',
   lastmod: new Date(),
-  priority: 0.7
-});
+  priority: 0.7,
+})
 
 /**
  *  Astro Configuration
@@ -28,15 +29,24 @@ const sitemapConfig = sitemap({
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [/*mdx(),*/ sitemapConfig, react(), tailwind()],
-  prefetch: true,
+  integrations: [mdx(), sitemapConfig, react(), tailwind()],
   site: 'https://asleepace.com',
+  output: 'server',
   adapter: node({
-    mode: 'standalone'
+    mode: 'standalone',
   }),
-  // output: 'server',
+  // output: 'static',
   // output: 'hybrid'
-  legacy: {
-    collections: true,
-  }
-});
+  // legacy: {
+  //   collections: true,
+  // },
+  // security: {
+  //   checkOrigin: false,
+  // },
+  // build: {
+  //   serverEntry: 'main.mjs',
+  //   server: './server',
+  //   client: './client',
+  //   format: 'preserve',
+  // }
+})

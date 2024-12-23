@@ -3,6 +3,7 @@ title: 'Typescript Snippets'
 description: 'Useful TypeScript snippets for everyday use which can be easily copied and pasted.'
 pubDate: 'May 14 2024'
 heroImage: '/images/typescript-banner.png'
+slug: 'typescript-snippets'
 ---
 
 This document contains a collection of useful, interesting and sometimes quirky snippets of TypeScript I've gathered over the years. Some of these patterns are not unique to TypeScript, but in these examples they should be also type-safe (hopefully).

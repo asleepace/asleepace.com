@@ -14,6 +14,8 @@ import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
 // Home Page
 // =====================================
 
+console.log('[index.astro] rendering homepage...')
+
 const blog = await getCollection('blog')
 const posts = blog.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()

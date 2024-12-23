@@ -1,9 +1,9 @@
 ---
-import { type AstroBlogItem } from '@/types'
+import { type Blog } from '@/types'
 import BlogItem from './BlogItem.astro'
 
 interface Props {
-  posts: AstroBlogItem[]
+  posts: Blog[]
 }
 
 const { posts } = Astro.props
@@ -11,8 +11,8 @@ const { posts } = Astro.props
 ---
 <ul class="flex flex-col flex-1 max-w-screen-xl gap-8">
   {
-    posts.map(({ slug, data }) => (
-      <BlogItem data={data} slug={slug} />
+    posts.map(({ data, filePath }) => (
+      <BlogItem data={data} slug={data.slug} />
     ))
   }
 </ul>

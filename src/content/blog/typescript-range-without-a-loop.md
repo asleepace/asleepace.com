@@ -3,6 +3,7 @@ title: 'Implement a range in TypeScript without loops*'
 description: 'How to implement a range sequence using generators in TypeScript for fun!'
 pubDate: 'Feb 13, 2024'
 heroImage: '/images/generator-cover.png'
+slug: 'typescript-range-without-a-loop'
 ---
 
 The other day I was browsing **LinkedIn** and came across the following [post](https://www.linkedin.com/feed/update/urn:li:activity:7163364024087220224?utm_source=share&utm_medium=member_desktop)
