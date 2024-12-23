@@ -17,7 +17,7 @@ function ShowcaseItem(props: ShowcaseItemProps) {
   return (
     <a
       href={props.url}
-      className="flex flex-col rounded-xl basis-1/3 hover:shadow-xl h-80 transform transition-transform duration-300 hover:scale-105 aspect-square shadow-lg overflow-clip"
+      className="flex flex-col rounded-xl sm:w-full md:basis-1/3 hover:shadow-xl md:h-80 transform transition-transform duration-300 hover:scale-105 aspect-square shadow-lg overflow-clip"
       style={{ backgroundColor }}
     >
       <div

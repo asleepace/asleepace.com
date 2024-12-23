@@ -22,7 +22,7 @@ const { data, slug } = Astro.props
 ---
 <li class="w-full xl:h-64 rounded-2xl hover:pop hover:shadow-lg bg-white hover:shadow-gray-300 hover:from-white hover:to-yellow-100 transition-all duration-300 shadow-xl hover:bg-gradient-to-br border-[1px] hover:border-none border-solid border-gray-100 overflow-clip">
   <a href={`/blog/${slug}/`} class="flex lg:flex-row flex-col h-full">
-    <div class="flex w-full sm:h-64 bg-cover bg-center aspect-square xl:aspect-video" style=`background-image: url('${data.heroImage}')` />
+    <div class="flex w-full bg-cover bg-center md:aspect-square aspect-video" style=`background-image: url('${data.heroImage}')` />
     <div class="py-8 pl-8 pr-3 flex flex-col justify-between w-full">
       <p class="font-bold text-3xl xl:text-4xl">{data.title}</p>
       <div class="flex flex-col flex-1 py-4">

@@ -4,6 +4,9 @@ import BaseHead from '@/components/astro/BaseHead.astro'
 import Header from '@/components/astro/Header.astro'
 import Footer from '@/components/astro/Footer.astro'
 import FormattedDate from '@/components/astro/FormattedDate.astro'
+import HeroImage from '@/components/astro/HeroImage.astro'
+import HeroTitle from '@/components/astro/HeroTitle.astro'
+import Prose from '@/components/astro/Prose.astro'
 
 type Props = CollectionEntry<'blog'>['data']
 
@@ -13,35 +16,53 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} image={heroImage} />
+    <style>
+      /* h1 {
+        font-size: 3.052em;
+      }
+      h2 {
+        font-size: 2.441em;
+      }
+      h3 {
+        font-size: 1.953em;
+      }
+      h4 {
+        font-size: 1.563em;
+      }
+      h5 {
+        font-size: 1.25em;
+      }
+      strong,
+      b {
+        font-weight: 700;
+      }
+      a {
+        color: var(--accent);
+      }
+      a:hover {
+        color: var(--accent);
+      }
+      p {
+        margin-bottom: 0.4em;
+      }
+      @media (max-width: 720px) {
+        body {
+          font-size: 18px;
+        }
+        /* main {
+          padding: 1em;
+        } */
+    </style>
   </head>
   <body class="w-full bg-white">
     <Header />
-    <main id="article" class="flex self-stretch flex-1 py-24 flex-col items-center">
-      <article class="flex flex-col max-w-screen-lg text-gray-800">
-        <div class="flex flex-col justify-center max-w-screen-[960px] items-center">
-          {
-            heroImage && (
-              <img class="max-w-[840px] rounded-3xl mb-16 shadow-2xl" src={heroImage} alt={title} />
-            )
-          }
-        </div>
-        <div class="prose flex flex-col gap-y-1 w-full">
-          <div class="text-center">
-            <div class="date pt-8 pb-4 text-gray-500">
-              <FormattedDate date={pubDate} />
-              {
-                updatedDate && (
-                  <div class="italic">
-                    Last updated on <FormattedDate date={updatedDate} />
-                  </div>
-                )
-              }
-            </div>
-            <h1 class="text-center mb-8">{title}</h1>
-            <hr />
-          </div>
+    <main id="article" class="flex flex-col flex-1 w-full lg:pt-16 pb-24 items-center">
+      <article class="flex flex-col items-center w-full max-w-screen-lg text-gray-800">
+        <HeroImage src={heroImage} alt={title} />
+        <HeroTitle title={title} pubDate={pubDate} updatedDate={updatedDate} />
+        <Prose className=''>
           <slot />
-        </div>
+        </Prose>
       </article>
     </main>
     <Footer />
