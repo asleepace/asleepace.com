@@ -159,7 +159,7 @@ body {
   h3 {
     font-size: 2em;
     margin-top: var(--padding-lg);
-    margin-bottom:  -8px;
+    margin-bottom: -8px;
   }
 
   p {
@@ -222,7 +222,8 @@ body {
     width: 100%;
   }
 
-  ul, ol {
+  ul,
+  ol {
     tab-size: 4;
     margin-left: var(--padding-sm);
     margin-block-start: var(--padding-sm);
@@ -280,24 +281,5 @@ body {
     margin-bottom: 0em;
     padding-top: 1rem;
     padding-bottom: 1rem;
-  }
-
-  /* dividing line for header */
-  /* hr {
-    border: none;
-    border-top: 1px solid rgb(var(--gray-light));
-    margin-top: 1.2em;
-    margin-bottom: 1.8em;
-  } */
-
-  @media (width > 768px) {
-    /* h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      padding-left: var(--padding-lg);
-    } */
   }
 }
