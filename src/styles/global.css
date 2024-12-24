@@ -120,10 +120,10 @@ body {
   white-space: nowrap;
 }
 
-hr {
-  margin-top: var(--padding-sm);
+/* hr {
+  margin-top: var(--padding-smz);
   margin-bottom: var(--padding-lg);
-}
+} */
 
 /** 
  * Blog Styling
@@ -283,12 +283,12 @@ hr {
   }
 
   /* dividing line for header */
-  hr {
+  /* hr {
     border: none;
     border-top: 1px solid rgb(var(--gray-light));
     margin-top: 1.2em;
     margin-bottom: 1.8em;
-  }
+  } */
 
   @media (width > 768px) {
     /* h1,
