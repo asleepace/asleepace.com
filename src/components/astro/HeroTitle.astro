@@ -14,7 +14,7 @@ interface Props {
 const { title, pubDate, updatedDate } = Astro.props
 
 ---
-<div class="text-center flex flex-col gap-y-2 py-4">
+<div class="text-center self-stretch px-4 flex flex-col gap-y-2 pt-4 md:pt-8">
   <div class="date text-gray-500">
     <FormattedDate date={pubDate} />
     {
@@ -26,5 +26,5 @@ const { title, pubDate, updatedDate } = Astro.props
     }
   </div>
   <p class="text-5xl text-balance font-black leading-1 mb-2">{title}</p>
-  <hr class="" />
+  <hr class="border-b-none border-t-[1px] w-full border-t-gray-200 my-4 mb-8 md:my-8" />
 </div>

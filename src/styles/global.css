@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 @layer utilities {
-  .pop:hover {
-    transform: scale(1.04);
-    transition: transform 0.1s ease-out;
+  @media (min-width: 768px) {
+    .pop:hover {
+      transform: scale(1.04);
+      transition: transform 0.1s ease-out;
+    }
   }
 }
 
@@ -118,10 +120,10 @@ body {
   white-space: nowrap;
 }
 
-hr {
-  margin-top: var(--padding-sm);
+/* hr {
+  margin-top: var(--padding-smz);
   margin-bottom: var(--padding-lg);
-}
+} */
 
 /** 
  * Blog Styling
@@ -157,7 +159,13 @@ hr {
   h3 {
     font-size: 2em;
     margin-top: var(--padding-lg);
-    margin-bottom:  -8px;
+    /* margin-bottom: rem; */
+  }
+
+  h4 {
+    font-size: 1.5em;
+    margin-top: var(--padding-sm);
+    margin-bottom: -1em;
   }
 
   p {
@@ -220,20 +228,24 @@ hr {
     width: 100%;
   }
 
-  ul, ol {
+  ul,
+  ol {
     tab-size: 4;
-    margin-left: var(--padding-sm);
+    margin-left: 1.5em;
     margin-block-start: var(--padding-sm);
     margin-block-end: 1.2em;
-    padding-inline-start: var(--box-shadow-lg);
-    list-style-position: inside;
+    padding-inline-start: 1em;
+    list-style-position: outside;
   }
 
   ul > li {
     list-style-type: disc;
     font-family: Atkinson, sans-serif;
+    padding-inline-start: 1em;
     line-height: 34px;
     font-size: 1em;
+    margin-top: 1em;
+
   }
 
   ol > li {
@@ -241,9 +253,11 @@ hr {
     font-family: Atkinson, sans-serif;
     line-height: 34px;
     font-size: 1em;
+    margin-top: 1em;
   }
 
-  article > li {
+
+  /* article > li {
     border: none;
     color: rgb(34, 41, 57);
     list-style-type: disc;
@@ -252,7 +266,7 @@ hr {
     padding-inline-end: 1.2em;
     line-height: 34px;
     font-size: 1em;
-  }
+  } */
 
   img {
     overflow: hidden;
@@ -278,24 +292,5 @@ hr {
     margin-bottom: 0em;
     padding-top: 1rem;
     padding-bottom: 1rem;
-  }
-
-  /* dividing line for header */
-  hr {
-    border: none;
-    border-top: 1px solid rgb(var(--gray-light));
-    margin-top: 1.2em;
-    margin-bottom: 1.8em;
-  }
-
-  @media (width > 768px) {
-    /* h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      padding-left: var(--padding-lg);
-    } */
   }
 }
