@@ -234,15 +234,17 @@ body {
     margin-left: 1.5em;
     margin-block-start: var(--padding-sm);
     margin-block-end: 1.2em;
-    padding-inline-start: var(--box-shadow-lg);
-    list-style-position: inside;
+    padding-inline-start: 1em;
+    list-style-position: outside;
   }
 
   ul > li {
     list-style-type: disc;
     font-family: Atkinson, sans-serif;
+    padding-inline-start: 1em;
     line-height: 34px;
     font-size: 1em;
+    margin-top: 1em;
 
   }
 
@@ -254,7 +256,8 @@ body {
     margin-top: 1em;
   }
 
-  article > li {
+
+  /* article > li {
     border: none;
     color: rgb(34, 41, 57);
     list-style-type: disc;
@@ -263,7 +266,7 @@ body {
     padding-inline-end: 1.2em;
     line-height: 34px;
     font-size: 1em;
-  }
+  } */
 
   img {
     overflow: hidden;
