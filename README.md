@@ -53,6 +53,9 @@ sudo nginx -t
 sudo systemctl restart nginx
 sudo systemctl reload nginx
 
+# Memory usage
+ps aux --sort=-%mem | head -n 10
+
 # Debug logs
 pm2 logs
 pm2 logs --last 200
