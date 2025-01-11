@@ -9,6 +9,21 @@ This directory contains copies of system configuration files for various Linux /
 
 **NOTE**: these are just reference files and are not the actual files on the server.
 
+```json
+{
+  "logs": "pm2 logs",
+  "logs:recent": "pm2 logs --last 200",
+  "logs:system": "sudo tail -f /var/log/syslog",
+  "logs:asleepace": "pm2 logs asleepace.com",
+  "logs:stockindx": "pm2 logs stockindx.com",
+  "logs:nginx": "sudo tail -f /var/log/nginx/error.log",
+  "logs:nginx:access": "sudo tail -f /var/log/nginx/access.log",
+  "logs:ufw": "sudo journalctl -u ufw",
+  "logs:postfix": "sudo tail -f /var/log/mail.log",
+  "logs:errors": "sudo journalctl -u errors"
+}
+```
+
 ## Quick Start
 
 ```bash

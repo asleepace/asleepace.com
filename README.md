@@ -16,12 +16,22 @@ My personal website and digital playground, where I like to tinker with and expl
 | [PM2](https://pm2.keymetrics.io/)                   | `5.3.0`  | Daemon process manager |
 | [React](https://react.dev/)                         | `19.0.0` | Frontend library       |
 
+## Table of Contents
+
+You can find more detailed documentation in the [services](services) directory.
+
+1. [Nginx documentation & configuration](services/nginx/ABOUT.md)
+2. [Postfix documentation & configuration](services/smtp/ABOUT.md)
+3. [ZSH documentation & configuration](services/zsh/ABOUT.md)
+4. [Misc documentation & configuration](services/misc/ABOUT.md)
+
 ## Quick Start
 
 The following is mainly just a reference for myself, but feel free to use it if you find it helpful!
 
 ```bash
-# use this to login to the remote server
+# use one of these to login to the remote server
+ssh root@asleepace.com
 ssh root@192.241.216.26
 
 # flow for updating on the site
@@ -42,6 +52,18 @@ sudo ln -s /etc/nginx/sites-available/asleepace.com /etc/nginx/sites-enabled/asl
 sudo nginx -t
 sudo systemctl restart nginx
 sudo systemctl reload nginx
+
+# Debug logs
+pm2 logs
+pm2 logs --last 200
+pm2 logs asleepace.com
+pm2 logs stockindx.com
+sudo tail -f /var/log/syslog
+sudo tail -f /var/log/nginx/error.log
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/mail.log
+sudo journalctl -u errors
+sudo journalctl -u ufw
 ```
 
 # Installation
