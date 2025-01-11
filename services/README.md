@@ -2,10 +2,10 @@
 
 This directory contains copies of system configuration files for various Linux / Unix systems which are used in this project such as Nginx, Postfix, etc. to help track changes and updates.
 
-- [Nginx](./nginx/ABOUT.md) - web server and reverse proxy
-- [Postfix](./smtp/ABOUT.md) - SMTP (mail server)
-- [ZSH](./zsh/ABOUT.md) - zsh & bash shell
-- [Misc](./misc/ABOUT.md) - misc. items
+- [Nginx](./nginx/) - web server and reverse proxy
+- [Postfix](./smtp/) - SMTP (mail server)
+- [Zsh](./zsh/) - zsh & bash shell
+- [Misc](./misc/) - misc. items
 
 **NOTE**: these are just reference files and are not the actual files on the server.
 
