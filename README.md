@@ -179,6 +179,127 @@ All the API endpoints can be found in the `src/api` directory, and each should i
 - `api/proxy` - fetches content from external sources and returns it to the client
 - `api/exec` - fetches & executes content from external sources and returns it to the client
 
+# SMTP / Email
+
+This server also contains an SMTP server which can be used to send emails and process incoming emails.
+
+```bash
+# check Postfix status
+sudo systemctl status postfix
+
+# connect to the Postfix SMTP server
+telnet localhost 25
+
+# enter the following send an email
+HELO localhost
+MAIL FROM: test@example.com
+RCPT TO: your@email.com
+DATA
+Subject: Test Email
+This is a test.
+.
+QUIT # to exit
+
+# send an email
+echo "Subject: Test" | sendmail -v user@example.com
+```
+
+# SMTP Local
+
+Postfix is also available on Unix and comes pre-installed on MacOS, add the following to your `/etc/postfix/main.cf` file to relay to the remote server.
+
+```bash
+# edit the main.cf file (nano gang)
+sudo nano /etc/postfix/main.cf
+```
+
+Then add the following to the bottom of the file
+
+```conf
+# replace 2525 with your custom port with your actual domain
+relayhost = [localhost]:2525
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
+smtp_tls_security_level = encrypt
+```
+
+**IMPORTANT**: Instead of relaying with ports we are going to use SSH from our local machine to send emails.
+
+```bash
+# SSH Tunnel (local)
+#
+# run this command on your local machine, note that the port 2525 is the port we are forwarding from (MacOS)
+# and the port 25 is the port we are forwarding to (remote).
+#
+# options:
+#   -f: run in the background
+#   -N: do not execute a remote command
+#   -L: forward local port 2525 to localhost:25
+#
+ssh -f -N -L 2525:localhost:25 root@asleepace.com
+
+# Troubleshooting
+#
+# if you need to find this connection, run the following command:
+ps aux | grep "ssh -f -N"
+
+# Kill the connection
+#
+# replace <process_id> with the actual process id from the previous command
+#
+kill <process_id>
+```
+The square brackets tell Postfix to treat asleepace.com as a hostname rather than potentially misinterpreting it as an MX record lookup. This is especially important when specifying a port number.
+
+```bash
+# edit the sasl_passwd file
+sudo nano /etc/postfix/sasl_passwd
+```
+add the following
+```conf
+[asleepace.com]:25    username:password
+```
+Make sure to replace `username` and `password` with your actual credentials.
+
+Next run the following command to create the hash for the `sasl_passwd` file
+
+```bash
+# create the password hash
+sudo postmap /etc/postfix/sasl_passwd
+sudo chmod 600 /etc/postfix/sasl_passwd*
+
+# Postfix commands (macOS)
+sudo postfix reload
+sudo postfix start
+sudo postfix stop
+sudo postfix status
+sudo killall postfix
+
+# Postfix commands (linux)
+sudo systemctl restart postfix
+sudo systemctl start postfix
+sudo systemctl stop postfix
+sudo systemctl status postfix
+
+
+# run the following to test the connection
+sudo postfix stop
+sudo postfix start
+sudo postfix reload
+
+# send an email (might be slightly different on odler versions)
+echo "Test mail" | mail -s "Test" your@email.com
+
+# check the mail queue
+mailq
+
+# check the logs
+sudo tail -f /var/log/mail.log
+```
+
+
+
 # Astro Starter Kit: Blog
 
 ```
