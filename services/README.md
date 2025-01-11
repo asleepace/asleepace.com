@@ -81,6 +81,13 @@ sudo systemctl restart nginx
 
 # view nginx logs
 sudo journalctl -u nginx
+
+
+# Copy to clipboard
+echo "text" | xclip -selection clipboard
+
+# Copy file content
+cat file.txt | xclip -selection clipboard
 ```
 
 ## [Postfix](./smtp/ABOUT.md)
@@ -135,6 +142,15 @@ Common commands for Misc:
 ```bash
 # show all running services
 ps aux | grep -E 'nginx|postfix|zsh|node|bun|pm2'
+
+# copy files from one machine to another
+scp $from_machine:$path $to_machine:$path
+
+# copy files from server to local
+scp root@asleepace.com:/path/to/file.txt .
+
+# copy files from local to server
+scp file.txt root@asleepace.com:/path/to/file.txt
 ```
 
 ## Resources
