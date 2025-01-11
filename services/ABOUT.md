@@ -121,3 +121,15 @@ Common commands for Misc:
 # show all running services
 ps aux | grep -E 'nginx|postfix|zsh|node|bun|pm2'
 ```
+
+## Resources
+
+- [Installation](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04)
+- [Ubuntu 20.0.4](https://releases.ubuntu.com/20.04/)
+- [UFW Firewall](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-18-04)
+- [NGINX](https://www.nginx.com/resources/wiki/?_bt=541137080527&_bk=&_bm=b&_bn=g&_bg=125748574545&gclid=CjwKCAjw4KyJBhAbEiwAaAQbE6ZBE80EtqlFLNQ4UHlTNbyCw0tTxKhCbFsAVgTbiHZWxbExVTAasRoCoJIQAvD_BwE)
+- [IPV4 Adress](198.199.98.58)
+- [SSH Keys](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)
+- [UFW Firewall](https://github.com/soladex/web/blob/main/docs/ufw.md)
+- [OpenSSL](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04)
+- [Parse](https://www.digitalocean.com/community/tutorials/how-to-run-parse-server-on-ubuntu-14-04)
