@@ -1,0 +1,123 @@
+# Services
+
+This directory contains copies of system configuration files for various Linux / Unix systems which are used in this project such as Nginx, Postfix, etc. to help track changes and updates.
+
+- [Nginx](./nginx/ABOUT.md) - web server and reverse proxy
+- [Postfix](./smtp/ABOUT.md) - SMTP (mail server)
+- [ZSH](./zsh/ABOUT.md) - zsh & bash shell
+- [Misc](./misc/ABOUT.md) - misc. items
+
+**NOTE**: these are just reference files and are not the actual files on the server.
+
+## Quick Start
+
+```bash
+# connect to the server
+ssh root@asleepace.com
+
+# firewall
+sudo ufw status
+sudo ufw allow 22/tcp
+sudo ufw allow 2525/tcp
+sudo ufw delete 4000
+
+# common system commands
+sudo systemctl reload nginx
+sudo systemctl status nginx
+sudo systemctl start postfix
+sudo systemctl stop postfix
+sudo systemctl restart nginx
+sudo systemctl enable postfix
+sudo systemctl disable postfix
+
+# common pm2 commands
+pm2 start $service_name
+pm2 stop $service_name
+pm2 restart $service_name
+pm2 status $service_name
+pm2 logs $service_name
+```
+
+## [Nginx](./nginx/ABOUT.md)
+
+Common commands for Nginx:
+
+```bash
+# common system commands
+sudo systemctl start nginx
+sudo systemctl stop nginx
+sudo systemctl restart nginx
+sudo systemctl status nginx
+sudo systemctl enable nginx
+sudo systemctl disable nginx
+sudo systemctl reload nginx
+
+# nginx configuration locations
+sudo nano /etc/nginx/nginx.conf
+sudo nano /etc/nginx/sites-available/asleepace.com
+sudo nano /etc/nginx/sites-enabled/asleepace.com
+
+# validate nginx configuration
+sudo nginx -t
+
+# refresh after making changes to conf files
+sudo systemctl reload nginx
+sudo systemctl restart nginx
+
+# view nginx logs
+sudo journalctl -u nginx
+```
+
+## [Postfix](./smtp/ABOUT.md)
+
+```bash
+# start Postfix
+sudo systemctl start postfix
+
+# stop Postfix
+sudo systemctl stop postfix
+```
+
+## [ZSH](./zsh/ABOUT.md)
+
+Common commands for ZSH:
+
+```bash
+# edit ZSH configurations
+sudo nano ~/.zshrc
+sudo nano ~/.zprofile
+sudo nano ~/.zsh_aliases
+
+# reload ZSH after making changes
+source ~/.zshrc
+```
+
+## [PM2](./pm2/ABOUT.md)
+
+Common commands for PM2:
+
+```bash
+# list all PM2 services
+pm2 list
+
+# restart a PM2 service
+pm2 restart asleepace.com
+
+# stop a PM2 service
+pm2 stop asleepace.com
+
+# delete a PM2 service
+pm2 delete stockindx.com
+
+# show PM2 logs
+pm2 logs asleepace.com
+```
+
+## [Misc](./misc/ABOUT.md)
+
+Common commands for Misc:
+
+```bash
+# show all running services
+ps aux | grep -E 'nginx|postfix|zsh|node|bun|pm2'
+```

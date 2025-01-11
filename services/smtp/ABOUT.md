@@ -27,6 +27,27 @@ sudo systemctl start postfix
 ssh -f -N -L 2525:localhost:25 root@asleepace.com
 ```
 
+## Installation
+
+There are two parts to the installation process, the first is the Postfix server and the second is the local machine. The second step is optional, but recommended to help with debugging and troubleshooting.
+
+```bash
+# connect to the remote server
+ssh root@asleepace.com
+
+# install Postfix
+sudo apt-get install mailutils
+
+# check the current version of Postfix
+postconf -d
+
+# edit the main.cf file (see ./services/smtp/main.cf)
+sudo nano /etc/postfix/main.cf
+
+# restart Postfix
+sudo systemctl restart postfix
+```
+
 ## Postfix
 
 ```bash
