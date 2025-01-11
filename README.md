@@ -20,10 +20,10 @@ My personal website and digital playground, where I like to tinker with and expl
 
 You can find more detailed documentation in the [services](services) directory.
 
-1. [Nginx documentation & configuration](services/nginx/ABOUT.md)
-2. [Postfix documentation & configuration](services/smtp/ABOUT.md)
-3. [ZSH documentation & configuration](services/zsh/ABOUT.md)
-4. [Misc documentation & configuration](services/misc/ABOUT.md)
+1. [Nginx documentation & configuration](/services/nginx/)
+2. [Postfix documentation & configuration](/services/smtp/)
+3. [ZSH documentation & configuration](/services/zsh/)
+4. [Misc documentation & configuration](/services/misc/)
 
 ## Quick Start
 
