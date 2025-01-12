@@ -1,0 +1,27 @@
+---
+import BaseHead from '@/components/astro/BaseHead.astro'
+import CodeEditor from '@/components/editor/CodeEditor'
+
+export const prerender = false;
+
+// =====================================
+// Copde Page
+// =====================================
+
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={"Code"} description={"a simple online code playground."} />
+    <link type="text/css" rel="stylesheet" href="/styles/material-palenight.css">
+  </head>
+  <body class="min-h-screen flex flex-1 flex-col bg-slate-500">
+    <CodeEditor client:only="react" />
+  </body>
+</html>
+<style>
+  body {
+    color: #e2e8f0;
+  }
+</style>

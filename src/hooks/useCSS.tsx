@@ -1,17 +1,18 @@
 import { useEffect } from 'react'
 
-export type CssStyleProps = {
+export type CSSParams = {
   path: string
 }
 
 /**
- * Dynamically adds a CSS stylesheet to the head of the document.
+ * This used to dynamically add the stylesheet to the `/public` directory,
+ * but it's better just to do that manually.
  */
-export function useCssStyle({ path }: CssStyleProps) {
+export function useCSS({ path }: CSSParams) {
   useEffect(() => {
     const head = document.head
     const link = document.createElement('link')
-    const href = ['/public', path].join('').replace('.', '')
+    const href = ['/public', path].join('')
     link.type = 'text/css'
     link.rel = 'stylesheet'
     link.href = href
