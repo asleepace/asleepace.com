@@ -1,13 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-  useState,
-  useTransition,
-  type ReactNode,
-} from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import javascript from 'highlight.js/lib/languages/javascript'
 import ts from 'highlight.js/lib/languages/typescript'
 import sql from 'highlight.js/lib/languages/sql'
@@ -17,107 +8,91 @@ import {
   getCursorSelection,
   setCursorPosition,
   type EditorRef,
+  type RangeArray,
 } from './selection'
 
-type SyntaxParams = {
-  editorRef: EditorRef
-  initialCode: string
-  language?: string
-}
-
-// Register all supported languages
-const SUPPORTED_LANGUAGES = {
+/**
+ * extend this as needed, for now just keeping the binary small.
+ */
+export const SUPPORTED_LANGUAGES = {
   javascript,
   typescript: ts,
   sql,
 } as const
 
+export type SupportedLanguages = keyof typeof SUPPORTED_LANGUAGES
+
+export type SyntaxParams = {
+  editorRef: EditorRef
+  defaultCode?: string
+  language?: SupportedLanguages
+}
+
+export type SyntaxResult = [
+  highlightedCode: string,
+  onChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  rawCode: string
+]
+
+/**
+ * register all supported languages with highlight.js these may also need to be imported
+ * in the main entry file and/or placed in the `./public/highlight.js` directory
+ */
 Object.entries(SUPPORTED_LANGUAGES).forEach(([name, language]) => {
   syntax.registerLanguage(name, language)
 })
 
-type RangeArray = [start: number, end: number]
-
 /**
- * Call this function before updating the UI to save the current selection,
- * and caret position, which will be used to restore it later.
+ * a simple typesafe wrapper around syntax.highlight that allows for language selection
+ * @param code - the code to highlight
+ * @param language - the language to highlight the code in
+ * @returns
  */
-function getTextContentRange(editorRef: EditorRef) {
-  if (!editorRef.current) {
-    throw Error('editorRef is null')
-  }
-
-  const selection = window.getSelection()
-
-  if (!selection?.rangeCount) {
-    throw Error('no selection ranges')
-  }
-  const caretPos = selection?.getRangeAt(0)
-
-  if (!caretPos) {
-    throw Error('no range found at index 0')
-  }
-
-  // close the range at the caret postion
-  const preCaretRange = caretPos.cloneRange()
-  preCaretRange.selectNodeContents(editorRef.current)
-  preCaretRange.setEnd(caretPos.startContainer, caretPos.startOffset)
-
-  // convert the range to a string
-  const caretStartPos = preCaretRange.toString().length
-  const caretEndPos = caretStartPos + caretPos.toString().length
-
-  // return the range as an array
-  return [caretStartPos, caretEndPos] as RangeArray
+const markup = (code: string, language: SupportedLanguages) => {
+  return language
+    ? syntax.highlight(code, { language }).value
+    : syntax.highlightAuto(code).value
 }
 
 /**
- * This hook handles parsing raw code into highlighted HTML code, updating the editor and
- * maintaining the cursor position.
+ * handle syntax highlighting and cursor position for the editor.
  */
-export function useSyntax({ editorRef, initialCode, language }: SyntaxParams) {
-  const markup = useCallback(
-    (code: string) => {
-      return language
-        ? syntax.highlight(code, { language }).value
-        : syntax.highlightAuto(code).value
-    },
-    [language]
+export function useSyntax({
+  editorRef,
+  defaultCode = '',
+  language = 'typescript',
+}: SyntaxParams): SyntaxResult {
+  const [rawCode, setRawCode] = useState(defaultCode)
+  const [highlightedCode, setHighlightedCode] = useState(
+    markup(defaultCode, language)
   )
 
-  // NOTE: We use useTransition to avoid blocking the UI when parsing the code
-  const [highlightedCode, setHighlightedCode] = useState(markup(initialCode))
+  /**
+   * since the html is regenerated each time the code changes,
+   * we need to keep track of the last cursor position and
+   * restore it after the html is re-rendered.
+   */
+  const lastCursorPosRef = useRef<RangeArray>([0, defaultCode.length])
 
-  // TODO: note sure if this is needed
-  const [isParsing, setParsing] = useTransition()
-
-  // keeps track of the last cursor postion
-  const lastCursorPosRef = useRef<RangeArray>([0, initialCode.length])
-
-  // callback for editable code element
+  /**
+   * callback passed to the <code> element onInput prop
+   */
   const onChangeInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const highlighted = markup(e.target.textContent || '')
+      const nextRawCode = e.target.textContent || ''
+      const highlighted = markup(nextRawCode, language)
       lastCursorPosRef.current = getCursorSelection(editorRef) // store before rendering
       setHighlightedCode(highlighted)
-      // setParsing(() => {
-      //   const highlighted = markup(e.target.textContent || '')
-      //   lastCursorPosRef.current = getCursorSelection(editorRef) // store before rendering
-      //   setHighlightedCode(highlighted)
-      // })
+      setRawCode(nextRawCode)
     },
-    [markup, setParsing]
+    [markup, language]
   )
 
-  // restore the cursor position after the code is parsed
   useEffect(() => {
     if (!editorRef.current) return
-    // if (isParsing) return
-
-    // updates are handle by browser apis
-    setCursorPosition(editorRef, lastCursorPosRef.current)
-  }, [highlightedCode, editorRef, isParsing])
+    setCursorPosition(editorRef, lastCursorPosRef.current) // restore once re-rendered
+  }, [highlightedCode, editorRef])
 
   // return the code and the onChangeInput function
-  return [highlightedCode, onChangeInput, isParsing] as const
+  return [highlightedCode, onChangeInput, rawCode] as const
 }

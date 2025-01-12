@@ -52,8 +52,7 @@ export type CodeBlockProps = {
 }
 
 export function Code({
-  code: initialCode,
-  detectSyntax = true,
+  code: defaultCode,
   pathToCSSTheme = DEFAULT_THEME,
   className = 'p-4 px-6 rounded-lg',
   placeholder = 'Type your code here...',
@@ -62,13 +61,13 @@ export function Code({
   onChange,
   onSave,
 }: CodeBlockProps) {
-  const { push, undo, redo } = useUndoRedo(initialCode)
+  const { push, undo, redo } = useUndoRedo(defaultCode)
   const editorRef = useRef<HTMLElement>(null)
 
   // NOTE: Highlighting the code is handled by the useSyntax hook
   const [code, onUpdateCode] = useSyntax({
     language: type,
-    initialCode,
+    defaultCode,
     editorRef,
   })
 
