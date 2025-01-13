@@ -196,6 +196,103 @@ Since this message went to my spam folder, I asked Claude about these settings a
 >
 > 3.  Create a DMARC record
 
+Following up here are the instructions Claude suggested for Digital Ocean.
+
+```bash
+# Set up DKIM. Install the required packages:
+sudo apt-get update
+sudo apt-get install opendkim opendkim-tools postfix-policyd-spf-python
+
+# Configure OpenDKIM. Edit /etc/opendkim.conf
+sudo nano /etc/opendkim.conf
+
+# Modify these lines:
+Domain                  asleepace.com
+KeyFile                 /etc/opendkim/keys/asleepace.com/mail.private
+Selector                mail
+Socket                  inet:12301@localhost
+
+# Create directories and generate DKIM key:
+sudo mkdir -p /etc/opendkim/keys/asleepace.com
+cd /etc/opendkim/keys/asleepace.com
+sudo opendkim-genkey -s mail -d asleepace.com
+sudo chown -R opendkim:opendkim /etc/opendkim/keys
+
+# Get your DKIM public record. Run:
+sudo cat mail.txt
+
+# Add the following DNS records to your domain (through your DNS provider)
+#
+# SPF Record (TXT record for @)
+# v=spf1 ip4:192.241.216.26 -all
+
+# DKIM Record (TXT record for mail._domainkey)
+# [Content from mail.txt file]
+
+# DMARC Record (TXT record for _dmarc)
+# v=DMARC1; p=reject; rua=mailto:colin@asleepace.com
+
+
+# Configure Postfix to use DKIM. Edit /etc/postfix/main.cf:
+sudo nano /etc/postfix/main.cf
 ```
 
+Add the following to `/etc/postfix/main.cf`
+
+```conf
+# DKIM
+milter_protocol = 2
+milter_default_action = accept
+smtpd_milters = inet:localhost:12301
+non_smtpd_milters = inet:localhost:12301
+
+# SPF
+policy-spf_time_limit = 3600s
+smtpd_recipient_restrictions = permit_mynetworks,permit_sasl_authenticated,reject_unauth_destination,check_policy_service unix:private/policy-spf
+```
+
+Then back in the terminal run the following:
+
+```bash
+sudo nano /etc/postfix-policyd-spf-python/policyd-spf.conf
+```
+
+Add the following to the to `/etc/postfix-policyd-spf-python/policyd-spf.conf`
+
+```conf
+# policyd-spf.conf
+debugLevel = 1
+defaultSeedOnly = 1
+HELO_reject = False
+mail_from_reject = False
+```
+
+Then run the following:
+
+```bash
+sudo systemctl restart postfix
+sudo systemctl restart postfix-policyd-spf-python
+```
+
+## Testing
+
+To test the DKIM and SPF settings you can use the following command:
+
+```bash
+# Test DKIM signing
+opendkim-testkey -d asleepace.com -s mail -vvv
+
+# Test SPF
+dig TXT asleepace.com
+
+# Test DMARC
+dig TXT _dmarc.asleepace.com
+```
+
+After setting this up, wait a bit for DNS propagation (can take up to 24-48 hours). You can monitor propagation using:
+
+```bash
+dig TXT asleepace.com
+dig TXT mail._domainkey.asleepace.com
+dig TXT _dmarc.asleepace.com
 ```
