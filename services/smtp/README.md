@@ -8,6 +8,10 @@ This is a guide for settings up an SMTP server using Postfix, as well as how to 
 # Send an email
 echo "Test message" | mail -s "Test Subject" colin_teahan@yahoo.com
 
+# Open interactive terminal
+telnet localhost 25   # (remote server)
+telnet localhost 2525 # (local comp)
+
 # Check the mail queue
 mailq
 
