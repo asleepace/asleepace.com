@@ -1,15 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-  type KeyboardEvent,
-  startTransition,
-  useTransition,
-  useLayoutEffect,
-} from 'react'
-import { useStore } from '@nanostores/react' // For state persistence across hydration
+import { useRef } from 'react'
 import syntax from 'highlight.js'
 import javascript from 'highlight.js/lib/languages/javascript'
 import ts from 'highlight.js/lib/languages/typescript'
@@ -17,14 +6,12 @@ import sql from 'highlight.js/lib/languages/sql'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'highlight.js/styles/base16/material-palenight.css'
 
-import { getCursorSelection, setCursorPosition } from './selection'
+// import { useStore } from '@nanostores/react' // For state persistence across hydration
 
 import clsx from 'clsx'
 
 import { useUndoRedo } from './useUndoRedo'
 import { useSyntax } from './useSyntax'
-
-export const prerender = false
 
 const DEFAULT_THEME = '/styles/material-palenight.css'
 
@@ -40,23 +27,18 @@ Object.entries(SUPPORTED_LANGUAGES).forEach(([name, language]) => {
 })
 
 export type CodeBlockProps = {
-  type?: keyof typeof SUPPORTED_LANGUAGES
-  detectSyntax?: boolean
-  pathToCSSTheme?: string
-  className?: string
   code: string
-  onChange?: (code: string) => void
+  lang?: keyof typeof SUPPORTED_LANGUAGES
+  className?: string
   readOnly?: boolean
-  placeholder?: string
+  onChange?: (code: string) => void
   onSave?: (code: string) => void
 }
 
 export function Code({
   code: defaultCode,
-  pathToCSSTheme = DEFAULT_THEME,
   className = 'p-4 px-6 rounded-lg',
-  placeholder = 'Type your code here...',
-  type = 'typescript',
+  lang = 'typescript',
   readOnly = false,
   onChange,
   onSave,
@@ -64,9 +46,11 @@ export function Code({
   const { push, undo, redo } = useUndoRedo(defaultCode)
   const editorRef = useRef<HTMLElement>(null)
 
+  const isEditable = !readOnly
+  
   // NOTE: Highlighting the code is handled by the useSyntax hook
   const [code, onUpdateCode] = useSyntax({
-    language: type,
+    language: lang,
     defaultCode,
     editorRef,
   })
@@ -80,16 +64,16 @@ export function Code({
     >
       <pre className="w-full h-full bg-transparent relative">
         <code
-          autoFocus={true}
-          className={clsx(
-            'focus:ring-0 border-none block focus-visible:outline-none p-2 w-full h-full bg-[rgba(255,255,255,0.02)] rounded-lg bg-transparent',
-            { 'cursor-text': !readOnly, 'cursor-default': readOnly }
-          )}
           dangerouslySetInnerHTML={{ __html: code }}
+          className={clsx(
+            'focus:ring-0 border-none block focus-visible:outline-none p-3 w-full h-full bg-[rgba(255,255,255,0.02)] rounded-lg bg-transparent',
+            { 'cursor-text': isEditable, 'cursor-default': readOnly }
+          )}
           onInput={onUpdateCode}
-          contentEditable={!readOnly}
+          contentEditable={isEditable}
           spellCheck={false}
           ref={editorRef}
+          autoFocus={true}
           onBlur={() => {
             console.log('editor blurred!')
           }}

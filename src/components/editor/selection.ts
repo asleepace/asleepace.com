@@ -91,7 +91,6 @@ export function setCursorPosition(
   }
 
   function traverse(node: CodeEditorNode, ctx: TraverseContext): void {
-    // Early return if we've found our position
     if (ctx.found) return
 
     if (node.nodeType === Node.TEXT_NODE && node.textContent) {
@@ -135,5 +134,3 @@ export function setCursorPosition(
     selection.addRange(context.range)
   }
 }
-
-function createTraverseWithContext() {}
