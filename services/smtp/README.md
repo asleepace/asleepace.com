@@ -1,6 +1,6 @@
 # SMTP
 
-This is a guide for settings up an SMTP server using Postfix, as well as how to connect to it from your local machine.
+This is a guide for settings up an SMTP server using Postfix, as well as how to connect to it from your local machine. You can also view some [example](./examples.md) of what the actual message looks like once they are sent. The preferred method is to use the `telnet` command to send the message from your local machine.
 
 ## Quick Start
 
