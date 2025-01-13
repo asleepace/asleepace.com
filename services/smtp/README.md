@@ -156,3 +156,46 @@ mailq | grep -c "^[A-F0-9]"
 # Clear deferred queue only
 sudo postsuper -d ALL deferred
 ```
+
+# DKIM and SPF
+
+If you view the first [example](./examples.md) you should see the following in the raw message received by Yahoo:
+
+```txt
+X-Originating-Ip: [192.241.216.26]
+Received-SPF: softfail (domain of transitioningasleepace.com does not designate 192.241.216.26 as permitted sender)
+Authentication-Results: atlas116.free.mail.bf1.yahoo.com;
+ dkim=unknown;
+ spf=softfail smtp.mailfrom=asleepace.com arc_overridden_status=NOT_OVERRIDDEN;
+ dmarc=unknown header.from=asleepace.com arc_overridden_status=NOT_OVERRIDDEN;
+```
+
+Since this message went to my spam folder, I asked Claude about these settings and this was the response:
+
+> This raw email shows several important things about your email setup:
+>
+> 1.  SPF is showing a softfail: `spf=softfail (domain of transitioningasleepace.com does not designate 192.241.216.26 as permitted sender)`
+>
+> This means your Digital Ocean droplet's IP (192.241.216.26) isn't authorized in your domain's SPF record
+>
+> 2.  DKIM is unknown: `dkim=unknown`
+>
+> This indicates no DKIM signing is set up for your domain
+>
+> 3.  DMARC is also unknown: `dmarc=unknown`
+>
+> To improve your email deliverability and prevent your emails from potentially being marked as spam, you should:
+>
+> 1.  Add an SPF record for your domain that includes your Digital Ocean droplet's IP:
+>
+> ```
+> v=spf1 ip4:192.241.216.26 -all
+> ```
+>
+> 2.  Set up DKIM signing with Postfix
+>
+> 3.  Create a DMARC record
+
+```
+
+```
