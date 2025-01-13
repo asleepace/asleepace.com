@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import javascript from 'highlight.js/lib/languages/javascript'
 import ts from 'highlight.js/lib/languages/typescript'
 import sql from 'highlight.js/lib/languages/sql'
@@ -38,8 +38,8 @@ export type SyntaxResult = [
  * register all supported languages with highlight.js these may also need to be imported
  * in the main entry file and/or placed in the `./public/highlight.js` directory
  */
-Object.entries(SUPPORTED_LANGUAGES).forEach(([name, language]) => {
-  syntax.registerLanguage(name, language)
+Object.entries(SUPPORTED_LANGUAGES).forEach(([name, lang]) => {
+  syntax.registerLanguage(name, lang)
 })
 
 /**

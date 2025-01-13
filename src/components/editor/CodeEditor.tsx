@@ -1,5 +1,22 @@
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
 import { Code } from './Code'
+
+import { useStore } from '@nanostores/react'
+import { atom } from 'nanostores'
+
+export type CodeEditorProps = {
+  persist?: boolean
+  code: string
+}
+
+const codeStore = atom({
+  lang: 'typescript',
+  code: `// code editor 
+
+console.log('Hello, World!')
+
+const editThis = true;`
+})
 
 /**
  * # Code Editor
@@ -7,12 +24,13 @@ import { Code } from './Code'
  * A full code editor with WYSIWYG support which can handle different themese and customizations.
  * Displays a side bar with a list of different code blocks and allows the user to select a code block.
  */
-function CodeEditor() {
-  const code = 'console.log("Hello, World!");'
+function CodeEditor({ code: defaultCode }: CodeEditorProps) {
 
-  return (
+  const data = useStore(codeStore)
+
+  return (  
     <div className="flex flex-1 flex-grow flex-col w-full min-h-screen bg-editor-200">
-      <Code code={code} lang="typescript" className="h-full p-8" />
+      <Code code={data.code} lang="typescript" className="h-full p-8" />
     </div>
   )
 }

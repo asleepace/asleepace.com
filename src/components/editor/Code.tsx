@@ -6,8 +6,6 @@ import sql from 'highlight.js/lib/languages/sql'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'highlight.js/styles/base16/material-palenight.css'
 
-// import { useStore } from '@nanostores/react' // For state persistence across hydration
-
 import clsx from 'clsx'
 
 import { useUndoRedo } from './useUndoRedo'
