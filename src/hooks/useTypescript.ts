@@ -1,5 +1,6 @@
 import { compileTypescript } from '@/lib/compileTypescript'
-import { useCallback, useMemo, useState } from 'react'
+import { useJSRuntime } from '@/hooks/useJSRuntime'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import tsc, {
   type CompilerOptions,
   type TranspileOptions,
@@ -38,7 +39,6 @@ export function useTypescript({
   compilerOptions = {},
 }: TypescriptParams) {
   const [javascript, setJavascript] = useState<string | undefined>()
-  const [output, setOutput] = useState<string | undefined>()
   const [error, setError] = useState<Error | undefined>()
 
   /**
@@ -46,6 +46,7 @@ export function useTypescript({
    */
   const compile = useCallback(async () => {
     try {
+      console.log('[typescript] compiling...')
       const compiledJsOutput = tsc.transpileModule(code, {
         ...DEFAULT_TRANSPILE_OPTIONS,
         ...transpileOptions,
@@ -54,34 +55,19 @@ export function useTypescript({
           ...compilerOptions,
         },
       })
+      console.log(compiledJsOutput)
       setJavascript(compiledJsOutput.outputText)
       setError(undefined)
+      return compiledJsOutput.outputText
     } catch (error) {
       console.warn('[useTypescript] Failed to compile TypeScript code', error)
       setError(error as Error)
     }
   }, [code, compilerOptions, transpileOptions])
 
-  /**
-   * Executes the compiled JavaScript code.
-   */
-  const execute = useCallback(async () => {
-    if (!javascript) return
-    try {
-      const result = eval(javascript)
-      setOutput(result)
-      setError(undefined)
-    } catch (error) {
-      console.warn('[useTypescript] Failed to execute JavaScript code', error)
-      setError(error as Error)
-    }
-  }, [javascript])
-
   return {
     compile,
-    execute,
     javascript,
-    output,
     error,
   }
 }

@@ -18,11 +18,11 @@ export default {
       scale: {},
       animation: {},
       keyframes: {},
-    },
-    colors: {
-      editor: {
-        100: '#292d3e',
-        200: '#212432',
+      colors: {
+        editor: {
+          100: '#292d3e',
+          200: '#212432',
+        },
       },
     },
   },

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import syntax from 'highlight.js'
 import javascript from 'highlight.js/lib/languages/javascript'
 import ts from 'highlight.js/lib/languages/typescript'
@@ -30,7 +30,7 @@ export type CodeBlockProps = {
   className?: string
   readOnly?: boolean
   onChange?: (code: string) => void
-  onSave?: (code: string) => void
+  onSubmit?: (code: string) => void
 }
 
 export function Code({
@@ -39,19 +39,24 @@ export function Code({
   lang = 'typescript',
   readOnly = false,
   onChange,
-  onSave,
+  onSubmit,
 }: CodeBlockProps) {
   const { push, undo, redo } = useUndoRedo(defaultCode)
   const editorRef = useRef<HTMLElement>(null)
 
   const isEditable = !readOnly
-  
+
   // NOTE: Highlighting the code is handled by the useSyntax hook
-  const [code, onUpdateCode] = useSyntax({
+  const [code, onUpdateCode, rawCode] = useSyntax({
     language: lang,
     defaultCode,
     editorRef,
   })
+
+  const handleSubmit = useCallback(() => {
+    console.log('[code] submitting code!')
+    onSubmit?.(editorRef.current?.textContent ?? code)
+  }, [code, onSubmit])
 
   return (
     <div
@@ -64,17 +69,16 @@ export function Code({
         <code
           dangerouslySetInnerHTML={{ __html: code }}
           className={clsx(
-            'focus:ring-0 border-none block focus-visible:outline-none p-3 w-full h-full bg-[rgba(255,255,255,0.02)] rounded-lg bg-transparent',
+            'focus:ring-0 border-none block focus-visible:outline-none p-3 w-full h-full rounded-lg bg-transparent',
             { 'cursor-text': isEditable, 'cursor-default': readOnly }
           )}
           onInput={onUpdateCode}
+          onSubmit={onSubmit ? handleSubmit : undefined}
           contentEditable={isEditable}
+          onBlur={handleSubmit}
           spellCheck={false}
-          ref={editorRef}
           autoFocus={true}
-          onBlur={() => {
-            console.log('editor blurred!')
-          }}
+          ref={editorRef}
         />
       </pre>
     </div>
