@@ -68,7 +68,7 @@ function makeJsHarness(code: string) {
 const makeWorkerCode = (code: string) => `
   self.onmessage = async (event) => {
     const { code, id } = event.data;
-    console.log('[jsRuntimeWorker] code:', code)
+    console.log('[jsRuntimeWorker] executing:', { id, code })
     ${makeJsHarness(code)}
   };
 `

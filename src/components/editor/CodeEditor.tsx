@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import { Code } from './Code'
 
 import { useTypescript } from '@/hooks/useTypescript'
@@ -33,7 +33,25 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
     },
   })
 
-  const js = useJSRuntime(ts.javascript)
+  const [result, execute] = useJSRuntime(ts.javascript)
+
+  const runJs = useCallback(() => {
+    if (!execute) {
+      console.warn('[CodeEditor] execute is not set!', execute)
+      return
+    }
+    ts.compile()
+      .then((nextCode) => {
+        if (nextCode) {
+          execute(nextCode)
+        } else {
+          throw new Error('no code to execute!')
+        }
+      })
+      .catch((error) => {
+        console.error('[CodeEditor] runJs error:', error)
+      })
+  }, [ts, execute])
 
   return (
     <div className="flex flex-1 flex-grow flex-col w-full min-h-screen bg-editor-200">
@@ -45,7 +63,7 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
       />
       <button
         className="bg-blue-500 p-2 rounded-lg w-16 absolute top-8 right-8 z-10"
-        onClick={() => ts.compile()}
+        onClick={runJs}
       >
         {'►'}
       </button>

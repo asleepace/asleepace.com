@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   makeJSRuntimeWorker,
@@ -9,6 +9,10 @@ export function useJSRuntime(code: string | undefined) {
   const [output, setOutput] = useState<JSRuntimeOutput>({
     result: null,
     loading: false,
+  })
+
+  const runJsCode = useRef((nextCode: string) => {
+    console.warn('[useJSRuntime] runJsCode is not set!')
   })
 
   const handleMessage = useCallback((event: MessageEvent) => {
@@ -28,12 +32,20 @@ export function useJSRuntime(code: string | undefined) {
     worker.addEventListener('message', handleMessage)
     worker.postMessage({ code })
 
+    runJsCode.current = (nextCode: string) => {
+      worker.postMessage({ code: nextCode })
+    }
+
     return () => {
+      console.info('[useJSRuntime] removing worker!')
       worker.removeEventListener('message', handleMessage)
       worker.terminate()
       URL.revokeObjectURL(workerUrl)
+      runJsCode.current = () => {
+        console.warn('[useJSRuntime] runJsCode is not set!')
+      }
     }
   }, [code, handleMessage])
 
-  return output
+  return [output, runJsCode.current] as const
 }
