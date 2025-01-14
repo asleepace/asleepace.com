@@ -18,6 +18,9 @@ telnet localhost 2525 # (local comp)
 # Check the mail queue
 mailq
 
+# View mail logs for user "mailgod
+sudo -u mailgod mail
+
 # Postfix Commands (macOS)
 sudo killall postfix
 sudo postsuper -d ALL
@@ -298,4 +301,35 @@ After setting this up, wait a bit for DNS propagation (can take up to 24-48 hour
 dig TXT asleepace.com
 dig TXT mail._domainkey.asleepace.com
 dig TXT _dmarc.asleepace.com
+```
+
+### Troubleshooting
+
+For the Yahoo rejection:
+
+This is likely because your IP is new and hasn't established a reputation
+You may need to:
+
+1. Gradually send emails
+2. Use a reputable email service
+3. Set up proper reverse DNS (PTR record)
+4. Configure SPF and DMARC in addition to DKIM
+
+### References
+
+Example message send via telnet `telnet localhost 25`
+
+```txt
+EHLO localhost
+MAIL FROM: <root@asleepace.com>
+RCPT TO: <colin_teahan@yahoo.com>
+DATA
+From: root@asleepace.com
+To: colin_teahan@yahoo.com
+Subject: DKIM Test Almost Working
+
+This is a DKIM test email.
+
+.
+QUIT
 ```
