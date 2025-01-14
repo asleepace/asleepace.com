@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { memo } from 'react'
 import { Code } from './Code'
 
 import { useTypescript } from '@/hooks/useTypescript'
@@ -16,17 +16,14 @@ export type CodeEditorProps = {
  *
  * A full code editor with WYSIWYG support which can handle different themese and customizations.
  * Displays a side bar with a list of different code blocks and allows the user to select a code block.
+ *
  */
 function CodeEditor({ code: defaultCode }: CodeEditorProps) {
+  // NOTE: the code is persisted to localStorage
   const [data, setCode] = useStore('code', {
-    lang: 'typescript',
     code: defaultCode,
+    lang: 'typescript',
   })
-
-  const onSubmit = useCallback((raw: string) => {
-    console.log('[code] submitting code!')
-    setCode({ code: raw, lang: 'typescript' })
-  }, [])
 
   const ts = useTypescript({
     code: data.code,
@@ -44,7 +41,7 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
         code={data.code}
         lang="typescript"
         className="h-full basis-3/4 p-8"
-        onSubmit={onSubmit}
+        onSubmit={(code) => setCode({ code, lang: 'typescript' })}
       />
       <button
         className="bg-blue-500 p-2 rounded-lg w-16 absolute top-8 right-8 z-10"
