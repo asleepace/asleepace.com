@@ -110,6 +110,80 @@ bun run build
 bun run preview
 ```
 
+# Troubleshooting
+
+Make sure your sever has a swap file, this is a requirement for the build process to work.
+
+```bash
+# Remove old swapfile
+sudo swapoff /swapfile
+sudo rm /swapfile
+
+# Create new one with proper permissions
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Verify it's working
+free -h
+```
+
+If you run into any issues during the build process, usually it is because of an OOM issue, you can try running the following command to free up some memory:
+
+```bash
+# Check current swap
+free -h
+
+# Add more swap if needed (as root)
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Check disk space usage
+df -h
+
+# Check largest directories/files
+du -hs /* | sort -rh | head -n 10
+
+# Find large files
+find / -type f -size +100M -exec ls -lh {} \;
+
+# Check largest directories in root
+du -h --max-depth=1 / | sort -rh | head -n 10
+
+# Check Docker if you're using it
+docker system df
+
+# Look for large log files
+find /var/log -type f -size +100M
+
+# Clean package manager cache
+apt-get clean
+apt-get autoremove
+
+# NOTE: installed ncdu to check disk space usage
+sudo apt-get install ncdu
+sudo ncdu /
+
+# NOTE: this was taking up a lot of space
+sudo rm -rf /usr/local/share/.cache
+
+# NOTE: the journalctl was taking up a lot of space
+journalctl --vacuum-time=3d
+```
+
+After changing the swap file, cleaning up the system cache, removing large log, etc. I was able to finally get it to build again. During the build process I was able to get the following error:
+
+```bash
+09:58:49 [WARN] [vite]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+```
+
 # Getting Started
 
 This website is deployed on a linux machine which contains several other projects which also use Bun. I recommend using ASDF to handle managing pacakge versions, here is the current config returned by running `asdf info`.
@@ -275,16 +349,20 @@ ps aux | grep "ssh -f -N"
 #
 kill <process_id>
 ```
+
 The square brackets tell Postfix to treat asleepace.com as a hostname rather than potentially misinterpreting it as an MX record lookup. This is especially important when specifying a port number.
 
 ```bash
 # edit the sasl_passwd file
 sudo nano /etc/postfix/sasl_passwd
 ```
+
 add the following
+
 ```conf
 [asleepace.com]:25    username:password
 ```
+
 Make sure to replace `username` and `password` with your actual credentials.
 
 Next run the following command to create the hash for the `sasl_passwd` file
@@ -322,8 +400,6 @@ mailq
 # check the logs
 sudo tail -f /var/log/mail.log
 ```
-
-
 
 # Astro Starter Kit: Blog
 
