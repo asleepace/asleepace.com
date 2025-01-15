@@ -1,18 +1,14 @@
 ---
-title: 'Code Editor'
+title: 'Online Code Editor'
 description: 'a simple online code editor which can compile and run typescript code.'
 pubDate: 'Jan 15 2025'
 heroImage: '/images/online-editor-cover.jpg'
-slug: 'code-editor'
+slug: 'online-code-editor'
 ---
 
-Introducing my [Code Editor](/code) (v1.0), a simple online code editor which can compile and run typescript code!
+Introducing my **Online Code Editor** (v1.0) a simple online code editor which can compile and run typescript code!
 
-<h3><a alt="Code Editor" href="/code"> Click here to try it out!</a></h3>
-
-Here's a summary of the online code editor implementation based on the code snippets provided:
-
-# Online Code Editor Implementation
+<h3 style="text-align: center; color: white; background-color: #222432; padding: 10px; border-radius: 16px;"><a alt="Code Editor" style="color: white;" href="/code"> Click here to try it out!</a></h3>
 
 ## Technical Overview
 
