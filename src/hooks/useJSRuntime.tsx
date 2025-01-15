@@ -5,10 +5,22 @@ import {
   type JSRuntimeOutput,
 } from '@/lib/runtime/jsRuntimeWorker'
 
+/**
+ * ## useJSRuntime(code)
+ *
+ * Executes code in a seperate worker process which can be ran multiple times.
+ *
+ * @param code - The code to execute.
+ * @returns [output, runJsCode]
+ * @description
+ * - `output` is the result of the code execution.
+ * - `runJsCode` is a function that can be used to run the code again.
+ */
 export function useJSRuntime(code: string | undefined) {
   const [output, setOutput] = useState<JSRuntimeOutput>({
-    result: null,
     loading: false,
+    result: null,
+    error: undefined,
   })
 
   const runJsCode = useRef((nextCode: string) => {
@@ -18,9 +30,9 @@ export function useJSRuntime(code: string | undefined) {
   const handleMessage = useCallback((event: MessageEvent) => {
     const { type, result, error } = event.data
     if (type === 'success') {
-      setOutput({ result, loading: false })
+      setOutput({ result, loading: false, error: undefined })
     } else {
-      setOutput({ result: null, loading: false, error })
+      setOutput({ result: undefined, loading: false, error })
     }
   }, [])
 

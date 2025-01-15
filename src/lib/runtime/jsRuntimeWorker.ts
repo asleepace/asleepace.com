@@ -32,46 +32,18 @@ function makeJsHarness(code: string) {
       console.error('[jsRuntimeWorker] error:', error);
       self.postMessage({ type: 'error', error, id });
     }
-  `
+  `.trim()
 }
 
-// const makeWorkerCode = (code: string) => `
-//   self.onmessage = async (event) => {
-//     const { code, id } = event.data;
-
-//     try {
-//       // Create a secure context for execution
-//       const context = {};
-//       const runner = new Function('context', \`
-//         with (context) {
-//           return (async () => {
-//             ${code}
-//           })();
-//         }
-//       \`);
-
-//       const result = await runner(context);
-//       self.postMessage({ type: 'success', result, id });
-//     } catch (error) {
-//       self.postMessage({
-//         type: 'error',
-//         error: {
-//           message: error.message,
-//           stack: error.stack
-//         },
-//         id
-//       });
-//     }
-//   };
-// `
-
-const makeWorkerCode = (code: string) => `
-  self.onmessage = async (event) => {
-    const { code, id } = event.data;
-    console.log('[jsRuntimeWorker] executing:', { id, code })
-    ${makeJsHarness(code)}
-  };
-`
+const makeWorkerCode = (code: string) => {
+  return `
+    self.onmessage = async (event) => {
+      const { code, id } = event.data;
+      console.log('[jsRuntimeWorker] executing:', { id, code })
+      ${makeJsHarness(code)}
+    };
+  `.trim()
+}
 
 /**
  * This function creates a worker that can execute JavaScript code.
@@ -81,7 +53,6 @@ const makeWorkerCode = (code: string) => `
  */
 export function makeJSRuntimeWorker(code: string) {
   const workerCode = makeWorkerCode(code)
-  console.log('[jsRuntimeWorker] workerCode:', workerCode)
   const workerBlob = new Blob([workerCode], { type: 'application/javascript' })
   const workerUrl = URL.createObjectURL(workerBlob)
   const worker = new Worker(workerUrl)
