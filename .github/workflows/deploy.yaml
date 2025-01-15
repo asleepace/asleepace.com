@@ -1,14 +1,16 @@
 name: Deploy
-on: [push, pull_request]
+on: pull_request
+  types: [labeled]
 jobs:
-  # test:
-  #   ...
   deploy:
     name: 'Deploy to production'
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.label == 'deploy'
+    if: github.event.label.name == 'deploy'
+
     # needs: test
     steps:
+      - uses: actions/checkout@v4
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
