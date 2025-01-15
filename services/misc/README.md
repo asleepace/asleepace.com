@@ -16,6 +16,9 @@ free -h
 # check memory usage
 htop
 
+# interfactive memory explorer (not-installed by default)
+sudo ncdu /
+
 # check journalctl memory usage
 journalctl --disk-usage
 
@@ -66,7 +69,7 @@ This was one of the most important changes which helped fix the OOM memory issue
 sudo swapoff /swapfile
 sudo rm /swapfile
 
-# Create new one with proper permissions
+# Create new one with proper permissions (2GB)
 sudo fallocate -l 2G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
@@ -77,6 +80,8 @@ free -h
 ```
 
 ## Journalctl
+
+This is a log management system that is used to store logs from various services, but can also destroy the your storage if not managed properly.
 
 ```bash
 # check journalctl memory usage
@@ -95,6 +100,8 @@ sudo nano /etc/systemd/journald.conf
 # restart journalctl
 sudo systemctl restart systemd-journald
 ```
+
+add the following to the file:
 
 ```conf
 # file: /etc/systemd/journald.conf
