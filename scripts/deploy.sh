@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 # Define ANSI escape codes for colors
 RESET="\033[0m"
@@ -40,7 +40,7 @@ bun run install
 pretty_print "[4/5] building application..."
 
 bun run build:tailwind
-bun run build
+bun run build:debug
 
 pretty_print "[5/5] restarting server..."
 
