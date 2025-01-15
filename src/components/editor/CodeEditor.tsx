@@ -34,12 +34,26 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
     },
   })
 
-  const [result, execute] = useJSRuntime(ts.javascript)
+  const [output, execute] = useJSRuntime(ts.javascript)
 
   const onSave = useCallback(() => {
     console.log('save code')
     setCode({ code: data.code, lang: 'typescript' })
-  }, [])
+    const saveFileName = window.prompt('Save file as:', `code_snippet_${Date.now()}.ts`)
+    if (!saveFileName) return
+    const blob = new Blob([data.code ?? ''], {
+      type: 'text/plain',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = saveFileName
+    a.click()
+    URL.revokeObjectURL(url)
+    requestAnimationFrame(() => {
+      a.remove()
+    })
+  }, [output, setCode])
 
   const onSettings = useCallback(() => {
     window.alert('Not logged in!')

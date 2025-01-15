@@ -8,7 +8,6 @@ import 'highlight.js/styles/base16/material-palenight.css'
 
 import clsx from 'clsx'
 
-import { useUndoRedo } from './useUndoRedo'
 import { useSyntax } from './useSyntax'
 
 // Register all supported languages
@@ -41,12 +40,11 @@ export function Code({
   className = 'p-4 px-6 rounded-lg',
   lang = 'typescript',
   readOnly = false,
-  onChange,
   onSubmit,
 }: CodeBlockProps) {
-  const { push, undo, redo } = useUndoRedo(defaultCode)
+  // TODO: re-add undo/redo operations
+  // const { push, undo, redo } = useUndoRedo(defaultCode)
   const editorRef = useRef<HTMLElement>(null)
-
   const isEditable = !readOnly
 
   // NOTE: Highlighting the code is handled by the useSyntax hook
@@ -57,8 +55,8 @@ export function Code({
   })
 
   const handleSubmit = useCallback(() => {
-    onSubmit?.(editorRef.current?.textContent ?? code)
-  }, [code, onSubmit])
+    onSubmit?.(editorRef.current?.textContent ?? rawCode)
+  }, [rawCode, onSubmit])
 
   return (
     <div
