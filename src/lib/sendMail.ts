@@ -44,7 +44,7 @@ class SMTP {
     ]
 
     this.client.on('data', (data) => {
-      console.log("stream:", data.toString())
+      console.log('stream:', data.toString())
     })
 
     return new Promise<boolean>((resolve, reject) => {
@@ -54,6 +54,7 @@ class SMTP {
           reject(new Error('Failed to flush command'))
         }
       }
+      resolve(true)
     })
   }
 }
@@ -61,4 +62,5 @@ class SMTP {
 export const sendMail = async (options: EmailOptions) => {
   const mail = new SMTP()
   const resp = await mail.send(options)
+  console.log('[sendMail] resp:', resp)
 }

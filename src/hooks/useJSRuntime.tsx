@@ -23,7 +23,7 @@ export function useJSRuntime(code: string | undefined) {
     error: undefined,
   })
 
-  const runJsCode = useRef((nextCode: string) => {
+  const runJsCode = useRef((_nextCode: string) => {
     console.warn('[useJSRuntime] runJsCode is not set!')
   })
 
