@@ -1,12 +1,13 @@
-# Asleepace.com
-
-My personal website and digital playground, where I like to tinker with and explore different technologies!
-
 <div align="center">
   <img
+    width="280"
     style="border-radius: 10px; border: 1px solid #ddd; padding: 5px;"
     src="https://github.com/user-attachments/assets/25c8baf2-90e6-47e2-b730-f0302232099f" />
 </div>
+
+# Asleepace.com
+
+My personal website and digital playground, where I like to tinker with and explore different technologies!
 
 | Service                                             | Version  | About                  |
 | --------------------------------------------------- | -------- | ---------------------- |
