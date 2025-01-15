@@ -11,8 +11,6 @@ import clsx from 'clsx'
 import { useUndoRedo } from './useUndoRedo'
 import { useSyntax } from './useSyntax'
 
-const DEFAULT_THEME = '/styles/material-palenight.css'
-
 // Register all supported languages
 const SUPPORTED_LANGUAGES = {
   javascript,
@@ -33,6 +31,11 @@ export type CodeBlockProps = {
   onSubmit?: (code: string) => void
 }
 
+/**
+ * ## Code
+ *
+ * An editable code block which can shows syntax highlighting.
+ */
 export function Code({
   code: defaultCode,
   className = 'p-4 px-6 rounded-lg',
@@ -54,7 +57,6 @@ export function Code({
   })
 
   const handleSubmit = useCallback(() => {
-    console.log('[code] submitting code!')
     onSubmit?.(editorRef.current?.textContent ?? code)
   }, [code, onSubmit])
 
