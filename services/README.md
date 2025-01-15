@@ -7,23 +7,6 @@ This directory contains copies of system configuration files for various Linux /
 - [Zsh](./zsh/) - zsh & bash shell
 - [Misc](./misc/) - misc. items
 
-**NOTE**: these are just reference files and are not the actual files on the server.
-
-```json
-{
-  "logs": "pm2 logs",
-  "logs:recent": "pm2 logs --last 200",
-  "logs:system": "sudo tail -f /var/log/syslog",
-  "logs:asleepace": "pm2 logs asleepace.com",
-  "logs:stockindx": "pm2 logs stockindx.com",
-  "logs:nginx": "sudo tail -f /var/log/nginx/error.log",
-  "logs:nginx:access": "sudo tail -f /var/log/nginx/access.log",
-  "logs:ufw": "sudo journalctl -u ufw",
-  "logs:postfix": "sudo tail -f /var/log/mail.log",
-  "logs:errors": "sudo journalctl -u errors"
-}
-```
-
 ## Quick Start
 
 ```bash
@@ -51,6 +34,12 @@ pm2 stop $service_name
 pm2 restart $service_name
 pm2 status $service_name
 pm2 logs $service_name
+
+# common memory commands
+free -h
+df -h
+ncdu /
+ps aux
 ```
 
 ## [Nginx](./nginx/ABOUT.md)
@@ -151,6 +140,42 @@ scp root@asleepace.com:/path/to/file.txt .
 
 # copy files from local to server
 scp file.txt root@asleepace.com:/path/to/file.txt
+```
+
+## Package Scripts
+
+You can find common scripts for managing memory, disk, logs, etc. in our `package.json` file or in the [Misc](./misc/ABOUT.md) directory.
+
+```json
+"scripts": {
+  "check": "bun --bun astro check",
+  "dev": "bunx --bun astro dev",
+  "start": "bunx --bun astro build --port 4321 && bunx --bun astro preview --port 4321",
+  "build": "bunx --bun astro build",
+  "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
+  "preview": "bunx --bun astro preview",
+  "build:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css",
+  "watch:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css --watch",
+  "deploy": "./scripts/deploy.sh",
+  "astro": "bunx --bun astro",
+  "util:upgrade": "bun upgrade",
+  "util:check": "bunx --bun astro check",
+  "run:server": "bun ./dist/server/entry.mjs",
+  "logs": "pm2 logs",
+  "logs:recent": "pm2 logs --last 200",
+  "logs:system": "sudo tail -f /var/log/syslog",
+  "logs:asleepace": "pm2 logs asleepace.com",
+  "logs:stockindx": "pm2 logs stockindx.com",
+  "logs:nginx": "sudo tail -f /var/log/nginx/error.log",
+  "logs:nginx:access": "sudo tail -f /var/log/nginx/access.log",
+  "logs:ufw": "sudo journalctl -u ufw",
+  "logs:postfix": "sudo tail -f /var/log/mail.log",
+  "logs:errors": "sudo journalctl -u errors",
+  "memory": "df -h",
+  "storage": "df -h",
+  "disk": "ncdu /",
+  "free": "free -h"
+}
 ```
 
 ## Resources
