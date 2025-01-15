@@ -38,7 +38,6 @@ export function useJSRuntime(code: string | undefined) {
 
   useEffect(() => {
     if (!code) return
-    console.info('[useJSRuntime] creating worker!')
     const [worker, workerUrl] = makeJSRuntimeWorker(code)
 
     worker.addEventListener('message', handleMessage)

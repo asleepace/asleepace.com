@@ -39,7 +39,7 @@ const makeWorkerCode = (code: string) => {
   return `
     self.onmessage = async (event) => {
       const { code, id } = event.data;
-      console.log('[jsRuntimeWorker] executing:', { id, code })
+      // console.log('[jsRuntimeWorker] executing:', { id, code })
       ${makeJsHarness(code)}
     };
   `.trim()

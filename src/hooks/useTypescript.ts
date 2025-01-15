@@ -46,7 +46,6 @@ export function useTypescript({
    */
   const compile = useCallback(async () => {
     try {
-      console.log('[typescript] compiling...')
       const compiledJsOutput = tsc.transpileModule(code, {
         ...DEFAULT_TRANSPILE_OPTIONS,
         ...transpileOptions,
@@ -55,12 +54,15 @@ export function useTypescript({
           ...compilerOptions,
         },
       })
-      console.log(compiledJsOutput)
+      // console.log(compiledJsOutput)
       setJavascript(compiledJsOutput.outputText)
       setError(undefined)
       return compiledJsOutput.outputText
     } catch (error) {
       console.warn('[useTypescript] Failed to compile TypeScript code', error)
+      if (error instanceof Error) {
+        window.alert(error.message)
+      }
       setError(error as Error)
     }
   }, [code, compilerOptions, transpileOptions])
