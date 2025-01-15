@@ -4,9 +4,9 @@ jobs:
   # test:
   #   ...
   deploy:
-    name: "Deploy to staging"
+    name: 'Deploy to production'
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.label == 'deploy'
     # needs: test
     steps:
       - name: Configure SSH
@@ -26,5 +26,5 @@ jobs:
           SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
           SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
 
-      - name: Stop the server
-        run: ssh staging 'cd asleepace.com && yarn deploy'
+      - name: Run deploy script
+        run: ssh staging '~/asleepace.com/scripts/deploy.sh'
