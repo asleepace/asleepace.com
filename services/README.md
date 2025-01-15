@@ -34,6 +34,12 @@ pm2 stop $service_name
 pm2 restart $service_name
 pm2 status $service_name
 pm2 logs $service_name
+
+# common memory commands
+free -h
+df -h
+ncdu /
+ps aux
 ```
 
 ## [Nginx](./nginx/ABOUT.md)
