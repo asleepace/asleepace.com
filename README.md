@@ -18,12 +18,14 @@ My personal website and digital playground, where I like to tinker with and expl
 
 ## Table of Contents
 
-You can find more detailed documentation in the [services](services) directory.
+You can find more detailed documentation for this project in the [services](services) directory.
 
-1. [Nginx documentation & configuration](/services/nginx/)
-2. [Postfix documentation & configuration](/services/smtp/)
-3. [ZSH documentation & configuration](/services/zsh/)
-4. [Misc documentation & configuration](/services/misc/)
+- [Changelog](/CHANGELOG.md)
+- [Services](/services)
+- [Nginx docs](/services/nginx/)
+- [Postfix docs](/services/smtp/)
+- [ZSH docs](/services/zsh/)
+- [Misc. docs](/services/misc/)
 
 ## Quick Start
 
