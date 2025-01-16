@@ -6,6 +6,8 @@ import { siteData } from '@/consts'
 import { Sessions, Users } from '@/db'
 import { UserFlags, type User } from '@/db/types'
 import { MemoryUsageTable } from '@/components/admin/MemoryUsageTable.tsx'
+import { ProcessInfoWidget } from '@/components/core/ProcessInfoWidget.tsx'
+import clsx from 'clsx'
 
 export const prerender = false;
 
@@ -27,6 +29,8 @@ if (!admin) {
   console.warn('[admin] not authorized, be gone!')
   return Astro.redirect('/login')
 }
+
+const hideScrollBars = true
 
 ---
 
@@ -52,20 +56,24 @@ if (!admin) {
           <p>Tools</p>
         </button>
       </aside>
-      <div class="flex h-full flex-row flex-1 justify-center items-start gap-16 p-16">
+      <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16">
         <!-- welcome message & search bar -->
         <div class="flex flex-col flex-1 self-stretch max-w-screen-xs">
-          <p class="text-6xl font-bold">Admin Panel</p>
+          <p class="text-6xl font-bold">Admin</p>
           <p class="tracking-wide text-zinc-400 py-2">Welcome to the admin page <strong>{admin.username}!</strong></p>
           <input type="text" placeholder="Search" class="w-full bg-zinc-800 focus:ring-0 focus:outline-none focus:border-orange-500 rounded-md p-2" />
 
-          <div class="flex flex-col my-8 flex-1 items-start justify-center">
-            <p class="my-2 text-7xl font-bold text-center">🎉</p>
+          <div class="flex flex-col flex-1 self-stretch items-start justify-start">
+            <p class="text-7xl font-bold m-auto">🎉</p>
           </div>
         </div>
         <!-- memory usage statistics -->
-        <div class="flex flex-col flex-1 basis-1/4 self-stretch h-[400px] bg-zinc-900 overflow-auto flex-nowrap rounded-xl gap-2">
-          <MemoryUsageTable client:only="react" />
+        <div class={
+        clsx("flex flex-col flex-1 basis-1/4 self-stretch min-h-[400px] mb-16 bg-zinc-900 overflow-auto rounded-xl max-w-screen-md ",
+          hideScrollBars && '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+        ) }>
+          <!-- <MemoryUsageTable client:only="react" /> -->
+          <ProcessInfoWidget client:only="react" />
         </div>
       </div>
     </main>
