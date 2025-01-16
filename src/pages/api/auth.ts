@@ -11,21 +11,15 @@ export const prerender = false
  * Check if the user is authenticated and return the user if so.
  */
 export const GET: APIRoute = endpoint(async ({ request }) => {
-  const { headers } = await http.parse(request)
+  const { oauthToken } = await http.parse(request)
 
-  const authorization = headers['Authorization'] || headers['authorization']
-
-  const users = await Users.fetchUsers()
-
-  console.log('[users]', users)
-
-  if (!authorization) {
+  if (!oauthToken) {
     return http.failure(401, 'Unauthorized')
   }
 
-  return http.success({
-    users,
-  })
+  const user = Sessions.findUser(oauthToken)
+
+  return http.success(user)
 })
 
 /**
@@ -34,11 +28,7 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
  * This endpoint can be used to either login or register a user.
  */
 export const POST: APIRoute = endpoint(async ({ request }) => {
-  const { headers } = await http.parse(request)
-
-  const authorization = headers['Authorization'] || headers['authorization']
-
-  const { email, username, password, type = 'login' } = await request.json()
+  const { email, username, password } = await request.json()
 
   if (!email || !username) {
     return http.failure(400, 'Invalid email or username')
@@ -48,16 +38,18 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
     return http.failure(400, 'Invalid password')
   }
 
-  // TODO: if already authenticated, return the user
+  const user = await Users.createUser({
+    email,
+    username,
+    password,
+  })
 
-  try {
-    const user = Users.createUser({
-      email,
-      username,
-      password,
-    })
-    return http.success(user)
-  } catch (error) {
-    return http.failure(400, 'Bad Request')
-  }
+  const session = Sessions.create(user.id)
+
+  return new Response(JSON.stringify(user), {
+    headers: {
+      'Set-Cookie': `session=${session}; HttpOnly; Secure; SameSite=Strict`,
+      'Content-Type': 'application/json',
+    },
+  })
 })

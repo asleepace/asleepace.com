@@ -24,21 +24,30 @@ export namespace Users {
     return db.query('SELECT * FROM users').all()
   }
 
-  export async function createUser(
-    user: Pick<User, 'email' | 'username' | 'password'>
-  ) {
-    const hash = await hashPassword(user.password)
+  export async function createUser({
+    email,
+    username,
+    password,
+  }: Pick<User, 'email' | 'username' | 'password'>) {
     const query = db.prepare(`
-    INSERT INTO users (email, username, password)
-    VALUES ($email, $username, $password)
-    RETURNING *;
-  `)
+      INSERT INTO users (email, username, password)
+      VALUES ($email, $username, $password)
+      RETURNING *;
+    `)
 
-    return query.get({
-      $email: user.email,
-      $username: user.username,
+    const hash = await hashPassword(password)
+
+    const user = query.get({
+      $email: email,
+      $username: username,
       $password: hash,
-    }) as User
+    }) as User | undefined
+
+    if (!user) {
+      throw new Error('Failed to create user')
+    }
+
+    return user
   }
 
   export function getUserByEmail(email: string) {
