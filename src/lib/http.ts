@@ -111,7 +111,10 @@ async function parse(request: Request) {
   const contentType = request.headers.get('content-type')
   const contentLength = Number(request.headers.get('content-length'))
 
-  const body = request.body && contentLength ? request.body: null
+  const authorization = headers['Authorization'] || headers['authorization']
+  const [authType, oauthToken] = authorization?.split(' ') || []
+
+  const body = request.body && contentLength ? request.body : null
 
   const getSearchParam = (key: string) => {
     const value = searchParams[key]
@@ -133,6 +136,8 @@ async function parse(request: Request) {
     body,
     searchParams,
     getSearchParam,
+    oauthToken,
+    authType,
   }
 }
 

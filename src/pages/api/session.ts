@@ -11,25 +11,13 @@ export const prerender = false
  * This route returns the current user for the session.
  */
 export const GET: APIRoute = endpoint(async ({ request }) => {
-  const { headers } = await http.parse(request)
+  const { oauthToken, authType } = await http.parse(request)
 
-  const authorization = headers['Authorization'] || headers['authorization']
-
-  if (!authorization) {
+  if (!oauthToken || !authType) {
     return http.failure(401, 'Unauthorized')
   }
 
-  const [authType, sessionToken] = authorization.split(' ')
-
-  if (authType !== 'Bearer') {
-    return http.failure(401, 'Invalid authorization type')
-  }
-
-  if (!sessionToken) {
-    return http.failure(401, 'Unauthorized')
-  }
-
-  const user = Sessions.findUser(sessionToken)
+  const user = Sessions.findUser(oauthToken)
 
   return http.success(user)
 })
