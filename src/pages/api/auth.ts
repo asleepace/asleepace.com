@@ -39,9 +39,9 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
 
   const contentType =
     request.headers.get('content-type') || request.headers.get('Content-Type')
-  const isFormEncoded = contentType?.includes(
-    'application/x-www-form-urlencoded'
-  )
+
+  const isFormEncoded = contentType?.includes(CONTENT_TYPE_FORM)
+  const isJsonEncoded = contentType?.includes(CONTENT_TYPE_JSON)
 
   let username: string | undefined
   let password: string | undefined
@@ -50,10 +50,12 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
     const formData = await request.formData()
     username = formData.get('username')?.toString()
     password = formData.get('password')?.toString()
-  } else {
+  } else if (isJsonEncoded) {
     const body = await request.json()
     username = body.username
     password = body.password
+  } else {
+    return http.failure(400, 'Invalid content type')
   }
 
   if (!username) return http.failure(400, INVALID_LOGIN)
@@ -74,12 +76,10 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
   // --- create a session ---
 
   const session = Sessions.create(user.id)
+  const sessionToken = session.token
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      'Set-Cookie': `session=${session}; HttpOnly; Secure; SameSite=Strict`,
-      Location: '/admin',
-    },
-  })
+  // NOTE: the status code needs to be 302 is a redirect in order for astro
+  // to redirect properly with the session cookie.
+  //
+  return http.session({ sessionToken, redirectTo: '/admin' })
 })

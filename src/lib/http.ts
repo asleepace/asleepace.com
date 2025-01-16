@@ -25,6 +25,7 @@ export type HttpResponseParams = {
 export const http = {
   success,
   failure,
+  session,
   response,
   parse,
   get,
@@ -84,6 +85,33 @@ function response({
  */
 function success(data: any) {
   return response({ data, status: 200, statusText: 'OK' })
+}
+
+/**
+ * Creates a new session by setting a cookie and redirecting (3032) to the given URL.
+ */
+function session({
+  sessionToken,
+  redirectTo = '/',
+  httpOnly = true,
+  secure = true,
+  sameSite = 'Strict',
+}: {
+  sessionToken: string
+  redirectTo?: string
+  httpOnly?: boolean
+  secure?: boolean
+  sameSite?: 'Strict' | 'Lax' | 'None'
+}) {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      'Set-Cookie': `session=${sessionToken}; ${httpOnly ? 'HttpOnly;' : ''}; ${
+        secure ? 'Secure;' : ''
+      }; SameSite=${sameSite}`,
+      Location: redirectTo,
+    },
+  })
 }
 
 /**
