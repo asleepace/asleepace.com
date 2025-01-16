@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 type MemoryUsageColumn =
   | 'USER'
@@ -30,49 +30,66 @@ const SampleData: MemoryUsage[] = [
     TIME: '0.0',
     COMMAND: '0.0',
   },
-  {
-    USER: 'user',
-    PID: '2',
-    CPU: '19.0',
-    MEM: '0.0',
-    VSZ: '0.0',
-    RSS: '0.0',
-    TT: '0.0',
-    STAT: '0.0',
-    STARTED: '0.0',
-    TIME: '0.0',
-    COMMAND: '0.0',
-  },
 ]
 
-export function MemoryUsageTable() {
-  const [memoryUsage, setMemoryUsage] = useState<MemoryUsage[]>(SampleData)
+export type MemoryUsageWidgetProps = {
+  refreshRate?: number
+}
 
-  const columns = Object.keys(memoryUsage[0])
+/**
+ * ## Memory Usage Table
+ *
+ * A simple data table which displays real-time user data.
+ */
+export function MemoryUsageTable({
+  refreshRate = 3500,
+}: MemoryUsageWidgetProps) {
+  const [memoryUsage, setMemoryUsage] = useState<MemoryUsage[]>(SampleData)
+  const [columns, setColumns] = useState<MemoryUsageColumn[]>(
+    Object.keys(memoryUsage[0]) as MemoryUsageColumn[]
+  )
+
+  const [sortBy, setSortBy] = useState(0)
 
   useEffect(() => {
-    fetch('/api/system/info', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    const interval = setInterval(() => {
+      fetch('/api/system/info', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => setMemoryUsage(data))
+        .catch((error) => console.error(error))
+    }, refreshRate)
+
+    return () => clearInterval(interval)
+  }, [refreshRate])
+
+  const sortedMemoryUsage = useMemo(() => {
+    return memoryUsage.sort((a, b) => {
+      return Number(a[columns[sortBy]]) - Number(b[columns[sortBy]])
     })
-      .then((response) => response.json())
-      .then((data) => setMemoryUsage(data))
-      .catch((error) => console.error(error))
-  }, [])
+  }, [memoryUsage, sortBy])
 
   return (
     <div className="flex flex-col flex-1 self-stretch min-h-[400px] w-full max-w-screen-lg">
-      <div className="sticky top-0 left-0 right-0 flex flex-row justify-between align-center px-4 py-3 text-white bg-blue-700 font-thin">
-        {columns.map((column) => (
-          <p className="text-sm flex-1 max-w-16 text-ellipsis flex truncate font-black">
+      <div className="sticky top-0 left-0 right-0 flex flex-row justify-between align-center px-4 py-3 drop-shadow-md text-white bg-blue-700 font-thin">
+        {columns.map((column, index) => (
+          <p
+            onClick={() => setSortBy(index)}
+            className={clsx(
+              'text-sm text-slate-200 flex-1 max-w-16 text-ellipsis flex truncate font-black',
+              sortBy === index && 'rounded-md text-white'
+            )}
+          >
             {column}
           </p>
         ))}
       </div>
       <div className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        {memoryUsage.map((usage, index) => (
+        {sortedMemoryUsage.map((usage, index) => (
           <MemoryRow key={usage.PID} {...usage} index={index} />
         ))}
       </div>
