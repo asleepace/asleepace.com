@@ -11,6 +11,8 @@ export const prerender = false
  * This route returns the current user for the session.
  */
 export const GET: APIRoute = endpoint(async ({ request }) => {
+
+  
   const { oauthToken, authType } = await http.parse(request)
 
   if (!oauthToken || !authType) {

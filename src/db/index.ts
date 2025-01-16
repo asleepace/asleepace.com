@@ -1,5 +1,6 @@
 import Database from 'bun:sqlite'
 import { USERS_INIT, SESSIONS_INIT, type User, type UserSession } from './types'
+import type { AstroCookies } from 'astro'
 
 // --- initialize the database ---
 
@@ -11,6 +12,13 @@ db.run(SESSIONS_INIT)
 // --- helper functions ---
 
 export namespace Users {
+  export async function verifyPassword(
+    hashedPassword: string,
+    rawPassword: string
+  ): Promise<boolean> {
+    return Bun.password.verify(rawPassword, hashedPassword)
+  }
+
   export async function hashPassword(rawPassword: string): Promise<string> {
     return Bun.password.hash(rawPassword, {
       algorithm: 'bcrypt',
@@ -88,6 +96,30 @@ export namespace Users {
 export namespace Sessions {
   const TOKEN_BYTES = 32
   const TOKEN_EXPIRATION_DAYS = 30
+
+  /**
+   * ## isValid(sessionCookie)
+   *
+   * @returns true if the session cookie is valid and not expired
+   *
+   * ```
+   * // example usage
+   * const sessionCookie = Astro.cookies.get('session')
+   *
+   * const isValid = Sessions.isValid(sessionCookie?.value)
+   *
+   * if (!isValid) return Astro.redirect('/')
+   * ```
+   */
+  export function isValid(sessionCookie: string | undefined): boolean {
+    if (!sessionCookie) return false
+    console.log('[Sessions] validate sessionToken:', sessionCookie)
+    const session = findByToken(sessionCookie)
+    console.log('[Sessions] found session:', session)
+    const isExpired = session.expiresAt > new Date()
+    console.log('[Sessions] isExpired:', isExpired)
+    return isExpired
+  }
 
   export function getExpiry(): Date {
     return new Date(Date.now() + 1000 * 60 * 60 * 24 * TOKEN_EXPIRATION_DAYS)

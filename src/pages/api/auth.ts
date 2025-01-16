@@ -28,28 +28,58 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
  * This endpoint can be used to either login or register a user.
  */
 export const POST: APIRoute = endpoint(async ({ request }) => {
-  const { email, username, password } = await request.json()
+  console.log('POST /api/auth', request)
 
-  if (!email || !username) {
-    return http.failure(400, 'Invalid email or username')
+  // --- don't leak information about the error ---
+  const INVALID_LOGIN = 'Invalid username or password'
+
+  // --- parse the request body ---
+  const CONTENT_TYPE_FORM = 'application/x-www-form-urlencoded'
+  const CONTENT_TYPE_JSON = 'application/json'
+
+  const contentType =
+    request.headers.get('content-type') || request.headers.get('Content-Type')
+  const isFormEncoded = contentType?.includes(
+    'application/x-www-form-urlencoded'
+  )
+
+  let username: string | undefined
+  let password: string | undefined
+
+  if (isFormEncoded) {
+    const formData = await request.formData()
+    username = formData.get('username')?.toString()
+    password = formData.get('password')?.toString()
+  } else {
+    const body = await request.json()
+    username = body.username
+    password = body.password
   }
 
-  if (!password || password.length < 8) {
-    return http.failure(400, 'Invalid password')
-  }
+  if (!username) return http.failure(400, INVALID_LOGIN)
+  if (!password) return http.failure(400, INVALID_LOGIN)
 
-  const user = await Users.createUser({
-    email,
-    username,
-    password,
-  })
+  // --- find the user ---
+
+  const user = Users.findUser({ username, email: username })
+
+  if (!user) return http.failure(401, INVALID_LOGIN)
+
+  // --- verify the password ---
+
+  const isPasswordValid = await Users.verifyPassword(user.password, password)
+
+  if (!isPasswordValid) return http.failure(401, INVALID_LOGIN)
+
+  // --- create a session ---
 
   const session = Sessions.create(user.id)
 
-  return new Response(JSON.stringify(user), {
+  return new Response(null, {
+    status: 302,
     headers: {
       'Set-Cookie': `session=${session}; HttpOnly; Secure; SameSite=Strict`,
-      'Content-Type': 'application/json',
+      Location: '/admin',
     },
   })
 })
