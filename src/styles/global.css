@@ -38,8 +38,8 @@
   --black-30: rgba(0, 0, 0, 0.3);
 
   /** table styles */
-  --table-max-col-width: 220px;
-  --table-min-col-width: 24px;
+  --table-max-col-width: 120px;
+  --table-min-col-width: 2px;
 }
 
 @font-face {
@@ -72,50 +72,11 @@ body {
   line-height: 1.7;
 }
 
-.data-table {
-  width: unset;
-
-  thead {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3),
-      0 4px 12px rgba(var(--black-30), 33%),
-      0 8px 16px rgba(var(--black-30), 33%);
-    background-color: #4f46e5;
-    position: sticky;
-    top: 0;
-  }
-
-  thead > tr > th {
-    resize: horizontal;
-    overflow: auto;
-    max-width: var(--table-max-col-width);
-    min-width: var(--table-min-col-width);
-  }
-
-  th {
-    font-size: 12px;
-    padding: 0.5rem;
-  }
-
-  th,
-  td {
-    max-width: var(--table-max-col-width);
-    min-width: var(--table-min-col-width);
-  }
-
-  /* td:before {
-    width: 100%;
-  } */
-
-  tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.02);
-  }
-
-  td {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.87);
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 

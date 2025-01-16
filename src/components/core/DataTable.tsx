@@ -18,20 +18,22 @@ function DataTable<T extends Record<string, any>>({
   }, [data])
 
   return (
-    <table className="data-table">
-      <thead>
-        <tr>
-          {columns.map((column) => (
-            <th key={String(`col-${column}`)}>{column}</th>
+    <div className="data-table-container scrollbar-none">
+      <table className="data-table">
+        <thead>
+          <tr>
+            {columns.map((column) => (
+              <th key={String(`col-${column}`)}>{column}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data?.map((row) => (
+            <DataRow key={String(`row-${row.PID}`)} data={row} />
           ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data?.map((row) => (
-          <DataRow key={String(`row-${row.PID}`)} data={row} />
-        ))}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   )
 }
 
