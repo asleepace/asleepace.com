@@ -18,8 +18,11 @@ try {
   const session = Astro.cookies.get('session')
   admin = Sessions.adminOnly(session?.value)
   // TODO: remove this after testing
+
+  console.log('[admin] setting flags for', admin.username)
   Users.setFlags(admin, UserFlags.SuperAdmin)
   Users.setFlags(admin, UserFlags.Admin)
+  console.log('[admin] flags set for', admin)
 } catch (error) {
   console.warn('[admin] error:', error)
   return Astro.redirect('/login')
@@ -33,18 +36,37 @@ if (!admin) {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
-    <BaseHead title={siteData.title} description={siteData.description} />
+    <BaseHead title={siteData.title} description={siteData.description} />  
   </head>
-  <body class="min-h-screen flex flex-col bg-white">
-    <Header title={siteData.title} />
-    <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto px-4">
-      <div class="flex flex-col gap-2">
-        <p class="text-5xl font-bold text-center">Admin</p>
-        <p class="text-center">Welcome to the admin page <strong>{admin.username}!</strong></p>
-        <p class="text-7xl font-bold text-center">🎉</p>
+  <body class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden">
+    <main class="flex flex-row h-full flex-1 bg-zinc-950">
+      <aside class="w-64 bg-black px-2 py-16 gap-y-2 flex flex-col text-zinc-300">
+        <button class="w-full bg-transparent rounded-md p-2">
+          <p>Database</p>
+        </button>
+        <button class="w-full bg-transparent rounded-md p-2">
+          <p>Sessions</p>
+        </button>
+        <button class="w-full bg-transparent rounded-md p-2">
+          <p>Settings</p>
+        </button>
+        <button class="w-full bg-transparent rounded-md p-2">
+          <p>Tools</p>
+        </button>
+      </aside>
+      <div class="flex h-full flex-col flex-1 justify-center items-start p-16">
+        <div class="flex flex-col flex-1 self-stretch max-w-screen-xs gap-2">
+          <p class="text-5xl font-bold">Admin Panel</p>
+          <p class="py-2">Welcome to the admin page <strong>{admin.username}!</strong></p>
+          <input type="text" placeholder="Search" class="w-full bg-zinc-800 rounded-md p-2" />
+
+          <div class="flex flex-col my-8 flex-1 items-start justify-center">
+            <p class="my-2 text-7xl font-bold text-center">🎉</p>
+          </div>
+        </div>
+      </div>
     </main>
-    <Footer />
   </body>
 </html>
