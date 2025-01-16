@@ -12,13 +12,8 @@ export const prerender = false
  */
 export const GET: APIRoute = endpoint(async ({ request }) => {
   const { oauthToken } = await http.parse(request)
-
-  if (!oauthToken) {
-    return http.failure(401, 'Unauthorized')
-  }
-
+  if (!oauthToken) return http.failure(401, 'Unauthorized')
   const user = Sessions.findUser(oauthToken)
-
   return http.success(user)
 })
 

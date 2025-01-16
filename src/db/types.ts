@@ -1,6 +1,7 @@
 export type User = {
   id: number
   email: string
+  flags: UserFlags
   username: string
   password: string
   createdAt: Date

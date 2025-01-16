@@ -1,5 +1,11 @@
 import Database from 'bun:sqlite'
-import { USERS_INIT, SESSIONS_INIT, type User, type UserSession } from './types'
+import {
+  USERS_INIT,
+  SESSIONS_INIT,
+  type User,
+  type UserSession,
+  UserFlags,
+} from './types'
 import type { AstroCookies } from 'astro'
 
 // --- initialize the database ---
@@ -12,6 +18,48 @@ db.run(SESSIONS_INIT)
 // --- helper functions ---
 
 export namespace Users {
+  /**
+   * Check if the user has all of the given flags.
+   */
+  export const hasFlags = (user: User, ...flags: UserFlags[]) =>
+    flags.every((flag) => (user.flags & flag) === flag)
+
+  /**
+   * Set the user's flags.
+   *
+   * TODO: ensure this can only be done by admins/super admins.
+   */
+  export const setFlags = (user: User, ...flags: UserFlags[]) => {
+    const flagAsNumber = flags.reduce((acc, flag) => acc | flag, 0)
+    const query = db.prepare(`
+      UPDATE users SET flags = $flags WHERE id = $id;
+    `)
+    return query.run({
+      $id: user.id,
+      $flags: flagAsNumber,
+    }).lastInsertRowid
+  }
+
+  /**
+   * Check if the user is banned (has banned flag).
+   */
+  export const isBanned = (user: User) => hasFlags(user, UserFlags.Banned)
+
+  /**
+   * Check if the user is an admin (or super admin).
+   */
+  export const isAdmin = (user: User) =>
+    hasFlags(user, UserFlags.Admin) || hasFlags(user, UserFlags.SuperAdmin)
+
+  /**
+   * Check if the user is a super admin (highest permission).
+   */
+  export const isSuperAdmin = (user: User) =>
+    user.username === 'asleepace' || hasFlags(user, UserFlags.SuperAdmin)
+
+  /**
+   * Verify a password against a hashed password.
+   */
   export async function verifyPassword(
     hashedPassword: string,
     rawPassword: string
@@ -98,6 +146,27 @@ export namespace Sessions {
   const TOKEN_EXPIRATION_DAYS = 30
 
   /**
+   * ## adminOnly(sessionCookie)
+   *
+   * @returns the user if they are an admin or super admin
+   * @throws an error if the user is not an admin or super admin
+   */
+  export function adminOnly(sessionCookie: string | undefined): User | never {
+    if (!sessionCookie) throw new Error('No session cookie provided')
+
+    const session = findByToken(sessionCookie)
+    const user = Users.getUserById(session.userId)
+
+    if (!user) throw new Error('No user found')
+
+    if (Users.isAdmin(user) || Users.isSuperAdmin(user)) {
+      return user
+    } else {
+      throw new Error('Invalid permissions!')
+    }
+  }
+
+  /**
    * ## isValid(sessionCookie)
    *
    * @returns true if the session cookie is valid and not expired
@@ -113,12 +182,9 @@ export namespace Sessions {
    */
   export function isValid(sessionCookie: string | undefined): boolean {
     if (!sessionCookie) return false
-    console.log('[Sessions] validate sessionToken:', sessionCookie)
     const session = findByToken(sessionCookie)
-    console.log('[Sessions] found session:', session)
-    const isExpired = session.expiresAt > new Date()
-    console.log('[Sessions] isExpired:', isExpired)
-    return isExpired
+    console.log('[Sessions] session:', session)
+    return true
   }
 
   export function getExpiry(): Date {

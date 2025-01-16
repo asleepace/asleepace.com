@@ -3,7 +3,8 @@ import BaseHead from '@/components/astro/BaseHead.astro'
 import Header from '@/components/astro/Header.astro'
 import Footer from '@/components/astro/Footer.astro'
 import { siteData } from '@/consts'
-import { Sessions } from '@/db'
+import { Sessions, Users } from '@/db'
+import { UserFlags, type User } from '@/db/types'
 
 export const prerender = false;
 
@@ -11,12 +12,24 @@ export const prerender = false;
 // Admin Page
 // =====================================
 
-const session = Astro.cookies.get('session')
-const isValid = Sessions.isValid(session?.value)
+let admin: User | undefined
 
-console.log('[admin] Astro.cookies:', Astro.cookies)
-console.log('[admin] session:', session)
-console.log('[admin] isValid:', isValid)
+try {
+  const session = Astro.cookies.get('session')
+  admin = Sessions.adminOnly(session?.value)
+  // TODO: remove this after testing
+  Users.setFlags(admin, UserFlags.SuperAdmin)
+  Users.setFlags(admin, UserFlags.Admin)
+} catch (error) {
+  console.warn('[admin] error:', error)
+  return Astro.redirect('/login')
+}
+
+if (!admin) {
+  console.warn('[admin] not authorized, be gone!')
+  return Astro.redirect('/login')
+}
+
 ---
 
 <!doctype html>
@@ -29,12 +42,8 @@ console.log('[admin] isValid:', isValid)
     <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto px-4">
       <div class="flex flex-col gap-2">
         <p class="text-5xl font-bold text-center">Admin</p>
-        <p class="text-center">Welcome to the admin page.</p>  
-        <!-- <form action="/api/auth" class="flex flex-col gap-2 w-[300px]" method="post">
-          <input class="border border-gray-300 rounded-md p-2"  id="username" type="text" name="username" placeholder="Username" />
-          <input class="border border-gray-300 rounded-md p-2" id="password" type="password" name="password" placeholder="Password" />
-          <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button>
-        </form> -->
+        <p class="text-center">Welcome to the admin page <strong>{admin.username}!</strong></p>
+        <p class="text-7xl font-bold text-center">🎉</p>
     </main>
     <Footer />
   </body>
