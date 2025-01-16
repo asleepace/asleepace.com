@@ -30,24 +30,25 @@ let cachedProcessInfo: ProcessInfo[] = []
  * Displays the process information for the current process.
  */
 export function ProcessInfoWidget({ refreshInterval }: Props) {
-  const [processInfo, setProcessInfo] = useState<ProcessInfo[]>(cachedProcessInfo)
+  const [processInfo, setProcessInfo] =
+    useState<ProcessInfo[]>(cachedProcessInfo)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const onFetchData = () =>
       getProcessInfo()
         .then(setProcessInfo)
         .catch((error) => {
-          clearInterval(interval)
           console.error(error)
           setError(error)
         })
-    }, refreshInterval ?? 3_000)
 
-    return () => {
-      cachedProcessInfo = processInfo
-      clearInterval(interval)
-    }
+    onFetchData() // fetch once immediately
+
+    const interval = setInterval(() => {
+      onFetchData()
+    }, refreshInterval ?? 5_000)
+    return () => clearInterval(interval)
   }, [refreshInterval])
 
   if (error) return <div className="text-red-500">{error}</div>

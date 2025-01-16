@@ -17,46 +17,32 @@ function DataTable<T extends Record<string, any>>({
     return Object.keys(data[0])
   }, [data])
 
-  console.log(columns)
-
   return (
-    <table className={clsx('min-h-96 overflow-auto', className)}>
+    <table className="data-table">
       <thead>
-        <tr className="bg-blue-600 text-white">
+        <tr>
           {columns.map((column) => (
-            <th className="resize-x overflow-auto" key={column}>
-              {column}
-            </th>
+            <th key={String(`col-${column}`)}>{column}</th>
           ))}
         </tr>
       </thead>
       <tbody>
-        {data?.map((row, index) => (
-          <DataRow key={index} data={row} column={index} />
+        {data?.map((row) => (
+          <DataRow key={String(`row-${row.PID}`)} data={row} />
         ))}
       </tbody>
     </table>
   )
 }
 
-const DataRow = memo(
-  <T extends Record<string, any>>({
-    data,
-    column,
-  }: {
-    data: T
-    column: number
-  }) => {
-    return (
-      <tr>
-        {Object.values(data).map((value, row) => (
-          <td className="resize overflow-auto" key={`${column}-${row}`}>
-            {value}
-          </td>
-        ))}
-      </tr>
-    )
-  }
-)
+const DataRow = memo(<T extends Record<string, any>>({ data }: { data: T }) => {
+  return (
+    <tr>
+      {Object.values(data).map((value, row) => (
+        <td key={`col-${data.PID}-${row}`}>{value}</td>
+      ))}
+    </tr>
+  )
+})
 
 export default memo(DataTable)
