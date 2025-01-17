@@ -4,6 +4,10 @@
  * ==============================
  */
 
+ @tailwind base;
+ @tailwind components;
+ @tailwind utilities;
+
 :root {
   --table-min-col-width: 100px;
   --table-max-col-width: 400px;
@@ -47,7 +51,7 @@ table.data-table {
 .data-table th {
   padding: 1em;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 500;
   text-align: left;
   color: white;
   white-space: nowrap;
