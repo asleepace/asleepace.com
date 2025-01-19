@@ -10,23 +10,40 @@ import {
   useTransition,
 } from 'react'
 
-type DataPrimitive = string | number | boolean | null | undefined
-type DataRecord = Record<string, DataPrimitive>
+//
+// -------------------------- TYPES --------------------------
+//
 
-export type DataTableProps<T extends DataRecord> = {
-  sortBy?: keyof T
-  className?: string
-  data: T[] | undefined
+type DataPrimitive = string | number | boolean | Date
+
+type DataRecord = {
+  [key: string]: DataPrimitive
 }
+
+type KeyExtractor = (row: DataRecord) => string
+
+export type DataTableProps<
+  T extends DataRecord,
+  K extends keyof T = keyof T
+> = {
+  data: T[]
+  sortBy: K
+  getKey: KeyExtractor
+  className?: string
+}
+
+//
+// -------------------------- HELPERS --------------------------
+//
 
 /**
  * ## sortData
  *
  * Sorts the data based on the sortBy column.
  */
-function sortData<T extends DataRecord>(
-  data: T[],
-  sortBy?: keyof T,
+function sortData<T extends DataRecord, K extends keyof T>(
+  data: T[] = [],
+  sortBy?: K,
   isAscending = true
 ) {
   if (!sortBy || !data) return data
@@ -50,21 +67,24 @@ function sortData<T extends DataRecord>(
  *
  * A hook that returns the sorted data based on the sortBy column.
  */
-function useSortedData<T extends DataRecord>(
+function useSortedData<T extends DataRecord, K extends keyof T>(
   data: T[],
-  sortBy?: keyof T,
+  sortBy: K,
   isAscending = true
 ) {
   const [isPending, startTransition] = useTransition()
   const [sortedData, setSortedData] = useState<T[]>(data)
 
   const initialSort = useMemo(() => {
+    if (sortedData && sortedData.length) {
+      return sortedData
+    }
     return sortData(data, sortBy, isAscending)
   }, [data, sortBy, isAscending])
 
   const sortWithTransition = useCallback(() => {
+    const sorted = sortData(data, sortBy, isAscending)
     startTransition(() => {
-      const sorted = sortData(data, sortBy, isAscending)
       setSortedData(sorted)
     })
   }, [data, sortBy, isAscending])
@@ -75,16 +95,12 @@ function useSortedData<T extends DataRecord>(
     }
   }, [sortWithTransition])
 
-  return [setSortedData?.length ? sortedData : initialSort, isPending] as const
+  return [sortedData.length ? sortedData : initialSort, isPending] as const
 }
 
-/**
- * ## getKey
- *
- * A function that returns a unique key for a row and column.
- */
-const getKey = <T extends DataRecord>(row: T, column: keyof T) =>
-  `row${row.PID}col${String(column)}`
+//
+// -------------------------- COMPONENT --------------------------
+//
 
 /**
  * ## DataTable
@@ -92,7 +108,11 @@ const getKey = <T extends DataRecord>(row: T, column: keyof T) =>
  * A table component that displays data in a tabular format, be sure to import
  * the css file `@/styles/data-table.css` to style the table.
  */
-function DataTable<T extends DataRecord>({ data = [] }: DataTableProps<T>) {
+function DataTable<T extends DataRecord>({
+  data = [],
+  getKey,
+  sortBy: sortByProp,
+}: DataTableProps<T>) {
   const columns = useMemo(() => {
     if (!data || !data.length) return []
     return Object.keys(data[0])
@@ -100,45 +120,62 @@ function DataTable<T extends DataRecord>({ data = [] }: DataTableProps<T>) {
 
   // scroll to top when sorting
   const tableBodyRef = useRef<HTMLTableSectionElement>(null)
+  const tableContainerRef = useRef<HTMLDivElement>(null)
 
   // sorting logic
   const [isAscending, setIsAscending] = useState(false)
-  const [sortBy, setSortBy] = useState<keyof T>('PID')
+  const [sortBy, setSortBy] = useState<keyof T>(sortByProp)
   const [sortedData, isPending] = useSortedData(data, sortBy, isAscending)
   const [activeColumnIndex, setActiveColumnIndex] = useState(0)
 
   // sort tablet by column when clicked
   const onClickSort = useCallback(
     (column: keyof T) => {
-      if (sortBy === column) {
-        setIsAscending(!isAscending)
-        setActiveColumnIndex(columns.indexOf(String(column)))
-      } else {
-        setSortBy(column)
-        setActiveColumnIndex(columns.indexOf(String(column)))
-      }
-      tableBodyRef.current?.scrollTo({
+      setSortBy(column)
+      setIsAscending(!isAscending)
+      setActiveColumnIndex(columns.indexOf(String(column)))
+      tableContainerRef.current?.scrollTo({
         top: 0,
         behavior: 'smooth',
       })
     },
-    [sortBy, isAscending, columns]
+    [sortBy, isAscending, columns, tableContainerRef]
   )
 
-  // memoized data column rendering
-  const DataColumn = useCallback(
-    (value: DataPrimitive, index: number, rowData: DataPrimitive[]) => {
-      return (
-        <Fragment key={`row${rowData[1]}col${index}`}>
-          <td>{value}</td>
-        </Fragment>
-      )
-    },
-    [activeColumnIndex]
-  )
+  // memoized data row rendering
+  const TableBody = useCallback(() => {
+    const tableKey = String(sortBy) + (isAscending ? 'asc' : 'desc')
+    return (
+      <Fragment key={tableKey}>
+        <tbody ref={tableBodyRef}>
+          {sortedData.map((row, index) => {
+            // get unique row key which will look like `row:<PID>:${index}:col:${index}`
+            const rowKey = `row:${getKey(row)}:${index}`
+
+            // render each column in the row here
+            const rowColumns = Object.values(row).map((col, index) => (
+              <Fragment key={`${rowKey}:col:${index}`}>
+                <td aria-label={String(col)}>{String(col)}</td>
+              </Fragment>
+            ))
+
+            // render entire row with column here
+            return (
+              <Fragment key={rowKey}>
+                <tr>{rowColumns}</tr>
+              </Fragment>
+            )
+          })}
+        </tbody>
+      </Fragment>
+    )
+  }, [getKey, isAscending, sortBy, sortedData])
 
   return (
-    <div className="data-table-container scrollbar-none">
+    <div
+      ref={tableContainerRef}
+      className="data-table-container scrollbar-none"
+    >
       <table className="data-table">
         <thead>
           <tr>
@@ -150,27 +187,14 @@ function DataTable<T extends DataRecord>({ data = [] }: DataTableProps<T>) {
                   columnIndex === activeColumnIndex && 'bg-indigo-500'
                 )}
               >
-                <strong
-                  className={
-                    isPending
-                      ? 'animate-pulse transition-transform to-orange-400'
-                      : 'animate-none'
-                  }
-                  onClick={() => onClickSort(columnTitle)}
-                >
+                <strong onClick={() => onClickSort(columnTitle)}>
                   {columnTitle}
                 </strong>
               </th>
             ))}
           </tr>
         </thead>
-        <tbody ref={tableBodyRef}>
-          {sortedData.map((rowData) => (
-            <Fragment key={getKey(rowData, sortBy)}>
-              <tr>{Object.values(rowData).map(DataColumn)}</tr>
-            </Fragment>
-          ))}
-        </tbody>
+        <TableBody />
       </table>
     </div>
   )

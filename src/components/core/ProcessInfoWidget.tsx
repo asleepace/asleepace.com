@@ -1,28 +1,12 @@
-import { getProcessInfo } from '@/lib/api/getProcessInfo'
-import { useEffect } from 'react'
+import { fetchProcessInfo } from '@/lib/api/fetchProcessInfo'
+import { useCallback, useEffect } from 'react'
 import { useState } from 'react'
 import DataTable from './DataTable'
-
-type ProcessInfoColumns =
-  | 'USER'
-  | 'PID'
-  | 'CPU'
-  | 'MEM'
-  | 'VSZ'
-  | 'RSS'
-  | 'TTY'
-  | 'STAT'
-  | 'STARTED'
-  | 'TIME'
-  | 'COMMAND'
-
-type ProcessInfo = Record<ProcessInfoColumns, string>
+import type { ProcessInfo } from '@/pages/api/system/info'
 
 type Props = {
   refreshInterval?: number
 }
-
-let cachedProcessInfo: ProcessInfo[] = []
 
 /**
  * ## ProcessInfo
@@ -30,13 +14,14 @@ let cachedProcessInfo: ProcessInfo[] = []
  * Displays the process information for the current process.
  */
 export function ProcessInfoWidget({ refreshInterval }: Props) {
-  const [processInfo, setProcessInfo] =
-    useState<ProcessInfo[]>(cachedProcessInfo)
-  const [error, setError] = useState<string | null>(null)
+  const [processInfo, setProcessInfo] = useState<ProcessInfo[]>([])
+  const [error, setError] = useState<string | undefined>()
+
+  const getKey = useCallback((row: ProcessInfo) => row.PID.toString(), [])
 
   useEffect(() => {
     const onFetchData = () =>
-      getProcessInfo()
+      fetchProcessInfo()
         .then(setProcessInfo)
         .catch((error) => {
           console.error(error)
@@ -53,5 +38,5 @@ export function ProcessInfoWidget({ refreshInterval }: Props) {
 
   if (error) return <div className="text-red-500">{error}</div>
 
-  return <DataTable data={processInfo ?? []} />
+  return <DataTable sortBy="PID" getKey={getKey} data={processInfo} />
 }
