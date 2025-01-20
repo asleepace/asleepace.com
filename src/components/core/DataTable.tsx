@@ -153,11 +153,16 @@ function DataTable<T extends DataRecord>({
             const rowKey = `row:${getKey(row)}:${index}`
 
             // render each column in the row here
-            const rowColumns = Object.values(row).map((col, index) => (
-              <Fragment key={`${rowKey}:col:${index}`}>
-                <td aria-label={String(col)}>{String(col)}</td>
-              </Fragment>
-            ))
+            const rowColumns = Object.values(row).map((col, index) => {
+              const column = String(col)
+              return (
+                <Fragment key={`${rowKey}:col:${index}`}>
+                  <td title={column} aria-label={column}>
+                    {column}
+                  </td>
+                </Fragment>
+              )
+            })
 
             // render entire row with column here
             return (
