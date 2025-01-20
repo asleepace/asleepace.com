@@ -65,20 +65,9 @@ const parsers: Parsers = {
   COMMAND: String,
 }
 
-// --------------------- FRONTEND API ---------------------
-
-export async function fetchProcessInfo() {
-  const response = await fetch('/api/system/info', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  return response.json()
-}
 
 // --------------------- BACKEND API ---------------------
+
 
 /**
  * GET /api/system/info
