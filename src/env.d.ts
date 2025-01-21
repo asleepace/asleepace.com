@@ -17,3 +17,10 @@ interface Env {
   PORT: number
   PROTOCOL: string
 }
+
+declare namespace App {
+  export interface Locals {
+    isLoggedIn: boolean
+    user: Record<string, any> | undefined
+  }
+}

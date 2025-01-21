@@ -167,6 +167,17 @@ export namespace Sessions {
   }
 
   /**
+   * ## getUser(sessionCookie)
+   *
+   * @returns the user for the given session cookie
+   */
+  export function getUser(sessionCookie: string | undefined): User | undefined {
+    if (!sessionCookie) return undefined
+    const session = findByToken(sessionCookie)
+    return Users.getUserById(session.userId)
+  }
+
+  /**
    * ## isValid(sessionCookie)
    *
    * @returns true if the session cookie is valid and not expired
