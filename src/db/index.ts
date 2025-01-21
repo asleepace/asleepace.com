@@ -6,7 +6,6 @@ import {
   type UserSession,
   UserFlags,
 } from './types'
-import type { AstroCookies } from 'astro'
 
 // --- initialize the database ---
 
