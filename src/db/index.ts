@@ -281,7 +281,6 @@ export namespace Analytics {
    *
    */
   export function track(data: AnalyticsDataInit) {
-    console.log('[Analytics] tracking data:', data)
     const query = db.prepare(`
       INSERT INTO analytics (path, userAgent, ipAddress, sessionId, referrer)
       VALUES ($path, $userAgent, $ipAddress, $sessionId, $referrer)
