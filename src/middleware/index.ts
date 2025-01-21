@@ -1,4 +1,5 @@
-import { Sessions } from '@/db'
+import { Analytics, Sessions } from '@/db'
+import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
 import { defineMiddleware, sequence } from 'astro:middleware'
 
 /**
@@ -44,6 +45,33 @@ const authMiddleware = defineMiddleware(async (context, next) => {
 })
 
 /**
+ * Analytics Middleware
+ *
+ * This middleware tracks request data and stores it in the database.
+ *
+ */
+const analyticsMiddleware = defineMiddleware((context, next) => {
+
+  const { request, cookies } = context
+  const { headers } = request
+
+  const referrer = headers.get('referer')
+  const userAgent = headers.get('user-agent')
+  const ipAddress = getIpAddressFromHeaders(headers)
+  const sessionId = cookies.get('session')?.value
+
+  Analytics.track({
+    path: context.url.href,
+    userAgent: userAgent ?? undefined,
+    ipAddress: ipAddress ?? undefined,
+    sessionId: sessionId ?? undefined,
+    referrer: referrer ?? undefined,
+  })
+
+  return next()
+})
+
+/**
  * ## Middleware
  *
  * Process requests and responses before they are sent to the client,
@@ -56,4 +84,4 @@ const authMiddleware = defineMiddleware(async (context, next) => {
  *  3.
  *
  */
-export const onRequest = sequence(authMiddleware)
+export const onRequest = sequence(analyticsMiddleware, authMiddleware)

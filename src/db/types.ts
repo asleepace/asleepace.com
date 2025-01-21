@@ -55,3 +55,25 @@ export const SESSIONS_INIT = `
   -- Add index for user sessions
   CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(userId);
 `
+
+export type AnalyticsData = {
+  id: number
+  path: string
+  createdAt: Date
+  userAgent: string
+  ipAddress: string
+  referrer: string
+  sessionId: string
+}
+
+export const ANALYTICS_INIT = `
+  CREATE TABLE IF NOT EXISTS analytics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      path TEXT NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      userAgent TEXT,
+      ipAddress TEXT,
+      sessionId TEXT,
+      referrer TEXT
+  );
+`

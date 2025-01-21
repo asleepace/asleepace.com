@@ -5,6 +5,8 @@ import {
   type User,
   type UserSession,
   UserFlags,
+  ANALYTICS_INIT,
+  type AnalyticsData,
 } from './types'
 
 // --- initialize the database ---
@@ -13,6 +15,7 @@ const db = new Database('db.sqlite')
 
 db.run(USERS_INIT)
 db.run(SESSIONS_INIT)
+db.run(ANALYTICS_INIT)
 
 // --- helper functions ---
 
@@ -257,5 +260,42 @@ export namespace Sessions {
     }
 
     return session
+  }
+}
+
+// --- analytics functions ---
+
+export namespace Analytics {
+  export type AnalyticsDataInit = {
+    path: string
+    userAgent?: string | null
+    ipAddress?: string | null
+    sessionId?: string | null
+    referrer?: string | null
+  }
+
+  /**
+   * ## Analytics.track(data)
+   *
+   * Track analytics data for a specific page.
+   *
+   */
+  export function track(data: AnalyticsDataInit) {
+    console.log('[Analytics] tracking data:', data)
+    const query = db.prepare(`
+      INSERT INTO analytics (path, userAgent, ipAddress, sessionId, referrer)
+      VALUES ($path, $userAgent, $ipAddress, $sessionId, $referrer)
+      RETURNING *;
+    `)
+
+    const result = query.run({
+      $path: data.path ?? '/',
+      $userAgent: data.userAgent ?? null,
+      $ipAddress: data.ipAddress ?? null,
+      $sessionId: data.sessionId ?? null,
+      $referrer: data.referrer ?? null,
+    })
+
+    return result.lastInsertRowid
   }
 }
