@@ -6,7 +6,6 @@ import {
   type UserSession,
   UserFlags,
   ANALYTICS_INIT,
-  type AnalyticsData,
 } from './types'
 
 // --- initialize the database ---

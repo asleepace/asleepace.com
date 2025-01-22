@@ -125,7 +125,7 @@ function DataTable<T extends DataRecord>({
   // sorting logic
   const [isAscending, setIsAscending] = useState(false)
   const [sortBy, setSortBy] = useState<keyof T>(sortByProp)
-  const [sortedData, isPending] = useSortedData(data, sortBy, isAscending)
+  const [sortedData, _isPending] = useSortedData(data, sortBy, isAscending)
   const [activeColumnIndex, setActiveColumnIndex] = useState(0)
 
   // sort tablet by column when clicked
