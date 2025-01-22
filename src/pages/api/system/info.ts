@@ -10,6 +10,8 @@ export const prerender = false
  *
  * run the `ps aux` command and return the output as a JSON object
  *
+ * @note must be authorized!
+ *
  */
 export const GET: APIRoute = endpoint(async ({ locals }) => {
   if (!locals.isLoggedIn) return http.failure(401, 'Unauthorized')
