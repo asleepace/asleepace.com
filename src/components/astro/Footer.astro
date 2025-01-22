@@ -1,4 +1,6 @@
 ---
+import Analytics from './Analytics.astro'
+
 const today = new Date()
 const fullYear = today.getFullYear()
 ---
@@ -33,6 +35,8 @@ const fullYear = today.getFullYear()
       >
     </a>
   </div>
+  <!-- perform some simple analytics tracking -->
+  <Analytics />
 </footer>
 <style>
   footer {
