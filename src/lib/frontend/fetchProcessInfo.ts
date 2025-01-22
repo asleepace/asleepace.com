@@ -1,9 +1,13 @@
-import type { ProcessInfo } from '@/pages/api/system/info'
+import type { ProcessInfo } from '../linux/getProcessInfo'
 
 /**
+ * ## fetchProcessInfo()
+ *
  * Fetches the process information from the backend API.
  *
  * @note see 'src/pages/api/system/info.ts` for more information
+ *
+ * @note frontend only!
  *
  */
 export async function fetchProcessInfo(): Promise<ProcessInfo[]> {
@@ -15,7 +19,7 @@ export async function fetchProcessInfo(): Promise<ProcessInfo[]> {
   })
     .then((res) => res.json())
     .catch((error) => {
-      console.error(error)
+      console.error('[fetchProcessInfo] failed', error)
       throw error
     })
 }

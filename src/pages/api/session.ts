@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { endpoint } from '.'
 import { http } from '@/lib/http'
-import { Users, Sessions } from '@/db/index'
+import { Sessions } from '@/db/index'
 
 export const prerender = false
 

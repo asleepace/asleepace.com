@@ -93,16 +93,6 @@ const parseProcessData = (rawData: string): ProcessInfo[] => {
     .filter((line) => line.length > 1 && line.at(1))
     .map((name) => name.replace('%', '') as Columns)
 
-  // Pre-compute column parsers array for better performance
-
-  const columnParsers = columns.map((col) => {
-    const dataParser = parsers[col]
-    if (!dataParser) {
-      throw new Error('[info.ts] no dataParser for column:' + col)
-    }
-    return dataParser
-  })
-
   // Process all lines in one go
 
   return tableData.map((line) => iterate(columns, line)) as ProcessInfo[]
@@ -123,7 +113,8 @@ function iterate<C extends string>(columns: C[], text: string) {
   const lastColumn = columns[lastColumnIndex] as InferredColumns
   let columnsWithValues = {} as Record<InferredColumns, any>
   for (let i = 0; i < lastColumnIndex; i++) {
-    columnsWithValues[columns[i]] = values[i]
+    const parse = parsers[columns[i]]
+    columnsWithValues[columns[i]] = parse(values[i])
   }
   columnsWithValues[lastColumn] = values.slice(lastColumnIndex).join(' ')
   return columnsWithValues

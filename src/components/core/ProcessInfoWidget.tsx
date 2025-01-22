@@ -1,23 +1,31 @@
-import { fetchProcessInfo } from '@/lib/api/fetchProcessInfo'
-import { useCallback, useEffect } from 'react'
+import { fetchProcessInfo } from '@/lib/frontend/fetchProcessInfo'
+import { useEffect } from 'react'
 import { useState } from 'react'
 import DataTable from './DataTable'
-import type { ProcessInfo } from '@/pages/api/system/info'
+import type { ProcessInfo } from '@/lib/linux/getProcessInfo'
 
 type Props = {
   refreshInterval?: number
 }
 
 /**
- * ## ProcessInfo
+ * ## getKey(row)
+ *
+ * Helper method for extracting a unique key for each row from it's PID
+ * number which is unique per process.
+ *
+ */
+const getKey = ({ PID }: ProcessInfo) => PID.toString()
+
+/**
+ * ## ProcessInfoWidget
  *
  * Displays the process information for the current process.
+ *
  */
 export function ProcessInfoWidget({ refreshInterval }: Props) {
   const [processInfo, setProcessInfo] = useState<ProcessInfo[]>([])
   const [error, setError] = useState<string | undefined>()
-
-  const getKey = useCallback((row: ProcessInfo) => row.PID.toString(), [])
 
   useEffect(() => {
     const onFetchData = () =>

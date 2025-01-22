@@ -11,16 +11,13 @@ import { defineMiddleware, sequence } from 'astro:middleware'
  *
  * See the `env.d.ts` file for types.
  *
+ * @note see bottom of this file!
+ *
  */
 
-const pipeToOutput = <T extends object>(data: T) =>
-  fetch('https://consoledump.io/qmtlvfx9', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+//
+// --------------------- utilities ---------------------
+//
 
 /**
  * Auth Middleware
@@ -51,7 +48,6 @@ const authMiddleware = defineMiddleware(async (context, next) => {
  *
  */
 const analyticsMiddleware = defineMiddleware((context, next) => {
-
   const { request, cookies } = context
   const { headers } = request
 
@@ -81,7 +77,7 @@ const analyticsMiddleware = defineMiddleware((context, next) => {
  *
  *  1. Analytics based logging
  *  2. Authorization
- *  3.
+ *  3. Remove redacted info?
  *
  */
 export const onRequest = sequence(analyticsMiddleware, authMiddleware)
