@@ -11,6 +11,8 @@ import { defineMiddleware, sequence } from 'astro:middleware'
  *
  * See the `env.d.ts` file for types.
  *
+ * @note pages which are pre-rendered bypass middleware!
+ *
  * @note see bottom of this file!
  *
  */
@@ -48,8 +50,13 @@ const authMiddleware = defineMiddleware(async (context, next) => {
  *
  */
 const analyticsMiddleware = defineMiddleware((context, next) => {
+  if (context.isPrerendered) return next()
+
   const { request, cookies } = context
   const { headers } = request
+
+  // ignore double logging analytics
+  if (request.url.includes('/api/analytics')) return next()
 
   const referrer = headers.get('referer')
   const userAgent = headers.get('user-agent')
