@@ -296,4 +296,38 @@ export namespace Analytics {
 
     return result.lastInsertRowid
   }
+
+  /**
+   * ## fetchAnalytics(limit=100, offset=0)
+   *
+   * fetches analytics data from the database.
+   *
+   * @param limit - the number of records to fetch
+   * @param offset - the number of records to skip
+   * @returns the analytics data
+   *
+   */
+  export function fetchAnalytics(limit: number = 100, offset: number = 0) {
+    if (limit < 0 || offset < 0) {
+      throw new Error('Limit and offset must be non-negative')
+    }
+
+    const query = db.prepare(
+      `
+      SELECT 
+        *,
+        COUNT(*) OVER() as totalCcount 
+      FROM analytics 
+      ORDER BY createdAt DESC
+      LIMIT $limit OFFSET $offset;
+  `.trim()
+    )
+
+    const result = query.run({
+      $limit: limit,
+      $offset: offset,
+    })
+
+    return result
+  }
 }

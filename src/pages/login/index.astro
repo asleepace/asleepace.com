@@ -13,23 +13,9 @@ export const prerender = false;
 // Login Page
 // =====================================
 
-// try {
-//   const session = Astro.cookies.get('session')
-
-//   console.log('[login] session:', session)
-
-//   if (!session || !session.value) throw new Error('No session found')
-
-//   const isValid = Sessions.isValid(session.value)
-
-//   if (!isValid) throw new Error('Session is invalid')
-
-//   console.log('[admin] session is valid')
-
-// } catch (error) {
-//   console.warn('[admin] not authorized, be gone!')
-//   // return Astro.redirect('/')
-// }
+if (Astro.locals.isLoggedIn) {
+  return Astro.redirect('/admin')
+}
 
 ---
 

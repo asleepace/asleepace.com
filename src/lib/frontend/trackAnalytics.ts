@@ -14,7 +14,7 @@ export async function trackAnalytics(): Promise<boolean> {
     return false
   }
   return fetch('/api/analytics', {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'user-agent': navigator.userAgent,
       referer: document.referrer,

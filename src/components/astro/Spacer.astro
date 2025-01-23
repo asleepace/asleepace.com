@@ -1,0 +1,14 @@
+---
+import clsx from 'clsx'
+
+interface Props {
+  direction?: 'vertical' | 'horizontal'
+}
+
+const { direction = 'vertical' } = Astro.props
+---
+
+<div class={clsx("flex-1", {
+  'flex-col': direction === 'vertical',
+  'flex-row': direction === 'horizontal',
+})} />
