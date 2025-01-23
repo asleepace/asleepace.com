@@ -23,8 +23,8 @@ const entries = Object.entries(data).reverse()
   {
     entries.map(([key, value]) => (
       <div class="flex flex-row gap-x-2 flex-grow items-baseline" onclick={`navigator.clipboard.writeText('${value}')`}>
-        <p class="text-xs opacity-80 font-bold font-mono tracking-wide">{key}</p>
-        <pre class="text-xs opacity-50">{value}</pre>
+        <p class="text-xs text-zinc-300 font-bold font-mono tracking-wider">{key}</p>
+        <pre class="text-xs text-zinc-500">{value}</pre>
       </div>
     ))
   }

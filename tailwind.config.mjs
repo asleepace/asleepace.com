@@ -18,6 +18,10 @@ export default {
       scale: {},
       animation: {},
       keyframes: {},
+      fontSize: {
+        '2xs': '0.625rem',
+        '3xs': '0.5rem',
+      },
       colors: {
         editor: {
           100: '#292d3e',

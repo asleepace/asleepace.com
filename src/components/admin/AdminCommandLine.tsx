@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import AdminCommandOutput from './AdminCommandOutput'
 
-type CommandResult = {
+export type CommandResult = {
+  type?: 'command' | 'error'
   command: string[]
   output: string
   whoami: string
@@ -8,9 +10,14 @@ type CommandResult = {
 }
 
 async function execute(command: string): Promise<CommandResult> {
-  const response = await fetch('/api/system/command', {
+  const response = await fetch('/api/shell', {
     method: 'POST',
-    body: command,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      command
+    }),
   })
   console.log('[AdminCommandLine] response', response)
   const data = await response.json()
@@ -18,18 +25,30 @@ async function execute(command: string): Promise<CommandResult> {
   return data
 }
 
-const formatOutput = (result: CommandResult) => (prev: string[]) => {
-  return [
-    ...prev,
-    `${result.pwd}@${result.whoami} $ ${result.command}`,
-    result.output,
-  ]
-}
+const formatError = (command: string, error: Error): CommandResult => ({
+  command: [command],
+  output: error?.message,
+  whoami: 'system',
+  pwd: 'error',
+  type: 'error',
+})
 
 export default function AdminCommandLine() {
-  const [output, setOutput] = useState<string[]>([])
+  const [output, setOutput] = useState<CommandResult[]>([])
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const onRunCommand = useCallback(async (command: string) => {
+    prevCommandsRef.push(command)
+    return execute(command)
+      .then((result) => {
+        setOutput((prev) => [...prev, result])
+      })
+      .catch((error) => {
+        console.warn('[AdminCommandLine] error', error)
+        setOutput((prev) => [...prev, formatError(command, error)])
+      })
+  }, [])
 
   const onSubmit = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
@@ -38,39 +57,27 @@ export default function AdminCommandLine() {
     const command = inputRef.current?.value?.trim()
     inputRef.current!.value = ''
     if (!command) return false
-    console.log('[AdminCommandLine] submit', command)
-    prevCommandsRef.push(command)
-    execute(command)
-      .then((result) => {
-        setOutput(formatOutput(result))
-      })
-      .catch((error) => {
-        setOutput((prev) => [...prev, error?.message])
-      })
-    return false
+    onRunCommand(command)
   }, [])
 
   return (
-    <div className="flex flex-col flex-1 self-stretch border-2 border-solid border-zinc-800 rounded-xl">
-      <textarea
-        className="flex-1 flex-grow ring-0 focus:ring-0 scrollbar-none focus:outline-none bg-transparent text-gray-200 p-2 font-mono text-sm"
-        contentEditable={false}
-        value={output.join('\n')}
-        id="cli-output"
-        readOnly
-      />
-      <input
-        ref={inputRef}
-        id="cli-input"
-        type="text"
-        className="flex flex-shrink bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-orange-500 rounded-md p-2 text-white"
-        autoCapitalize="off"
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-        placeholder="Run command..."
-        onKeyDown={onSubmit}
-      />
+    <div className="bg-black rounded-2xl flex-1 p-1 self-stretch max-w-screen-lg max-h-[500px] flex flex-col">
+      <AdminCommandOutput data={output} />
+      <div className="flex flex-row px-2 py-1">
+        <p className='text-green-500 font-mono text-sm self-center font-bold'>$</p>
+        <input
+          ref={inputRef}
+          id="cli-input"
+          type="text"
+          className="flex flex-shrink font-mono text-sm tracking-wide text-green-500 bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-orange-500 rounded-md p-2"
+          autoCapitalize="off"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder="Run command..."
+          onKeyDown={onSubmit}
+        />
+      </div>
     </div>
   )
 }
