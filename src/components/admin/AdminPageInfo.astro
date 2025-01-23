@@ -1,25 +1,31 @@
 ---
+/**
+ * ## AdminPageInfo.astro
+ * 
+ * A generic component to display information about a page from a key-value object.
+ * 
+ * @note the entries are reversed to display the most recent at the top.
+ * 
+ * @action copyToClipboard - copy value to clipboard when clicked
+ * 
+ */
 
 interface Props {
-  title?: string
   data: Record<string, any>
 }
 
-const { title, data } = Astro.props
+const { data } = Astro.props
 
 const entries = Object.entries(data).reverse()
 
 ---
-<div class="flex flex-col gap-y-2 flex-grow">
-  { title  ? <p class="text-2xl sticky z-10 top-0 text-orange-500 bg-zinc-950 tracking-wide font-bold p-2">{title}</p> : null }
-  <div class="flex flex-col gap-y-2 p-2 pt-0 flex-grow">
+<div class="flex flex-col gap-y-2 p-2 flex-grow">
   {
     entries.map(([key, value]) => (
       <div class="flex flex-row gap-x-2 flex-grow items-baseline" onclick={`navigator.clipboard.writeText('${value}')`}>
-        <p class="text-lg opacity-90 font-bold">{key}</p>
-        <pre class="text-sm opacity-50">{value}</pre>
+        <p class="text-xs opacity-80 font-bold font-mono tracking-wide">{key}</p>
+        <pre class="text-xs opacity-50">{value}</pre>
       </div>
     ))
   }
-  </div>
 </div>

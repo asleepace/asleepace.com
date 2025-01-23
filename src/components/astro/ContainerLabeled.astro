@@ -1,0 +1,25 @@
+---
+import clsx from "clsx"
+
+interface Props {
+  outlineColor?: string
+  className?: string
+  label: string
+}
+
+const { outlineColor = 'zinc-700', className, label } = Astro.props
+
+// make border color and label text color match
+const textColorClass = `text-${outlineColor}`
+const borderColorClass = `border-${outlineColor}`
+
+---
+
+<div aria-label={`${label} Section`}>
+  <p class={clsx("text-xs font-bold font-mono uppercase rounded-xl tracking-widest inline-block relative top-4 px-2 z-50 bg-zinc-950 ml-6", textColorClass)}>{label}</p>
+  <div class={clsx("flex flex-col rounded-2xl border-2 border-solid shadow-inner-lg overflow-auto", borderColorClass, className)}>
+    <div class="flex flex-col gap-y-2 p-1 mt-3 pt-0 flex-grow overflow-auto w-full scrollbar-none">
+      <slot />
+    </div>
+  </div>
+</div>
