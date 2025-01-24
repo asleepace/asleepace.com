@@ -137,8 +137,14 @@ export const POST: APIRoute = async ({ request }) => {
   //   `printf '{"usr":"%s","cwd":"%s","cmd":"%s","out":"%s"}\n' "$(whoami)" "$(pwd)" "${command}" "$(${command})"\n`
   // )
 
+  // THIS ALMOST WORKS!
+  // childShellProcess.stdin.write(
+  //   `${command} | (echo "$(cat -)\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";)\n`
+  // )
+
   childShellProcess.stdin.write(
-    `${command} | (echo "$(cat -)\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";)\n`
+    `${command}\n
+    echo "\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";\n`
   )
 
   return new Response('OK', {
