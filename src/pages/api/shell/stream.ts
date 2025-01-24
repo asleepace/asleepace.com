@@ -130,18 +130,11 @@ export const POST: APIRoute = async ({ request }) => {
 
   console.log('[shell/stream] writing command:', command)
 
-  // send the command to the shell
-  // childShellProcess.stdin.write(command + '\n')
-
-  // childShellProcess.stdin.write(
-  //   `printf '{"usr":"%s","cwd":"%s","cmd":"%s","out":"%s"}\n' "$(whoami)" "$(pwd)" "${command}" "$(${command})"\n`
-  // )
-
-  // THIS ALMOST WORKS!
-  // childShellProcess.stdin.write(
-  //   `${command} | (echo "$(cat -)\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";)\n`
-  // )
-
+  // NOTE: This part is a bit tricky
+  // 1. We need to execute the command first
+  // 2. We need to mark the end with ETX 0x03
+  // 3. We need to send the metadata after the command has finished
+  // 4. TODO: do we need to send and end of command marker?
   childShellProcess.stdin.write(
     `${command}\n
     echo "\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";\n`
