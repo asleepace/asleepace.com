@@ -34,6 +34,7 @@ export function useShellStream() {
     const textDecoder = new TextDecoder()
 
     console.log('[shell/stream] eventSource:', eventSource)
+    console.log('[shell/stream] eventSource.readyState:', eventSource.readyState)
 
     eventSource.onmessage = (event) => {
       console.log('[shell/stream] event:', event)
@@ -71,6 +72,7 @@ export function useShellStream() {
     }
 
     return () => {
+      console.log('[shell/stream] eventSource.close()')
       eventSource.close()
     }
   }, [])

@@ -1,5 +1,11 @@
 import type { APIRoute } from 'astro'
 
+/**
+ * ## SSR Only
+ *
+ * This API should only be executed in a severside context.
+ *
+ */
 export const prerender = false
 
 /**
@@ -8,7 +14,7 @@ export const prerender = false
  * The shell process that we will be streaming the output of.
  *
  */
-const childShellProcess = Bun.spawn(['sh'], {
+const childProcess = Bun.spawn(['sh'], {
   stdout: 'pipe',
   stdin: 'pipe',
   stderr: 'pipe',
@@ -22,7 +28,8 @@ const childShellProcess = Bun.spawn(['sh'], {
 /**
  * ## ETX
  *
- * End of Text (ETX) is the ASCII character 3, which is used to indicate the end of a message.
+ * End of Text (ETX) is the ASCII character 3, which is used to indicate the end of a message,
+ * this is given as both a string and binary representation.
  *
  */
 const ETX = {
@@ -37,26 +44,41 @@ export type ShellStreamData = {
   pid: number
 }
 
-const cleanup = {
-  [Symbol.dispose]: () => {
-    console.log('[shell/stream] cleanup...')
-    console.log('[shell/stream] killing child process!!!!!!!!!!!!!!')
-    childShellProcess.kill()
-  },
-}
-
 /**
  * GET /api/shell/stream
  *
- * Streams the output of the shell.
+ * Streams the output of the shell via a server-sent event.
+ *
+ *  1. Create a new readable stream to be sent to the client
+ *  2. Pipe output from the childProcess to a writeable stream in chunks
+ *  3. When the end of text (ETX) is detected send to client
+ *  4. Handle edge cases and cleanup gracefully
  *
  */
 export const GET: APIRoute = async ({ request }) => {
-  console.log('[shell/stream] GET shell stream...')
+  console.log('[shell/stream] GET shell stream:', request.headers)
+
+  // resolver for when the stream is finished
+  let onStreamDidFinish: ((value: unknown) => void) | undefined
+
+  // create a new readable stream
+  const waitForStreamToFinish = new Promise((resolve) => {
+    onStreamDidFinish = resolve
+  })
+
+  // create a new readable stream
   const stream = new ReadableStream({
     async start(controller) {
       const buffer: Uint8Array[] = []
 
+      // setup an abort signal
+      request.signal.onabort = () => {
+        console.warn('[shell/stream] aborting...')
+        childProcess.kill()
+        controller.close()
+      }
+
+      // create a new writeable stream
       const output = new WritableStream({
         write(chunk) {
           // buffer chunks
@@ -69,34 +91,56 @@ export const GET: APIRoute = async ({ request }) => {
             controller.enqueue(`data: ${output}\n\n`)
             buffer.length = 0 // empty the buffer
           }
+
+          onStreamDidFinish?.(true)
+        },
+        abort() {
+          console.warn('[shell/stream] writeable stream aborted!')
+          childProcess.kill()
+          controller.close()
         },
         close() {
-          console.warn('[shell/stream] output stream closed!')
+          console.warn('[shell/stream] writeable stream closed!')
           controller.close()
         },
       })
 
-      await childShellProcess.stdout.pipeTo(output).catch((err) => {
-        console.error(`[shell/stream] ERROR stdout: \n\n${err}\n`)
-        childShellProcess.kill()
-        controller.close()
-      })
+      // pipe the output stream to the writeable stream
+      await childProcess.stdout
+        .pipeTo(output)
+        .then(() => {
+          console.log('[shell/stream] finished piping!')
+        })
+        .catch((err) => {
+          console.error(`[shell/stream] ERROR stdout: \n\n${err}\n`)
+          childProcess.kill()
+          controller.close()
+        })
+        .finally(() => {
+          console.log('[shell/stream] finally...')
+        })
     },
     cancel() {
       console.warn('[shell/stream] killing child process!')
-      childShellProcess.kill()
+      childProcess.kill()
     },
   })
+
+  console.log('[shell/stream] waiting for stream to finish...')
+  await waitForStreamToFinish
+  console.log('[shell/stream] stream finished!')
 
   if (stream.locked) {
     console.warn('[shell/stream] stream is locked!')
     return new Response('Stream is locked', { status: 500 })
   }
 
-  return new Response(stream, {
+  const clientResponseStream = await new Response(stream, {
     headers: { 'Content-Type': 'text/event-stream' },
     status: 200,
   })
+
+  return clientResponseStream
 }
 
 /**
@@ -112,19 +156,19 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response('Invalid command', { status: 400 })
   }
 
-  if (!childShellProcess) {
+  if (!childProcess) {
     return new Response('Shell not initialized', { status: 500 })
   }
 
-  if (childShellProcess.killed) {
+  if (childProcess.killed) {
     return new Response('Shell killed', { status: 500 })
   }
 
-  if (!childShellProcess.stdin) {
+  if (!childProcess.stdin) {
     return new Response('Shell not initialized', { status: 500 })
   }
 
-  if (typeof childShellProcess.stdin.write !== 'function') {
+  if (typeof childProcess.stdin.write !== 'function') {
     return new Response('Shell is not writable', { status: 500 })
   }
 
@@ -135,7 +179,7 @@ export const POST: APIRoute = async ({ request }) => {
   // 2. We need to mark the end with ETX 0x03
   // 3. We need to send the metadata after the command has finished
   // 4. TODO: do we need to send and end of command marker?
-  childShellProcess.stdin.write(
+  childProcess.stdin.write(
     `${command}\n
     echo "\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";\n`
   )
