@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminCommandOutput from './AdminCommandOutput'
+import { useShellStream } from './useShellStream'
 
 export type CommandResult = {
   type?: 'command' | 'error'
@@ -34,21 +35,26 @@ const formatError = (command: string, error: Error): CommandResult => ({
 })
 
 export default function AdminCommandLine() {
-  const [output, setOutput] = useState<CommandResult[]>([])
+  // const [output, setOutput] = useState<CommandResult[]>([])
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const [output, onRunCommandStream] = useShellStream()
+
   const onRunCommand = useCallback(async (command: string) => {
     prevCommandsRef.push(command)
-    return execute(command)
-      .then((result) => {
-        setOutput((prev) => [...prev, result])
-      })
-      .catch((error) => {
-        console.warn('[AdminCommandLine] error', error)
-        setOutput((prev) => [...prev, formatError(command, error)])
-      })
-  }, [])
+    onRunCommandStream(command).catch((err) => {
+      console.warn('[AdminCommandLine] error', err)
+    })
+    // return execute(command)
+    //   .then((result) => {
+    //     setOutput((prev) => [...prev, result])
+    //   })
+    //   .catch((error) => {
+    //     console.warn('[AdminCommandLine] error', error)
+    //     setOutput((prev) => [...prev, formatError(command, error)])
+    //   })
+  }, [onRunCommandStream])
 
   const onSubmit = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
