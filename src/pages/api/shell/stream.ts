@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-
+import { ShellProcessManager } from '@/lib/linux/ShellProcessManager'
 /**
  * ## SSR Only
  *
@@ -14,17 +14,21 @@ export const prerender = false
  * The shell process that we will be streaming the output of.
  *
  */
-const childProcess = Bun.spawn(['sh'], {
-  stdout: 'pipe',
-  stdin: 'pipe',
-  stderr: 'pipe',
-  // onExit(subprocess, exitCode, signalCode, error) {
-  //   console.log(
-  //     `[shell/stream] onExit code: ${exitCode} signal: ${signalCode} error: ${error}`
-  //   )
-  // },
-})
+// const childProcess = Bun.spawn(['sh'], {
+//   stdout: 'pipe',
+//   stdin: 'pipe',
+//   stderr: 'pipe',
+// })
 
+/**
+ * ## Shell Process Manager
+ *
+ * Manages the shell processes.
+ *
+ */
+const processManager = new ShellProcessManager()
+
+/**
 /**
  * ## ETX
  *
@@ -55,8 +59,26 @@ export type ShellStreamData = {
  *  4. Handle edge cases and cleanup gracefully
  *
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, cookies }) => {
   console.log('[shell/stream] GET shell stream:', request.headers)
+
+  const shellPidCookie = cookies.get('pid')
+  const shellPid = shellPidCookie?.number()
+  console.log('[shell/stream] shellPidCookie:', shellPidCookie)
+
+  // get the shell from the process manager
+  const shell = processManager.getOrCreateShell(shellPid)
+
+  // update the cookie if the PIDs don't match
+  if (shellPid !== shell.pid) {
+    console.log(`[shell/stream] updated from:${shellPid} to:${shell.pid}`)
+    cookies.set('pid', shell.pid.toString())
+  }
+
+  console.log('[shell/stream] shellPid:', shellPid)
+
+  // get child process from the process manager
+  const { childProcess } = shell
 
   // resolver for when the stream is finished
   let onStreamDidFinish: ((value: unknown) => void) | undefined
@@ -105,6 +127,13 @@ export const GET: APIRoute = async ({ request }) => {
         },
       })
 
+      console.log(
+        '[shell/stream] waiting for child process:',
+        childProcess.signalCode
+      )
+
+      childProcess.stdin.write('echo "Hello, world!";' + '\n')
+
       // pipe the output stream to the writeable stream
       await childProcess.stdout
         .pipeTo(output)
@@ -112,7 +141,7 @@ export const GET: APIRoute = async ({ request }) => {
           console.log('[shell/stream] finished piping!')
         })
         .catch((err) => {
-          console.error(`[shell/stream] ERROR stdout: \n\n${err}\n`)
+          console.error(`[shell/stream] ERROR stdout: \n\n\t${err}\n`)
           childProcess.kill()
           controller.close()
         })
@@ -149,8 +178,25 @@ export const GET: APIRoute = async ({ request }) => {
  * Sends a command to the shell and streams the output.
  *
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   const { command } = await request.json()
+
+  const shellPidCookie = cookies.get('pid')
+  const shellPid = shellPidCookie?.number()
+
+  if (!shellPid) {
+    return new Response('Missing PID cookie', { status: 404 })
+  }
+
+  console.log('[shell/stream] POST shellPid:', shellPid)
+
+  const shell = processManager.getShell(shellPid)
+
+  if (!shell) {
+    return new Response('Shell not found', { status: 404 })
+  }
+
+  const { childProcess } = shell
 
   if (!command || typeof command !== 'string') {
     return new Response('Invalid command', { status: 400 })

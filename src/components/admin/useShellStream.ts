@@ -33,26 +33,30 @@ export function useShellStream() {
     const eventSource = new EventSource('/api/shell/stream')
     const textDecoder = new TextDecoder()
 
-    console.log('[shell/stream] eventSource:', eventSource)
-    console.log('[shell/stream] eventSource.readyState:', eventSource.readyState)
+    eventSource.onopen = () => {
+      console.log('[useShellStream] eventSource.onopen()')
+    }
+
+    console.log('[useShellStream] eventSource:', eventSource)
+    console.log('[useShellStream] eventSource.readyState:', eventSource.readyState)
 
     eventSource.onmessage = (event) => {
-      console.log('[shell/stream] event:', event)
+      console.log('[useShellStream] event:', event)
 
       if (typeof event.data !== 'string') {
-        console.error('[shell/stream] event.data is not a string:', event.data)
+        console.error('[useShellStream] event.data is not a string:', event.data)
         return
       }
 
       const rawBytes = new Uint8Array(event.data.split(',').map(Number))
 
       const endOfText = rawBytes.findLastIndex((byte) => byte === 0x03)
-      console.log('[shell/stream] endOfText:', endOfText)
+      console.log('[useShellStream] endOfText:', endOfText)
 
       const output = textDecoder.decode(rawBytes.slice(0, endOfText))
       const rawMetadata = textDecoder.decode(rawBytes.slice(endOfText + 1))
-      console.log('[shell/stream] output:', output)
-      console.log('[shell/stream] rawMetadata:', rawMetadata)
+      console.log('[useShellStream] output:', output)
+      console.log('[useShellStream] rawMetadata:', rawMetadata)
 
       const meta = JSON.parse(rawMetadata.trim())
 
@@ -68,11 +72,11 @@ export function useShellStream() {
     }
 
     eventSource.onerror = (error) => {
-      console.error('[shell/stream] error:', error)
+      console.log('[useShellStream] error:', error)
     }
 
     return () => {
-      console.log('[shell/stream] eventSource.close()')
+      console.warn('[useShellStream] eventSource.close()')
       eventSource.close()
     }
   }, [])

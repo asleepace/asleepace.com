@@ -5,12 +5,12 @@
  *
  *
  */
-function BufferedEventStream(request: Request) {
+function BufferedEventStream(request: Request, childProcess: ReturnType<typeof Bun.spawn>) {
   const END_OF_TEXT = 0x03
 
   const buffer: Uint8Array[] = []
 
-  const writer: WritableStream = new WritableStream({})
+  const manager = new AbortController()
 
   const bufferOrFlush = (
     chunk: Uint8Array,
@@ -19,7 +19,8 @@ function BufferedEventStream(request: Request) {
     buffer.push(chunk)
     if (chunk.includes(END_OF_TEXT)) {
       const fullBuffer = buffer.join('')
-      controller.enqueue(String(`data: ${fullBuffer}\n\n`))
+      const eventData = `data: ${fullBuffer}\n\n`
+      controller.enqueue(eventData)
       buffer.length = 0
     }
   }
@@ -27,15 +28,39 @@ function BufferedEventStream(request: Request) {
   const output = new ReadableStream({
     async start(controller) {
       // setup the abort controller
-      request.signal.onabort = () => {
-        console.log('[BufferedEventStream] aborting...')
+      manager.signal.onabort = () => {
+        console.log('[BufferedEventStream] abortStream aborting...')
         controller.close()
       }
 
-      // start the stream
+      // listen for abort events on the request
+      request.signal.onabort = () => {
+        console.log('[BufferedEventStream] request aborting...')
+        manager.abort('request aborted')
+      }
+
+      // create the writeable stream we will pipe to
       const writer = new WritableStream<Uint8Array>({
-        write: (chunk) => bufferChunkOrFlushToController(chunk, controller),
+        write: (chunk) => bufferOrFlush(chunk, controller),
+        close: () => {
+          console.log('[BufferedEventStream] output stream closed!')
+          manager.abort('output stream closed')
+        },
+        abort: (reason) => {
+          console.log('[BufferedEventStream] output stream aborted!', reason)
+          manager.abort(reason)
+        },
       })
+
+      // pipe the output stream to the writer
+      await childProcess.stdout.pipeTo(writer).catch((err) => {
+        console.error(`[shell/stream] ERROR stdout: \n\n${err}\n`)
+        manager.abort('output stream error')
+      })
+    },
+    cancel: () => {
+      console.log('[BufferedEventStream] canceling...')
+      manager.abort('canceled')
     },
   })
 }
