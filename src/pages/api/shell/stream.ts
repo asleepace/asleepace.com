@@ -20,50 +20,78 @@ const childShellProcess = Bun.spawn(['sh'], {
 })
 
 /**
+ * ## ETX
+ *
+ * End of Text (ETX) is the ASCII character 3, which is used to indicate the end of a message.
+ *
+ */
+const ETX = {
+  STR: '\x03',
+  NUM: 0x03,
+}
+
+export type ShellStreamData = {
+  type: 'command' | 'error'
+  command: string | undefined
+  bytes: Uint8Array
+  pid: number
+}
+
+const cleanup = {
+  [Symbol.dispose]: () => {
+    console.log('[shell/stream] cleanup...')
+    console.log('[shell/stream] killing child process!!!!!!!!!!!!!!')
+    childShellProcess.kill()
+  },
+}
+
+/**
  * GET /api/shell/stream
  *
  * Streams the output of the shell.
  *
  */
 export const GET: APIRoute = async ({ request }) => {
-  // create a new readable stream response
+  console.log('[shell/stream] GET shell stream...')
   const stream = new ReadableStream({
     async start(controller) {
-      console.log(
-        '[shell/stream] starting ReadableStream signal:',
-        childShellProcess.signalCode
-      )
+      const buffer: Uint8Array[] = []
 
-      // STDOUT: pipe the shell output to the stream as UInt8Array
-      // string which will be decoded by the client
-      childShellProcess.stdout.pipeTo(
-        new WritableStream({
-          write(chunk) {
-            const bytesString = chunk.toString()
-            controller.enqueue(`data: ${bytesString}\n\n`)
-          },
-        })
-      ).catch((err) => {
-        console.error('[shell/stream] failed to pipeTo:', err)
+      const output = new WritableStream({
+        write(chunk) {
+          // buffer chunks
+          buffer.push(chunk)
+          console.log('[shell/stream] buffer:', buffer)
+          // only send data when ETX is detected
+          if (chunk.includes(ETX.NUM)) {
+            console.log('[shell/stream] ETX detected!')
+            const output = buffer.join(',')
+            controller.enqueue(`data: ${output}\n\n`)
+            buffer.length = 0 // empty the buffer
+          }
+        },
+        close() {
+          console.warn('[shell/stream] output stream closed!')
+          controller.close()
+        },
       })
 
-      // STDERR: pipe the shell error to the stream
-      // childShellProcess.stderr?.pipeTo(
-      //   new WritableStream({
-      //     write(chunk) {
-      //       const data = decoder.decode(chunk, { stream: true })
-      //       console.log('[shell/stream] error:', data)
-      //       controller.enqueue(`error: ${data}\n\n`)
-      //     },
-      //   })
-      // )
+      await childShellProcess.stdout.pipeTo(output).catch((err) => {
+        console.error(`[shell/stream] ERROR stdout: \n\n${err}\n`)
+        childShellProcess.kill()
+        controller.close()
+      })
     },
     cancel() {
-      console.log('[shell/stream] cancel...')
-      console.log('[shell/stream] killing child process!!!!!!!!!!!!!!')
+      console.warn('[shell/stream] killing child process!')
       childShellProcess.kill()
     },
   })
+
+  if (stream.locked) {
+    console.warn('[shell/stream] stream is locked!')
+    return new Response('Stream is locked', { status: 500 })
+  }
 
   return new Response(stream, {
     headers: { 'Content-Type': 'text/event-stream' },
@@ -103,7 +131,15 @@ export const POST: APIRoute = async ({ request }) => {
   console.log('[shell/stream] writing command:', command)
 
   // send the command to the shell
-  childShellProcess.stdin.write(command + '\n')
+  // childShellProcess.stdin.write(command + '\n')
+
+  // childShellProcess.stdin.write(
+  //   `printf '{"usr":"%s","cwd":"%s","cmd":"%s","out":"%s"}\n' "$(whoami)" "$(pwd)" "${command}" "$(${command})"\n`
+  // )
+
+  childShellProcess.stdin.write(
+    `${command} | (echo "$(cat -)\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";)\n`
+  )
 
   return new Response('OK', {
     status: 200,

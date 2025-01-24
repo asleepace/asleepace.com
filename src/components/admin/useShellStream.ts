@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react'
  *
  */
 export function useShellStream() {
-  const [output, setOutput] = useState<string[]>([])
+  const [output, setOutput] = useState<ShellResponse[]>([])
   const [commands, setCommands] = useState<string[]>([])
 
   // PART #1: Executes a command on the server
@@ -33,14 +33,37 @@ export function useShellStream() {
     const eventSource = new EventSource('/api/shell/stream')
     const textDecoder = new TextDecoder()
 
+    console.log('[shell/stream] eventSource:', eventSource)
+
     eventSource.onmessage = (event) => {
       console.log('[shell/stream] event:', event)
 
-      const byteArray = new Uint8Array(event.data.split(',').map(Number))
+      if (typeof event.data !== 'string') {
+        console.error('[shell/stream] event.data is not a string:', event.data)
+        return
+      }
 
-      const data = textDecoder.decode(byteArray)
+      const rawBytes = new Uint8Array(event.data.split(',').map(Number))
 
-      setOutput((prev) => [...prev, data])
+      const endOfText = rawBytes.findLastIndex((byte) => byte === 0x03)
+      console.log('[shell/stream] endOfText:', endOfText)
+
+      const output = textDecoder.decode(rawBytes.slice(0, endOfText))
+      const rawMetadata = textDecoder.decode(rawBytes.slice(endOfText + 1))
+      console.log('[shell/stream] output:', output)
+      console.log('[shell/stream] rawMetadata:', rawMetadata)
+
+      const meta = JSON.parse(rawMetadata.trim())
+
+      const resp: ShellResponse = {
+        command: meta.cmd?.split(' ') ?? [],
+        output,
+        whoami: meta.usr,
+        pwd: meta.dir,
+        type: 'command',
+      }
+
+      setOutput((prev) => [...prev, resp])
     }
 
     eventSource.onerror = (error) => {
@@ -52,17 +75,8 @@ export function useShellStream() {
     }
   }, [])
 
-  const formattedOutput = output.map((data, index) => {
-    const command = commands.at(index)?.split(' ') ?? []
-    const shellResponse: ShellResponse = {
-      command,
-      output: data,
-      whoami: 'system',
-      pwd: 'error',
-      type: 'command',
-    }
-    return shellResponse
-  })
-
-  return [formattedOutput, onRunCommand] as const
+  /**
+   * Output is a list of ShellResponse objects.
+   */
+  return [output, onRunCommand] as const
 }
