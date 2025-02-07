@@ -103,12 +103,14 @@ function session({
   httpOnly = true,
   secure = true,
   sameSite = 'Strict',
+  domain = process.env.COOKIE_DOMAIN,
 }: {
   sessionToken: string
   redirectTo?: string
   httpOnly?: boolean
   secure?: boolean
   sameSite?: 'Strict' | 'Lax' | 'None'
+  domain?: string
 }) {
   const cookieFlags = [
     `session=${sessionToken}`,
@@ -116,6 +118,7 @@ function session({
     httpOnly && 'HttpOnly',
     secure && 'Secure',
     `SameSite=${sameSite}`,
+    domain && `Domain=${domain}`,
   ]
     .filter(Boolean)
     .join('; ')
