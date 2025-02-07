@@ -1,37 +1,42 @@
 import type { ShellResponse } from '@/pages/api/shell'
 import { useCallback, useEffect, useState } from 'react'
+import { useShellPid } from './useShellPid'
 
-function useShellPid() {
-  const [pid, setPid] = useState<number | undefined>(undefined)
-
-  useEffect(() => {
-    fetch('/api/shell/stream', { method: 'HEAD' })
-      .then((resp) => {
-        console.log('[useShellPid] resp:', resp)
-        return resp.json()
-      })
-      .then((data) => setPid(data.pid))
-      .catch((err) => {
-        console.error('[useShellPid] error:', err)
-      })
-  }, [])
-
-  return pid
+/**
+ * Helper function to log the shell response.
+ */
+const logShellResponse = (command: string) => (resp: Response) => {
+  console.log(
+    `[useShellStream] exec "${command}" (${resp.status}) ${resp.statusText}`
+  )
 }
 
+/**
+ * Helper function to log the shell error.
+ */
+const logShellError = (command: string) => (err: Error) => {
+  console.error(`[useShellStream] exec "${command}" error:`, err)
+}
 
 /**
  * ## useShellStream()
  *
- * This hook receives events from the backend shell stream.
+ * This hook receives events from the backend shell stream, this also handles
+ * per-session shell pid management.
+ *
+ *    1. HEAD request to /api/shell/stream to get the current shell pid
+ *    2. POST request to /api/shell/stream to execute a command
+ *    3. Receives events from the server via Server-Sent Events
+ *    4. Decodes the event data into a ShellResponse object
+ *    5. Updates the output state with the new ShellResponse object
  *
  */
 export function useShellStream() {
   const [output, setOutput] = useState<ShellResponse[]>([])
   const [commands, setCommands] = useState<string[]>([])
 
+  // PART #0: Get the current shell pid
   const pid = useShellPid()
-  console.log('[useShellStream] pid:', pid)
 
   // PART #1: Executes a command on the server
   const onRunCommand = useCallback((command: string) => {
@@ -40,18 +45,14 @@ export function useShellStream() {
       method: 'POST',
       body: JSON.stringify({ command }),
     })
-      .then((resp) => {
-        console.log(
-          `[useShellStream] exec "${command}" ({ code: ${resp.status}, status: ${resp.statusText} })`
-        )
-      })
-      .catch((err) => {
-        console.error(`[useShellStream] exec:"${command}" error:`, err)
-      })
-  }, [])
+      .then(logShellResponse(command))
+      .catch(logShellError(command))
+  }, [pid])
 
   // PART #2: Receives events from the server
   useEffect(() => {
+    if (!pid) return
+
     const eventSource = new EventSource('/api/shell/stream')
     const textDecoder = new TextDecoder()
 
@@ -60,13 +61,19 @@ export function useShellStream() {
     }
 
     console.log('[useShellStream] eventSource:', eventSource)
-    console.log('[useShellStream] eventSource.readyState:', eventSource.readyState)
+    console.log(
+      '[useShellStream] eventSource.readyState:',
+      eventSource.readyState
+    )
 
     eventSource.onmessage = (event) => {
       console.log('[useShellStream] event:', event)
 
       if (typeof event.data !== 'string') {
-        console.error('[useShellStream] event.data is not a string:', event.data)
+        console.error(
+          '[useShellStream] event.data is not a string:',
+          event.data
+        )
         return
       }
 
@@ -98,10 +105,10 @@ export function useShellStream() {
     }
 
     return () => {
-      console.warn('[useShellStream] eventSource.close()')
+      console.warn('[useShellStream] closing eventSource...')
       eventSource.close()
     }
-  }, [])
+  }, [pid])
 
   /**
    * Output is a list of ShellResponse objects.

@@ -9,21 +9,9 @@ import { ShellProcessManager } from '@/lib/linux/ShellProcessManager'
 export const prerender = false
 
 /**
- * ## Shell
- *
- * The shell process that we will be streaming the output of.
- *
- */
-// const childProcess = Bun.spawn(['sh'], {
-//   stdout: 'pipe',
-//   stdin: 'pipe',
-//   stderr: 'pipe',
-// })
-
-/**
  * ## Shell Process Manager
  *
- * Manages the shell processes.
+ * Manages the shell processes for each PID
  *
  */
 const processManager = new ShellProcessManager()
@@ -240,33 +228,25 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 /**
  * HEAD /api/shell/stream
  *
- * Call this to get the current shell pid or create a new one if it doesn't exist.
+ * Call this to get the current shell pid or create a new one if it doesn't exist,
+ * this will be set as the cookie 'pid' and returned in the response headers
+ * as `x-shell-pid`.
  *
  */
 export const HEAD: APIRoute = async ({ request, cookies }) => {
   console.log('[shell/stream] HEAD request:', cookies)
-
-  // helper to set the pid cookie and return a response
-  const withCookieResponse = (pid: number) => {
-    cookies.set('pid', pid.toString())    
-    return new Response(JSON.stringify({ pid }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-
   const shellPidCookie = cookies.get('pid')
-  console.log('[shell/stream] shellPidCookie:', shellPidCookie)
+  const shell = processManager.getOrCreateShell(shellPidCookie?.number())
 
-  if (shellPidCookie) {
-    console.log('[shell/stream] found shellPidCookie:', shellPidCookie)
-    return withCookieResponse(shellPidCookie.number())
-  }
+  const shellPidString = shell.pid.toString()
+  console.log('[shell/stream] pid:', shellPidString)
+  cookies.set('pid', shellPidString)
 
-  // get the shell from the process manager
-  const shell = processManager.getOrCreateShell(shellPidCookie)
-  console.log('[shell/stream] created shell:', shell)
-
-  return withCookieResponse(shell.pid)
+  return new Response('OK', {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain',
+      'x-shell-pid': shellPidString,
+    },
+  })
 }
