@@ -36,6 +36,33 @@ export type ShellStreamData = {
   pid: number
 }
 
+
+/**
+ * HEAD /api/shell/stream
+ *
+ * Call this to get the current shell pid or create a new one if it doesn't exist,
+ * this will be set as the cookie 'pid' and returned in the response headers
+ * as `x-shell-pid`.
+ *
+ */
+export const HEAD: APIRoute = async ({ request, cookies }) => {
+  console.log('[shell/stream] HEAD request:', cookies)
+  const shellPidCookie = cookies.get('pid')
+  const shell = processManager.getOrCreateShell(shellPidCookie?.number())
+
+  const shellPidString = shell.pid.toString()
+  console.log('[shell/stream] pid:', shellPidString)
+  cookies.set('pid', shellPidString)
+
+  return new Response('OK', {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain',
+      'x-shell-pid': shellPidString,
+    },
+  })
+}
+
 /**
  * GET /api/shell/stream
  *
@@ -225,28 +252,3 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   })
 }
 
-/**
- * HEAD /api/shell/stream
- *
- * Call this to get the current shell pid or create a new one if it doesn't exist,
- * this will be set as the cookie 'pid' and returned in the response headers
- * as `x-shell-pid`.
- *
- */
-export const HEAD: APIRoute = async ({ request, cookies }) => {
-  console.log('[shell/stream] HEAD request:', cookies)
-  const shellPidCookie = cookies.get('pid')
-  const shell = processManager.getOrCreateShell(shellPidCookie?.number())
-
-  const shellPidString = shell.pid.toString()
-  console.log('[shell/stream] pid:', shellPidString)
-  cookies.set('pid', shellPidString)
-
-  return new Response('OK', {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/plain',
-      'x-shell-pid': shellPidString,
-    },
-  })
-}
