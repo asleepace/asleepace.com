@@ -1,6 +1,7 @@
 import type { ShellResponse } from '@/pages/api/shell'
 import { useCallback, useEffect, useState } from 'react'
 import { useShellPid } from './useShellPid'
+import { useEventSource } from './useEventSource'
 
 /**
  * Helper function to log the shell response.
@@ -12,11 +13,9 @@ const logShellResponse = (command: string) => (resp: Response) => {
 }
 
 /**
- * Helper function to log the shell error.
+ * For decoding the shell stream.
  */
-const logShellError = (command: string) => (err: Error) => {
-  console.error(`[useShellStream] exec "${command}" error:`, err)
-}
+const textDecoder = new TextDecoder()
 
 /**
  * ## useShellStream()
@@ -32,104 +31,67 @@ const logShellError = (command: string) => (err: Error) => {
  *
  */
 export function useShellStream() {
-  const [output, setOutput] = useState<ShellResponse[]>([])
-  const [commands, setCommands] = useState<string[]>([])
-  const [status, setStatus] = useState<string>('UNKNOWN')
+  const [pid, onResetPid] = useShellPid()
 
-  console.log('[useShellStream] status:', status)
+  // only subscribe to events if we have a pid
+  const eventStreamUrl = pid ? `/api/shell/stream?pid=${pid}` : undefined
 
-  // PART #0: Get the current shell pid
-  const pid = useShellPid()
+  // subcribe to server events
+  const { messages, error, state } = useEventSource(eventStreamUrl, (event) => {
+    const rawBytes = new Uint8Array(event.data.split(',').map(Number))
+    const endOfText = rawBytes.findLastIndex((byte) => byte === 0x03)
+    console.log('[useShellStream] endOfText:', endOfText)
 
-  // PART #1: Executes a command on the server
-  const onRunCommand = useCallback((command: string) => {
-    setCommands((prev) => [...prev, command])
-    return fetch('/api/shell/stream', {
-      method: 'POST',
-      body: JSON.stringify({ command }),
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    })
-      .then(logShellResponse(command))
-      .catch(logShellError(command))
-  }, [pid])
+    const output = textDecoder.decode(rawBytes.slice(0, endOfText))
+    const rawMetadata = textDecoder.decode(rawBytes.slice(endOfText + 1))
+    console.log('[useShellStream] output:', output)
+    console.log('[useShellStream] rawMetadata:', rawMetadata)
 
-  // PART #2: Receives events from the server
+    const meta = JSON.parse(rawMetadata.trim())
+
+    const resp: ShellResponse = {
+      command: meta.cmd?.split(' ') ?? [],
+      output,
+      whoami: meta.usr,
+      pwd: meta.dir,
+      type: 'command',
+    }
+
+    return resp
+  })
+
+  // derive state variables
+  const isConnected = state === 'connected'
+
   useEffect(() => {
-    if (!pid) return
-
-    const eventSource = new EventSource('/api/shell/stream')
-    const textDecoder = new TextDecoder()
-
-    eventSource.onopen = () => {
-      console.log('[useShellStream] eventSource.onopen()')
-    }
-
-    console.log('[useShellStream] eventSource:', eventSource)
-
-    if (eventSource.readyState === EventSource.OPEN) {
-      console.log('[useShellStream] readyState: OPEN')
-      setStatus('OPEN')
-    } else if (eventSource.readyState === EventSource.CLOSED) {
-      console.log('[useShellStream] readyState: CLOSED')
-      setStatus('CLOSED')
-    } else if (eventSource.readyState === EventSource.CONNECTING) {
-      console.log('[useShellStream] readyState: CONNECTING')
-      setStatus('CONNECTING')
-    } else {
-      console.log('[useShellStream] readyState: UNKNOWN')
-      setStatus('UNKNOWN')
-    }
-
-    eventSource.onmessage = (event) => {
-      console.log('[useShellStream] event:', event)
-
-      if (typeof event.data !== 'string') {
-        console.error(
-          '[useShellStream] event.data is not a string:',
-          event.data
-        )
-        return
-      }
-
-      const rawBytes = new Uint8Array(event.data.split(',').map(Number))
-
-      const endOfText = rawBytes.findLastIndex((byte) => byte === 0x03)
-      console.log('[useShellStream] endOfText:', endOfText)
-
-      const output = textDecoder.decode(rawBytes.slice(0, endOfText))
-      const rawMetadata = textDecoder.decode(rawBytes.slice(endOfText + 1))
-      console.log('[useShellStream] output:', output)
-      console.log('[useShellStream] rawMetadata:', rawMetadata)
-
-      const meta = JSON.parse(rawMetadata.trim())
-
-      const resp: ShellResponse = {
-        command: meta.cmd?.split(' ') ?? [],
-        output,
-        whoami: meta.usr,
-        pwd: meta.dir,
-        type: 'command',
-      }
-
-      setOutput((prev) => [...prev, resp])
-    }
-
-    eventSource.onerror = (error) => {
-      console.log('[useShellStream] error:', error)
-    }
-
-    return () => {
-      console.warn('[useShellStream] closing eventSource...')
-      eventSource.close()
-    }
+    console.log('[useShellStream] pid:', pid)
   }, [pid])
+
+  // execute a command on the server
+  const onRunCommand = useCallback(
+    (command: string) => {
+      return fetch('/api/shell/stream', {
+        method: 'POST',
+        body: JSON.stringify({ command }),
+      })
+        .then((resp) => {
+          if (resp.status !== 200) {
+            throw new Error(resp.statusText)
+          }
+          console.log('[useShellStream] onRunCommand:', resp)
+          logShellResponse(command)(resp)
+          return resp
+        })
+        .catch((err) => {
+          console.error('[useShellStream] error:', err)
+          onResetPid()
+        })
+    },
+    [pid, isConnected, onResetPid]
+  )
 
   /**
    * Output is a list of ShellResponse objects.
    */
-  return [output, onRunCommand] as const
+  return [messages, onRunCommand] as const
 }

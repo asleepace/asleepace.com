@@ -20,7 +20,6 @@ export type CommandResult = {
 export default function AdminCommandLine() {
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
-
   const [output, onRunCommandStream] = useShellStream()
 
   const onRunCommand = useCallback(

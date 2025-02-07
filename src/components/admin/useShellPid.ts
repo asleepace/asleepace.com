@@ -1,4 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+const PID_HEADER = 'x-shell-pid'
+
+const fetchProcessPid = async () => {
+  const resp = await fetch('/api/shell/stream', {
+    method: 'HEAD',
+    credentials: 'include',
+  })
+  const pid = Number(resp.headers.get(PID_HEADER))
+  return pid
+}
 
 /**
  * ## useShellPid()
@@ -6,32 +17,25 @@ import { useEffect, useState } from 'react'
  * This hook returns the current shell pid, if no pid is found it will fetch
  * a new one from the server.
  *
+ * Also returns a function to clear the PID and fetch a new one.
+ *
  */
 export function useShellPid() {
   const [pid, setPid] = useState<number | undefined>(undefined)
-  console.log('[useShellPid] pid:', pid)
 
   useEffect(() => {
-    fetch('/api/shell/stream', {
-      method: 'HEAD',
-      credentials: 'include',
-    })
-      .then((resp) => {
-        console.log('[useShellPid] resp:', resp)
-
-        const pid = resp.headers.get('x-shell-pid')
-        const pidNumber = Number(pid)
-        console.log('[useShellPid] pid header:', pid)
-
-        if (!pid) throw new Error('No pid found')
-        if (isNaN(pidNumber) || pidNumber <= 0) throw new Error('Invalid pid')
-
-        setPid(pidNumber)
-      })
+    fetchProcessPid()
+      .then((nextPid) => setPid(nextPid))
       .catch((err) => {
         console.error('[useShellPid] error:', err)
+        setPid(undefined)
       })
+  }, [pid])
+
+  const onResetPid = useCallback(() => {
+    console.log('[onResetPid] resetting pid')
+    setPid(undefined)
   }, [])
 
-  return pid
+  return [pid, onResetPid] as const
 }

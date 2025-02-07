@@ -36,7 +36,6 @@ export type ShellStreamData = {
   pid: number
 }
 
-
 /**
  * HEAD /api/shell/stream
  *
@@ -48,7 +47,12 @@ export type ShellStreamData = {
 export const HEAD: APIRoute = async ({ request, cookies }) => {
   console.log('[shell/stream] HEAD request:', cookies)
   const shellPidCookie = cookies.get('pid')
+
+  processManager.runCleanup()
+
   const shell = processManager.getOrCreateShell(shellPidCookie?.number())
+
+  console.log(`[shell/stream] shell:${shell.pid} killed:${shell.childProcess.killed}`)
 
   const shellPidString = shell.pid.toString()
   console.log('[shell/stream] pid:', shellPidString)
@@ -77,12 +81,28 @@ export const HEAD: APIRoute = async ({ request, cookies }) => {
 export const GET: APIRoute = async ({ request, cookies }) => {
   console.log('[shell/stream] GET shell stream:', request.headers)
 
-  const shellPidCookie = cookies.get('pid')
-  const shellPid = shellPidCookie?.number()
-  console.log('[shell/stream] shellPidCookie:', shellPidCookie)
+  const url = new URL(request.url)
+  const pid = url.searchParams.get('pid')
 
-  // get the shell from the process manager
+  if (!pid) return new Response('Missing PID', { status: 400 })
+
+  const shellPid = Number(pid)
+
+  processManager.runCleanup()
+
   const shell = processManager.getOrCreateShell(shellPid)
+
+  console.log('[shell/stream] shell killed:', shell.childProcess.killed)
+
+  // check if the shell has already been killed
+  if (shell.childProcess.killed) {
+    console.warn('[shell/stream] shell has already been killed!')
+    cookies.delete('pid')
+    return new Response(null, {
+      statusText: 'Shell killed',
+      status: 500,
+    })
+  }
 
   // update the cookie if the PIDs don't match
   if (shellPid !== shell.pid) {
@@ -147,7 +167,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         childProcess.signalCode
       )
 
-      childProcess.stdin.write('echo "Hello, world!";' + '\n')
+      // childProcess.stdin.write('echo "Hello, world!";' + '\n\n')
+      // onStreamDidFinish?.(true)
 
       // pipe the output stream to the writeable stream
       await childProcess.stdout
@@ -174,10 +195,10 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   await waitForStreamToFinish
   console.log('[shell/stream] stream finished!')
 
-  if (stream.locked) {
-    console.warn('[shell/stream] stream is locked!')
-    return new Response('Stream is locked', { status: 500 })
-  }
+  // if (stream.locked) {
+  //   console.warn('[shell/stream] stream is locked!')
+  //   return new Response('Stream is locked', { status: 500 })
+  // }
 
   const clientResponseStream = await new Response(stream, {
     headers: { 'Content-Type': 'text/event-stream' },
@@ -194,62 +215,59 @@ export const GET: APIRoute = async ({ request, cookies }) => {
  *
  */
 export const POST: APIRoute = async ({ request, cookies }) => {
-  console.log('[shell/stream] POST request:', request.headers)
-  const { command } = await request.json()
+  try {
+    console.log('[shell/stream] POST request:', request.headers)
+    const { command } = await request.json()
 
-  const shellPidCookie = cookies.get('pid')
-  const shellPid = shellPidCookie?.number()
+    const shellPid = cookies.get('pid')?.number()
 
-  if (!shellPid) {
-    console.warn('[shell/stream] missing PID cookie')
-    return new Response('Missing PID cookie', { status: 404 })
-  }
+    if (!shellPid) {
+      console.warn('[shell/stream] missing PID cookie')
+      return new Response('Missing PID cookie', { status: 404 })
+    }
 
-  console.log('[shell/stream] POST shellPid:', shellPid)
+    console.log('[shell/stream] POST shellPid:', shellPid)
 
-  const shell = processManager.getShell(shellPid)
+    const shell = processManager.getShell(shellPid)
 
-  if (!shell) {
-    return new Response('Shell not found', { status: 404 })
-  }
+    if (!shell) throw new Error('Shell not found')
 
-  const { childProcess } = shell
+    const { childProcess } = shell
 
-  if (!command || typeof command !== 'string') {
-    return new Response('Invalid command', { status: 400 })
-  }
+    if (!command || typeof command !== 'string')
+      throw new Error('Invalid command')
 
-  if (!childProcess) {
-    return new Response('Shell not initialized', { status: 500 })
-  }
+    if (!childProcess) throw new Error('Shell not initialized')
 
-  if (childProcess.killed) {
-    return new Response('Shell killed', { status: 500 })
-  }
+    if (childProcess.killed) throw new Error('Shell killed')
 
-  if (!childProcess.stdin) {
-    return new Response('Shell not initialized', { status: 500 })
-  }
+    if (!childProcess.stdin) throw new Error('Shell is not writable')
 
-  if (typeof childProcess.stdin.write !== 'function') {
-    return new Response('Shell is not writable', { status: 500 })
-  }
+    if (typeof childProcess.stdin.write !== 'function')
+      throw new Error('Shell stdin is not writable')
 
-  console.log('[shell/stream] writing command:', command)
+    console.log('[shell/stream] writing command:', command)
 
-  // NOTE: This part is a bit tricky
-  // 1. We need to execute the command first
-  // 2. We need to mark the end with ETX 0x03
-  // 3. We need to send the metadata after the command has finished
-  // 4. TODO: do we need to send and end of command marker?
-  childProcess.stdin.write(
-    `${command}\n
+    // NOTE: This part is a bit tricky
+    // 1. We need to execute the command first
+    // 2. We need to mark the end with ETX 0x03
+    // 3. We need to send the metadata after the command has finished
+    // 4. TODO: do we need to send and end of command marker?
+    childProcess.stdin.write(
+      `${command}\n
     echo "\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";\n`
-  )
+    )
 
-  return new Response('OK', {
-    status: 200,
-    headers: { 'Content-Type': 'text/plain' },
-  })
+    return new Response('OK', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  } catch (error) {
+    console.error('[shell/stream] error:', error)
+    return new Response(null, {
+      statusText: error.message ?? 'Unknown error',
+      status: 500,
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  }
 }
-
