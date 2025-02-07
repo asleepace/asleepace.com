@@ -5,6 +5,14 @@ import { Users, Sessions } from '@/db/index'
 
 export const prerender = false
 
+
+const isDevelopment = Boolean(process.env.ENVIRONMENT === 'development')
+const isProduction = !isDevelopment
+const cookieDomain = isDevelopment ? undefined : process.env.COOKIE_DOMAIN
+
+console.log('[auth] isDevelopment:', isDevelopment)
+console.log('[auth] cookieDomain:', cookieDomain)
+
 /**
  * GET /api/auth
  *
@@ -17,12 +25,14 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
   return http.success(user)
 })
 
+
+
 /**
  * POST /api/auth
  *
  * This endpoint can be used to either login or register a user.
  */
-export const POST: APIRoute = endpoint(async ({ request }) => {
+export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
   console.log('POST /api/auth', request)
 
   // --- don't leak information about the error ---
@@ -73,8 +83,37 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
   const session = Sessions.create(user.id)
   const sessionToken = session.token
 
-  // NOTE: the status code needs to be 302 is a redirect in order for astro
-  // to redirect properly with the session cookie.
-  //
-  return http.session({ sessionToken, redirectTo: '/admin' })
+  // --- set the session cookie ---
+
+  cookies.set('session', sessionToken, {
+    /** where the cookie is valid */
+    path: '/',
+    /** the domain that the cookie is valid for */
+    domain: cookieDomain,
+    /** javascript cannot access the cookie */
+    httpOnly: true,
+    /** if the cookie is only accessible via https */
+    secure: isProduction,
+    /** if the cookie is only accessible via the same site */
+    sameSite: 'lax',
+    /** the expiration date of the cookie */
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+  })
+
+  // --- redirect to the admin page ---
+
+  const cookieHeaders = {
+    'Set-Cookie': [...cookies.headers()].join(),
+  }
+
+  console.log('[auth] cookieHeaders:', cookieHeaders)
+
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      ...cookieHeaders,
+      Location: '/admin',
+    }
+  })
 })

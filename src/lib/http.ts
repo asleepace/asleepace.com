@@ -25,7 +25,6 @@ export type HttpResponseParams = {
 export const http = {
   success,
   failure,
-  session,
   response,
   parse,
   get,
@@ -97,41 +96,41 @@ function success(data: any) {
  * @param {boolean} options.secure - Flag if cookie should be sent only over HTTPS.
  * @param {string} options.sameSite - The SameSite attribute for the cookie.
  */
-function session({
-  sessionToken,
-  redirectTo = '/',
-  httpOnly = true,
-  secure = true,
-  sameSite = 'Strict',
-  domain = process.env.COOKIE_DOMAIN,
-}: {
-  sessionToken: string
-  redirectTo?: string
-  httpOnly?: boolean
-  secure?: boolean
-  sameSite?: 'Strict' | 'Lax' | 'None'
-  domain?: string
-}) {
-  const cookieFlags = [
-    `session=${sessionToken}`,
-    'Path=/',
-    httpOnly && 'HttpOnly',
-    secure && 'Secure',
-    `SameSite=${sameSite}`,
-    domain && `Domain=${domain}`,
-  ]
-    .filter(Boolean)
-    .join('; ')
+// function session({
+//   sessionToken,
+//   redirectTo = '/',
+//   httpOnly = true,
+//   secure = true,
+//   sameSite = 'Strict',
+//   domain = process.env.COOKIE_DOMAIN,
+// }: {
+//   sessionToken: string
+//   redirectTo?: string
+//   httpOnly?: boolean
+//   secure?: boolean
+//   sameSite?: 'Strict' | 'Lax' | 'None'
+//   domain?: string
+// }) {
+//   const cookieFlags = [
+//     `session=${sessionToken}`,
+//     'Path=/',
+//     httpOnly && 'HttpOnly',
+//     secure && 'Secure',
+//     `SameSite=${sameSite}`,
+//     domain && `Domain=${domain}`,
+//   ]
+//     .filter(Boolean)
+//     .join('; ')
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      'Set-Cookie': cookieFlags,
-      Location: redirectTo,
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
-    },
-  })
-}
+//   return new Response(null, {
+//     status: 302,
+//     headers: {
+//       'Set-Cookie': cookieFlags,
+//       Location: redirectTo,
+//       'Cache-Control': 'no-store, no-cache, must-revalidate',
+//     },
+//   })
+// }
 
 /**
  * Create a failure HTTP response which returns JSON data.
