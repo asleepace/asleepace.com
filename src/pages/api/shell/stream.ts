@@ -185,6 +185,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const shellPid = shellPidCookie?.number()
 
   if (!shellPid) {
+    console.warn('[shell/stream] missing PID cookie')
     return new Response('Missing PID cookie', { status: 404 })
   }
 
@@ -234,4 +235,38 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     status: 200,
     headers: { 'Content-Type': 'text/plain' },
   })
+}
+
+/**
+ * HEAD /api/shell/stream
+ *
+ * Call this to get the current shell pid or create a new one if it doesn't exist.
+ *
+ */
+export const HEAD: APIRoute = async ({ request, cookies }) => {
+  console.log('[shell/stream] HEAD request:', cookies)
+
+  // helper to set the pid cookie and return a response
+  const withCookieResponse = (pid: number) => {
+    cookies.set('pid', pid.toString())    
+    return new Response(JSON.stringify({ pid }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+
+  const shellPidCookie = cookies.get('pid')
+  console.log('[shell/stream] shellPidCookie:', shellPidCookie)
+
+  if (shellPidCookie) {
+    console.log('[shell/stream] found shellPidCookie:', shellPidCookie)
+    return withCookieResponse(shellPidCookie.number())
+  }
+
+  // get the shell from the process manager
+  const shell = processManager.getOrCreateShell(shellPidCookie)
+  console.log('[shell/stream] created shell:', shell)
+
+  return withCookieResponse(shell.pid)
 }

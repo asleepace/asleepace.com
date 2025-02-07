@@ -1,6 +1,25 @@
 import type { ShellResponse } from '@/pages/api/shell'
 import { useCallback, useEffect, useState } from 'react'
 
+function useShellPid() {
+  const [pid, setPid] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    fetch('/api/shell/stream', { method: 'HEAD' })
+      .then((resp) => {
+        console.log('[useShellPid] resp:', resp)
+        return resp.json()
+      })
+      .then((data) => setPid(data.pid))
+      .catch((err) => {
+        console.error('[useShellPid] error:', err)
+      })
+  }, [])
+
+  return pid
+}
+
+
 /**
  * ## useShellStream()
  *
@@ -10,6 +29,9 @@ import { useCallback, useEffect, useState } from 'react'
 export function useShellStream() {
   const [output, setOutput] = useState<ShellResponse[]>([])
   const [commands, setCommands] = useState<string[]>([])
+
+  const pid = useShellPid()
+  console.log('[useShellStream] pid:', pid)
 
   // PART #1: Executes a command on the server
   const onRunCommand = useCallback((command: string) => {
