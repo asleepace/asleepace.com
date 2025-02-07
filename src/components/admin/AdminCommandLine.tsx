@@ -10,26 +10,28 @@ export type CommandResult = {
   pwd: string
 }
 
-// const formatError = (command: string, error: Error): CommandResult => ({
-//   command: [command],
-//   output: error?.message,
-//   whoami: 'system',
-//   pwd: 'error',
-//   type: 'error',
-// })
-
+/**
+ * ## AdminCommandLine
+ *
+ * This is a client-side react island which handles executing command line arguments
+ * on the backend server.
+ *
+ */
 export default function AdminCommandLine() {
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [output, onRunCommandStream] = useShellStream()
 
-  const onRunCommand = useCallback(async (command: string) => {
-    prevCommandsRef.push(command)
-    onRunCommandStream(command)?.catch((err) => {
-      console.warn('[AdminCommandLine] error', err)
-    })
-  }, [onRunCommandStream])
+  const onRunCommand = useCallback(
+    async (command: string) => {
+      prevCommandsRef.push(command)
+      onRunCommandStream(command)?.catch((err) => {
+        console.warn('[AdminCommandLine] error', err)
+      })
+    },
+    [onRunCommandStream]
+  )
 
   const onSubmit = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
@@ -45,7 +47,9 @@ export default function AdminCommandLine() {
     <div className="bg-black rounded-2xl flex-1 p-1 self-stretch max-w-screen-lg max-h-[500px] flex flex-col">
       <AdminCommandOutput data={output} />
       <div className="flex flex-row px-2 py-1">
-        <p className='text-green-500 font-mono text-sm self-center font-bold'>$</p>
+        <p className="text-green-500 font-mono text-sm self-center font-bold">
+          $
+        </p>
         <input
           ref={inputRef}
           id="cli-input"
