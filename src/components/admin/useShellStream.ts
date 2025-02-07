@@ -34,6 +34,9 @@ const logShellError = (command: string) => (err: Error) => {
 export function useShellStream() {
   const [output, setOutput] = useState<ShellResponse[]>([])
   const [commands, setCommands] = useState<string[]>([])
+  const [status, setStatus] = useState<string>('UNKNOWN')
+
+  console.log('[useShellStream] status:', status)
 
   // PART #0: Get the current shell pid
   const pid = useShellPid()
@@ -44,6 +47,11 @@ export function useShellStream() {
     return fetch('/api/shell/stream', {
       method: 'POST',
       body: JSON.stringify({ command }),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
     })
       .then(logShellResponse(command))
       .catch(logShellError(command))
@@ -61,10 +69,20 @@ export function useShellStream() {
     }
 
     console.log('[useShellStream] eventSource:', eventSource)
-    console.log(
-      '[useShellStream] eventSource.readyState:',
-      eventSource.readyState
-    )
+
+    if (eventSource.readyState === EventSource.OPEN) {
+      console.log('[useShellStream] readyState: OPEN')
+      setStatus('OPEN')
+    } else if (eventSource.readyState === EventSource.CLOSED) {
+      console.log('[useShellStream] readyState: CLOSED')
+      setStatus('CLOSED')
+    } else if (eventSource.readyState === EventSource.CONNECTING) {
+      console.log('[useShellStream] readyState: CONNECTING')
+      setStatus('CONNECTING')
+    } else {
+      console.log('[useShellStream] readyState: UNKNOWN')
+      setStatus('UNKNOWN')
+    }
 
     eventSource.onmessage = (event) => {
       console.log('[useShellStream] event:', event)

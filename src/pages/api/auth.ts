@@ -10,8 +10,11 @@ const isDevelopment = Boolean(process.env.ENVIRONMENT === 'development')
 const isProduction = !isDevelopment
 const cookieDomain = isDevelopment ? undefined : process.env.COOKIE_DOMAIN
 
-console.log('[auth] isDevelopment:', isDevelopment)
-console.log('[auth] cookieDomain:', cookieDomain)
+console.log('[auth] config:', JSON.stringify({
+  isDevelopment,
+  isProduction,
+  cookieDomain,
+}, null, 2))
 
 /**
  * GET /api/auth
@@ -102,18 +105,18 @@ export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
 
   // --- redirect to the admin page ---
 
-  const cookieHeaders = {
-    'Set-Cookie': [...cookies.headers()].join(),
-  }
+  // const cookieHeaders = {
+  //   'Set-Cookie': [...cookies.headers()].join(),
+  // }
 
-  console.log('[auth] cookieHeaders:', cookieHeaders)
+  // console.log('[auth] cookieHeaders:', cookieHeaders)
 
 
   return new Response(null, {
     status: 302,
     headers: {
-      ...cookieHeaders,
       Location: '/admin',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
     }
   })
 })

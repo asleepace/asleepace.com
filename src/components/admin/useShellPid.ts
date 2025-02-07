@@ -12,7 +12,10 @@ export function useShellPid() {
   console.log('[useShellPid] pid:', pid)
 
   useEffect(() => {
-    fetch('/api/shell/stream', { method: 'HEAD' })
+    fetch('/api/shell/stream', {
+      method: 'HEAD',
+      credentials: 'include',
+    })
       .then((resp) => {
         console.log('[useShellPid] resp:', resp)
 

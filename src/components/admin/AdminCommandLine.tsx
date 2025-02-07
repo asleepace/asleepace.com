@@ -10,32 +10,15 @@ export type CommandResult = {
   pwd: string
 }
 
-async function execute(command: string): Promise<CommandResult> {
-  const response = await fetch('/api/shell', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      command
-    }),
-  })
-  console.log('[AdminCommandLine] response', response)
-  const data = await response.json()
-  console.log('[AdminCommandLine] data', data)
-  return data
-}
-
-const formatError = (command: string, error: Error): CommandResult => ({
-  command: [command],
-  output: error?.message,
-  whoami: 'system',
-  pwd: 'error',
-  type: 'error',
-})
+// const formatError = (command: string, error: Error): CommandResult => ({
+//   command: [command],
+//   output: error?.message,
+//   whoami: 'system',
+//   pwd: 'error',
+//   type: 'error',
+// })
 
 export default function AdminCommandLine() {
-  // const [output, setOutput] = useState<CommandResult[]>([])
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -43,17 +26,9 @@ export default function AdminCommandLine() {
 
   const onRunCommand = useCallback(async (command: string) => {
     prevCommandsRef.push(command)
-    onRunCommandStream(command).catch((err) => {
+    onRunCommandStream(command)?.catch((err) => {
       console.warn('[AdminCommandLine] error', err)
     })
-    // return execute(command)
-    //   .then((result) => {
-    //     setOutput((prev) => [...prev, result])
-    //   })
-    //   .catch((error) => {
-    //     console.warn('[AdminCommandLine] error', error)
-    //     setOutput((prev) => [...prev, formatError(command, error)])
-    //   })
   }, [onRunCommandStream])
 
   const onSubmit = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {

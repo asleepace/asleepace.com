@@ -194,6 +194,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
  *
  */
 export const POST: APIRoute = async ({ request, cookies }) => {
+  console.log('[shell/stream] POST request:', request.headers)
   const { command } = await request.json()
 
   const shellPidCookie = cookies.get('pid')
