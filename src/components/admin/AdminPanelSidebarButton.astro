@@ -1,0 +1,22 @@
+---
+import clsx from 'clsx'
+
+interface Props {
+  href: string
+  title: string
+  variant?: 'default' | 'primary' | 'destructive'
+  active?: boolean
+}
+
+const { href, title, variant = 'default', active = false } = Astro.props
+---
+
+<a href={href} class="flex flex-col flex-shrink justify-end">
+  <button class={clsx("bg-transparent rounded-md p-2 mx-2", {
+    'hover:bg-red-600': variant === 'destructive',
+    'hover:bg-blue-600': variant === 'primary',
+    'hover:bg-zinc-600': variant === 'default',
+  })}>
+    <p class={clsx({ 'text-orange-500': active })}>{title}</p>
+  </button>
+</a>

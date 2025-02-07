@@ -34,6 +34,12 @@
   --padding-lg: 2rem;
 
   --max-width-article: 820px;
+
+  --black-30: rgba(0, 0, 0, 0.3);
+
+  /** table styles */
+  --table-max-col-width: 120px;
+  --table-min-col-width: 2px;
 }
 
 @font-face {
@@ -64,6 +70,14 @@ body {
   color: rgb(var(--gray-dark));
   font-size: 20px;
   line-height: 1.7;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Blog Specific Styles */
@@ -245,7 +259,6 @@ body {
     line-height: 34px;
     font-size: 1em;
     margin-top: 1em;
-
   }
 
   ol > li {
@@ -255,7 +268,6 @@ body {
     font-size: 1em;
     margin-top: 1em;
   }
-
 
   /* article > li {
     border: none;

@@ -1,0 +1,108 @@
+/**
+ * ==============================
+ * Data Table Styles
+ * ==============================
+ */
+
+ @tailwind base;
+ @tailwind components;
+ @tailwind utilities;
+
+:root {
+  --table-min-col-width: 100px;
+  --table-max-col-width: 400px;
+  --header-bg-color: #4f46e5;
+  --last-col-bg-color: #ffac1c;
+  --row-hover-color: rgba(255, 255, 255, 0.05);
+  --zebra-stripe-color: rgba(255, 255, 255, 0.02);
+  --text-color: rgba(255, 255, 255, 0.87);
+}
+
+/* --- Table Container --- */
+
+.data-table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* --- Table --- */
+
+table.data-table {
+  border-collapse: collapse;
+  width: max-content;
+  table-layout: fixed;
+  min-width: 100%;
+}
+
+/* --- Table Header --- */
+
+.data-table thead {
+  font-weight: bold;
+  background-color: #4f46e5;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Table Header Columns --- */
+
+.data-table th {
+  padding: 1em;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: min(400px, fit-content);
+  min-width: var(--table-min-col-width, 100px);
+  max-width: 400px;
+}
+
+/* --- Resizable columns except last --- */
+
+.data-table th:not(:last-child) {
+  resize: horizontal;
+  overflow: auto;
+  font-weight: 500;
+}
+
+/* --- Hide default resize handle --- */
+
+.data-table th::-webkit-resizer {
+  display: none;
+}
+
+/* --- Last column header specific --- */
+
+.data-table th:last-child {
+  background-color: #ffac1c;
+}
+
+/* --- Regular cell styles --- */
+
+.data-table td {
+  padding: 0.5rem;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.87);
+  min-width: var(--table-min-col-width, 100px);
+  max-width: 400px;
+}
+
+/* --- Zebra striping --- */
+
+.data-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* --- Optional hover effect --- */
+
+.data-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}

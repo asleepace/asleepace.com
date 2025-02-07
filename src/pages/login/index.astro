@@ -1,0 +1,42 @@
+---
+import BaseHead from '@/components/astro/BaseHead.astro'
+import Header from '@/components/astro/Header.astro'
+import Footer from '@/components/astro/Footer.astro'
+import { siteData } from '@/consts'
+
+import { CircleUser } from 'lucide-react'
+
+
+export const prerender = false;
+
+// =====================================
+// Login Page
+// =====================================
+
+if (Astro.locals.isLoggedIn) {
+  return Astro.redirect('/admin')
+}
+
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={siteData.title} description={siteData.description} />
+  </head>
+  <body class="min-h-screen flex flex-col bg-white">
+    <Header title={siteData.title} />
+    <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto px-4">
+      <div class="flex flex-col items-center gap-2">
+        <CircleUser className="text-gray-400" size={96} />
+        <p class="text-5xl font-bold text-center">Login</p>
+        <p class="text-center">Please login to continue.</p>  
+        <form action="/api/auth" class="flex flex-col gap-2 w-[300px]" method="post">
+          <input class="border border-gray-300 rounded-md p-2"  id="username" type="text" name="username" placeholder="Username" />
+          <input class="border border-gray-300 rounded-md p-2" id="password" type="password" name="password" placeholder="Password" />
+          <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button>
+        </form>
+    </main>
+    <Footer />
+  </body>
+</html>

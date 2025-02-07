@@ -1,7 +1,7 @@
 # build output
-dist/
+# dist/
 # generated types
-.astro/
+#.astro/
 
 # dependencies
 node_modules/
@@ -26,4 +26,4 @@ backend/target/
 backend/Cargo.lock
 
 # generated files
-src/styles/output.css
+# src/styles/output.css

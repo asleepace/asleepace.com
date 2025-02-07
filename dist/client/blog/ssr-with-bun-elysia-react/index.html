@@ -1,0 +1,298 @@
+<!DOCTYPE html><html lang="en"> <head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator" content="Astro v5.1.1"><!-- Font preloads --><link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin><!-- Scripts --><script type="text/javascript" src="/scripts/htmx.min.js"></script><!-- Canonical URL --><link rel="canonical" href="https://asleepace.com/blog/ssr-with-bun-elysia-react/"><!-- Primary Meta Tags --><title>SSR with Bun, Elysia &amp; React</title><meta name="title" content="SSR with Bun, Elysia &#38; React"><meta name="description" content="How to build a simple website using React, Bun and Elysia with server-side rendering in 2023."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://asleepace.com/blog/ssr-with-bun-elysia-react/"><meta property="og:title" content="SSR with Bun, Elysia &#38; React"><meta property="og:description" content="How to build a simple website using React, Bun and Elysia with server-side rendering in 2023."><meta property="og:image" content="https://asleepace.com/images/bun-elysia-react-banner.png"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://asleepace.com/blog/ssr-with-bun-elysia-react/"><meta property="twitter:title" content="SSR with Bun, Elysia &#38; React"><meta property="twitter:description" content="How to build a simple website using React, Bun and Elysia with server-side rendering in 2023."><meta property="twitter:image" content="https://asleepace.com/images/bun-elysia-react-banner.png"><!-- Sitemap --><link rel="sitemap" href="/sitemap-index.xml"><link rel="stylesheet" href="/_astro/about.DGBjM-Qr.css">
+<link rel="stylesheet" href="/_astro/about.CsaI5UsK.css">
+<style>a[data-astro-cid-xvislcag]{display:inline-block;text-decoration:none}a[data-astro-cid-xvislcag].active{font-weight:bolder;text-decoration:underline}header[data-astro-cid-mq3pp5jd]{margin:0;padding:0 1em;background:#fff;box-shadow:0 2px 8px rgba(var(--black),5%)}h2[data-astro-cid-mq3pp5jd]{margin:0;font-size:1em}h2[data-astro-cid-mq3pp5jd] a[data-astro-cid-mq3pp5jd],h2[data-astro-cid-mq3pp5jd] a[data-astro-cid-mq3pp5jd].active{text-decoration:none}nav[data-astro-cid-mq3pp5jd]{display:flex;align-items:center;justify-content:space-between}nav[data-astro-cid-mq3pp5jd] a[data-astro-cid-mq3pp5jd]{padding:1em .5em;color:var(--black);border-bottom:4px solid transparent;text-decoration:none}nav[data-astro-cid-mq3pp5jd] a[data-astro-cid-mq3pp5jd].active{text-decoration:none;border-bottom-color:var(--accent)}.social-links[data-astro-cid-mq3pp5jd],.social-links[data-astro-cid-mq3pp5jd] a[data-astro-cid-mq3pp5jd]{display:flex}@media (max-width: 720px){.social-links[data-astro-cid-mq3pp5jd]{display:none}}footer[data-astro-cid-lejjx2fa]{padding:2em 1em 6em;background:linear-gradient(var(--gray-gradient)) no-repeat;color:rgb(var(--gray));text-align:center}.social-links[data-astro-cid-lejjx2fa]{display:flex;justify-content:center;gap:1em;margin-top:1em}.social-links[data-astro-cid-lejjx2fa] a[data-astro-cid-lejjx2fa]{text-decoration:none;color:rgb(var(--gray))}.social-links[data-astro-cid-lejjx2fa] a[data-astro-cid-lejjx2fa]:hover{color:rgb(var(--gray-dark))}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body class="w-full bg-white"> <header data-astro-cid-mq3pp5jd> <nav data-astro-cid-mq3pp5jd> <div class="title-and-logo" data-astro-cid-mq3pp5jd> <img src="/images/logo.png" width="44" height="44" data-astro-cid-mq3pp5jd> <h2 class="xs:hidden" data-astro-cid-mq3pp5jd><a class="font-black text-lg" href="/" data-astro-cid-mq3pp5jd>Asleepace</a></h2> </div> <div class="internal-links" data-astro-cid-mq3pp5jd> <a href="/" data-astro-cid-mq3pp5jd="true" data-astro-cid-xvislcag> Home </a>  <a href="/blog" class="active" data-astro-cid-mq3pp5jd="true" data-astro-cid-xvislcag> Blog </a>  <a href="/about" data-astro-cid-mq3pp5jd="true" data-astro-cid-xvislcag> About </a>  </div> <div class="social-links" data-astro-cid-mq3pp5jd> <a href="https://twitter.com/asleepace" target="_blank" data-astro-cid-mq3pp5jd> <span class="sr-only" data-astro-cid-mq3pp5jd>Follow Asleepace on Twitter</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" - data-astro-cid-mq3pp5jd><path fill="currentColor" d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" data-astro-cid-mq3pp5jd></path></svg> </a> <a href="https://github.com/asleepace" target="_blank" data-astro-cid-mq3pp5jd> <span class="sr-only" data-astro-cid-mq3pp5jd>Go to Asleepace's GitHub repo</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-mq3pp5jd><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-mq3pp5jd></path></svg> </a> </div> </nav> </header>  <main id="article" class="flex flex-col flex-1 w-full lg:pt-16 pb-24 items-center"> <article class="flex flex-col items-center w-full max-w-screen-lg text-gray-800"> <div class="flex flex-1 items-center justify-center w-full"> <img src="/images/bun-elysia-react-banner.png" alt="SSR with Bun, Elysia &#38; React" class="lg:rounded-3xl lg:shadow-2xl aspect-video lg:max-w-screen-md"> </div> <div class="text-center self-stretch px-4 flex flex-col gap-y-2 pt-4 md:pt-8"> <div class="date text-gray-500"> <time datetime="2023-09-13T07:00:00.000Z"> September 13, 2023 </time>  </div> <p class="text-5xl text-balance font-black leading-1 mb-2">SSR with Bun, Elysia &amp; React</p> <hr class="border-b-none border-t-[1px] w-full border-t-gray-200 my-4 mb-8 md:my-8"> </div> <div id="prose" class="flex flex-col gap-y-2 w-full">   <p>This article will show you how to create a simple website using <a href="https://bun.sh/docs/installation">Bun</a>, <a href="https://elysiajs.com/">Elysia</a> and <a href="https://react.dev/">React</a> with support for server-side rendering.</p>
+<ul>
+<li><strong>Bun</strong> the JS/TS bundler, runtime &#x26; package manager</li>
+<li><strong>Elysia</strong> a framework for building performant web applications</li>
+<li><strong>React</strong> a JavaScript library for building user interfaces</li>
+</ul>
+<p>Original source code here on <a href="https://github.com/asleepace/bun-elysia-react-srr-example">GitHub</a>.</p>
+<h3 id="pre-requisites">Pre-requisites</h3>
+<p>Before we begin make sure you have <strong>Bun</strong> installed on your machine</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">curl</span><span style="color:#79B8FF"> -fsSL</span><span style="color:#9ECBFF"> https://bun.sh/install</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> bash</span><span style="color:#6A737D"> # for macOS, Linux, and WSL</span></span></code></pre>
+<p><a href="https://bun.sh/docs/installation">Bun installation documentation</a></p>
+<p>Next let’s initialize a new project with <strong>Elysia</strong> by running the following command in your terminal</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">bun</span><span style="color:#9ECBFF"> create</span><span style="color:#9ECBFF"> elysia</span><span style="color:#9ECBFF"> your-project-name</span><span style="color:#6A737D"> # edit this</span></span>
+<span class="line"><span style="color:#79B8FF">cd</span><span style="color:#9ECBFF"> your-project-name</span></span>
+<span class="line"><span style="color:#B392F0">bun</span><span style="color:#9ECBFF"> run</span><span style="color:#9ECBFF"> dev</span></span></code></pre>
+<p><a href="https://elysiajs.com/quick-start.html">Elysia installation documentation</a></p>
+<p>You should see the following in your terminal</p>
+<blockquote>
+<p>🦊 Elysia is running at localhost:3000</p>
+</blockquote>
+<p>And the following when you visit <a href="http://localhost:3000">http://localhost:3000</a></p>
+<blockquote>
+<p>Hello, Elysia!</p>
+</blockquote>
+<h3 id="project-structure">Project Structure</h3>
+<p>Next lets go ahead and define two more folders in our project which will hold our static files and react code.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">mkdir</span><span style="color:#9ECBFF"> public</span></span>
+<span class="line"><span style="color:#B392F0">mkdir</span><span style="color:#9ECBFF"> src/react</span></span></code></pre>
+<p>You project structure should now look like this</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">├──</span><span style="color:#9ECBFF"> ./your-project-name</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> node_modules</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> public</span><span style="color:#6A737D">            # client-side static files</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> src</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> react</span><span style="color:#6A737D">         # react code</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   └──</span><span style="color:#9ECBFF"> index.ts</span><span style="color:#6A737D">      # server-side entry point</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> .gitignore</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> bun.lock.b</span></span>
+<span class="line"><span style="color:#F97583">|</span><span style="color:#B392F0">   ├──</span><span style="color:#9ECBFF"> package.json</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> README.md</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> tsconfig.json</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   └──</span><span style="color:#9ECBFF"> yarn.lock</span></span></code></pre>
+<p>We want to be able to return static files from our server, so lets go ahead and add the following <strong>Elysia</strong> static plugin.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">bun</span><span style="color:#9ECBFF"> add</span><span style="color:#9ECBFF"> @elysiajs/static</span></span></code></pre>
+<p>This will allow the client to request static files from our server such as images, css, js, etc. Now replace the contents of your <code>src/index.ts</code> file with</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// src/index.ts</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { Elysia } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'elysia'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { staticPlugin } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@elysiajs/static'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> app</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Elysia</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">use</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">staticPlugin</span><span style="color:#E1E4E8">())</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#9ECBFF"> 'Our first route'</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<p>The static plugin default folder is public, and registered with <code>/public</code> prefix. <a href="https://elysiajs.com/plugins/static.html">Click here to learn more</a></p>
+<h2 id="react-setup">React Setup</h2>
+<p>The next thing we want to do is be able to render our React code on the server, so let’s go ahead and add the following dependencies</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">bun</span><span style="color:#9ECBFF"> add</span><span style="color:#9ECBFF"> react</span><span style="color:#9ECBFF"> react-dom</span><span style="color:#6A737D">  # article is using 18.2.0</span></span></code></pre>
+<p>Next let’s create our React application by adding a file called <code>App.tsx</code> in our <code>./src/react/</code> folder with the following code</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#6A737D">// src/react/App.tsx</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> React, { useState } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> App</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">count</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setCount</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">html</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">head</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> charSet</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"utf-8"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">title</span><span style="color:#E1E4E8">>Bun, Elysia &#x26; React&#x3C;/</span><span style="color:#85E89D">title</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> name</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"description"</span><span style="color:#B392F0"> content</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"Bun, Elysia &#x26; React"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> name</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"viewport"</span><span style="color:#B392F0"> content</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"width=device-width, initial-scale=1"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">head</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">body</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">h1</span><span style="color:#E1E4E8">>Counter {count}&#x3C;/</span><span style="color:#85E89D">h1</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#B392F0"> onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{() </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setCount</span><span style="color:#E1E4E8">(count </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)}>Increment&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">body</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">html</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  )</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://react.dev/reference/react-dom/server/renderToReadableStream">React server-side rendering documentation</a></p>
+<p>Now back in our <code>./src/index.ts</code> let’s import this component by adding the following line</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// src/index.ts</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> App </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './react/App'</span></span></code></pre>
+<p>Don’t worry if you see a type error, we will fix in the next section.</p>
+<h2 id="fixing-type-errors">Fixing Type Errors</h2>
+<p>At this point you should see a couple type errors since we haven’t specified how our project should handle JSX and React types. To fix this add the following dev dependencies</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">bun</span><span style="color:#9ECBFF"> add</span><span style="color:#79B8FF"> -d</span><span style="color:#9ECBFF"> @types/react</span><span style="color:#9ECBFF"> @types/react-dom</span></span></code></pre>
+<p>Next let’s specify how the project should handle <strong>JSX</strong> by opening our <code>./tsconfig.json</code> and setting the following options</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "jsx"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"react"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "jsxFactory"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"React.createElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "jsxFragmentFactory"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"React.Fragment"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>For more information refer to the <a href="https://bun.sh/docs/runtime/jsx">Bun JSX documentation</a>. The type errors should now be gone, but sometimes you need to restart your IDE for the changes to take effect; <em>looking at you VSCode</em>…</p>
+<h2 id="react-ssr">React SSR</h2>
+<p>Now back in our <code>./src/index.ts</code> let’s go ahead and render our React component by adding the following</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// src/index.ts</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { Elysia } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'elysia'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { staticPlugin } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@elysiajs/static'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { renderToReadableStream } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react-dom/server'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { createElement } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> App </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './react/App'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> app</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Elysia</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">use</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">staticPlugin</span><span style="color:#E1E4E8">())</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">async</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // create our react App component</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> app</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createElement</span><span style="color:#E1E4E8">(App)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // render the app component to a readable stream</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> stream</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> renderToReadableStream</span><span style="color:#E1E4E8">(app, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      bootstrapScripts: [</span><span style="color:#9ECBFF">'/public/index.js'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // output the stream as the response</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Response</span><span style="color:#E1E4E8">(stream, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      headers: { </span><span style="color:#9ECBFF">'Content-Type'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'text/html'</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<p>Make sure your local dev server is still running if you closed your IDE earlier by running the following from your project root</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">bun</span><span style="color:#9ECBFF"> run</span><span style="color:#9ECBFF"> dev</span></span></code></pre>
+<p>Then open <a href="http://localhost:3000">http://localhost:3000</a> in your browser and you should see the following</p>
+<img src="/images/ssr-example.png" style="box-shadow: 0px 1px 5px rgba(0,0,0,0.1);" alt="React SSR" width="100%">
+<p>However, you may notice that pressing the button doesn’t increment the counter. This is because we haven’t added any client-side code yet. Let’s go ahead and do that now. Create a new file called <code>index.tsx</code> in your <code>./react/</code> folder with the following code</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#6A737D">// src/react/index.tsx</span></span>
+<span class="line"><span style="color:#6A737D">// Make sure to include the following two lines:</span></span>
+<span class="line"><span style="color:#6A737D">/// &#x3C;</span><span style="color:#85E89D">reference</span><span style="color:#B392F0"> lib</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"dom"</span><span style="color:#6A737D"> /></span></span>
+<span class="line"><span style="color:#6A737D">/// &#x3C;</span><span style="color:#85E89D">reference</span><span style="color:#B392F0"> lib</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"dom.iterable"</span><span style="color:#6A737D"> /></span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> React </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { hydrateRoot } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react-dom/client'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> App </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './App.js'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">hydrateRoot</span><span style="color:#E1E4E8">(document, &#x3C;</span><span style="color:#79B8FF">App</span><span style="color:#E1E4E8"> />)</span></span></code></pre>
+<p>Normally this is where we would call <code>createRoot</code>, but since the root will be created on the server, all we need to do is hydrate the client after the initial load. This will attach event listeners to the server-generated HTML and make it interactive.</p>
+<p><a href="https://react.dev/reference/react-dom/client/hydrateRoot">React Hydrate Documentation</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">/// &#x3C;</span><span style="color:#85E89D">reference</span><span style="color:#B392F0"> lib</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"dom"</span><span style="color:#6A737D"> /></span></span>
+<span class="line"><span style="color:#6A737D">/// &#x3C;</span><span style="color:#85E89D">reference</span><span style="color:#B392F0"> lib</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"dom.iterable"</span><span style="color:#6A737D"> /></span></span></code></pre>
+<p>Note these two lines above are not comments, but rather <a href="https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html">Triple-Slash Directives</a>. These are used to tell the TypeScript compiler how to handle certain files. In this case, we are telling the compiler to include the DOM types in our project. This is necessary because the <code>hydrateRoot</code> function requires the DOM types to be present (i.e. <code>document</code>).</p>
+<p>If you wish to access DOM elements (<code>window</code>, <code>document</code>, etc.) in another file just add these directives at the top of the file.</p>
+<p><a href="https://stackoverflow.com/a/75726039/4326715">How to add DOM types in Bun</a></p>
+<h2 id="bundle-client-js">Bundle Client JS</h2>
+<p>We are almost there! The last step is to bundle our <code>react</code> code which will be loaded by the client. Luckily <strong>Bun</strong> has a built-in bundler which we can use to bundle our client-side code. We could do this via the command line or as a script in our <code>package.json</code>, but for this example we will do it programmatically in our <code>./src/index.ts</code> file, just add the following at the top of the file</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// src/index.ts</span></span>
+<span class="line"><span style="color:#F97583">await</span><span style="color:#E1E4E8"> Bun.</span><span style="color:#B392F0">build</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  entrypoints: [</span><span style="color:#9ECBFF">'./src/react/index.tsx'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">  outdir: </span><span style="color:#9ECBFF">'./public'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">})</span></span></code></pre>
+<div style="text-align: center;"><sub>That's right top level await!</sub></div>
+<p>Now our <strong>React</strong> code will be automatically bundled each time we start our server! You can verify this by checking if the <code>./public/index.js</code> file exists. Make sure that this file path matches the <code>bootstrapScripts</code> option in your <code>./src/index.ts</code> file.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// Make sure the bootstrapScripts matches the output</span></span>
+<span class="line"><span style="color:#6A737D">// file path in your ./public folder</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> stream</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> renderToReadableStream</span><span style="color:#E1E4E8">(app, {</span></span>
+<span class="line"><span style="color:#E1E4E8">  bootstrapScripts: [</span><span style="color:#9ECBFF">'/public/index.js'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">})</span></span></code></pre>
+<p>Now open <a href="http://localhost:3000">http://localhost:3000</a> in your browser, the counter should now be working!</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Congratulations you have just created a simple website using Bun, Elysia and React with support for server-side rendering!</p>
+<p>If you have any additional questions feel free to reach out to me on <a href="https://twitter.com/asleepace">Twitter</a> or dropping me an email at <a href="mailto:colin@asleepace.com">colin@asleepace.com</a> :)</p>
+<p><strong>Next Recommended Reading</strong></p>
+<ul>
+<li><a href="https://react.dev/reference/react/Suspense">React Readable Streams</a></li>
+<li><a href="https://react.dev/reference/react/Suspense">React Suspense</a></li>
+</ul>
+<h2 id="helpful-resources">Helpful Resources</h2>
+<p>The following links are helpful resources for learning more about the technologies used in this project:</p>
+<ul>
+<li><a href="https://elysiajs.com/plugins/static.html">How to server static files with Elysia</a></li>
+<li><a href="https://elysiajs.com/quick-start.html">How to create a simple website with Elysia</a></li>
+<li><a href="https://stackoverflow.com/a/75726039/4326715">How to configure Bun with DOM types</a></li>
+<li><a href="https://bun.sh/docs/runtime/jsx">How to configure Bun with JSX documentation</a></li>
+<li><a href="https://bun.sh/docs/bundler">How to bundle assets with Bun documentation</a></li>
+<li><a href="https://react.dev/reference/react-dom/server/renderToReadableStream">How to render react on the server</a></li>
+</ul>
+<p>If you have any additional questions feel free to reach out to me on <a href="https://twitter.com/asleepace">Twitter</a> or dropping me an <a href="mailto:colin@asleepace.com">email</a>.</p>
+<h2 id="tldr">TL;DR</h2>
+<p>Here is the final code from the article, you can also view this project on <a href="https://github.com/asleepace/bun-elysia-react-srr-example">GitHub</a>.</p>
+<h4 id="project-structure-1">Project Structure</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">├──</span><span style="color:#9ECBFF"> ./your-project-name</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> node_modules</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> public</span><span style="color:#6A737D">              # client-side static files</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   └──</span><span style="color:#9ECBFF"> index.js</span><span style="color:#6A737D">        # generated client bundle</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> src</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> react</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> App.tsx</span><span style="color:#6A737D">     # react application</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   └──</span><span style="color:#9ECBFF"> index.tsx</span><span style="color:#6A737D">   # client-side entry point</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   │</span><span style="color:#9ECBFF">   └──</span><span style="color:#9ECBFF"> index.ts</span><span style="color:#6A737D">        # server-side entry point</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> bun.lock.b</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> package.json</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   ├──</span><span style="color:#9ECBFF"> tsconfig.json</span></span>
+<span class="line"><span style="color:#B392F0">│</span><span style="color:#9ECBFF">   └──</span><span style="color:#9ECBFF"> yarn.lock</span></span></code></pre>
+<h4 id="srcindexts"><strong>src/index.ts</strong></h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// src/index.ts</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { Elysia } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'elysia'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { staticPlugin } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@elysiajs/static'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { renderToReadableStream } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react-dom/server'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { createElement } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> App </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './react/App'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// bundle client side react-code</span></span>
+<span class="line"><span style="color:#F97583">await</span><span style="color:#E1E4E8"> Bun.</span><span style="color:#B392F0">build</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  entrypoints: [</span><span style="color:#9ECBFF">'./src/react/index.tsx'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">  outdir: </span><span style="color:#9ECBFF">'./public'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">})</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// start a new Elysia server on port 3000</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> app</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Elysia</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">use</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">staticPlugin</span><span style="color:#E1E4E8">())</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">async</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // create our react App component</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> app</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createElement</span><span style="color:#E1E4E8">(App)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // render the app component to a readable stream</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> stream</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> renderToReadableStream</span><span style="color:#E1E4E8">(app, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      bootstrapScripts: [</span><span style="color:#9ECBFF">'/public/index.js'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // output the stream as the response</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Response</span><span style="color:#E1E4E8">(stream, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      headers: { </span><span style="color:#9ECBFF">'Content-Type'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'text/html'</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<h4 id="srcreactapptsx">src/react/App.tsx</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#6A737D">// src/react/App.tsx</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> React, { useState } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> App</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">count</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setCount</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">html</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">head</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> charSet</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"utf-8"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">title</span><span style="color:#E1E4E8">>Bun, Elysia &#x26; React&#x3C;/</span><span style="color:#85E89D">title</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> name</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"description"</span><span style="color:#B392F0"> content</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"Bun, Elysia &#x26; React"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> name</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"viewport"</span><span style="color:#B392F0"> content</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"width=device-width, initial-scale=1"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">head</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">body</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">h1</span><span style="color:#E1E4E8">>Counter {count}&#x3C;/</span><span style="color:#85E89D">h1</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#B392F0"> onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{() </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setCount</span><span style="color:#E1E4E8">(count </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)}>Increment&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">body</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">html</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  )</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="srcreactindextsx">src/react/index.tsx</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#6A737D">/// &#x3C;</span><span style="color:#85E89D">reference</span><span style="color:#B392F0"> lib</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"dom"</span><span style="color:#6A737D"> /></span></span>
+<span class="line"><span style="color:#6A737D">/// &#x3C;</span><span style="color:#85E89D">reference</span><span style="color:#B392F0"> lib</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"dom.iterable"</span><span style="color:#6A737D"> /></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> React </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { hydrateRoot } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'react-dom/client'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> App </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './App.js'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">hydrateRoot</span><span style="color:#E1E4E8">(document, &#x3C;</span><span style="color:#79B8FF">App</span><span style="color:#E1E4E8"> />)</span></span></code></pre>
+<h4 id="tsconfigjson">tsconfig.json</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "compilerOptions"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "target"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ES2021"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "jsx"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"react"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "jsxFactory"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"React.createElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "jsxFragmentFactory"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"React.Fragment"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "module"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ES2022"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "moduleResolution"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"node"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "types"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"bun-types"</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#79B8FF">    "esModuleInterop"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "forceConsistentCasingInFileNames"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "strict"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "skipLibCheck"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="packagejson">package.json</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"bun-elysia-react-ssr"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "version"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"1.0.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "scripts"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "test"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"echo </span><span style="color:#79B8FF">\"</span><span style="color:#9ECBFF">Error: no test specified</span><span style="color:#79B8FF">\"</span><span style="color:#9ECBFF"> &#x26;&#x26; exit 1"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "dev"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"bun run --watch src/index.ts"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "dependencies"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "@elysiajs/static"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^0.6.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "elysia"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"latest"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "react"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^18.2.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "react-dom"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^18.2.0"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "devDependencies"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "@types/react"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^18.2.21"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "@types/react-dom"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^18.2.7"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "bun-types"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"latest"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "module"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"src/index.js"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>Article and <a href="https://github.com/asleepace/bun-elysia-react-srr-example">source code</a> by <a href="https://www.linkedin.com/in/colin-teahan/?lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BeM7QoEWiSIOwjiKXlYu0VA%3D%3D">Colin Teahan</a></p>
+<h1>🥳</h1>   </div> </article> </main> <footer data-astro-cid-lejjx2fa>
+&copy; 2025 Colin Teahan. All rights reserved.
+<div class="social-links" data-astro-cid-lejjx2fa> <a href="https://twitter.com/Asleepace" target="_blank" data-astro-cid-lejjx2fa> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/twitter" data-astro-cid-lejjx2fa><path fill="currentColor" d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" data-astro-cid-lejjx2fa></path></svg> </a> <a href="https://github.com/Asleepace" target="_blank" data-astro-cid-lejjx2fa> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github" data-astro-cid-lejjx2fa><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-lejjx2fa></path></svg> </a> </div> <!-- perform some simple analytics tracking --> <script type="module">async function n(){return typeof window>"u"?(console.warn("[trackAnalytics] called from non-browser context, skipping..."),!1):fetch("/api/analytics",{method:"POST",headers:{"user-agent":navigator.userAgent,referer:document.referrer}}).then(e=>e.ok).catch(e=>(console.warn("[trackAnalytics] failed",e),!1))}window.addEventListener("beforeunload",n);</script> </footer>  </body></html>
