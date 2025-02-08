@@ -32,12 +32,34 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   // NOTE: ignore pre-rendered pages!
   if (context.isPrerendered) return next()
 
+  // extract the request url
+  const url = new URL(context.request.url)
+
+  // skip auth request for these
+  switch (url.pathname) {
+    case '/api/analytics':
+      return next()
+    default:
+      break
+  }
+
   // validate user from session cookie
   const sessionCookie = context.cookies.get('session')
   const user = Sessions.getUser(sessionCookie?.value)
 
-  console.log('[authMiddleware] sessionCookie:', sessionCookie)
-  console.log('[authMiddleware] user:', user)
+  console.log('[authMiddleware] user:', user?.email)
+
+  // remove session cookie if user is not found
+  if (!user) {
+    context.cookies.delete('session')
+    context.locals.isLoggedIn = false
+    context.locals.user = undefined
+
+    // throw unauthorized error for api requests
+    if (url.pathname.startsWith('/api/')) {
+      return new Response('Unauthorized', { status: 401 })
+    }
+  }
 
   // set user data to locals
   context.locals.isLoggedIn = Boolean(user)
