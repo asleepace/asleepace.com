@@ -143,11 +143,11 @@ export namespace Users {
 
   try {
     console.log('[db] creating user...')
-    createUser({
-      email: 'colin_teahan@yahoo.com',
-      username: 'asleepace',
-      password: '!Password123',
-    })
+    // createUser({
+    //   email: 'colin_teahan@yahoo.com',
+    //   username: 'asleepace',
+    //   password: '!Password123',
+    // })
     const user = getUserByUsername('asleepace')
     if (!user) throw new Error('User not found')
     setFlags(user, UserFlags.Admin)
