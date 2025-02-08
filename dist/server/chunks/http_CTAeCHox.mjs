@@ -20,7 +20,6 @@ const config = {
 const http = {
   success,
   failure,
-  session,
   response,
   parse,
   get,
@@ -58,29 +57,6 @@ function response({
 }
 function success(data) {
   return response({ data, status: 200, statusText: "OK" });
-}
-function session({
-  sessionToken,
-  redirectTo = "/",
-  httpOnly = true,
-  secure = true,
-  sameSite = "Strict"
-}) {
-  const cookieFlags = [
-    `session=${sessionToken}`,
-    "Path=/",
-    httpOnly && "HttpOnly",
-    secure && "Secure",
-    `SameSite=${sameSite}`
-  ].filter(Boolean).join("; ");
-  return new Response(null, {
-    status: 302,
-    headers: {
-      "Set-Cookie": cookieFlags,
-      Location: redirectTo,
-      "Cache-Control": "no-store, no-cache, must-revalidate"
-    }
-  });
 }
 function failure(status = 500, statusText = "Internal Server Error", data = {
   error: statusText,

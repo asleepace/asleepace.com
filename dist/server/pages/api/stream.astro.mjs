@@ -1,6 +1,5 @@
+import { s as sleep } from '../../chunks/sleep_Dbtaq-qv.mjs';
 export { renderers } from '../../renderers.mjs';
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function createEventStream({
   request,

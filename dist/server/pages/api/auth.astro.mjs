@@ -1,16 +1,24 @@
-import { e as endpoint } from '../../chunks/index_BajHgFuI.mjs';
-import { h as http } from '../../chunks/http_NXgto6Mv.mjs';
+import { e as endpoint } from '../../chunks/index_IKKZRfRd.mjs';
+import { h as http } from '../../chunks/http_CTAeCHox.mjs';
 import { S as Sessions, U as Users } from '../../chunks/index_9dWHXndf.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const prerender = false;
+const isDevelopment = Boolean(process.env.ENVIRONMENT === "development");
+const isProduction = !isDevelopment;
+const cookieDomain = isDevelopment ? void 0 : process.env.COOKIE_DOMAIN;
+console.log("[auth] config:", JSON.stringify({
+  isDevelopment,
+  isProduction,
+  cookieDomain
+}, null, 2));
 const GET = endpoint(async ({ request }) => {
   const { oauthToken } = await http.parse(request);
   if (!oauthToken) return http.failure(401, "Unauthorized");
   const user = Sessions.findUser(oauthToken);
   return http.success(user);
 });
-const POST = endpoint(async ({ request }) => {
+const POST = endpoint(async ({ request, cookies }) => {
   console.log("POST /api/auth", request);
   const INVALID_LOGIN = "Invalid username or password";
   const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
@@ -39,7 +47,28 @@ const POST = endpoint(async ({ request }) => {
   if (!isPasswordValid) return http.failure(401, INVALID_LOGIN);
   const session = Sessions.create(user.id);
   const sessionToken = session.token;
-  return http.session({ sessionToken, redirectTo: "/admin" });
+  cookies.set("session", sessionToken, {
+    /** where the cookie is valid */
+    path: "/",
+    /** the domain that the cookie is valid for */
+    domain: cookieDomain,
+    /** javascript cannot access the cookie */
+    httpOnly: true,
+    /** if the cookie is only accessible via https */
+    secure: isProduction,
+    /** if the cookie is only accessible via the same site */
+    sameSite: "lax",
+    /** the expiration date of the cookie */
+    expires: new Date(Date.now() + 1e3 * 60 * 60 * 24 * 30)
+    // 30 days
+  });
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: "/admin",
+      "Cache-Control": "no-store, no-cache, must-revalidate"
+    }
+  });
 });
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({

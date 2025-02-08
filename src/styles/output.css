@@ -892,6 +892,10 @@ video {
   align-items: baseline;
 }
 
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-end {
   justify-content: flex-end;
 }
