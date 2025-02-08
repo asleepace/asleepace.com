@@ -87,52 +87,6 @@ function success(data: any) {
 }
 
 /**
- * Creates a new session by setting a cookie and redirecting (3032) to the given URL.
- *
- * @param {object} options - The options for the session.
- * @param {string} options.sessionToken - The session token to set in the cookie.
- * @param {string} options.redirectTo - The URL to redirect to after setting the cookie.
- * @param {boolean} options.httpOnly - Prevents javascript from accessing the cookie when true.
- * @param {boolean} options.secure - Flag if cookie should be sent only over HTTPS.
- * @param {string} options.sameSite - The SameSite attribute for the cookie.
- */
-// function session({
-//   sessionToken,
-//   redirectTo = '/',
-//   httpOnly = true,
-//   secure = true,
-//   sameSite = 'Strict',
-//   domain = process.env.COOKIE_DOMAIN,
-// }: {
-//   sessionToken: string
-//   redirectTo?: string
-//   httpOnly?: boolean
-//   secure?: boolean
-//   sameSite?: 'Strict' | 'Lax' | 'None'
-//   domain?: string
-// }) {
-//   const cookieFlags = [
-//     `session=${sessionToken}`,
-//     'Path=/',
-//     httpOnly && 'HttpOnly',
-//     secure && 'Secure',
-//     `SameSite=${sameSite}`,
-//     domain && `Domain=${domain}`,
-//   ]
-//     .filter(Boolean)
-//     .join('; ')
-
-//   return new Response(null, {
-//     status: 302,
-//     headers: {
-//       'Set-Cookie': cookieFlags,
-//       Location: redirectTo,
-//       'Cache-Control': 'no-store, no-cache, must-revalidate',
-//     },
-//   })
-// }
-
-/**
  * Create a failure HTTP response which returns JSON data.
  */
 function failure(
