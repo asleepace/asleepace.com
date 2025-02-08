@@ -81,8 +81,6 @@ export namespace Users {
     return db.query('SELECT * FROM users').all()
   }
 
-  console.log('[db] all users:', fetchUsers())
-
   export async function createUser({
     email,
     username,
@@ -139,6 +137,21 @@ export namespace Users {
         $email: user.email ?? null,
         $username: user.username ?? null,
       }) as User | undefined
+  }
+
+  // --- initialize the database ---
+
+  try {
+    console.log('[db] creating user...')
+    createUser({
+      email: 'colin_teahan@yahoo.com',
+      username: 'asleepace',
+      password: '!Password123',
+    })
+  } catch (error) {
+    console.error('[db] error creating user:', error)
+  } finally {
+    console.log('[db] user created:', fetchUsers())
   }
 }
 
