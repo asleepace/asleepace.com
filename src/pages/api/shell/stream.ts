@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 import { ShellProcessManager } from '@/lib/linux/ShellProcessManager'
+import { createBufferedStream } from '@/lib/linux/createBufferedStream'
 /**
  * ## SSR Only
  *
@@ -45,26 +46,47 @@ export type ShellStreamData = {
  *
  */
 export const HEAD: APIRoute = async ({ request, cookies }) => {
-  console.log('[shell/stream] HEAD request:', cookies)
-  const shellPidCookie = cookies.get('pid')
+  try {
+    console.log(
+      '||--------------------------------------------------------------------------------------------------||'
+    )
 
-  processManager.runCleanup()
+    // const shellPidCookie = cookies.get('pid')
+    // console.log('[HEAD] PID:', shellPidCookie?.number())
+    processManager.runCleanup()
 
-  const shell = processManager.getOrCreateShell(shellPidCookie?.number())
+    ///const clientPid = Number(shellPidCookie?.number())
 
-  console.log(`[shell/stream] shell:${shell.pid} killed:${shell.childProcess.killed}`)
+    // start a new shell
+    const shell = processManager.startShell()
+    console.log('[HEAD] shell:', shell.pid)
 
-  const shellPidString = shell.pid.toString()
-  console.log('[shell/stream] pid:', shellPidString)
-  cookies.set('pid', shellPidString)
+    // set cookie to proper shell pid
+    cookies.set('pid', shell.pid.toString())
 
-  return new Response('OK', {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/plain',
-      'x-shell-pid': shellPidString,
-    },
-  })
+    // return response
+    return new Response(null, {
+      statusText: 'OK',
+      status: 200,
+      headers: {
+        'x-shell-pid': shell.pid.toString(),
+      },
+    })
+  } catch (error) {
+    console.error('[shell/stream] error:', error)
+
+    // clear any existing cookies
+    cookies.delete('pid')
+
+    // cleanup any existing shell
+    processManager.runCleanup()
+
+    // return error response
+    return new Response(null, {
+      statusText: error.message ?? 'Unknown error',
+      status: 500,
+    })
+  }
 }
 
 /**
@@ -79,24 +101,26 @@ export const HEAD: APIRoute = async ({ request, cookies }) => {
  *
  */
 export const GET: APIRoute = async ({ request, cookies }) => {
-  console.log('[shell/stream] GET shell stream:', request.headers)
+  console.log(
+    '||==================================================================================================||'
+  )
 
-  const url = new URL(request.url)
-  const pid = url.searchParams.get('pid')
+  const pid = cookies.get('pid')?.number()
 
-  if (!pid) return new Response('Missing PID', { status: 400 })
-
-  const shellPid = Number(pid)
+  if (!pid) {
+    console.warn('[GET] Missing PID cookie')
+    return new Response(null, { status: 404, statusText: 'Missing PID' })
+  }
 
   processManager.runCleanup()
 
-  const shell = processManager.getOrCreateShell(shellPid)
+  const shell = processManager.getOrCreateShell(pid)
 
-  console.log('[shell/stream] shell killed:', shell.childProcess.killed)
+  console.log('[GET] shell:', shell.pid, 'killed:', shell.childProcess.killed)
 
   // check if the shell has already been killed
   if (shell.childProcess.killed) {
-    console.warn('[shell/stream] shell has already been killed!')
+    console.warn('[GET] shell has already been killed!')
     cookies.delete('pid')
     return new Response(null, {
       statusText: 'Shell killed',
@@ -104,96 +128,68 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     })
   }
 
-  // update the cookie if the PIDs don't match
-  if (shellPid !== shell.pid) {
-    console.log(`[shell/stream] updated from:${shellPid} to:${shell.pid}`)
-    cookies.set('pid', shell.pid.toString())
-  }
-
-  console.log('[shell/stream] shellPid:', shellPid)
-
   // get child process from the process manager
   const { childProcess } = shell
 
   // resolver for when the stream is finished
-  let onStreamDidFinish: ((value: unknown) => void) | undefined
+  let onStreamReady: ((value: unknown) => void) | undefined
 
   // create a new readable stream
   const waitForStreamToFinish = new Promise((resolve) => {
-    onStreamDidFinish = resolve
+    onStreamReady = resolve
   })
 
   // create a new readable stream
   const stream = new ReadableStream({
     async start(controller) {
-      const buffer: Uint8Array[] = []
+      console.log('[GET] starting stream...')
 
       // setup an abort signal
       request.signal.onabort = () => {
         console.warn('[shell/stream] aborting...')
-        childProcess.kill()
         controller.close()
       }
 
       // create a new writeable stream
-      const output = new WritableStream({
-        write(chunk) {
-          // buffer chunks
-          buffer.push(chunk)
-          console.log('[shell/stream] buffer:', buffer)
-          // only send data when ETX is detected
-          if (chunk.includes(ETX.NUM)) {
-            console.log('[shell/stream] ETX detected!')
-            const output = buffer.join(',')
-            controller.enqueue(`data: ${output}\n\n`)
-            buffer.length = 0 // empty the buffer
-          }
-
-          onStreamDidFinish?.(true)
-        },
-        abort() {
-          console.warn('[shell/stream] writeable stream aborted!')
-          childProcess.kill()
-          controller.close()
-        },
-        close() {
-          console.warn('[shell/stream] writeable stream closed!')
-          controller.close()
-        },
-      })
-
-      console.log(
-        '[shell/stream] waiting for child process:',
-        childProcess.signalCode
-      )
+      const bufferedStream = createBufferedStream(controller)
 
       // childProcess.stdin.write('echo "Hello, world!";' + '\n\n')
       // onStreamDidFinish?.(true)
 
-      // pipe the output stream to the writeable stream
-      await childProcess.stdout
-        .pipeTo(output)
+      console.log('[stream] childProcess stdout:', childProcess.stdout)
+
+      setTimeout(() => {
+        console.log('[stream] stream ready!')
+        onStreamReady?.(true)
+      }, 300)
+
+      setTimeout(() => {
+        controller.enqueue('data: \x03\n\n')
+      }, 1_000)
+
+      // pipe the childProcess stdout to the buffered stream
+      return childProcess.stdout
+        .pipeTo(bufferedStream)
         .then(() => {
-          console.log('[shell/stream] finished piping!')
+          console.log('[stream] finished piping!')
         })
         .catch((err) => {
-          console.error(`[shell/stream] ERROR stdout: \n\n\t${err}\n`)
-          childProcess.kill()
+          console.warn(`[stream] childProcess error: \n\n\t${err}\n`)
           controller.close()
         })
         .finally(() => {
-          console.log('[shell/stream] finally...')
+          console.log('[stream] childProcess finally...')
         })
     },
     cancel() {
-      console.warn('[shell/stream] killing child process!')
+      console.warn('[stream] canceling...')
       childProcess.kill()
+      processManager.runCleanup()
     },
   })
 
-  console.log('[shell/stream] waiting for stream to finish...')
+  console.log('[stream] waiting for stream...')
   await waitForStreamToFinish
-  console.log('[shell/stream] stream finished!')
 
   // if (stream.locked) {
   //   console.warn('[shell/stream] stream is locked!')
@@ -204,6 +200,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     headers: { 'Content-Type': 'text/event-stream' },
     status: 200,
   })
+
+  console.log('[stream] stream returned!')
 
   return clientResponseStream
 }
@@ -216,15 +214,12 @@ export const GET: APIRoute = async ({ request, cookies }) => {
  */
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    console.log('[shell/stream] POST request:', request.headers)
+    // console.log('[shell/stream] POST request:', request.headers)
     const { command } = await request.json()
 
     const shellPid = cookies.get('pid')?.number()
 
-    if (!shellPid) {
-      console.warn('[shell/stream] missing PID cookie')
-      return new Response('Missing PID cookie', { status: 404 })
-    }
+    if (!shellPid) throw new Error('Missing PID cookie')
 
     console.log('[shell/stream] POST shellPid:', shellPid)
 
@@ -267,7 +262,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(null, {
       statusText: error.message ?? 'Unknown error',
       status: 500,
-      headers: { 'Content-Type': 'text/plain' },
     })
   }
 }

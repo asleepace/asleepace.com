@@ -1,16 +1,7 @@
-import type { ShellResponse } from '@/pages/api/shell'
-import { useCallback, useEffect, useState } from 'react'
-import { useShellPid } from './useShellPid'
+import { useCallback, useEffect } from 'react'
+import { usePid } from './usePid'
 import { useEventSource } from './useEventSource'
-
-/**
- * Helper function to log the shell response.
- */
-const logShellResponse = (command: string) => (resp: Response) => {
-  console.log(
-    `[useShellStream] exec "${command}" (${resp.status}) ${resp.statusText}`
-  )
-}
+import { parseClientData } from './parseClientData'
 
 /**
  * For decoding the shell stream.
@@ -31,41 +22,22 @@ const textDecoder = new TextDecoder()
  *
  */
 export function useShellStream() {
-  const [pid, onResetPid] = useShellPid()
-
-  // only subscribe to events if we have a pid
-  const eventStreamUrl = pid ? `/api/shell/stream?pid=${pid}` : undefined
+  const [pid, onStartPid, onResetPid] = usePid()
 
   // subcribe to server events
-  const { messages, error, state } = useEventSource(eventStreamUrl, (event) => {
-    const rawBytes = new Uint8Array(event.data.split(',').map(Number))
-    const endOfText = rawBytes.findLastIndex((byte) => byte === 0x03)
-    console.log('[useShellStream] endOfText:', endOfText)
+  const { messages, subscribeToEventSource, state } =
+    useEventSource(parseClientData)
 
-    const output = textDecoder.decode(rawBytes.slice(0, endOfText))
-    const rawMetadata = textDecoder.decode(rawBytes.slice(endOfText + 1))
-    console.log('[useShellStream] output:', output)
-    console.log('[useShellStream] rawMetadata:', rawMetadata)
-
-    const meta = JSON.parse(rawMetadata.trim())
-
-    const resp: ShellResponse = {
-      command: meta.cmd?.split(' ') ?? [],
-      output,
-      whoami: meta.usr,
-      pwd: meta.dir,
-      type: 'command',
+  // this callback is used to register a new shell
+  const onRegisterShell = useCallback(async () => {
+    try {
+      const pid = await onStartPid()
+      if (!pid) throw new Error('missing pid')
+      subscribeToEventSource(`/api/shell/stream?pid=${pid}`)
+    } catch (error) {
+      console.warn('[useShellStream] error registering shell:', error)
     }
-
-    return resp
-  })
-
-  // derive state variables
-  const isConnected = state === 'connected'
-
-  useEffect(() => {
-    console.log('[useShellStream] pid:', pid)
-  }, [pid])
+  }, [onStartPid, subscribeToEventSource])
 
   // execute a command on the server
   const onRunCommand = useCallback(
@@ -75,11 +47,7 @@ export function useShellStream() {
         body: JSON.stringify({ command }),
       })
         .then((resp) => {
-          if (resp.status !== 200) {
-            throw new Error(resp.statusText)
-          }
-          console.log('[useShellStream] onRunCommand:', resp)
-          logShellResponse(command)(resp)
+          if (resp.status !== 200) throw new Error(resp.statusText)
           return resp
         })
         .catch((err) => {
@@ -87,11 +55,11 @@ export function useShellStream() {
           onResetPid()
         })
     },
-    [pid, isConnected, onResetPid]
+    [pid, onResetPid]
   )
 
   /**
    * Output is a list of ShellResponse objects.
    */
-  return [messages, onRunCommand] as const
+  return [messages, onRunCommand, onRegisterShell] as const
 }

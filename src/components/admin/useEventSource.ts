@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 type HandleMessage<T> = (event: MessageEvent) => T | void | undefined
 
@@ -7,14 +7,46 @@ type HandleMessage<T> = (event: MessageEvent) => T | void | undefined
  *
  * A simple wrapper arround an event source.
  */
-export function useEventSource<T>(
-  url: string | undefined,
-  handleMessage: HandleMessage<T>
-) {
+export function useEventSource<T>(handleMessage: HandleMessage<T>) {
   const [eventSource, setEventSource] = useState<EventSource | undefined>()
-  const [error, setError] = useState<Error | undefined>()
   const [messages, setMessages] = useState<T[]>([])
 
+  /**
+   * Creates a new event source.
+   */
+  const subscribeToEventSource = useCallback((url: string) => {
+    console.log('[useEventSource] creating event source:', url)
+    const nextEventSource = new EventSource(url)
+
+    // handle initial connection
+    nextEventSource.onopen = () => {
+      console.log('[useEventSource] event source opened:', url)
+      setEventSource(nextEventSource)
+      setMessages([])
+    }
+
+    // hadle errors
+    nextEventSource.onerror = () => {
+      console.error('[useEventSource] error: ', true)
+      nextEventSource.close()
+      setEventSource(undefined)
+    }
+
+    // handle incoming messages
+    nextEventSource.onmessage = (event) => {
+      if (!event.data || typeof event.data !== 'string') return
+      const data = handleMessage(event)
+      if (data) {
+        setMessages((prev) => [...prev, data])
+      }
+    }
+
+    return nextEventSource
+  }, [])
+
+  /**
+   * Checks the state of the event source.
+   */
   const state = useMemo(() => {
     switch (eventSource?.readyState) {
       case EventSource.OPEN:
@@ -27,51 +59,8 @@ export function useEventSource<T>(
     }
   }, [eventSource])
 
-  useEffect(() => {
-    if (!url) return
-
-    // reset the messages and error
-    setMessages([])
-    setError(undefined)
-
-    // create a new event source
-    const nextEventSource = new EventSource(url)
-
-    // log any errors and close the event source
-    nextEventSource.onerror = (event) => {
-      console.error('[useEventSource] error: ', JSON.stringify(event))
-      setError(new Error('EventSource error: ' + event['target']?.toString()))
-      nextEventSource.close()
-    }
-
-    // parse incoming messages and append to messages
-    nextEventSource.onmessage = (event) => {
-      if (!event.data || typeof event.data !== 'string') {
-        console.error('[useEventSource] invalid event data:', event.data)
-        return
-      }
-
-      if (event.data === 'ping') {
-        console.log('[useEventSource] received ping', true)
-        return 
-      }
-
-      console.log('[useEventSource] rawEvent:', event.data)
-      const data = handleMessage(event)
-      if (data) {
-        setMessages((prev) => [...prev, data])
-      }
-    }
-
-    // keep the event source in state
-    setEventSource(nextEventSource)
-
-    // close the event source when the component unmounts
-    return () => {
-      console.warn('[useEventSource] closing: ', url, true)
-      nextEventSource.close()
-    }
-  }, [url])
-
-  return { eventSource, messages, error, state }
+  /**
+   * Returns the event source, subscribe function, messages and state.
+   */
+  return { eventSource, subscribeToEventSource, messages, state }
 }

@@ -20,7 +20,7 @@ export type CommandResult = {
 export default function AdminCommandLine() {
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
-  const [output, onRunCommandStream] = useShellStream()
+  const [output, onRunCommandStream, onRegisterShell] = useShellStream()
 
   const onRunCommand = useCallback(
     async (command: string) => {
@@ -50,7 +50,13 @@ export default function AdminCommandLine() {
           $
         </p>
         <input
-          ref={inputRef}
+          ref={(inRef) => {
+            if (inputRef.current) return;
+            if (inRef) {
+              inputRef.current = inRef
+              onRegisterShell()
+            }
+          }}
           id="cli-input"
           type="text"
           className="flex flex-shrink font-mono text-sm tracking-wide text-green-500 bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-orange-500 rounded-md p-2"

@@ -7,6 +7,7 @@ const fetchProcessPid = async () => {
     method: 'HEAD',
     credentials: 'include',
   })
+  console.log('[fetchProcessPid] status:', resp.status)
   const pid = Number(resp.headers.get(PID_HEADER))
   return pid
 }
@@ -20,22 +21,28 @@ const fetchProcessPid = async () => {
  * Also returns a function to clear the PID and fetch a new one.
  *
  */
-export function useShellPid() {
+export function usePid() {
   const [pid, setPid] = useState<number | undefined>(undefined)
 
-  useEffect(() => {
-    fetchProcessPid()
-      .then((nextPid) => setPid(nextPid))
-      .catch((err) => {
-        console.error('[useShellPid] error:', err)
-        setPid(undefined)
-      })
-  }, [pid])
+  const onStartPid = useCallback(
+    () =>
+      fetchProcessPid()
+        .then((nextPid) => {
+          console.log('[usePid] new pid:', nextPid)
+          setPid(nextPid)
+          return nextPid
+        })
+        .catch((err) => {
+          console.error('[usePid] error:', err)
+          setPid(undefined)
+        }),
+    []
+  )
 
   const onResetPid = useCallback(() => {
-    console.log('[onResetPid] resetting pid')
+    console.warn('[usePid] resetting!')
     setPid(undefined)
   }, [])
 
-  return [pid, onResetPid] as const
+  return [pid, onStartPid, onResetPid] as const
 }
