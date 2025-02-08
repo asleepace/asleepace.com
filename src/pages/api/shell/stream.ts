@@ -1,5 +1,8 @@
 import type { APIRoute } from 'astro'
 import { ShellProcessManager } from '@/lib/linux/ShellProcessManager'
+import { createBufferedStream } from '@/lib/linux/createBufferedStream'
+import { sleep } from '@/lib/utils/sleep'
+
 /**
  * ## SSR Only
  *
@@ -17,18 +20,11 @@ export const prerender = false
 const processManager = new ShellProcessManager()
 
 /**
-/**
- * ## ETX
+ * ## Shell Stream Data
  *
- * End of Text (ETX) is the ASCII character 3, which is used to indicate the end of a message,
- * this is given as both a string and binary representation.
+ * The data sent from the client to the server.
  *
  */
-const ETX = {
-  STR: '\x03',
-  NUM: 0x03,
-}
-
 export type ShellStreamData = {
   type: 'command' | 'error'
   command: string | undefined
@@ -36,31 +32,52 @@ export type ShellStreamData = {
   pid: number
 }
 
-
 /**
  * HEAD /api/shell/stream
  *
- * Call this to get the current shell pid or create a new one if it doesn't exist,
- * this will be set as the cookie 'pid' and returned in the response headers
- * as `x-shell-pid`.
+ * This will create a new shell and set the cookie 'pid' to the shell pid,
+ * this should be called before connecting to the shell stream or posting
+ * commands to the shell.
  *
  */
 export const HEAD: APIRoute = async ({ request, cookies }) => {
-  console.log('[shell/stream] HEAD request:', cookies)
-  const shellPidCookie = cookies.get('pid')
-  const shell = processManager.getOrCreateShell(shellPidCookie?.number())
+  try {
+    console.log(
+      '||--------------------------------------------------------------------------------------------------||'
+    )
 
-  const shellPidString = shell.pid.toString()
-  console.log('[shell/stream] pid:', shellPidString)
-  cookies.set('pid', shellPidString)
+    // cleanup any killed shells
+    processManager.runCleanup()
 
-  return new Response('OK', {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/plain',
-      'x-shell-pid': shellPidString,
-    },
-  })
+    // start a new shell
+    const shell = processManager.startShell()
+    console.log('[HEAD] shell:', shell.pid)
+
+    // set cookie to proper shell pid
+    cookies.set('pid', shell.pid.toString())
+
+    // return response
+    return new Response(null, {
+      statusText: 'OK',
+      status: 200,
+      headers: {
+        'x-shell-pid': shell.pid.toString(),
+      },
+    })
+  } catch (error) {
+    console.error('[HEAD] error:', error)
+
+    // clear any existing cookies
+    cookies.delete('pid')
+
+    return new Response(null, {
+      statusText: error.message ?? 'Unknown error',
+      status: 500,
+    })
+  } finally {
+    // cleanup any existing shell
+    processManager.runCleanup()
+  }
 }
 
 /**
@@ -75,116 +92,112 @@ export const HEAD: APIRoute = async ({ request, cookies }) => {
  *
  */
 export const GET: APIRoute = async ({ request, cookies }) => {
-  console.log('[shell/stream] GET shell stream:', request.headers)
+  console.log(
+    '||==================================================================================================||'
+  )
 
-  const shellPidCookie = cookies.get('pid')
-  const shellPid = shellPidCookie?.number()
-  console.log('[shell/stream] shellPidCookie:', shellPidCookie)
+  const pid = cookies.get('pid')?.number()
 
-  // get the shell from the process manager
-  const shell = processManager.getOrCreateShell(shellPid)
-
-  // update the cookie if the PIDs don't match
-  if (shellPid !== shell.pid) {
-    console.log(`[shell/stream] updated from:${shellPid} to:${shell.pid}`)
-    cookies.set('pid', shell.pid.toString())
+  if (!pid) {
+    console.warn('[GET] Missing PID cookie')
+    return new Response(null, { status: 404, statusText: 'Missing PID' })
   }
 
-  console.log('[shell/stream] shellPid:', shellPid)
+  // cleanup any killed shells
+  processManager.runCleanup()
+
+  // TODO: This should not create a new shell if it has already been killed
+  // and instead return and error.
+  const shell = processManager.getOrCreateShell(pid)
+
+  console.log('[GET] shell:', shell.pid, 'killed:', shell.childProcess.killed)
+
+  // check if the shell has already been killed
+  if (shell.childProcess.killed) {
+    console.warn('[GET] shell has already been killed!')
+    cookies.delete('pid')
+    return new Response(null, {
+      statusText: 'Shell killed',
+      status: 500,
+    })
+  }
 
   // get child process from the process manager
   const { childProcess } = shell
 
   // resolver for when the stream is finished
-  let onStreamDidFinish: ((value: unknown) => void) | undefined
+  let onStreamReady: ((value: unknown) => void) | undefined
 
   // create a new readable stream
   const waitForStreamToFinish = new Promise((resolve) => {
-    onStreamDidFinish = resolve
+    onStreamReady = resolve
   })
 
   // create a new readable stream
   const stream = new ReadableStream({
     async start(controller) {
-      const buffer: Uint8Array[] = []
+      console.log('[stream] stream...')
 
       // setup an abort signal
       request.signal.onabort = () => {
-        console.warn('[shell/stream] aborting...')
-        childProcess.kill()
+        console.warn('[stream] aborting...')
         controller.close()
       }
 
-      // create a new writeable stream
-      const output = new WritableStream({
-        write(chunk) {
-          // buffer chunks
-          buffer.push(chunk)
-          console.log('[shell/stream] buffer:', buffer)
-          // only send data when ETX is detected
-          if (chunk.includes(ETX.NUM)) {
-            console.log('[shell/stream] ETX detected!')
-            const output = buffer.join(',')
-            controller.enqueue(`data: ${output}\n\n`)
-            buffer.length = 0 // empty the buffer
-          }
+      // create a new writeable buffered stream which pipes the childProcess stdout
+      // and enqueues the data to the controller
+      const bufferedStream = createBufferedStream(controller)
 
-          onStreamDidFinish?.(true)
-        },
-        abort() {
-          console.warn('[shell/stream] writeable stream aborted!')
-          childProcess.kill()
-          controller.close()
-        },
-        close() {
-          console.warn('[shell/stream] writeable stream closed!')
-          controller.close()
-        },
-      })
+      // HACK: Connecting the childProcess stdout to the controller is async,
+      // so we need to wait for the stream to be ready before we can send the
+      // ETX event to the client.
+      setTimeout(() => {
+        console.log('[stream] stream ready!')
+        onStreamReady?.(true)
+      }, 300)
 
-      console.log(
-        '[shell/stream] waiting for child process:',
-        childProcess.signalCode
-      )
+      // HACK: This will cause the client connection to connect after the
+      // stream response has been sent. Make sure this triggers slightly
+      // after we return the stream response and client has time to make
+      // an event source connection.
+      setTimeout(() => {
+        controller.enqueue('data: \x03\n\n')
+      }, 1_000)
 
-      childProcess.stdin.write('echo "Hello, world!";' + '\n')
-
-      // pipe the output stream to the writeable stream
-      await childProcess.stdout
-        .pipeTo(output)
+      // pipe the childProcess stdout to the buffered stream, not sure if this
+      // needs to be returned here or awaited, but this is where we create a
+      // pipe from the childProcess.stdout to the buffered writeable stream.
+      return childProcess.stdout
+        .pipeTo(bufferedStream)
         .then(() => {
-          console.log('[shell/stream] finished piping!')
+          console.log('[stream] finished piping!')
         })
         .catch((err) => {
-          console.error(`[shell/stream] ERROR stdout: \n\n\t${err}\n`)
-          childProcess.kill()
+          console.warn(`[stream] error: \n\n\t${err}\n`)
           controller.close()
-        })
-        .finally(() => {
-          console.log('[shell/stream] finally...')
         })
     },
     cancel() {
-      console.warn('[shell/stream] killing child process!')
+      console.warn('[stream] canceling...')
       childProcess.kill()
+      processManager.runCleanup()
     },
   })
 
-  console.log('[shell/stream] waiting for stream to finish...')
+  console.log('[stream] waiting for stream...')
   await waitForStreamToFinish
-  console.log('[shell/stream] stream finished!')
 
   if (stream.locked) {
-    console.warn('[shell/stream] stream is locked!')
-    return new Response('Stream is locked', { status: 500 })
+    console.warn('[stream] stream is locked (sleeping 1s)')
+    await sleep(1_000)
   }
 
-  const clientResponseStream = await new Response(stream, {
+  console.log('[GET] finished!')
+
+  return new Response(stream, {
     headers: { 'Content-Type': 'text/event-stream' },
     status: 200,
   })
-
-  return clientResponseStream
 }
 
 /**
@@ -194,61 +207,57 @@ export const GET: APIRoute = async ({ request, cookies }) => {
  *
  */
 export const POST: APIRoute = async ({ request, cookies }) => {
-  const { command } = await request.json()
+  try {
+    const shellPid = cookies.get('pid')?.number()
+    console.log('[POST] PID:', shellPid)
 
-  const shellPidCookie = cookies.get('pid')
-  const shellPid = shellPidCookie?.number()
+    // parse the command from the request body
+    const { command } = await request.json().catch(async (error) => {
+      console.log('[POST] JSON error:', error?.message ?? 'Unknown error')
+      const plainText = await request.text()
+      return JSON.parse(plainText)
+    })
 
-  if (!shellPid) {
-    console.warn('[shell/stream] missing PID cookie')
-    return new Response('Missing PID cookie', { status: 404 })
-  }
+    if (!shellPid) throw new Error('Missing PID cookie')
 
-  console.log('[shell/stream] POST shellPid:', shellPid)
+    console.log('[shell/stream] POST shellPid:', shellPid)
 
-  const shell = processManager.getShell(shellPid)
+    const shell = processManager.getShell(shellPid)
 
-  if (!shell) {
-    return new Response('Shell not found', { status: 404 })
-  }
+    if (!shell) throw new Error('Shell not found')
 
-  const { childProcess } = shell
+    const { childProcess } = shell
 
-  if (!command || typeof command !== 'string') {
-    return new Response('Invalid command', { status: 400 })
-  }
+    // handle various errors
+    if (!command || typeof command !== 'string')
+      throw new Error('Invalid command')
+    if (!childProcess) throw new Error('Shell not initialized')
+    if (childProcess.killed) throw new Error('Shell killed')
+    if (!childProcess.stdin) throw new Error('Shell is not writable')
+    if (typeof childProcess.stdin.write !== 'function')
+      throw new Error('Shell stdin is not writable')
 
-  if (!childProcess) {
-    return new Response('Shell not initialized', { status: 500 })
-  }
+    console.log('[shell/stream] writing command:', command)
 
-  if (childProcess.killed) {
-    return new Response('Shell killed', { status: 500 })
-  }
-
-  if (!childProcess.stdin) {
-    return new Response('Shell not initialized', { status: 500 })
-  }
-
-  if (typeof childProcess.stdin.write !== 'function') {
-    return new Response('Shell is not writable', { status: 500 })
-  }
-
-  console.log('[shell/stream] writing command:', command)
-
-  // NOTE: This part is a bit tricky
-  // 1. We need to execute the command first
-  // 2. We need to mark the end with ETX 0x03
-  // 3. We need to send the metadata after the command has finished
-  // 4. TODO: do we need to send and end of command marker?
-  childProcess.stdin.write(
-    `${command}\n
+    // NOTE: This part is a bit tricky
+    // 1. We need to execute the command first
+    // 2. We need to mark the end with ETX 0x03
+    // 3. We need to send the metadata after the command has finished
+    // 4. TODO: do we need to send and end of command marker?
+    childProcess.stdin.write(
+      `${command}\n
     echo "\x03{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";\n`
-  )
+    )
 
-  return new Response('OK', {
-    status: 200,
-    headers: { 'Content-Type': 'text/plain' },
-  })
+    return new Response('OK', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  } catch (error) {
+    console.error('[shell/stream] error:', error)
+    return new Response(null, {
+      statusText: error.message ?? 'Unknown error',
+      status: 500,
+    })
+  }
 }
-

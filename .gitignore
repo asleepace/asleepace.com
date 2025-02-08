@@ -6,12 +6,17 @@
 # dependencies
 node_modules/
 
+# SQLite database
+db.sqlite
+
 # logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# local gitignore
+.gitignore.local
 
 # environment variables
 .env

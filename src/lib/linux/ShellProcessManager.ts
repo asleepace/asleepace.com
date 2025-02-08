@@ -45,6 +45,16 @@ export class ShellProcessManager {
     })
   }
 
+  runCleanup(): void {
+    for (const pid of this.processes.keys()) {
+      const shell = this.getShell(pid)
+      if (!shell || shell.childProcess.killed) {
+        console.log('[ShellProcessManager] autorelease:', pid)
+        this.processes.delete(pid)
+      }
+    }
+  }
+
   terminate(): void {
     for (const pid of this.processes.keys()) {
       this.killShell(pid)

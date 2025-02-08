@@ -1,22 +1,12 @@
-import type { ShellResponse } from '@/pages/api/shell'
-import { useCallback, useEffect, useState } from 'react'
-import { useShellPid } from './useShellPid'
+import { useCallback, useEffect } from 'react'
+import { usePid } from './usePid'
+import { useEventSource } from './useEventSource'
+import { parseClientData } from './parseClientData'
 
 /**
- * Helper function to log the shell response.
+ * For decoding the shell stream.
  */
-const logShellResponse = (command: string) => (resp: Response) => {
-  console.log(
-    `[useShellStream] exec "${command}" (${resp.status}) ${resp.statusText}`
-  )
-}
-
-/**
- * Helper function to log the shell error.
- */
-const logShellError = (command: string) => (err: Error) => {
-  console.error(`[useShellStream] exec "${command}" error:`, err)
-}
+const textDecoder = new TextDecoder()
 
 /**
  * ## useShellStream()
@@ -32,86 +22,44 @@ const logShellError = (command: string) => (err: Error) => {
  *
  */
 export function useShellStream() {
-  const [output, setOutput] = useState<ShellResponse[]>([])
-  const [commands, setCommands] = useState<string[]>([])
+  const [pid, onStartPid, onResetPid] = usePid()
 
-  // PART #0: Get the current shell pid
-  const pid = useShellPid()
+  // subcribe to server events
+  const { messages, subscribeToEventSource, state } =
+    useEventSource(parseClientData)
 
-  // PART #1: Executes a command on the server
-  const onRunCommand = useCallback((command: string) => {
-    setCommands((prev) => [...prev, command])
-    return fetch('/api/shell/stream', {
-      method: 'POST',
-      body: JSON.stringify({ command }),
-    })
-      .then(logShellResponse(command))
-      .catch(logShellError(command))
-  }, [pid])
-
-  // PART #2: Receives events from the server
-  useEffect(() => {
-    if (!pid) return
-
-    const eventSource = new EventSource('/api/shell/stream')
-    const textDecoder = new TextDecoder()
-
-    eventSource.onopen = () => {
-      console.log('[useShellStream] eventSource.onopen()')
+  // this callback is used to register a new shell
+  const onRegisterShell = useCallback(async () => {
+    try {
+      const pid = await onStartPid()
+      if (!pid) throw new Error('missing pid')
+      subscribeToEventSource(`/api/shell/stream?pid=${pid}`)
+    } catch (error) {
+      console.warn('[useShellStream] error registering shell:', error)
     }
+  }, [onStartPid, subscribeToEventSource])
 
-    console.log('[useShellStream] eventSource:', eventSource)
-    console.log(
-      '[useShellStream] eventSource.readyState:',
-      eventSource.readyState
-    )
-
-    eventSource.onmessage = (event) => {
-      console.log('[useShellStream] event:', event)
-
-      if (typeof event.data !== 'string') {
-        console.error(
-          '[useShellStream] event.data is not a string:',
-          event.data
-        )
-        return
-      }
-
-      const rawBytes = new Uint8Array(event.data.split(',').map(Number))
-
-      const endOfText = rawBytes.findLastIndex((byte) => byte === 0x03)
-      console.log('[useShellStream] endOfText:', endOfText)
-
-      const output = textDecoder.decode(rawBytes.slice(0, endOfText))
-      const rawMetadata = textDecoder.decode(rawBytes.slice(endOfText + 1))
-      console.log('[useShellStream] output:', output)
-      console.log('[useShellStream] rawMetadata:', rawMetadata)
-
-      const meta = JSON.parse(rawMetadata.trim())
-
-      const resp: ShellResponse = {
-        command: meta.cmd?.split(' ') ?? [],
-        output,
-        whoami: meta.usr,
-        pwd: meta.dir,
-        type: 'command',
-      }
-
-      setOutput((prev) => [...prev, resp])
-    }
-
-    eventSource.onerror = (error) => {
-      console.log('[useShellStream] error:', error)
-    }
-
-    return () => {
-      console.warn('[useShellStream] closing eventSource...')
-      eventSource.close()
-    }
-  }, [pid])
+  // execute a command on the server
+  const onRunCommand = useCallback(
+    (command: string) => {
+      return fetch('/api/shell/stream', {
+        method: 'POST',
+        body: JSON.stringify({ command }),
+      })
+        .then((resp) => {
+          if (resp.status !== 200) throw new Error(resp.statusText)
+          return resp
+        })
+        .catch((err) => {
+          console.error('[useShellStream] error:', err)
+          onResetPid()
+        })
+    },
+    [pid, onResetPid]
+  )
 
   /**
    * Output is a list of ShellResponse objects.
    */
-  return [output, onRunCommand] as const
+  return [messages, onRunCommand, onRegisterShell] as const
 }

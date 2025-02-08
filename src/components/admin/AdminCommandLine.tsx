@@ -10,51 +10,27 @@ export type CommandResult = {
   pwd: string
 }
 
-async function execute(command: string): Promise<CommandResult> {
-  const response = await fetch('/api/shell', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      command
-    }),
-  })
-  console.log('[AdminCommandLine] response', response)
-  const data = await response.json()
-  console.log('[AdminCommandLine] data', data)
-  return data
-}
-
-const formatError = (command: string, error: Error): CommandResult => ({
-  command: [command],
-  output: error?.message,
-  whoami: 'system',
-  pwd: 'error',
-  type: 'error',
-})
-
+/**
+ * ## AdminCommandLine
+ *
+ * This is a client-side react island which handles executing command line arguments
+ * on the backend server.
+ *
+ */
 export default function AdminCommandLine() {
-  // const [output, setOutput] = useState<CommandResult[]>([])
   const prevCommandsRef = useRef<string[]>([]).current
   const inputRef = useRef<HTMLInputElement>(null)
+  const [output, onRunCommandStream, onRegisterShell] = useShellStream()
 
-  const [output, onRunCommandStream] = useShellStream()
-
-  const onRunCommand = useCallback(async (command: string) => {
-    prevCommandsRef.push(command)
-    onRunCommandStream(command).catch((err) => {
-      console.warn('[AdminCommandLine] error', err)
-    })
-    // return execute(command)
-    //   .then((result) => {
-    //     setOutput((prev) => [...prev, result])
-    //   })
-    //   .catch((error) => {
-    //     console.warn('[AdminCommandLine] error', error)
-    //     setOutput((prev) => [...prev, formatError(command, error)])
-    //   })
-  }, [onRunCommandStream])
+  const onRunCommand = useCallback(
+    async (command: string) => {
+      prevCommandsRef.push(command)
+      onRunCommandStream(command)?.catch((err) => {
+        console.warn('[AdminCommandLine] error', err)
+      })
+    },
+    [onRunCommandStream]
+  )
 
   const onSubmit = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return
@@ -66,13 +42,31 @@ export default function AdminCommandLine() {
     onRunCommand(command)
   }, [])
 
+  /**
+   * NOTE: This is a ref callback that is used to set the input ref and register
+   * a new shell when the input is focused. This is called to prevent the useEffect
+   * hook from double mounting and deadlocking the stream.
+   */
+  const onInitializeShell = useCallback(
+    (htmlInput: HTMLInputElement | null) => {
+      if (inputRef.current) return
+      if (!htmlInput) return
+      inputRef.current = htmlInput
+      htmlInput.focus()
+      onRegisterShell()
+    },
+    []
+  )
+
   return (
     <div className="bg-black rounded-2xl flex-1 p-1 self-stretch max-w-screen-lg max-h-[500px] flex flex-col">
       <AdminCommandOutput data={output} />
       <div className="flex flex-row px-2 py-1">
-        <p className='text-green-500 font-mono text-sm self-center font-bold'>$</p>
+        <p className="text-green-500 font-mono text-sm self-center font-bold">
+          $
+        </p>
         <input
-          ref={inputRef}
+          ref={onInitializeShell}
           id="cli-input"
           type="text"
           className="flex flex-shrink font-mono text-sm tracking-wide text-green-500 bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-orange-500 rounded-md p-2"

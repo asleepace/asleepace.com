@@ -1,3 +1,4 @@
+import { s as sleep } from '../../../chunks/sleep_Dbtaq-qv.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 class ShellProcessManager {
@@ -22,6 +23,15 @@ class ShellProcessManager {
       totalRunningTime: this.totalRunningTime,
       shells: this.processes
     });
+  }
+  runCleanup() {
+    for (const pid of this.processes.keys()) {
+      const shell = this.getShell(pid);
+      if (!shell || shell.childProcess.killed) {
+        console.log("[ShellProcessManager] autorelease:", pid);
+        this.processes.delete(pid);
+      }
+    }
   }
   terminate() {
     for (const pid of this.processes.keys()) {
@@ -63,151 +73,173 @@ class ShellProcessManager {
   }
 }
 
-const prerender = false;
-const processManager = new ShellProcessManager();
 const ETX = {
   STR: "",
   NUM: 3
 };
-const HEAD = async ({ request, cookies }) => {
-  console.log("[shell/stream] HEAD request:", cookies);
-  const shellPidCookie = cookies.get("pid");
-  const shell = processManager.getOrCreateShell(shellPidCookie?.number());
-  const shellPidString = shell.pid.toString();
-  console.log("[shell/stream] pid:", shellPidString);
-  cookies.set("pid", shellPidString);
-  return new Response("OK", {
-    status: 200,
-    headers: {
-      "Content-Type": "text/plain",
-      "x-shell-pid": shellPidString
+function createBufferedStream(controller) {
+  console.log("[buffer] creating...");
+  const buffer = [];
+  return new WritableStream({
+    write(chunk) {
+      buffer.push(chunk);
+      console.log("[buffer] buffering:", buffer.length);
+      if (chunk.includes(ETX.NUM)) {
+        const output = buffer.join(",");
+        controller.enqueue(`data: ${output}
+
+`);
+        buffer.length = 0;
+        console.log("[buffer] flushing!");
+      }
+    },
+    abort() {
+      console.warn("[buffer] ABORTED!");
+      controller.close();
+    },
+    close() {
+      console.warn("[buffer] CLOSED!");
+      controller.close();
     }
   });
+}
+
+const prerender = false;
+const processManager = new ShellProcessManager();
+const HEAD = async ({ request, cookies }) => {
+  try {
+    console.log(
+      "||--------------------------------------------------------------------------------------------------||"
+    );
+    processManager.runCleanup();
+    const shell = processManager.startShell();
+    console.log("[HEAD] shell:", shell.pid);
+    cookies.set("pid", shell.pid.toString());
+    return new Response(null, {
+      statusText: "OK",
+      status: 200,
+      headers: {
+        "x-shell-pid": shell.pid.toString()
+      }
+    });
+  } catch (error) {
+    console.error("[HEAD] error:", error);
+    cookies.delete("pid");
+    return new Response(null, {
+      statusText: error.message ?? "Unknown error",
+      status: 500
+    });
+  } finally {
+    processManager.runCleanup();
+  }
 };
 const GET = async ({ request, cookies }) => {
-  console.log("[shell/stream] GET shell stream:", request.headers);
-  const shellPidCookie = cookies.get("pid");
-  const shellPid = shellPidCookie?.number();
-  console.log("[shell/stream] shellPidCookie:", shellPidCookie);
-  const shell = processManager.getOrCreateShell(shellPid);
-  if (shellPid !== shell.pid) {
-    console.log(`[shell/stream] updated from:${shellPid} to:${shell.pid}`);
-    cookies.set("pid", shell.pid.toString());
+  console.log(
+    "||==================================================================================================||"
+  );
+  const pid = cookies.get("pid")?.number();
+  if (!pid) {
+    console.warn("[GET] Missing PID cookie");
+    return new Response(null, { status: 404, statusText: "Missing PID" });
   }
-  console.log("[shell/stream] shellPid:", shellPid);
+  processManager.runCleanup();
+  const shell = processManager.getOrCreateShell(pid);
+  console.log("[GET] shell:", shell.pid, "killed:", shell.childProcess.killed);
+  if (shell.childProcess.killed) {
+    console.warn("[GET] shell has already been killed!");
+    cookies.delete("pid");
+    return new Response(null, {
+      statusText: "Shell killed",
+      status: 500
+    });
+  }
   const { childProcess } = shell;
-  let onStreamDidFinish;
+  let onStreamReady;
   const waitForStreamToFinish = new Promise((resolve) => {
-    onStreamDidFinish = resolve;
+    onStreamReady = resolve;
   });
   const stream = new ReadableStream({
     async start(controller) {
-      const buffer = [];
+      console.log("[stream] stream...");
       request.signal.onabort = () => {
-        console.warn("[shell/stream] aborting...");
-        childProcess.kill();
+        console.warn("[stream] aborting...");
         controller.close();
       };
-      const output = new WritableStream({
-        write(chunk) {
-          buffer.push(chunk);
-          console.log("[shell/stream] buffer:", buffer);
-          if (chunk.includes(ETX.NUM)) {
-            console.log("[shell/stream] ETX detected!");
-            const output2 = buffer.join(",");
-            controller.enqueue(`data: ${output2}
-
-`);
-            buffer.length = 0;
-          }
-          onStreamDidFinish?.(true);
-        },
-        abort() {
-          console.warn("[shell/stream] writeable stream aborted!");
-          childProcess.kill();
-          controller.close();
-        },
-        close() {
-          console.warn("[shell/stream] writeable stream closed!");
-          controller.close();
-        }
-      });
-      console.log(
-        "[shell/stream] waiting for child process:",
-        childProcess.signalCode
-      );
-      childProcess.stdin.write('echo "Hello, world!";\n');
-      await childProcess.stdout.pipeTo(output).then(() => {
-        console.log("[shell/stream] finished piping!");
+      const bufferedStream = createBufferedStream(controller);
+      setTimeout(() => {
+        console.log("[stream] stream ready!");
+        onStreamReady?.(true);
+      }, 300);
+      setTimeout(() => {
+        controller.enqueue("data: \n\n");
+      }, 1e3);
+      return childProcess.stdout.pipeTo(bufferedStream).then(() => {
+        console.log("[stream] finished piping!");
       }).catch((err) => {
-        console.error(`[shell/stream] ERROR stdout: 
+        console.warn(`[stream] error: 
 
 	${err}
 `);
-        childProcess.kill();
         controller.close();
-      }).finally(() => {
-        console.log("[shell/stream] finally...");
       });
     },
     cancel() {
-      console.warn("[shell/stream] killing child process!");
+      console.warn("[stream] canceling...");
       childProcess.kill();
+      processManager.runCleanup();
     }
   });
-  console.log("[shell/stream] waiting for stream to finish...");
+  console.log("[stream] waiting for stream...");
   await waitForStreamToFinish;
-  console.log("[shell/stream] stream finished!");
   if (stream.locked) {
-    console.warn("[shell/stream] stream is locked!");
-    return new Response("Stream is locked", { status: 500 });
+    console.warn("[stream] stream is locked (sleeping 1s)");
+    await sleep(1e3);
   }
-  const clientResponseStream = await new Response(stream, {
+  console.log("[GET] finished!");
+  return new Response(stream, {
     headers: { "Content-Type": "text/event-stream" },
     status: 200
   });
-  return clientResponseStream;
 };
 const POST = async ({ request, cookies }) => {
-  const { command } = await request.json();
-  const shellPidCookie = cookies.get("pid");
-  const shellPid = shellPidCookie?.number();
-  if (!shellPid) {
-    console.warn("[shell/stream] missing PID cookie");
-    return new Response("Missing PID cookie", { status: 404 });
-  }
-  console.log("[shell/stream] POST shellPid:", shellPid);
-  const shell = processManager.getShell(shellPid);
-  if (!shell) {
-    return new Response("Shell not found", { status: 404 });
-  }
-  const { childProcess } = shell;
-  if (!command || typeof command !== "string") {
-    return new Response("Invalid command", { status: 400 });
-  }
-  if (!childProcess) {
-    return new Response("Shell not initialized", { status: 500 });
-  }
-  if (childProcess.killed) {
-    return new Response("Shell killed", { status: 500 });
-  }
-  if (!childProcess.stdin) {
-    return new Response("Shell not initialized", { status: 500 });
-  }
-  if (typeof childProcess.stdin.write !== "function") {
-    return new Response("Shell is not writable", { status: 500 });
-  }
-  console.log("[shell/stream] writing command:", command);
-  childProcess.stdin.write(
-    `${command}
+  try {
+    const shellPid = cookies.get("pid")?.number();
+    console.log("[POST] PID:", shellPid);
+    const { command } = await request.json().catch(async (error) => {
+      console.log("[POST] JSON error:", error?.message ?? "Unknown error");
+      const plainText = await request.text();
+      return JSON.parse(plainText);
+    });
+    if (!shellPid) throw new Error("Missing PID cookie");
+    console.log("[shell/stream] POST shellPid:", shellPid);
+    const shell = processManager.getShell(shellPid);
+    if (!shell) throw new Error("Shell not found");
+    const { childProcess } = shell;
+    if (!command || typeof command !== "string")
+      throw new Error("Invalid command");
+    if (!childProcess) throw new Error("Shell not initialized");
+    if (childProcess.killed) throw new Error("Shell killed");
+    if (!childProcess.stdin) throw new Error("Shell is not writable");
+    if (typeof childProcess.stdin.write !== "function")
+      throw new Error("Shell stdin is not writable");
+    console.log("[shell/stream] writing command:", command);
+    childProcess.stdin.write(
+      `${command}
 
     echo "{\\"cmd\\":\\"${command}\\",\\"usr\\":\\"$USER\\",\\"dir\\":\\"$PWD\\"}";
 `
-  );
-  return new Response("OK", {
-    status: 200,
-    headers: { "Content-Type": "text/plain" }
-  });
+    );
+    return new Response("OK", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" }
+    });
+  } catch (error) {
+    console.error("[shell/stream] error:", error);
+    return new Response(null, {
+      statusText: error.message ?? "Unknown error",
+      status: 500
+    });
+  }
 };
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({

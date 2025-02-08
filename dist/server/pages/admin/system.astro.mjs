@@ -1,7 +1,7 @@
 /* empty css                                    */
 import { b as createAstro, c as createComponent, r as renderTemplate, a as renderComponent, d as renderHead, e as addAttribute } from '../../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_xTJnHrRH.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_DGWSCeWb.mjs';
 import { s as siteData } from '../../chunks/consts_CaV8g65M.mjs';
 /* empty css                                    */
 import clsx from 'clsx';
