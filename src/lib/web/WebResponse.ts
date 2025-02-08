@@ -1,4 +1,9 @@
-const HEADERS = {
+/**
+ * ## HEADERS
+ *
+ * The headers for the response, these are frozen to prevent mutation.
+ */
+const HEADERS = Object.freeze({
   API: {
     'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -17,14 +22,15 @@ const HEADERS = {
   get DEFAULT() {
     return { ...this.API, ...this.CORS }
   },
-}
+} as const)
 
-type OkOptions = {
-  body?: any
-  status?: number
-  statusText?: string
-}
-
+/**
+ * ## ErrorOptions
+ *
+ * The options for the error message, the error string should be a code
+ * which will also be sent as the statusText.
+ *
+ */
 type ErrorOptions = {
   message?: string
   error?: `ERR_${string}`
@@ -52,6 +58,30 @@ export class WebResponse extends Response {
     })
   }
 
+  static NOT_AUTHORIZED(message: string = 'Not Authorized') {
+    return WebResponse.ERR({
+      error: 'ERR_NOT_AUTHORIZED',
+      status: 401,
+      message,
+    })
+  }
+
+  static FORBIDDEN(message: string = 'Forbidden') {
+    return WebResponse.ERR({
+      error: 'ERR_FORBIDDEN',
+      status: 403,
+      message,
+    })
+  }
+
+  static BAD_REQUEST(message: string = 'Bad Request') {
+    return WebResponse.ERR({
+      error: 'ERR_BAD_REQUEST',
+      status: 400,
+      message,
+    })
+  }
+
   /**
    * Returns a 200 response with the given body, if the body is a string it will
    * be converted to an object with a `message` property. If the body is an object
@@ -69,12 +99,14 @@ export class WebResponse extends Response {
    * be a JSON object with an `error` property and a `message` property.
    */
   static ERR(options: ErrorOptions) {
+    const error = options.error ?? 'ERR_UNKNOWN'
+    const message = options.message ?? 'An unknown error occurred'
     const body = {
-      error: options.error ?? options.statusText ?? 'ERR_UNKNOWN',
-      message: options.message ?? 'An unknown error occurred',
+      error,
+      message,
     }
     return new WebResponse(body, {
-      statusText: options.statusText ?? 'ERR_UNKNOWN',
+      statusText: error,
       status: options.status ?? 500,
     }).toJson()
   }
