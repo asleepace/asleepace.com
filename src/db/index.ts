@@ -81,6 +81,8 @@ export namespace Users {
     return db.query('SELECT * FROM users').all()
   }
 
+  console.log('[db] all users:', fetchUsers())
+
   export async function createUser({
     email,
     username,
