@@ -47,7 +47,8 @@ function sortData<T extends DataRecord, K extends keyof T>(
   isAscending = true
 ) {
   if (!sortBy || !data) return data
-  return data.sort((a, b) => {
+  console.log('[DataTable] Sorting data', data, sortBy, isAscending)
+  return [...data].toSorted((a, b) => {
     const aValue = a[sortBy]
     const bValue = b[sortBy]
 

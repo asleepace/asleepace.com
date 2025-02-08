@@ -114,7 +114,7 @@ function iterate<C extends string>(columns: C[], text: string) {
   let columnsWithValues = {} as Record<InferredColumns, any>
   for (let i = 0; i < lastColumnIndex; i++) {
     const parse = parsers[columns[i]]
-    columnsWithValues[columns[i]] = parse(values[i])
+    columnsWithValues[columns[i]] = parse ? parse(values[i]) : values[i]
   }
   columnsWithValues[lastColumn] = values.slice(lastColumnIndex).join(' ')
   return columnsWithValues
