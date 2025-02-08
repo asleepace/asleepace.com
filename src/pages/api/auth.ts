@@ -72,12 +72,14 @@ export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
   // --- find the user ---
 
   const user = Users.findUser({ username, email: username })
+  console.log('[auth] user:', user)
 
   if (!user) return http.failure(401, INVALID_LOGIN)
 
   // --- verify the password ---
 
   const isPasswordValid = await Users.verifyPassword(user.password, password)
+  console.log('[auth] user:', user)
 
   if (!isPasswordValid) return http.failure(401, INVALID_LOGIN)
 

@@ -2,7 +2,6 @@
 import BaseHead from '@/components/astro/BaseHead.astro'
 import { siteData } from '@/consts'
 import '@/styles/data-table.css'
-import clsx from 'clsx'
 import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
 import AdminPageInfo from '@/components/admin/AdminPageInfo.astro'
 import AdminCommandLine from '@/components/admin/AdminCommandLine'
@@ -20,9 +19,6 @@ if (!isLoggedIn || !user) {
   console.warn('[admin] not authorized, be gone!')
   return Astro.redirect('/login')
 }
-
-const hideScrollBars = true
-
 
 const adminPageInfo = {
   ...process.env, 

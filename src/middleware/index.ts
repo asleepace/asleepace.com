@@ -36,11 +36,14 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   const sessionCookie = context.cookies.get('session')
   const user = Sessions.getUser(sessionCookie?.value)
 
+  console.log('[authMiddleware] sessionCookie:', sessionCookie)
+  console.log('[authMiddleware] user:', user)
+
   // set user data to locals
   context.locals.isLoggedIn = Boolean(user)
   context.locals.user = user
 
-  return next()
+  return await next()
 })
 
 /**

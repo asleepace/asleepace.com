@@ -36,4 +36,8 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+  // https://lucia-auth.com/sessions/cookies/astro
+  security: {
+		checkOrigin: true
+	},
 })
