@@ -27,7 +27,7 @@ export function useEventSource<T>(handleMessage: HandleMessage<T>) {
 
     // hadle errors
     nextEventSource.onerror = () => {
-      console.error('[useEventSource] error: ', true)
+      console.warn('[useEventSource] closing: ', true)
       nextEventSource.close()
       setEventSource(undefined)
     }

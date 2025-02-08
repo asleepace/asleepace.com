@@ -20,9 +20,9 @@ export function parseClientData(
 
   // check if metadata is empty
   const trimmedMetadata = rawMetadata.trim()
-  if (!trimmedMetadata) return undefined
+  if (!trimmedMetadata || !trimmedMetadata.startsWith('{')) return undefined
 
-  const meta = JSON.parse(rawMetadata.trim())
+  const meta = JSON.parse(trimmedMetadata)
 
   const resp: ShellResponse = {
     command: meta.cmd?.split(' ') ?? [],
