@@ -144,13 +144,13 @@ export namespace Users {
   try {
     console.log('[db] creating user...')
     // createUser({
-    //   email: 'colin_teahan@yahoo.com',
-    //   username: 'asleepace',
-    //   password: '!Password123',
+    //   email: 'admin@admin,com',
+    //   username: 'admin',
+    //   password: 'password',
     // })
-    const user = getUserByUsername('asleepace')
-    if (!user) throw new Error('User not found')
-    setFlags(user, UserFlags.Admin)
+    // const user = getUserByUsername('asleepace')
+    // if (!user) throw new Error('User not found')
+    // setFlags(user, UserFlags.Admin)
   } catch (error) {
     console.error('[db] error creating user:', error)
   } finally {
