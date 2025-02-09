@@ -1,6 +1,7 @@
 import { sequence } from 'astro:middleware'
 import { sessionMiddleware } from './sessionMiddleware'
 import { analyticsMiddleware } from './analyticsMiddleware'
+import { corsMiddleware } from './corsMiddleware'
 
 /**
  *  ## Middleware
@@ -18,4 +19,8 @@ import { analyticsMiddleware } from './analyticsMiddleware'
  *    3. Remove redacted info?
  *
  */
-export const onRequest = sequence(analyticsMiddleware, sessionMiddleware)
+export const onRequest = sequence(
+  analyticsMiddleware,
+  sessionMiddleware,
+  corsMiddleware
+)
