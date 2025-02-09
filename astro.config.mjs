@@ -38,6 +38,13 @@ export default defineConfig({
   }),
   // https://lucia-auth.com/sessions/cookies/astro
   security: {
-		checkOrigin: true
-	},
+    checkOrigin: true,
+  },
+  // redirects
+  redirects: {
+    '/api/auth': {
+      destination: '/admin',
+      status: 302,
+    },
+  },
 })

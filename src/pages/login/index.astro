@@ -5,6 +5,7 @@ import Footer from '@/components/astro/Footer.astro'
 import { siteData } from '@/consts'
 
 import { CircleUser } from 'lucide-react'
+import { undefined } from 'astro:schema'
 
 
 export const prerender = false;
@@ -17,6 +18,18 @@ if (Astro.locals.isLoggedIn) {
   return Astro.redirect('/admin')
 }
 
+const error = Astro.url.searchParams.get('error')?.toString() ?? undefined
+
+const isError = error !== undefined && typeof error === 'string'
+
+const cases = {
+  invalid_credentials: 'Invalid username or password.',
+  bad_content: 'Invalid content type.',
+  unknown: 'An unknown error occurred: ' + error,
+}
+
+const message = isError ? (cases[error] ?? cases.unknown) : undefined
+
 ---
 
 <!doctype html>
@@ -27,15 +40,16 @@ if (Astro.locals.isLoggedIn) {
   <body class="min-h-screen flex flex-col bg-white">
     <Header title={siteData.title} />
     <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto px-4">
-      <div class="flex flex-col items-center gap-2">
-        <CircleUser className="text-gray-400" size={96} />
-        <p class="text-5xl font-bold text-center">Login</p>
-        <p class="text-center">Please login to continue.</p>  
-        <form action="/api/auth" class="flex flex-col gap-2 w-[300px]" method="post">
-          <input class="border border-gray-300 rounded-md p-2"  id="username" type="text" name="username" placeholder="Username" />
-          <input class="border border-gray-300 rounded-md p-2" id="password" type="password" name="password" placeholder="Password" />
+      <div class="flex flex-col items-center gap-2 py-12 border-[1px] bg-white border-gray-300 rounded-md p-4">
+        <CircleUser className="text-blue-500" size={84} />
+        <p class="text-4xl font-bold text-center">Admin</p>
+        <p class="text-center text-gray-500">Please login to continue.</p>  
+        <form action="/api/auth" class="flex flex-col mt-4 gap-2 w-[300px]" method="post">
+          <input autofocus class="border border-gray-300 rounded-md p-2" autocomplete="email" id="username" type="text" name="username" placeholder="Username" />
+          <input class="border border-gray-300 rounded-md p-2" autocomplete="current-password" id="password" type="password" name="password" placeholder="Password" />
           <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button>
         </form>
+        {isError && <p class="text-red-500 text-sm">{message}</p>}
     </main>
     <Footer />
   </body>
