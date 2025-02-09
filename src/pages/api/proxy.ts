@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
-import { http } from '@/lib/http'
+import { http } from '@/lib/web'
 import { endpoint, Exception } from '.'
-import { isResponse, isURL, isSet } from '@/lib/is'
+import { isResponse, isURL, isSet } from '@/lib/utils'
 
 class UserAgents {
   static MICROSOFT =

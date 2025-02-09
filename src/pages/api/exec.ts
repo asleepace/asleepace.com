@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
-import { http } from '@/lib/http'
-import { safeEval } from '@/lib/safeEval'
+import { http } from '@/lib/web'
+import { safeEval } from '@/lib/utils/safeEval'
 import { Exception } from '.'
 import { endpoint } from './index'
 

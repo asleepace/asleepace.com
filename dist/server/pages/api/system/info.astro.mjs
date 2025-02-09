@@ -25,7 +25,9 @@ const parsers = {
   USER: String,
   TT: String,
   STAT: String,
-  COMMAND: String
+  COMMAND: String,
+  // LINUX SPECIFIC
+  START: String
 };
 async function getProcessInfo() {
   const proc = Bun.spawn(["ps", "aux"], {
@@ -47,7 +49,12 @@ function iterate(columns, text) {
   let columnsWithValues = {};
   for (let i = 0; i < lastColumnIndex; i++) {
     const parse = parsers[columns[i]];
-    columnsWithValues[columns[i]] = parse(values[i]);
+    if (!parse) {
+      console.warn(`[getProcessInfo] No parser found for column: ${columns[i]}`);
+      columnsWithValues[columns[i]] = values[i];
+    } else {
+      columnsWithValues[columns[i]] = parse(values[i]);
+    }
   }
   columnsWithValues[lastColumn] = values.slice(lastColumnIndex).join(" ");
   return columnsWithValues;

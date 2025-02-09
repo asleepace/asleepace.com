@@ -1,6 +1,6 @@
 import { e as endpoint } from '../../chunks/index_IKKZRfRd.mjs';
 import { h as http } from '../../chunks/http_CTAeCHox.mjs';
-import { S as Sessions } from '../../chunks/index_9dWHXndf.mjs';
+import { S as Sessions } from '../../chunks/index_BE_uF71e.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const prerender = false;

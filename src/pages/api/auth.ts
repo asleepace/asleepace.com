@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { endpoint } from '.'
-import { http } from '@/lib/http'
+import { http } from '@/lib/web'
 import { Users, Sessions } from '@/db/index'
 import { WebResponse } from '@/lib/web/WebResponse'
 

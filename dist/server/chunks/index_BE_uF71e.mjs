@@ -134,6 +134,12 @@ var Users;
     });
   }
   Users2.findUser = findUser;
+  try {
+  } catch (error) {
+    console.error("[db] error creating user:", error);
+  } finally {
+    console.log("[db] user created:", fetchUsers());
+  }
 })(Users || (Users = {}));
 var Sessions;
 ((Sessions2) => {
@@ -151,7 +157,7 @@ var Sessions;
     }
   }
   Sessions2.adminOnly = adminOnly;
-  function getUser(sessionCookie) {
+  async function getUser(sessionCookie) {
     if (!sessionCookie) return void 0;
     const session = findByToken(sessionCookie);
     return Users.getUserById(session.userId);
@@ -256,4 +262,4 @@ var Analytics;
   Analytics2.fetchAnalytics = fetchAnalytics;
 })(Analytics || (Analytics = {}));
 
-export { Analytics as A, Sessions as S, Users as U };
+export { Analytics as A, Sessions as S };

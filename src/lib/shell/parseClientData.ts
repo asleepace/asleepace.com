@@ -1,4 +1,4 @@
-import type { ShellResponse } from '@/pages/api/shell'
+import type { ShellResponse } from '@/lib/shell'
 
 const textDecoder = new TextDecoder()
 
