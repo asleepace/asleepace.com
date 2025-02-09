@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 type HandleMessage<T> = (event: MessageEvent) => T | void | undefined
 

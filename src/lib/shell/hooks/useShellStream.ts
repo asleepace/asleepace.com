@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { usePid } from './usePid'
 import { useEventSource } from './useEventSource'
-import { parseClientData } from './parseClientData'
+import { parseClientData } from '../logic/parseClientData'
 
 /**
  * For decoding the shell stream.

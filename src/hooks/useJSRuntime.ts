@@ -3,16 +3,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   makeJSRuntimeWorker,
   type JSRuntimeOutput,
-} from '@/lib/runtime/jsRuntimeWorker'
+} from '@/lib/frontend/jsRuntimeWorker'
 
 /**
  * ## useJSRuntime(code)
  *
  * Executes code in a seperate worker process which can be ran multiple times.
  *
- * @param code - The code to execute.
- * @returns [output, runJsCode]
- * @description
  * - `output` is the result of the code execution.
  * - `runJsCode` is a function that can be used to run the code again.
  */
