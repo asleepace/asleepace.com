@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro'
 import { ShellProcessManager } from '@/lib/linux/ShellProcessManager'
 import { createBufferedStream } from '@/lib/linux/createBufferedStream'
 import { sleep } from '@/lib/utils/sleep'
+import chalk from 'chalk'
 
 /**
  * ## SSR Only
@@ -32,6 +33,8 @@ export type ShellStreamData = {
   pid: number
 }
 
+const TAG = (prefix: string) => chalk.gray(`[${prefix}] ↳ /stream\t`)
+
 /**
  * HEAD /api/shell/stream
  *
@@ -42,16 +45,12 @@ export type ShellStreamData = {
  */
 export const HEAD: APIRoute = async ({ cookies }) => {
   try {
-    console.log(
-      '||--------------------------------------------------------------------------------------------------||'
-    )
-
     // cleanup any killed shells
     processManager.runCleanup()
 
     // start a new shell
     const shell = processManager.startShell()
-    console.log('[HEAD] shell:', shell.pid)
+    console.log(TAG('H'), chalk.white('PID:'), chalk.yellow(shell.pid))
 
     // set cookie to proper shell pid
     cookies.set('pid', shell.pid.toString())
@@ -65,7 +64,7 @@ export const HEAD: APIRoute = async ({ cookies }) => {
       },
     })
   } catch (error) {
-    console.error('[HEAD] error:', error)
+    console.error(TAG('H'), chalk.red(error))
 
     // clear any existing cookies
     cookies.delete('pid', { path: '/' })
@@ -92,10 +91,6 @@ export const HEAD: APIRoute = async ({ cookies }) => {
  *
  */
 export const GET: APIRoute = async ({ request, cookies }) => {
-  console.log(
-    '||==================================================================================================||'
-  )
-
   const pid = cookies.get('pid')?.number()
 
   if (!pid) {
@@ -110,11 +105,16 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   // and instead return and error.
   const shell = processManager.getOrCreateShell(pid)
 
-  console.log('[GET] shell:', shell.pid, 'killed:', shell.childProcess.killed)
+  console.log(
+    TAG('G'),
+    chalk.white('PID:'),
+    chalk.yellow(pid),
+    shell.childProcess.killed ? chalk.red('(killed)') : '(alive)'
+  )
 
   // check if the shell has already been killed
   if (shell.childProcess.killed) {
-    console.warn('[GET] shell has already been killed!')
+    console.warn(TAG('G'), chalk.red('shell killed!'))
     cookies.delete('pid', { path: '/' })
     return new Response(null, {
       statusText: 'Shell killed',
@@ -133,14 +133,19 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     onStreamReady = resolve
   })
 
+  const STREAM_TAG = chalk.gray('[G][stream]')
+
   // create a new readable stream
   const stream = new ReadableStream({
     async start(controller) {
-      console.log('[stream] stream...')
+      console.log(STREAM_TAG, chalk.gray('starting readbale stream'))
 
       // setup an abort signal
       request.signal.onabort = () => {
-        console.warn('[stream] aborting...')
+        console.warn(
+          STREAM_TAG,
+          chalk.red('request aborted, closing stream...')
+        )
         controller.close()
       }
 
@@ -152,7 +157,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       // so we need to wait for the stream to be ready before we can send the
       // ETX event to the client.
       setTimeout(() => {
-        console.log('[stream] stream ready!')
+        console.log(STREAM_TAG, chalk.white('ready!'))
         onStreamReady?.(true)
       }, 300)
 
@@ -161,6 +166,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       // after we return the stream response and client has time to make
       // an event source connection.
       setTimeout(() => {
+        console.log(STREAM_TAG, chalk.white('initial enqueue!'))
         controller.enqueue('data: \x03\n\n')
       }, 1_000)
 
@@ -170,29 +176,29 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       return childProcess.stdout
         .pipeTo(bufferedStream)
         .then(() => {
-          console.log('[stream] finished piping!')
+          console.log(STREAM_TAG, 'finished piping!')
         })
         .catch((err) => {
-          console.warn(`[stream] error: \n\n\t${err}\n`)
+          console.warn(STREAM_TAG, chalk.red(err))
           controller.close()
         })
     },
     cancel() {
-      console.warn('[stream] canceling...')
+      console.warn(STREAM_TAG, chalk.yellow('cancelling...'))
       childProcess.kill()
       processManager.runCleanup()
     },
   })
 
-  console.log('[stream] waiting for stream...')
+  console.log(STREAM_TAG, chalk.gray('waiting...'))
   await waitForStreamToFinish
 
   if (stream.locked) {
-    console.warn('[stream] stream is locked (sleeping 1s)')
+    console.warn(STREAM_TAG, chalk.yellow('locked!'), chalk.gray('sleeping 1s'))
     await sleep(1_000)
   }
 
-  console.log('[GET] finished!')
+  console.log(STREAM_TAG, chalk.gray('finished!'))
 
   return new Response(stream, {
     headers: { 'Content-Type': 'text/event-stream' },

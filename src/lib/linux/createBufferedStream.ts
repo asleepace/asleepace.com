@@ -1,3 +1,5 @@
+import chalk from 'chalk'
+
 /**
 /**
  * ## ETX
@@ -11,6 +13,9 @@ export const ETX = {
   NUM: 0x03,
 }
 
+let bufferId = 0;
+const MAKE_TAG = () => chalk.gray(' ↳ [buffer]')
+
 /**
  * ## createBufferedStream(controller)
  *
@@ -23,7 +28,8 @@ export const ETX = {
 export function createBufferedStream(
   controller: ReadableStreamDefaultController
 ) {
-  console.log('[buffer] creating...')
+  const TAG = MAKE_TAG()
+  console.log(TAG, chalk.gray('starting id:'), bufferId++)
   const buffer: Uint8Array[] = []
 
   return new WritableStream({
@@ -36,15 +42,15 @@ export function createBufferedStream(
         const output = buffer.join(',')
         controller.enqueue(`data: ${output}\n\n`)
         buffer.length = 0 // empty the buffer
-        console.log('[buffer] flushing!')
+        console.log(TAG, chalk.gray('flushing!'))
       }
     },
     abort() {
-      console.warn('[buffer] ABORTED!')
+      console.warn(TAG, chalk.red('ABORTED!'))
       controller.close()
     },
     close() {
-      console.warn('[buffer] CLOSED!')
+      console.warn(TAG, chalk.gray('closing...'))
       controller.close()
     },
   })

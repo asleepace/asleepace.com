@@ -2,9 +2,10 @@ import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 
 const TAG = chalk.gray('[m] cors\t')
-const IS_DISABLED = true
 
 /**
+ *  @deprecated this is not needed, since Astro's CORS config is set to `false`
+ *
  *  ## corsMiddleware
  *
  *  NOTE: This should run after everything else!
@@ -19,7 +20,6 @@ const IS_DISABLED = true
  *
  */
 export const corsMiddleware = defineMiddleware(async (context, next) => {
-  if (IS_DISABLED) return next()
   if (context.isPrerendered !== true) return next() // skip if
 
   const response = await next()
