@@ -16,6 +16,8 @@ interface Env {
   HOST: string
   PORT: number
   PROTOCOL: string
+  ENVIRONMENT: 'development' | 'production'
+  COOKIE_DOMAIN: string
 }
 
 declare namespace App {

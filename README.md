@@ -279,7 +279,7 @@ sudo certbot renew --dry-run
 All the API endpoints can be found in the `src/api` directory, and each should include a `HEAD` method which will return the schema of the endpoint.
 
 - `api/proxy` - fetches content from external sources and returns it to the client
-- `api/exec` - fetches & executes content from external sources and returns it to the client
+- `api/shell/exec` - fetches & executes content from external sources and returns it to the client
 
 # SMTP / Email
 

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
-import { http } from '@/lib/http'
+import { http } from '@/lib/web'
 
-export const prerender = false;
+export const prerender = false
 
 export class Exception extends Error {
   /**

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { endpoint } from '..'
 import { Analytics } from '@/db'
-import { http } from '@/lib/http'
+import { http } from '@/lib/web'
 import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
 
 export const prerender = false

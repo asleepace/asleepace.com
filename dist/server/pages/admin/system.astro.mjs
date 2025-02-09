@@ -1,11 +1,11 @@
 /* empty css                                    */
 import { b as createAstro, c as createComponent, r as renderTemplate, a as renderComponent, d as renderHead, e as addAttribute } from '../../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_DGWSCeWb.mjs';
-import { s as siteData } from '../../chunks/consts_CaV8g65M.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_B6V25uw4.mjs';
+import { P as PATH, s as siteData } from '../../chunks/consts_DA6-2Sut.mjs';
 /* empty css                                    */
 import clsx from 'clsx';
-import { $ as $$AdminPanelSidebar } from '../../chunks/AdminPanelSidebar_RLuYp0Cw.mjs';
+import { $ as $$AdminPanelSidebar } from '../../chunks/AdminPanelSidebar_KdKz4I4K.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const $$Astro = createAstro("https://asleepace.com");
@@ -15,8 +15,8 @@ const $$System = createComponent(($$result, $$props, $$slots) => {
   Astro2.self = $$System;
   const { user, isLoggedIn } = Astro2.locals;
   if (!isLoggedIn || !user) {
-    console.warn("[admin] not authorized, be gone!");
-    return Astro2.redirect("/login");
+    console.warn("[/admin/system] not authorized!");
+    return Astro2.redirect(PATH.ADMIN_LOGOUT);
   }
   return renderTemplate`<html lang="en" class="h-full"> <head>${renderComponent($$result, "BaseHead", $$BaseHead, { "title": siteData.title, "description": siteData.description })}${renderHead()}</head> <body class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden"> <main class="flex flex-row h-full flex-1 bg-zinc-950"> <!-- side bar --> ${renderComponent($$result, "AdminPanelSidebar", $$AdminPanelSidebar, { "activeTab": 1 })} <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16"> <!-- welcome message & search bar --> <div class="flex gap-y-4 flex-col flex-1 self-stretch max-w-screen-xl"> <p class="text-6xl font-bold">⚙️ System</p> <p class="tracking-wide text-zinc-400 p-2">Detailed information on current system processess...</p> <!-- memory usage statistics --> <div${addAttribute(
     clsx(

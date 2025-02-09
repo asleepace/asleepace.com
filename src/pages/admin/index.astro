@@ -1,6 +1,6 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { siteData } from '@/consts'
+import { PATH, siteData } from '@/consts'
 import '@/styles/data-table.css'
 import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
 import AdminPageInfo from '@/components/admin/AdminPageInfo.astro'
@@ -16,8 +16,9 @@ export const prerender = false;
 const { user, isLoggedIn } = Astro.locals
 
 if (!isLoggedIn || !user) {
-  console.warn('[admin] not authorized, be gone!')
-  return Astro.redirect('/login')
+  console.warn('[/admin] not logged in!')
+  console.warn('[/admin] redirecting...')
+  return Astro.redirect(PATH.ADMIN_LOGOUT, 302)
 }
 
 const adminPageInfo = {

@@ -40,7 +40,7 @@ export type ShellStreamData = {
  * commands to the shell.
  *
  */
-export const HEAD: APIRoute = async ({ request, cookies }) => {
+export const HEAD: APIRoute = async ({ cookies }) => {
   try {
     console.log(
       '||--------------------------------------------------------------------------------------------------||'

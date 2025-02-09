@@ -1,0 +1,54 @@
+---
+import BaseHead from '@/components/astro/BaseHead.astro'
+import Header from '@/components/astro/Header.astro'
+import Footer from '@/components/astro/Footer.astro'
+import { PATH, siteData } from '@/consts'
+
+import { CircleUser } from 'lucide-react'
+
+export const prerender = false
+
+const isLoggedIn = Boolean(Astro.locals.isLoggedIn && Astro.cookies?.get('session'))
+
+if (isLoggedIn) {
+  return Astro.redirect(PATH.ADMIN_HOME, 302)
+}
+
+console.log('ASTRO SESSION:', Astro.session)
+
+// NOTE: Astro.redirect() is not working here for logged in users.
+
+const error = Astro.url.searchParams.get('error')?.toString() ?? undefined
+
+const message = ({
+  invalid_credentials: 'Invalid username or password.',
+  bad_content: 'Invalid content type.',
+  unknown: 'An unknown error occurred: ' + error,
+  undefined: undefined,
+})[String(error)]
+
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={siteData.title} description={siteData.description} />
+  </head>
+  <body class="min-h-screen flex flex-col bg-white">
+    <Header title={siteData.title} />
+    <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto p-4">
+      <div class="flex flex-col items-center gap-2 py-12 border-[1px] bg-white border-gray-300 rounded-md p-4">
+        <CircleUser className="text-blue-500" size={84} />
+        <p class="text-4xl font-bold text-center">Admin</p>
+        <p class="text-center text-gray-500">Please login to continue.</p>
+        <!-- Login Form -->
+        <form action="/api/auth" class="flex flex-col mt-4 gap-2 w-[300px]" method="post">
+          <input autofocus class="border border-gray-300 rounded-md p-2" autocomplete="email" id="username" type="text" name="username" placeholder="Username" />
+          <input class="border border-gray-300 rounded-md p-2" autocomplete="current-password" id="password" type="password" name="password" placeholder="Password" />
+          <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button>
+        </form>
+        {message && <p class="text-red-500 text-sm">{message}</p>}
+    </main>
+    <Footer />
+  </body>
+</html>
