@@ -2,7 +2,7 @@ import { b as createAstro, c as createComponent, r as renderTemplate, m as maybe
 import 'kleur/colors';
 /* empty css                         */
 import 'clsx';
-import { S as SITE_TITLE } from './consts_CaV8g65M.mjs';
+import { S as SITE_TITLE } from './consts_DA6-2Sut.mjs';
 
 const $$Astro = createAstro("https://asleepace.com");
 const $$HeaderLink = createComponent(($$result, $$props, $$slots) => {

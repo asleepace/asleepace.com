@@ -14,5 +14,16 @@ const siteData = {
     "https://stockindx.com"
   ]
 };
+const PATH = {
+  ADMIN_LOGIN(searchParams = {}) {
+    const query = new URLSearchParams(searchParams);
+    return "/admin/login" + query.toString();
+  },
+  ADMIN_LOGOUT: "/admin/logout",
+  ADMIN_HOME: "/admin",
+  ADMIN_SYSTEM: "/admin/system",
+  ADMIN_ANALYTICS: "/admin/analytics",
+  CODE_EDITOR: "/code"
+};
 
-export { SITE_TITLE as S, SITE_DESCRIPTION as a, siteData as s };
+export { PATH as P, SITE_TITLE as S, SITE_DESCRIPTION as a, siteData as s };

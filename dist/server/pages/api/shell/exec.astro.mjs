@@ -1,6 +1,6 @@
-import { h as http } from '../../chunks/http_CTAeCHox.mjs';
-import { e as endpoint, E as Exception } from '../../chunks/index_IKKZRfRd.mjs';
-export { renderers } from '../../renderers.mjs';
+import { h as http } from '../../../chunks/http_Dt5sa3ww.mjs';
+import { e as endpoint, E as Exception } from '../../../chunks/index_us8lJ1Xd.mjs';
+export { renderers } from '../../../renderers.mjs';
 
 const ALLOWED_GLOBALS = [
   "console",
@@ -42,11 +42,11 @@ async function safeEval(code, context = {}) {
     );
     const ctx = createSafeContext(ALLOWED_GLOBALS);
     let output = safeEvalFunc.call(ctx, ...Object.values(context));
-    console.log("[api/exec] output:", output);
+    console.log("[api/sehll/exec] output:", output);
     if (output instanceof Function) {
       output = output.call(ctx);
     }
-    console.log("[api/exec] safeEvalResult:", output);
+    console.log("[api/shell/exec] safeEvalResult:", output);
     if (output instanceof Promise) {
       return await output;
     } else {

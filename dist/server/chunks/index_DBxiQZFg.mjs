@@ -262,4 +262,4 @@ var Analytics;
   Analytics2.fetchAnalytics = fetchAnalytics;
 })(Analytics || (Analytics = {}));
 
-export { Analytics as A, Sessions as S };
+export { Analytics as A, Sessions as S, Users as U };

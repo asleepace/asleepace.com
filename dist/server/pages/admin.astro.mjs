@@ -1,10 +1,10 @@
 /* empty css                                 */
 import { b as createAstro, c as createComponent, r as renderTemplate, m as maybeRenderHead, e as addAttribute, f as renderSlot, a as renderComponent, d as renderHead } from '../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../chunks/BaseHead_DLIglmua.mjs';
-import { s as siteData } from '../chunks/consts_CaV8g65M.mjs';
+import { $ as $$BaseHead } from '../chunks/BaseHead_eNYzOnOe.mjs';
+import { P as PATH, s as siteData } from '../chunks/consts_DA6-2Sut.mjs';
 /* empty css                                 */
-import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_RLuYp0Cw.mjs';
+import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_CVBb8KTM.mjs';
 import clsx from 'clsx';
 export { renderers } from '../renderers.mjs';
 
@@ -32,8 +32,9 @@ const $$Index = createComponent(($$result, $$props, $$slots) => {
   Astro2.self = $$Index;
   const { user, isLoggedIn } = Astro2.locals;
   if (!isLoggedIn || !user) {
-    console.warn("[admin] not authorized, be gone!");
-    return Astro2.redirect("/login");
+    console.warn("[/admin] not logged in!");
+    console.warn("[/admin] redirecting...");
+    return Astro2.redirect(PATH.ADMIN_LOGOUT, 302);
   }
   const adminPageInfo = {
     ...process.env

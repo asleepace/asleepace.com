@@ -6,9 +6,16 @@ import { WebResponse } from '@/lib/web/WebResponse'
 
 export const prerender = false
 
-const isDevelopment = Boolean(process.env.ENVIRONMENT === 'development')
+const environment = process.env.ENVIRONMENT
+const isDevelopment = Boolean(environment === 'development')
 const isProduction = !isDevelopment
-const cookieDomain = isDevelopment ? undefined : process.env.COOKIE_DOMAIN
+const cookieDomain = isDevelopment ? 'localhost' : process.env.COOKIE_DOMAIN
+
+console.assert(cookieDomain, 'COOKIE_DOMAIN env variable is not set!')
+console.assert(
+  environment === 'development' || environment === 'production',
+  'ENVIRONMENT env variable is not set to development or production!'
+)
 
 console.log(
   '[auth] config:',
@@ -40,8 +47,8 @@ export const GET: APIRoute = endpoint(async ({ request }) => {
  *
  * This endpoint can be used to either login or register a user.
  */
-export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
-  console.log('POST /api/auth', request)
+export const POST: APIRoute = async ({ request, locals, cookies }) => {
+  console.log('[auth] POST /api/auth')
 
   // --- don't leak information about the error ---
 
@@ -83,7 +90,7 @@ export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
 
   if (!user) {
     console.log('[auth] user not found: ', username)
-    return WebResponse.redirect('/login?error=invalid_credentials', 302)
+    return WebResponse.redirect('/admin/login?error=user_not_found', 302)
   }
 
   // --- verify the password ---
@@ -93,17 +100,15 @@ export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
 
   if (!isPasswordValid) {
     console.log('[auth] invalid password')
-    return WebResponse.redirect('/login?error=invalid_credentials', 302)
+    return WebResponse.redirect('/admin/login?error=invalid_credentials', 302)
   }
 
-  // --- create a session ---
+  // --- on success, create a session ---
 
   const session = Sessions.create(user.id)
   const sessionToken = session.token
 
-  // --- set the session cookie ---
-
-  cookies.set('session', sessionToken, {
+  const cookieOptions = {
     /** where the cookie is valid */
     path: '/',
     /** the domain that the cookie is valid for */
@@ -116,9 +121,17 @@ export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
     sameSite: 'lax',
     /** the expiration date of the cookie */
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-  })
+  } as const
+
+  cookies.set('session', sessionToken, cookieOptions)
+  locals.isLoggedIn = true
+  locals.user = user
+
+  console.log('[auth] setting cookie:', cookieOptions)
 
   // --- redirect to the admin page ---
 
+  console.log('[auth] success, redirecting to /admin')
+
   return WebResponse.redirect('/admin', 302)
-})
+}

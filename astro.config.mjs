@@ -7,44 +7,23 @@ import node from '@astrojs/node'
 import mdx from '@astrojs/mdx'
 
 /**
- *  Site-map Configuration
+ *  ## AstroConfiguration
  *
- *  https://docs.astro.build/en/guides/integrations-guide/sitemap/
+ *  Main site configuration.
+ *
+ *  @see https://astro.build/config for more information
+ *  @see https://docs.astro.build/en/recipes/bun/ for astro with bun
+ *  @see https://docs.astro.build/en/guides/server-side-rendering/ for SSR
+ *  @see https://lucia-auth.com/sessions/cookies/astro for cookies
  */
 
-// const sitemapConfig = sitemap({
-//   changefreq: 'weekly',
-//   lastmod: new Date(),
-//   priority: 0.7,
-// })
-
-/**
- *  Astro Configuration
- *
- *  This is the where the typescript application is configured.
- *
- *  - https://astro.build/config
- *  - https://docs.astro.build/en/recipes/bun/
- *  - https://docs.astro.build/en/guides/server-side-rendering/
- */
-
-// https://astro.build/config
 export default defineConfig({
-  integrations: [mdx(), sitemap(), react(), tailwind()],
   site: 'https://asleepace.com',
-  // output: 'server',
+  integrations: [mdx(), sitemap(), react(), tailwind()],
   adapter: node({
     mode: 'standalone',
   }),
-  // https://lucia-auth.com/sessions/cookies/astro
   security: {
     checkOrigin: true,
-  },
-  // redirects
-  redirects: {
-    '/api/auth': {
-      destination: '/admin',
-      status: 302,
-    },
   },
 })

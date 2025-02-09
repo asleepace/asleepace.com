@@ -18,3 +18,18 @@ export const siteData = {
     'https://stockindx.com',
   ],
 }
+
+/**
+ * Routes for common site paths.
+ */
+export const PATH = {
+  ADMIN_LOGIN(searchParams: Record<string, string> = {}) {
+    const query = new URLSearchParams(searchParams)
+    return '/admin/login' + query.toString()
+  },
+  ADMIN_LOGOUT: '/admin/logout',
+  ADMIN_HOME: '/admin',
+  ADMIN_SYSTEM: '/admin/system',
+  ADMIN_ANALYTICS: '/admin/analytics',
+  CODE_EDITOR: '/code',
+}

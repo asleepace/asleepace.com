@@ -6,15 +6,17 @@ import { siteData } from '@/consts'
 
 import { CircleUser } from 'lucide-react'
 
-
-export const prerender = false;
+export const prerender = false
 
 // =====================================
 // Login Page
 // =====================================
 
+console.log('/admin/login props:', Astro.request)
+
 if (Astro.locals.isLoggedIn) {
-  return Astro.redirect('/admin')
+  console.log('[login] redirecting to /admin')
+  // return Astro.redirect('/admin', 302)
 }
 
 // --- Error Handling ---

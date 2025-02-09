@@ -3,22 +3,18 @@ import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
 import { defineMiddleware } from 'astro:middleware'
 
 /**
- * Analytics Middleware
+ *  ## analyticsMiddleware
  *
- * This middleware tracks request data and stores it in the database.
+ *  This middleware tracks request data and stores it in the database.
  *
  */
 export const analyticsMiddleware = defineMiddleware(
   ({ request, url, cookies, isPrerendered }, next) => {
     try {
-      if (isPrerendered) throw new Error('ERR_ANALYTICS_SKIP:' + request.url)
+      if (isPrerendered) return next()
+      if (url.pathname.startsWith('/api/analytics')) return next()
 
       const { headers } = request
-
-      // ignore double logging analytics
-      if (url.pathname.includes('/api/analytics'))
-        throw new Error('ERR_ANALYTICS_API:' + request.url)
-
       const referrer = headers.get('referer')
       const userAgent = headers.get('user-agent')
       const ipAddress = getIpAddressFromHeaders(headers)
@@ -31,12 +27,8 @@ export const analyticsMiddleware = defineMiddleware(
         sessionId: sessionId ?? undefined,
         referrer: referrer ?? undefined,
       })
-    } catch (error) {
-      console.log(
-        '[analyticsMiddleware] skipping:',
-        url.pathname,
-        error?.message
-      )
+    } catch (e) {
+      console.warn('[analytics][middleware] error:', url.pathname, e?.message)
     } finally {
       return next()
     }
