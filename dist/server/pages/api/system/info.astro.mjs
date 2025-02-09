@@ -1,5 +1,5 @@
-import { e as endpoint } from '../../../chunks/index_C0mVf6K2.mjs';
-import { h as http } from '../../../chunks/http_BfDphACp.mjs';
+import { e as endpoint } from '../../../chunks/index_Drlln7Y2.mjs';
+import { h as http } from '../../../chunks/http_DcLcmgav.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const Seperator = {
