@@ -15,7 +15,7 @@ const { activeTab = 0 } = Astro.props
   <AdminPanelSidebarButton href={PATH.ADMIN_HOME} title="Home" active={activeTab === 0} />
   <AdminPanelSidebarButton href={PATH.ADMIN_SYSTEM} title="System" active={activeTab === 1} />
   <AdminPanelSidebarButton href={PATH.ADMIN_ANALYTICS} title="Analytics" active={activeTab === 2} />
-  <AdminPanelSidebarButton href={PATH.ADMIN_ANALYTICS} title="Code Editor" active={activeTab === 3} />
+  <AdminPanelSidebarButton href={PATH.CODE_EDITOR} title="Code" active={activeTab === 3} />
   <Spacer direction="vertical" />
-  <AdminPanelSidebarButton href={PATH.CODE_EDITOR} title="Logout" variant="destructive" />
+  <AdminPanelSidebarButton href={PATH.ADMIN_LOGOUT} title="Logout" variant="destructive" />
 </aside>

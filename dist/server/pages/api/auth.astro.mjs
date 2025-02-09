@@ -1,7 +1,8 @@
 import { e as endpoint } from '../../chunks/index_us8lJ1Xd.mjs';
 import { h as http } from '../../chunks/http_Dt5sa3ww.mjs';
 import { W as WebResponse } from '../../chunks/WebResponse_Ctsx2gFv.mjs';
-import { S as Sessions, U as Users } from '../../chunks/index_DBxiQZFg.mjs';
+import { S as Sessions, U as Users } from '../../chunks/index_DBharnCd.mjs';
+import { P as PATH } from '../../chunks/consts_DA6-2Sut.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const prerender = false;
@@ -51,21 +52,25 @@ const POST = async ({ request, locals, cookies }) => {
     username = body.username;
     password = body.password;
   } else {
-    return WebResponse.redirect("/login?error=bad_content", 302);
+    return WebResponse.redirect(PATH.ADMIN_LOGIN({ error: "bad_content" }), 302);
   }
   if (!username) return http.failure(400, INVALID_LOGIN);
   if (!password) return http.failure(400, INVALID_LOGIN);
   const user = Users.findUser({ username, email: username });
-  console.log("[auth] user:", user);
   if (!user) {
     console.log("[auth] user not found: ", username);
-    return WebResponse.redirect("/admin/login?error=user_not_found", 302);
+    return WebResponse.redirect(
+      PATH.ADMIN_LOGIN({ error: "user_not_found" }),
+      302
+    );
   }
   const isPasswordValid = await Users.verifyPassword(user.password, password);
-  console.log("[auth] user:", user);
   if (!isPasswordValid) {
     console.log("[auth] invalid password");
-    return WebResponse.redirect("/admin/login?error=invalid_credentials", 302);
+    return WebResponse.redirect(
+      PATH.ADMIN_LOGIN({ error: "invalid_password" }),
+      302
+    );
   }
   const session = Sessions.create(user.id);
   const sessionToken = session.token;
@@ -88,8 +93,7 @@ const POST = async ({ request, locals, cookies }) => {
   locals.isLoggedIn = true;
   locals.user = user;
   console.log("[auth] setting cookie:", cookieOptions);
-  console.log("[auth] success, redirecting to /admin");
-  return WebResponse.redirect("/admin", 302);
+  return WebResponse.redirect(PATH.ADMIN_HOME, 302);
 };
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({

@@ -3,6 +3,7 @@ import { endpoint } from '..'
 import { http } from '@/lib/web'
 import { Users, Sessions } from '@/db/index'
 import { WebResponse } from '@/lib/web/WebResponse'
+import { PATH } from '@/consts'
 
 export const prerender = false
 
@@ -77,7 +78,7 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
     username = body.username
     password = body.password
   } else {
-    return WebResponse.redirect('/login?error=bad_content', 302)
+    return WebResponse.redirect(PATH.ADMIN_LOGIN({ error: 'bad_content' }), 302)
   }
 
   if (!username) return http.failure(400, INVALID_LOGIN)
@@ -86,21 +87,23 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
   // --- find the user ---
 
   const user = Users.findUser({ username, email: username })
-  console.log('[auth] user:', user)
-
   if (!user) {
     console.log('[auth] user not found: ', username)
-    return WebResponse.redirect('/admin/login?error=user_not_found', 302)
+    return WebResponse.redirect(
+      PATH.ADMIN_LOGIN({ error: 'user_not_found' }),
+      302
+    )
   }
 
   // --- verify the password ---
 
   const isPasswordValid = await Users.verifyPassword(user.password, password)
-  console.log('[auth] user:', user)
-
   if (!isPasswordValid) {
     console.log('[auth] invalid password')
-    return WebResponse.redirect('/admin/login?error=invalid_credentials', 302)
+    return WebResponse.redirect(
+      PATH.ADMIN_LOGIN({ error: 'invalid_password' }),
+      302
+    )
   }
 
   // --- on success, create a session ---
@@ -131,7 +134,5 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
 
   // --- redirect to the admin page ---
 
-  console.log('[auth] success, redirecting to /admin')
-
-  return WebResponse.redirect('/admin', 302)
+  return WebResponse.redirect(PATH.ADMIN_HOME, 302)
 }

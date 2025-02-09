@@ -34,16 +34,14 @@ const META_REFRESH = `3; url=${PATH.ADMIN_LOGIN()}`
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     <Header title={siteData.title} />
-    <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto px-4">
-      <div class="flex flex-col gap-2">
-        <p class="text-5xl font-bold text-center">Goodbye! 👋</p>
-        <p class="text-center">You are now logged out, please come back soon!</p>  
+    <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto p-4">
+      <div class="flex flex-col items-center gap-4 bg-white rounded-md p-8 py-12 min-w-screen-sm">
+        <p class="text-7xl">👋</p>  
+        <p class="text-5xl font-bold text-center">Goodbye!</p>
+        <p class="text-center px-2">Come back soon.</p>  
         <div class="flex flex-col items-center gap-2">
-          <a href="/">
-            <button class="bg-blue-500 text-white rounded-md p-2">Go to Home</button>
-          </a>
           <a href={PATH.ADMIN_LOGIN()}>
-            <button class="bg-green-500 w-full text-white rounded-md p-2">Login</button>
+            <button class="bg-blue-500 hover:bg-blue-400 w-full px-16 text-white rounded-md p-2">Go to login</button>
           </a>
         </div>
     </main>

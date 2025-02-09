@@ -2,24 +2,21 @@
 import BaseHead from '@/components/astro/BaseHead.astro'
 import Header from '@/components/astro/Header.astro'
 import Footer from '@/components/astro/Footer.astro'
-import { siteData } from '@/consts'
+import { PATH, siteData } from '@/consts'
 
 import { CircleUser } from 'lucide-react'
 
 export const prerender = false
 
-// =====================================
-// Login Page
-// =====================================
+const isLoggedIn = Boolean(Astro.locals.isLoggedIn && Astro.cookies?.get('session'))
 
-console.log('/admin/login props:', Astro.request)
-
-if (Astro.locals.isLoggedIn) {
-  console.log('[login] redirecting to /admin')
-  // return Astro.redirect('/admin', 302)
+if (isLoggedIn) {
+  return Astro.redirect(PATH.ADMIN_HOME, 302)
 }
 
-// --- Error Handling ---
+console.log('ASTRO SESSION:', Astro.session)
+
+// NOTE: Astro.redirect() is not working here for logged in users.
 
 const error = Astro.url.searchParams.get('error')?.toString() ?? undefined
 

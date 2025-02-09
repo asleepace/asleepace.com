@@ -142,6 +142,12 @@ export namespace Users {
   // --- initialize the database ---
 
   try {
+    const allUsers = fetchUsers()
+    console.log('[db] all users:', allUsers)
+    console.assert(
+      allUsers.length !== 0,
+      'No users in database:' + allUsers.length
+    )
     // console.log('[db] creating user...')
     // createUser({
     //   email: 'colin_teahan@yahoo.com',
