@@ -1,6 +1,8 @@
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
 import chalk from 'chalk'
+import packageJson from '../package.json'
+
 export type SiteCookieDomain = `.${string}` // example: ".asleepace.com"
 export type SiteCookiePath = `/${string}` // example: "/"
 export type SiteEnvironment = 'production' | 'development'
@@ -13,6 +15,7 @@ export type SiteConfig = {
   cookiePath: SiteCookiePath
   mongodbUri: string
   sqliteUri: string
+  version: string
 }
 
 // --- check environment variables ---
@@ -52,6 +55,7 @@ export const siteConfig: SiteConfig = {
   isDebug: ENVIRONMENT === 'development',
   mongodbUri: MONGODB_URI,
   sqliteUri: 'db.sqlite',
+  version: packageJson.version,
   baseUrl,
   /** NOTE: must have preceding dot (.) for cookies */
   cookieDomain: `.${baseUrl.hostname}` as const,
