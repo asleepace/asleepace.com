@@ -1,4 +1,4 @@
-import { c as config } from './config_B2ewIaNm.mjs';
+import { a as siteConfig } from './consts_Bbo_36Xm.mjs';
 
 const http = {
   success,
@@ -9,7 +9,7 @@ const http = {
   host
 };
 function host(path, searchParams) {
-  const url = new URL(path, config.baseUrl);
+  const url = new URL(path, siteConfig.baseUrl);
   if (searchParams) {
     url.search = new URLSearchParams(searchParams).toString();
   }

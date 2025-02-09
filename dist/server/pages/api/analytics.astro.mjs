@@ -1,6 +1,6 @@
-import { e as endpoint } from '../../chunks/index_us8lJ1Xd.mjs';
+import { e as endpoint } from '../../chunks/index_C0mVf6K2.mjs';
 import { A as Analytics } from '../../chunks/index_cCZ8Gi1v.mjs';
-import { h as http } from '../../chunks/http_Dt5sa3ww.mjs';
+import { h as http } from '../../chunks/http_BfDphACp.mjs';
 import { g as getIpAddressFromHeaders } from '../../chunks/ipAddress_bVurJUOX.mjs';
 export { renderers } from '../../renderers.mjs';
 

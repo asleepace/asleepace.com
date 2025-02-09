@@ -1,6 +1,6 @@
 import { b as createAstro, c as createComponent, r as renderTemplate, m as maybeRenderHead, e as addAttribute, a as renderComponent } from './astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { P as PATH } from './consts_BT7Y9G2r.mjs';
+import { P as PATH } from './consts_Bbo_36Xm.mjs';
 import clsx from 'clsx';
 
 const $$Astro$2 = createAstro("https://asleepace.com");

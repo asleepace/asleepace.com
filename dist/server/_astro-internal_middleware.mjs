@@ -4,55 +4,74 @@ import '@astrojs/internal-helpers/path';
 import 'cookie';
 import { d as defineMiddleware, s as sequence } from './chunks/index_DGL2UL-f.mjs';
 import { S as Sessions, A as Analytics } from './chunks/index_cCZ8Gi1v.mjs';
+import chalk from 'chalk';
 import { g as getIpAddressFromHeaders } from './chunks/ipAddress_bVurJUOX.mjs';
 
+const TAG$2 = chalk.gray("[m] session	");
 const sessionMiddleware = defineMiddleware(async (context, next) => {
-  context.locals.isLoggedIn = false;
-  context.locals.user = void 0;
   if (context.isPrerendered) return next();
   console.log(
-    "[auth][middleware]:",
-    context.request.method,
-    context.url.pathname
+    TAG$2,
+    chalk.gray(context.url.pathname),
+    chalk.gray(`(${context.request.method.toLowerCase()})`)
   );
-  const sessionCookie = context.cookies.get("session")?.value;
-  if (!sessionCookie) return next();
-  const user = await Sessions.getUser(sessionCookie).catch((e) => {
-    console.warn("[authMiddleware] no user for:", sessionCookie, e);
+  const sessionCookie = context.cookies.get("session");
+  const cookieString = sessionCookie?.value;
+  const user = await Sessions.getUser(cookieString).catch((e) => {
+    console.warn(TAG$2, chalk.red("BAD_COOKIE:"), sessionCookie, e);
     return void 0;
   });
-  console.log("[auth] session:", user?.username);
   context.locals.isLoggedIn = Boolean(user);
   context.locals.user = user;
   return next();
 });
 
+const TAG$1 = chalk.gray("[m] analytics	");
 const analyticsMiddleware = defineMiddleware(
   ({ request, url, cookies, isPrerendered }, next) => {
-    try {
-      if (isPrerendered) return next();
-      if (url.pathname.startsWith("/api/analytics")) return next();
-      const { headers } = request;
-      const referrer = headers.get("referer");
-      const userAgent = headers.get("user-agent");
-      const ipAddress = getIpAddressFromHeaders(headers);
-      const sessionId = cookies.get("session")?.value;
-      Analytics.track({
-        path: url.pathname,
-        userAgent: userAgent ?? void 0,
-        ipAddress: ipAddress ?? void 0,
-        sessionId: sessionId ?? void 0,
-        referrer: referrer ?? void 0
-      });
-    } catch (e) {
-      console.warn("[analytics][middleware] error:", url.pathname, e?.message);
-    } finally {
-      return next();
-    }
+    if (isPrerendered) return next();
+    if (url.pathname.startsWith("/api/analytics")) return next();
+    if (request.method === "POST") return next();
+    console.log(TAG$1, chalk.gray(url.pathname));
+    const { headers } = request;
+    const referrer = headers.get("referer");
+    const userAgent = headers.get("user-agent");
+    const ipAddress = getIpAddressFromHeaders(headers);
+    const sessionId = cookies.get("session")?.value;
+    Analytics.track({
+      path: url.pathname,
+      userAgent: userAgent ?? void 0,
+      ipAddress: ipAddress ?? void 0,
+      sessionId: sessionId ?? void 0,
+      referrer: referrer ?? void 0
+    });
+    return next();
   }
 );
 
-const onRequest$1 = sequence(analyticsMiddleware, sessionMiddleware);
+const TAG = chalk.gray("[m] cors	");
+const corsMiddleware = defineMiddleware(async (context, next) => {
+  const response = await next();
+  console.log(TAG, chalk.gray(context.url.pathname));
+  const headers = new Headers(response.headers);
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+  );
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  headers.set("Access-Control-Allow-Credentials", "true");
+  return new Response(response.body, {
+    status: response.status,
+    headers
+  });
+});
+
+const onRequest$1 = sequence(
+  analyticsMiddleware,
+  sessionMiddleware,
+  corsMiddleware
+);
 
 const onRequest = sequence(
 	

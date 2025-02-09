@@ -2,7 +2,7 @@ import { sequence } from 'astro:middleware'
 import { sessionMiddleware } from './sessionMiddleware'
 import { analyticsMiddleware } from './analyticsMiddleware'
 import { corsMiddleware } from './corsMiddleware'
-
+import { securityMiddleware } from './securityMiddleware'
 /**
  *  ## Middleware
  *
@@ -14,13 +14,15 @@ import { corsMiddleware } from './corsMiddleware'
  *
  *  @see `env.d.ts` for types.
  *
- *    1. Analytics based logging
+ *    1. Analytics
  *    2. User session
- *    3. Remove redacted info?
+ *    3. Security checks
+ *    4. CORS
  *
  */
 export const onRequest = sequence(
   analyticsMiddleware,
   sessionMiddleware,
+  securityMiddleware,
   corsMiddleware
 )

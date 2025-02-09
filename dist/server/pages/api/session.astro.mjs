@@ -1,4 +1,4 @@
-import '../../chunks/config_B2ewIaNm.mjs';
+import '../../chunks/consts_Bbo_36Xm.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const HEADERS = Object.freeze({

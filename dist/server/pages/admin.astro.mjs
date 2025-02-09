@@ -2,10 +2,11 @@
 import { b as createAstro, c as createComponent, r as renderTemplate, m as maybeRenderHead, e as addAttribute, f as renderSlot, a as renderComponent, d as renderHead } from '../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
 import { $ as $$BaseHead } from '../chunks/BaseHead_BE74BL6x.mjs';
-import { P as PATH, s as siteData } from '../chunks/consts_BT7Y9G2r.mjs';
+import { P as PATH, s as siteData } from '../chunks/consts_Bbo_36Xm.mjs';
 /* empty css                                 */
-import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_DJlz8uFk.mjs';
+import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar__w7FZ0sF.mjs';
 import clsx from 'clsx';
+import chalk from 'chalk';
 export { renderers } from '../renderers.mjs';
 
 const $$Astro$2 = createAstro("https://asleepace.com");
@@ -30,11 +31,11 @@ const prerender = false;
 const $$Index = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$Index;
+  const TAG = chalk.white("[@] " + Astro2.request.method + " ") + chalk.gray(Astro2.url.pathname) + "	";
   const { user, isLoggedIn } = Astro2.locals;
   if (!isLoggedIn || !user) {
-    console.warn("[/admin] not logged in!");
-    console.warn("[/admin] redirecting...");
-    return Astro2.redirect(PATH.ADMIN_LOGOUT, 302);
+    console.warn(TAG, chalk.yellow("NOT_LOGGED_IN"), chalk.gray("redirecting..."));
+    return Astro2.redirect(PATH.ADMIN_LOGIN(), 302);
   }
   const adminPageInfo = {
     ...process.env
