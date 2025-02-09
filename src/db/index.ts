@@ -143,24 +143,11 @@ export namespace Users {
 
   try {
     const allUsers = fetchUsers()
-    console.log('[db] all users:', allUsers)
-    console.assert(
-      allUsers.length !== 0,
-      'No users in database:' + allUsers.length
-    )
-    // console.log('[db] creating user...')
-    // createUser({
-    //   email: 'colin_teahan@yahoo.com',
-    //   username: 'asleepace',
-    //   password: '!Password123',
-    // })
-    // const user = getUserByUsername('asleepace')
-    // if (!user) throw new Error('User not found')
-    // setFlags(user, UserFlags.Admin)
-  } catch (error) {
-    console.error('[db] error creating user:', error)
-  } finally {
-    console.log('[db] user created:', fetchUsers())
+    const numberOfUsers = allUsers.length
+    console.log('DB_USERS:', allUsers)
+    console.assert(numberOfUsers > 0, 'ASSERT_USERS_EXISTS')
+  } catch (e) {
+    console.error('[db] error:', e)
   }
 }
 

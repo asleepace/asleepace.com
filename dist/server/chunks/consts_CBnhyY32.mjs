@@ -17,7 +17,8 @@ const siteData = {
 const PATH = {
   ADMIN_LOGIN(searchParams = {}) {
     const query = new URLSearchParams(searchParams);
-    return "/admin/login" + query.toString();
+    const queryString = query.toString();
+    return "/admin/login" + queryString ? `?${queryString}` : "";
   },
   ADMIN_LOGOUT: "/admin/logout",
   ADMIN_HOME: "/admin",
