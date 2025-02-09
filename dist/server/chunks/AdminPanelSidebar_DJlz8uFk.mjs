@@ -1,6 +1,6 @@
 import { b as createAstro, c as createComponent, r as renderTemplate, m as maybeRenderHead, e as addAttribute, a as renderComponent } from './astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { P as PATH } from './consts_CBnhyY32.mjs';
+import { P as PATH } from './consts_BT7Y9G2r.mjs';
 import clsx from 'clsx';
 
 const $$Astro$2 = createAstro("https://asleepace.com");
@@ -31,7 +31,7 @@ const $$AdminPanelSidebar = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$AdminPanelSidebar;
   const { activeTab = 0 } = Astro2.props;
-  return renderTemplate`${maybeRenderHead()}<aside class="w-64 bg-black px-2 py-16 pb-4 gap-y-2 flex flex-col text-zinc-300"> ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_HOME, "title": "Home", "active": activeTab === 0 })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_SYSTEM, "title": "System", "active": activeTab === 1 })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_ANALYTICS, "title": "Analytics", "active": activeTab === 2 })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.CODE_EDITOR, "title": "Code", "active": activeTab === 3 })} ${renderComponent($$result, "Spacer", $$Spacer, { "direction": "vertical" })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_LOGOUT, "title": "Logout", "variant": "destructive" })} </aside>`;
+  return renderTemplate`${maybeRenderHead()}<aside class="w-64 bg-black px-2 py-16 pb-4 gap-y-2 flex flex-col text-zinc-300"> ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_HOME, "title": "Home", "active": activeTab === 0 })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_SYSTEM, "title": "System", "active": activeTab === 1 })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.ADMIN_ANALYTICS, "title": "Analytics", "active": activeTab === 2 })} ${renderComponent($$result, "AdminPanelSidebarButton", $$AdminPanelSidebarButton, { "href": PATH.CODE_EDITOR, "title": "Code", "active": activeTab === 3 })} ${renderComponent($$result, "Spacer", $$Spacer, { "direction": "vertical" })} <form method="post"${addAttribute(PATH.CLEAR_SESSION, "action")}> <button type="submit" class="bg-red-500 hover:bg-red-400 w-full px-16 text-white rounded-md p-2">Logout</button> </form> </aside>`;
 }, "/Users/asleepace/dev/asleepace.com/src/components/admin/AdminPanelSidebar.astro", void 0);
 
 export { $$AdminPanelSidebar as $ };

@@ -1,6 +1,7 @@
 const SITE_TITLE = "Asleepace";
 const SITE_DESCRIPTION = "a random collection of internet treasures";
 const SITE_URL = "https://asleepace.com";
+const COOKIE_PATH = "/";
 const siteData = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
@@ -17,14 +18,16 @@ const siteData = {
 const PATH = {
   ADMIN_LOGIN(searchParams = {}) {
     const query = new URLSearchParams(searchParams);
-    const queryString = query.toString();
-    return "/admin/login" + queryString ? `?${queryString}` : "";
+    const hasParams = Object.keys(searchParams).length > 0;
+    const queryString = hasParams ? `?${query.toString()}` : "";
+    return "/admin/login" + queryString;
   },
   ADMIN_LOGOUT: "/admin/logout",
   ADMIN_HOME: "/admin",
   ADMIN_SYSTEM: "/admin/system",
   ADMIN_ANALYTICS: "/admin/analytics",
-  CODE_EDITOR: "/code"
+  CODE_EDITOR: "/code",
+  CLEAR_SESSION: "/api/auth/clearSession"
 };
 
-export { PATH as P, SITE_TITLE as S, SITE_DESCRIPTION as a, siteData as s };
+export { COOKIE_PATH as C, PATH as P, SITE_TITLE as S, SITE_DESCRIPTION as a, siteData as s };

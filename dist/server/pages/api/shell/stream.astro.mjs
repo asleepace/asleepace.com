@@ -125,7 +125,7 @@ const HEAD = async ({ cookies }) => {
     });
   } catch (error) {
     console.error("[HEAD] error:", error);
-    cookies.delete("pid");
+    cookies.delete("pid", { path: "/" });
     return new Response(null, {
       statusText: error.message ?? "Unknown error",
       status: 500
@@ -148,7 +148,7 @@ const GET = async ({ request, cookies }) => {
   console.log("[GET] shell:", shell.pid, "killed:", shell.childProcess.killed);
   if (shell.childProcess.killed) {
     console.warn("[GET] shell has already been killed!");
-    cookies.delete("pid");
+    cookies.delete("pid", { path: "/" });
     return new Response(null, {
       statusText: "Shell killed",
       status: 500

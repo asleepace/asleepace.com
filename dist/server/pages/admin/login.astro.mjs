@@ -1,24 +1,19 @@
 /* empty css                                    */
 import { b as createAstro, c as createComponent, r as renderTemplate, a as renderComponent, d as renderHead } from '../../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_B6V25uw4.mjs';
-import { $ as $$Header, a as $$Footer } from '../../chunks/Footer_s1-66hAt.mjs';
-import { P as PATH, s as siteData } from '../../chunks/consts_CBnhyY32.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_BE74BL6x.mjs';
+import { $ as $$Header, a as $$Footer } from '../../chunks/Footer_BXiM9hNU.mjs';
+import { s as siteData } from '../../chunks/consts_BT7Y9G2r.mjs';
 import { CircleUser } from 'lucide-react';
 export { renderers } from '../../renderers.mjs';
 
 const $$Astro = createAstro("https://asleepace.com");
 const prerender = false;
+const route = "/admin/login";
 const $$Login = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$Login;
-  const isLoggedIn = Boolean(Astro2.locals.isLoggedIn && Astro2.cookies?.get("session"));
-  if (isLoggedIn) {
-    console.log("[/admin/login] redirecting to admin home...");
-    return Astro2.redirect(PATH.ADMIN_HOME, 302);
-  }
-  console.log("ASTRO SESSION:", Astro2.session);
-  const error = Astro2.url.searchParams.get("error")?.toString() ?? void 0;
+  const error = Astro2.url.searchParams.get("error");
   const ERROR_CASES = {
     invalid_credentials: "Invalid username or password.",
     invalid_password: "Invalid password.",
@@ -37,6 +32,7 @@ const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   default: $$Login,
   file: $$file,
   prerender,
+  route,
   url: $$url
 }, Symbol.toStringTag, { value: 'Module' }));
 
