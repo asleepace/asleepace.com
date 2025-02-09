@@ -55,6 +55,8 @@ const parsers: Parsers = {
   TT: String,
   STAT: String,
   COMMAND: String,
+  // LINUX SPECIFIC
+  START: String,
 }
 
 /**

@@ -142,11 +142,11 @@ export namespace Users {
   // --- initialize the database ---
 
   try {
-    console.log('[db] creating user...')
+    // console.log('[db] creating user...')
     // createUser({
-    //   email: 'admin@admin,com',
-    //   username: 'admin',
-    //   password: 'password',
+    //   email: 'colin_teahan@yahoo.com',
+    //   username: 'asleepace',
+    //   password: '!Password123',
     // })
     // const user = getUserByUsername('asleepace')
     // if (!user) throw new Error('User not found')
@@ -190,7 +190,9 @@ export namespace Sessions {
    *
    * @returns the user for the given session cookie
    */
-  export function getUser(sessionCookie: string | undefined): User | undefined {
+  export async function getUser(
+    sessionCookie: string | undefined
+  ): Promise<User | undefined> {
     if (!sessionCookie) return undefined
     const session = findByToken(sessionCookie)
     return Users.getUserById(session.userId)

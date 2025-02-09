@@ -1,5 +1,6 @@
 import { Analytics, Sessions } from '@/db'
 import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
+import { WebResponse } from '@/lib/web/WebResponse'
 import { defineMiddleware, sequence } from 'astro:middleware'
 
 /**
@@ -29,43 +30,49 @@ import { defineMiddleware, sequence } from 'astro:middleware'
  *
  */
 const authMiddleware = defineMiddleware(async (context, next) => {
-  // NOTE: ignore pre-rendered pages!
-  if (context.isPrerendered) return next()
+  try {
+    // NOTE: ignore pre-rendered pages!
+    if (context.isPrerendered) return next()
 
-  // extract the request url
-  const url = new URL(context.request.url)
+    // extract the request url
+    const url = new URL(context.request.url)
 
-  // skip auth request for these
-  switch (url.pathname) {
-    case '/api/analytics':
+    // --- skip auth request for these ---
+
+    if (url.pathname.startsWith('/api/analytics')) {
       return next()
-    default:
-      break
-  }
-
-  // validate user from session cookie
-  const sessionCookie = context.cookies.get('session')
-  const user = Sessions.getUser(sessionCookie?.value)
-
-  console.log('[authMiddleware] user:', user?.email)
-
-  // remove session cookie if user is not found
-  if (!user) {
-    context.cookies.delete('session')
-    context.locals.isLoggedIn = false
-    context.locals.user = undefined
-
-    // throw unauthorized error for api requests
-    if (url.pathname.startsWith('/api/')) {
-      return new Response('Unauthorized', { status: 401 })
     }
+
+    if (url.pathname.startsWith('/api/auth')) {
+      return next()
+    }
+
+    // --- validate user from session cookie ---
+
+    const sessionCookie = context.cookies.get('session')
+
+    const user = await Sessions.getUser(sessionCookie?.value).catch((err) => {
+      console.error('[authMiddleware] error fetching user:', err)
+      return undefined
+    })
+
+    console.log('[authMiddleware] user:', user)
+
+    if (!user) {
+      context.cookies.delete('session')
+      context.locals.isLoggedIn = false
+      context.locals.user = undefined
+    } else {
+      console.log('[authMiddleware] user:', user?.username)
+      context.locals.isLoggedIn = Boolean(user)
+      context.locals.user = user
+    }
+
+    return next()
+  } catch (error) {
+    console.error('[authMiddleware] Error:', error)
+    return next()
   }
-
-  // set user data to locals
-  context.locals.isLoggedIn = Boolean(user)
-  context.locals.user = user
-
-  return await next()
 })
 
 /**
@@ -75,28 +82,33 @@ const authMiddleware = defineMiddleware(async (context, next) => {
  *
  */
 const analyticsMiddleware = defineMiddleware((context, next) => {
-  if (context.isPrerendered) return next()
+  try {
+    if (context.isPrerendered) return next()
 
-  const { request, cookies } = context
-  const { headers } = request
+    const { request, cookies } = context
+    const { headers } = request
 
-  // ignore double logging analytics
-  if (request.url.includes('/api/analytics')) return next()
+    // ignore double logging analytics
+    if (request.url.includes('/api/analytics')) return next()
 
-  const referrer = headers.get('referer')
-  const userAgent = headers.get('user-agent')
-  const ipAddress = getIpAddressFromHeaders(headers)
-  const sessionId = cookies.get('session')?.value
+    const referrer = headers.get('referer')
+    const userAgent = headers.get('user-agent')
+    const ipAddress = getIpAddressFromHeaders(headers)
+    const sessionId = cookies.get('session')?.value
 
-  Analytics.track({
-    path: context.url.href,
-    userAgent: userAgent ?? undefined,
-    ipAddress: ipAddress ?? undefined,
-    sessionId: sessionId ?? undefined,
-    referrer: referrer ?? undefined,
-  })
+    Analytics.track({
+      path: context.url.href,
+      userAgent: userAgent ?? undefined,
+      ipAddress: ipAddress ?? undefined,
+      sessionId: sessionId ?? undefined,
+      referrer: referrer ?? undefined,
+    })
 
-  return next()
+    return next()
+  } catch (error) {
+    console.error('[analyticsMiddleware] error:', error)
+    return next()
+  }
 })
 
 /**
