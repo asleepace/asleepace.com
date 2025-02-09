@@ -12,7 +12,6 @@ interface Env {
   GITHUB_CLIENT_SECRET: string
   GITHUB_CLIENT_ID: string
   MONGODB_URI: string
-  IS_DEV: boolean
   HOST: string
   PORT: number
   PROTOCOL: string

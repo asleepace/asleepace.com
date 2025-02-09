@@ -11,6 +11,7 @@ import { defineMiddleware } from 'astro:middleware'
 export const analyticsMiddleware = defineMiddleware(
   ({ request, url, cookies, isPrerendered }, next) => {
     try {
+      console.log('[middleware] analytics...')
       if (isPrerendered) return next()
       if (url.pathname.startsWith('/api/analytics')) return next()
 

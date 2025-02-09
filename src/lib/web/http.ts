@@ -1,4 +1,4 @@
-import config from '../config'
+import { siteConfig } from "@/consts"
 
 // ================================================
 // Types
@@ -36,7 +36,7 @@ export const http = {
 // ================================================
 
 function host(path: string, searchParams?: Record<string, any>): URL {
-  const url = new URL(path, config.baseUrl)
+  const url = new URL(path, siteConfig.baseUrl)
   if (searchParams) {
     url.search = new URLSearchParams(searchParams).toString()
   }
