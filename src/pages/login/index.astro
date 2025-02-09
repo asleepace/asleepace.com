@@ -5,7 +5,6 @@ import Footer from '@/components/astro/Footer.astro'
 import { siteData } from '@/consts'
 
 import { CircleUser } from 'lucide-react'
-import { undefined } from 'astro:schema'
 
 
 export const prerender = false;
@@ -20,15 +19,12 @@ if (Astro.locals.isLoggedIn) {
 
 const error = Astro.url.searchParams.get('error')?.toString() ?? undefined
 
-const isError = error !== undefined && typeof error === 'string'
-
-const cases = {
+const message = ({
   invalid_credentials: 'Invalid username or password.',
   bad_content: 'Invalid content type.',
   unknown: 'An unknown error occurred: ' + error,
-}
-
-const message = isError ? (cases[error] ?? cases.unknown) : undefined
+  undefined: undefined,
+})[String(error)]
 
 ---
 
@@ -49,7 +45,7 @@ const message = isError ? (cases[error] ?? cases.unknown) : undefined
           <input class="border border-gray-300 rounded-md p-2" autocomplete="current-password" id="password" type="password" name="password" placeholder="Password" />
           <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button>
         </form>
-        {isError && <p class="text-red-500 text-sm">{message}</p>}
+        {message && <p class="text-red-500 text-sm">{message}</p>}
     </main>
     <Footer />
   </body>
