@@ -1,14 +1,14 @@
 import type { APIRoute } from 'astro'
 import { http } from '@/lib/web'
 import { safeEval } from '@/lib/utils/safeEval'
-import { Exception } from '.'
-import { endpoint } from './index'
+import { Exception } from '..'
+import { endpoint } from '../index'
 
 export const prerender = false
 
 /**
  *
- *  GET /api/exec?uri={uri}
+ *  GET /api/shell/exec?uri={uri}
  *
  *  Fetches JavaScript code from a remote URI and evaluates it in a safe context,
  *  returning the result to the client. The search parameters will be passed to the

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef } from 'react'
 import AdminCommandOutput from './AdminCommandOutput'
-import { useShellStream } from '../../lib/shell/hooks/useShellStream'
+import { useShellStream } from '@/lib/shell/hooks/useShellStream'
 
 export type CommandResult = {
   type?: 'command' | 'error'

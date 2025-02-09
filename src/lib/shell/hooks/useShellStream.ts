@@ -1,12 +1,7 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { usePid } from './usePid'
 import { useEventSource } from './useEventSource'
 import { parseClientData } from '../logic/parseClientData'
-
-/**
- * For decoding the shell stream.
- */
-const textDecoder = new TextDecoder()
 
 /**
  * ## useShellStream()
@@ -22,13 +17,16 @@ const textDecoder = new TextDecoder()
  *
  */
 export function useShellStream() {
+  // --- manage the shell pid ---
+
   const [pid, onStartPid, onResetPid] = usePid()
 
-  // subcribe to server events
-  const { messages, subscribeToEventSource, state } =
-    useEventSource(parseClientData)
+  // --- subscribe to server events ---
 
-  // this callback is used to register a new shell
+  const { messages, subscribeToEventSource } = useEventSource(parseClientData)
+
+  // --- register a new shell ---
+
   const onRegisterShell = useCallback(async () => {
     try {
       const pid = await onStartPid()
@@ -39,27 +37,30 @@ export function useShellStream() {
     }
   }, [onStartPid, subscribeToEventSource])
 
-  // execute a command on the server
+  // --- execute a command on the server ---
+
   const onRunCommand = useCallback(
-    (command: string) => {
-      return fetch('/api/shell/stream', {
-        method: 'POST',
-        body: JSON.stringify({ command }),
-      })
-        .then((resp) => {
-          if (resp.status !== 200) throw new Error(resp.statusText)
-          return resp
+    async (command: string) => {
+      try {
+        const resp = await fetch('/api/shell/stream', {
+          method: 'POST',
+          body: JSON.stringify({ command }),
         })
-        .catch((err) => {
-          console.error('[useShellStream] error:', err)
-          onResetPid()
-        })
+
+        if (resp.status !== 200) {
+          throw new Error(resp.statusText)
+        }
+
+        return resp
+      } catch (error) {
+        console.error('[useShellStream] error:', error)
+        onResetPid()
+      }
     },
     [pid, onResetPid]
   )
 
-  /**
-   * Output is a list of ShellResponse objects.
-   */
+  // --- return the messages and the commands ---
+
   return [messages, onRunCommand, onRegisterShell] as const
 }
