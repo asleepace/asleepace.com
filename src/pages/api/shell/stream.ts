@@ -157,7 +157,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       // so we need to wait for the stream to be ready before we can send the
       // ETX event to the client.
       setTimeout(() => {
-        console.log(STREAM_TAG, chalk.white('ready!'))
+        console.log(STREAM_TAG, chalk.gray('ready!'))
         onStreamReady?.(true)
       }, 300)
 
@@ -176,7 +176,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       return childProcess.stdout
         .pipeTo(bufferedStream)
         .then(() => {
-          console.log(STREAM_TAG, 'finished piping!')
+          console.log(STREAM_TAG, 'piped!')
         })
         .catch((err) => {
           console.warn(STREAM_TAG, chalk.red(err))
