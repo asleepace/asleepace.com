@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type HandleMessage<T> = (event: MessageEvent) => T | void | undefined
+
+// TODO: ERR_INCOMPLETE_CHUNKED_ENCODING
 
 /**
  * ## useEventSource(url)
@@ -10,6 +12,14 @@ type HandleMessage<T> = (event: MessageEvent) => T | void | undefined
 export function useEventSource<T>(handleMessage: HandleMessage<T>) {
   const [eventSource, setEventSource] = useState<EventSource | undefined>()
   const [messages, setMessages] = useState<T[]>([])
+
+  useEffect(() => {
+    if (!eventSource) return
+    return () => {
+      console.log('[useEventSource] closing event source!')
+      eventSource.close()
+    }
+  }, [eventSource])
 
   /**
    * Creates a new event source.
