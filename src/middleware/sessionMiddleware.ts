@@ -1,5 +1,8 @@
 import { defineMiddleware } from 'astro:middleware'
 import { Sessions } from '@/db/index'
+import chalk from 'chalk'
+
+const TAG = chalk.gray('[m] session\t')
 
 /**
  *  ## sessionMiddleware
@@ -11,23 +14,22 @@ import { Sessions } from '@/db/index'
  *
  */
 export const sessionMiddleware = defineMiddleware(async (context, next) => {
-  console.log(
-    '[middleware] auth:',
-    context.request.method,
-    context.url.pathname
-  )
-
   if (context.isPrerendered) return next() // skip pre-renders
+
+  console.log(
+    TAG,
+    chalk.gray(context.url.pathname),
+    chalk.gray(`(${context.request.method.toLowerCase()})`)
+  )
 
   const sessionCookie = context.cookies.get('session')
   const cookieString = sessionCookie?.value
 
   const user = await Sessions.getUser(cookieString).catch((e) => {
-    console.warn('[authMiddleware] BAD_COOKIE:', sessionCookie, e)
+    console.warn(TAG, chalk.red('BAD_COOKIE:'), sessionCookie, e)
     return undefined
   })
 
-  console.log('[middleware] SETTING_SESSION:', user?.username)
   context.locals.isLoggedIn = Boolean(user)
   context.locals.user = user
   return next()

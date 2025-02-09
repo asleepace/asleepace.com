@@ -1,6 +1,6 @@
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
-
+import chalk from 'chalk'
 export type SiteCookieDomain = `.${string}` // example: ".asleepace.com"
 export type SiteCookiePath = `/${string}` // example: "/"
 export type SiteEnvironment = 'production' | 'development'
@@ -22,7 +22,9 @@ const MONGODB_URI = process.env.MONGODB_URI as string
 
 console.assert(ENVIRONMENT, 'ASSERT_ENVIRONMENT is not set!')
 console.assert(MONGODB_URI, 'ASSERT_MONGODB_URI is not set!')
-console.log('\n+' + '-'.repeat(60) + '--[ configuration ]' + '----+\n')
+console.log(
+  chalk.white('\n+' + '-'.repeat(60) + '--[ configuration ]' + '----+\n')
+)
 
 const DEFAULT_CONFIGURATIONS = {
   production: {
@@ -58,12 +60,14 @@ export const siteConfig: SiteConfig = {
 }
 
 Object.entries(siteConfig).forEach(([key, value]) => {
+  const tag = chalk.gray(`>>  [${key}]`)
+
   if (value instanceof URL) {
-    console.log(`  CONFIG: ${key}:`, value.toString())
+    console.log(tag, chalk.cyan(value.toString()))
   } else if (typeof value === 'string') {
-    console.log(`  CONFIG: ${key}: "${value}"`)
+    console.log(tag, `"${value}"`)
   } else {
-    console.log(`  CONFIG: ${key}:`, value)
+    console.log(tag, value)
   }
 })
 

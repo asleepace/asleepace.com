@@ -1,6 +1,9 @@
 import { Analytics } from '@/db'
 import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
 import { defineMiddleware } from 'astro:middleware'
+import chalk from 'chalk'
+
+const TAG = chalk.gray('[m] analytics\t')
 
 /**
  *  ## analyticsMiddleware
@@ -10,10 +13,11 @@ import { defineMiddleware } from 'astro:middleware'
  */
 export const analyticsMiddleware = defineMiddleware(
   ({ request, url, cookies, isPrerendered }, next) => {
-    console.log('[middleware] analytics...')
-
     if (isPrerendered) return next()
     if (url.pathname.startsWith('/api/analytics')) return next()
+    if (request.method === 'POST') return next()
+
+    console.log(TAG, chalk.gray(url.pathname))
 
     const { headers } = request
     const referrer = headers.get('referer')

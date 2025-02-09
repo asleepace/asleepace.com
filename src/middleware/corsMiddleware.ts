@@ -1,4 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
+import chalk from 'chalk'
+
+const TAG = chalk.gray('[m] cors\t')
 
 /**
  * ## corsMiddleware
@@ -12,9 +15,9 @@ import { defineMiddleware } from 'astro:middleware'
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
  */
-export const corsMiddleware = defineMiddleware(async (_context, next) => {
-  console.log('[middleware] appending cors...')
+export const corsMiddleware = defineMiddleware(async (context, next) => {
   const response = await next()
+  console.log(TAG, chalk.gray(context.url.pathname))
   response.headers.set('Access-Control-Allow-Origin', '*')
   response.headers.set(
     'Access-Control-Allow-Methods',
