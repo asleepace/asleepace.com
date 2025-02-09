@@ -3,7 +3,7 @@ import './chunks/astro-designed-error-pages_CP0-NeA3.mjs';
 import '@astrojs/internal-helpers/path';
 import 'cookie';
 import { d as defineMiddleware, s as sequence } from './chunks/index_DGL2UL-f.mjs';
-import { S as Sessions, A as Analytics } from './chunks/index_DBharnCd.mjs';
+import { S as Sessions, A as Analytics } from './chunks/index_cCZ8Gi1v.mjs';
 import { g as getIpAddressFromHeaders } from './chunks/ipAddress_bVurJUOX.mjs';
 
 const sessionMiddleware = defineMiddleware(async (context, next) => {

@@ -2,30 +2,39 @@
 import BaseHead from '@/components/astro/BaseHead.astro'
 import Header from '@/components/astro/Header.astro'
 import Footer from '@/components/astro/Footer.astro'
-import { PATH, siteData } from '@/consts'
+import { COOKIE_PATH, PATH, siteData } from '@/consts'
 
 import { CircleUser } from 'lucide-react'
 
 export const prerender = false
+export const route = '/admin/login'
 
-const isLoggedIn = Boolean(Astro.locals.isLoggedIn && Astro.cookies?.get('session'))
+// const sessionCookie = Astro.cookies?.get('session')
+// const hasSessionCookie = Boolean(sessionCookie)
+// const isLoggedIn = Boolean(Astro.locals.isLoggedIn && Astro.locals.user)
 
-if (isLoggedIn) {
-  return Astro.redirect(PATH.ADMIN_HOME, 302)
-}
+// if (hasSessionCookie && isLoggedIn) {
+//   console.log(`GET ${route} redirecting to ADMIN_HOME ...`, Astro.request)
+//   return Astro.redirect(PATH.ADMIN_HOME, 302)
+// }
 
-console.log('ASTRO SESSION:', Astro.session)
+// if (hasSessionCookie && !isLoggedIn) {
+//   Astro.cookies.delete('session', { path: COOKIE_PATH })
+// }
+
 
 // NOTE: Astro.redirect() is not working here for logged in users.
 
-const error = Astro.url.searchParams.get('error')?.toString() ?? undefined
+const error = Astro.url.searchParams.get('error')
 
-const message = ({
+const ERROR_CASES = ({
   invalid_credentials: 'Invalid username or password.',
+  invalid_password: 'Invalid password.',
   bad_content: 'Invalid content type.',
   unknown: 'An unknown error occurred: ' + error,
-  undefined: undefined,
-})[String(error)]
+})
+
+const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
 
 ---
 

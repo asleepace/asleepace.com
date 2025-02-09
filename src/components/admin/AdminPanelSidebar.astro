@@ -17,5 +17,7 @@ const { activeTab = 0 } = Astro.props
   <AdminPanelSidebarButton href={PATH.ADMIN_ANALYTICS} title="Analytics" active={activeTab === 2} />
   <AdminPanelSidebarButton href={PATH.CODE_EDITOR} title="Code" active={activeTab === 3} />
   <Spacer direction="vertical" />
-  <AdminPanelSidebarButton href={PATH.ADMIN_LOGOUT} title="Logout" variant="destructive" />
+  <form method="post" action={PATH.CLEAR_SESSION}>
+    <button type="submit" class="bg-red-500 hover:bg-red-400 w-full px-16 text-white rounded-md p-2">Logout</button>
+  </form>
 </aside>

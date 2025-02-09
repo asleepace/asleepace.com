@@ -1,10 +1,10 @@
 /* empty css                                 */
 import { b as createAstro, c as createComponent, r as renderTemplate, m as maybeRenderHead, e as addAttribute, f as renderSlot, a as renderComponent, d as renderHead } from '../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../chunks/BaseHead_B6V25uw4.mjs';
-import { P as PATH, s as siteData } from '../chunks/consts_DA6-2Sut.mjs';
+import { $ as $$BaseHead } from '../chunks/BaseHead_BE74BL6x.mjs';
+import { P as PATH, s as siteData } from '../chunks/consts_BT7Y9G2r.mjs';
 /* empty css                                 */
-import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_KdKz4I4K.mjs';
+import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_DJlz8uFk.mjs';
 import clsx from 'clsx';
 export { renderers } from '../renderers.mjs';
 

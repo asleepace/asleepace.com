@@ -68,7 +68,7 @@ export const HEAD: APIRoute = async ({ cookies }) => {
     console.error('[HEAD] error:', error)
 
     // clear any existing cookies
-    cookies.delete('pid')
+    cookies.delete('pid', { path: '/' })
 
     return new Response(null, {
       statusText: error.message ?? 'Unknown error',
@@ -115,7 +115,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   // check if the shell has already been killed
   if (shell.childProcess.killed) {
     console.warn('[GET] shell has already been killed!')
-    cookies.delete('pid')
+    cookies.delete('pid', { path: '/' })
     return new Response(null, {
       statusText: 'Shell killed',
       status: 500,

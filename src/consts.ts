@@ -5,6 +5,8 @@ export const SITE_TITLE = 'Asleepace'
 export const SITE_DESCRIPTION = 'a random collection of internet treasures'
 export const SITE_URL = 'https://asleepace.com'
 
+export const COOKIE_PATH = '/'
+
 export const siteData = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
@@ -25,11 +27,14 @@ export const siteData = {
 export const PATH = {
   ADMIN_LOGIN(searchParams: Record<string, string> = {}) {
     const query = new URLSearchParams(searchParams)
-    return '/admin/login' + query.toString()
+    const hasParams = Object.keys(searchParams).length > 0
+    const queryString = hasParams ? `?${query.toString()}` : ''
+    return '/admin/login' + queryString
   },
   ADMIN_LOGOUT: '/admin/logout',
   ADMIN_HOME: '/admin',
   ADMIN_SYSTEM: '/admin/system',
   ADMIN_ANALYTICS: '/admin/analytics',
   CODE_EDITOR: '/code',
+  CLEAR_SESSION: '/api/auth/clearSession',
 }

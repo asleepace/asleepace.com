@@ -6,6 +6,8 @@ import { PATH, siteData } from '@/consts'
 
 export const prerender = false
 
+const COOKIE_PATH = '/'
+
 /**
  *  NOTE: This page should clear the session cookie and redirect to the login page.
  * 
@@ -13,24 +15,22 @@ export const prerender = false
  * 
  *  @note the astro redirect() might act strange on this page.
  * 
+ *  @note the path needs to match the path that was set in the cookie.
+ * 
  */
 console.warn('[/admin/logout] clearing session...')
 
-Astro.cookies.delete('session')
-Astro.locals.isLoggedIn = false
-Astro.locals.user = undefined
+Astro.cookies.delete('session', {
+  path: COOKIE_PATH, // IMPORTANT: must match the path that was set in the cookie.
+})
 
-console.log('[/admin/logout] redirecting ...')
-
-const META_REFRESH = `3; url=${PATH.ADMIN_LOGIN()}`
+Astro.redirect(PATH.ADMIN_LOGIN())
 
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={siteData.title} description={siteData.description} />
-    <!-- NOTE: REDIRECT HAPPENS HERE -->
-    <meta http-equiv={META_REFRESH}>
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     <Header title={siteData.title} />
