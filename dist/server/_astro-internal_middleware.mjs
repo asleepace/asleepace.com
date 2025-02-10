@@ -6,7 +6,7 @@ import { d as defineMiddleware, s as sequence } from './chunks/index_DGL2UL-f.mj
 import { S as Sessions, A as Analytics } from './chunks/index_cCZ8Gi1v.mjs';
 import chalk from 'chalk';
 import { g as getIpAddressFromHeaders } from './chunks/ipAddress_bVurJUOX.mjs';
-import { P as PATH } from './chunks/consts_By69ZWqL.mjs';
+import { P as PATH } from './chunks/consts_-x9zbxjG.mjs';
 
 const TAG$3 = chalk.gray("[m] session	");
 const sessionMiddleware = defineMiddleware(async (context, next) => {
@@ -50,25 +50,7 @@ const analyticsMiddleware = defineMiddleware(
   }
 );
 
-const TAG$1 = chalk.gray("[m] cors	");
-const corsMiddleware = defineMiddleware(async (context, next) => {
-  const response = await next();
-  console.log(TAG$1, chalk.gray(context.url.pathname));
-  const headers = new Headers(response.headers);
-  headers.set("Access-Control-Allow-Origin", "*");
-  headers.set(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS, HEAD"
-  );
-  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  headers.set("Access-Control-Allow-Credentials", "true");
-  return new Response(response.body, {
-    status: response.status,
-    headers
-  });
-});
-
-const TAG = chalk.gray("[m] security	");
+const TAG$1 = chalk.gray("[m] security	");
 const whitelist = ["/admin/logout", "/admin/login", "/api/proxy"];
 const blacklist = ["/api", "/admin"];
 const securityMiddleware = defineMiddleware(async (context, next) => {
@@ -79,22 +61,44 @@ const securityMiddleware = defineMiddleware(async (context, next) => {
   const isWhitelisted = whitelist.some((p) => path.startsWith(p));
   const isBlacklisted = blacklist.some((p) => path.startsWith(p));
   if (isWhitelisted) {
-    console.log(TAG, chalk.gray(path), chalk.white(`(whitelisted)`));
+    console.log(TAG$1, chalk.gray(path), chalk.white(`(whitelisted)`));
     return next();
   } else if (isBlacklisted) {
-    console.log(TAG, chalk.gray(path), chalk.red(`(blacklisted)`));
+    console.log(TAG$1, chalk.gray(path), chalk.red(`(blacklisted)`));
     return context.redirect(PATH.ADMIN_LOGIN(), 302);
   } else {
-    console.log(TAG, chalk.gray(path), chalk.gray(`(skipping...)`));
+    console.log(TAG$1, chalk.gray(path), chalk.gray(`(skipping...)`));
     return next();
   }
 });
 
+let numberOfRequests = 0;
+const TAG = (id) => chalk.gray(`[m]` + chalk.magenta(` REQ #${id}	`));
+const rootMiddleware = defineMiddleware(async (context, next) => {
+  let requestId = numberOfRequests++;
+  let requestTag = TAG(requestId);
+  try {
+    if (context.isPrerendered) return next();
+    context.locals.requestId = requestId;
+    const method = context.request.method;
+    const path = context.url.pathname;
+    console.log("\n");
+    console.log(requestTag, chalk.gray(method), chalk.cyan(path));
+    const response = await next();
+    return response;
+  } catch (e) {
+    console.error(requestTag, chalk.red(e));
+    return new Response(e?.message, { status: 500 });
+  } finally {
+    console.log(chalk.gray(`[m][closed] REQ #${requestId}`));
+  }
+});
+
 const onRequest$1 = sequence(
+  rootMiddleware,
   analyticsMiddleware,
   sessionMiddleware,
-  securityMiddleware,
-  corsMiddleware
+  securityMiddleware
 );
 
 const onRequest = sequence(

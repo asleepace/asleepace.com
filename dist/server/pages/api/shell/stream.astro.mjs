@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 export { renderers } from '../../../renderers.mjs';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -78,8 +79,11 @@ const ETX = {
   STR: "",
   NUM: 3
 };
+let bufferId = 0;
+const MAKE_TAG = () => chalk.gray(" ↳ [buffer]");
 function createBufferedStream(controller) {
-  console.log("[buffer] creating...");
+  const TAG = MAKE_TAG();
+  console.log(TAG, chalk.gray("starting id:"), bufferId++);
   const buffer = [];
   return new WritableStream({
     write(chunk) {
@@ -91,15 +95,15 @@ function createBufferedStream(controller) {
 
 `);
         buffer.length = 0;
-        console.log("[buffer] flushing!");
+        console.log(TAG, chalk.gray("flushing!"));
       }
     },
     abort() {
-      console.warn("[buffer] ABORTED!");
+      console.warn(TAG, chalk.red("ABORTED!"));
       controller.close();
     },
     close() {
-      console.warn("[buffer] CLOSED!");
+      console.warn(TAG, chalk.gray("closing..."));
       controller.close();
     }
   });
@@ -107,14 +111,12 @@ function createBufferedStream(controller) {
 
 const prerender = false;
 const processManager = new ShellProcessManager();
+const TAG = (prefix) => chalk.gray(`[${prefix}] ↳ /stream	`);
 const HEAD = async ({ cookies }) => {
   try {
-    console.log(
-      "||--------------------------------------------------------------------------------------------------||"
-    );
     processManager.runCleanup();
     const shell = processManager.startShell();
-    console.log("[HEAD] shell:", shell.pid);
+    console.log(TAG("H"), chalk.white("PID:"), chalk.yellow(shell.pid));
     cookies.set("pid", shell.pid.toString());
     return new Response(null, {
       statusText: "OK",
@@ -124,7 +126,7 @@ const HEAD = async ({ cookies }) => {
       }
     });
   } catch (error) {
-    console.error("[HEAD] error:", error);
+    console.error(TAG("H"), chalk.red(error));
     cookies.delete("pid", { path: "/" });
     return new Response(null, {
       statusText: error.message ?? "Unknown error",
@@ -135,9 +137,6 @@ const HEAD = async ({ cookies }) => {
   }
 };
 const GET = async ({ request, cookies }) => {
-  console.log(
-    "||==================================================================================================||"
-  );
   const pid = cookies.get("pid")?.number();
   if (!pid) {
     console.warn("[GET] Missing PID cookie");
@@ -145,9 +144,14 @@ const GET = async ({ request, cookies }) => {
   }
   processManager.runCleanup();
   const shell = processManager.getOrCreateShell(pid);
-  console.log("[GET] shell:", shell.pid, "killed:", shell.childProcess.killed);
+  console.log(
+    TAG("G"),
+    chalk.white("PID:"),
+    chalk.yellow(pid),
+    shell.childProcess.killed ? chalk.red("(killed)") : "(alive)"
+  );
   if (shell.childProcess.killed) {
-    console.warn("[GET] shell has already been killed!");
+    console.warn(TAG("G"), chalk.red("shell killed!"));
     cookies.delete("pid", { path: "/" });
     return new Response(null, {
       statusText: "Shell killed",
@@ -159,44 +163,46 @@ const GET = async ({ request, cookies }) => {
   const waitForStreamToFinish = new Promise((resolve) => {
     onStreamReady = resolve;
   });
+  const STREAM_TAG = chalk.gray("[G][stream]");
   const stream = new ReadableStream({
     async start(controller) {
-      console.log("[stream] stream...");
+      console.log(STREAM_TAG, chalk.gray("starting readbale stream"));
       request.signal.onabort = () => {
-        console.warn("[stream] aborting...");
+        console.warn(
+          STREAM_TAG,
+          chalk.red("request aborted, closing stream...")
+        );
         controller.close();
       };
       const bufferedStream = createBufferedStream(controller);
       setTimeout(() => {
-        console.log("[stream] stream ready!");
+        console.log(STREAM_TAG, chalk.gray("ready!"));
         onStreamReady?.(true);
       }, 300);
       setTimeout(() => {
+        console.log(STREAM_TAG, chalk.white("initial enqueue!"));
         controller.enqueue("data: \n\n");
       }, 1e3);
       return childProcess.stdout.pipeTo(bufferedStream).then(() => {
-        console.log("[stream] finished piping!");
+        console.log(STREAM_TAG, "piped!");
       }).catch((err) => {
-        console.warn(`[stream] error: 
-
-	${err}
-`);
+        console.warn(STREAM_TAG, chalk.red(err));
         controller.close();
       });
     },
     cancel() {
-      console.warn("[stream] canceling...");
+      console.warn(STREAM_TAG, chalk.yellow("cancelling..."));
       childProcess.kill();
       processManager.runCleanup();
     }
   });
-  console.log("[stream] waiting for stream...");
+  console.log(STREAM_TAG, chalk.gray("waiting..."));
   await waitForStreamToFinish;
   if (stream.locked) {
-    console.warn("[stream] stream is locked (sleeping 1s)");
+    console.warn(STREAM_TAG, chalk.yellow("locked!"), chalk.gray("sleeping 1s"));
     await sleep(1e3);
   }
-  console.log("[GET] finished!");
+  console.log(STREAM_TAG, chalk.gray("finished!"));
   return new Response(stream, {
     headers: { "Content-Type": "text/event-stream" },
     status: 200
