@@ -115,6 +115,9 @@ bun run preview
 
 # Troubleshooting
 
+Server-Side Events (SSE) works in development, but not in production, then this is most likely the issue because of the nginx configuration.
+See [nginx/asleepace.com.conf](./services/nginx/asleepace.com.conf) for the correct configuration.
+
 Make sure your sever has a swap file, this is a requirement for the build process to work.
 
 ```bash
