@@ -1,5 +1,6 @@
 import { HEADERS } from '@/lib/web/WebResponse'
 import { defineMiddleware } from 'astro:middleware'
+import { services } from '@/modules/services'
 import chalk from 'chalk'
 
 let numberOfRequests = 0
@@ -39,6 +40,15 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
     Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
       response.headers.set(header, value)
     })
+
+    const permissions = services.permissions.getHeader()
+
+    if (permissions) {
+      console.log(requestTag, chalk.gray('setting permissions'), permissions)
+      response.headers.set('Permissions-Policy', permissions)
+    } else {
+      response.headers.delete('Permissions-Policy')
+    }
 
     // --- post-processing ---
 

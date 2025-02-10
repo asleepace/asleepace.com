@@ -1,0 +1,14 @@
+{
+  "filePath": "./servicePermissions.json",
+  "permissions": {
+    "accelerometer": true,
+    "camera": true,
+    "geolocation": true,
+    "gyroscope": true,
+    "magnetometer": true,
+    "microphone": false,
+    "payment": false,
+    "usb": false
+  },
+  "isEnabled": true
+}
