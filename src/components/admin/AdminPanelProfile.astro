@@ -14,7 +14,7 @@ const { username = 'Admin', environment = 'production', className, image = '/ima
 ---
 <div class={clsx("gap-x-3 items-center justify-start flex flex-row p-2", className)}>
   <img src={image} alt="Asleepace Logo" class="w-8 h-8 rounded-lg bg-zinc-800" />
-  <div class="flex flex-col">
+  <div class="flex flex-col pt-1">
     <p class="text-md font-light -mb-0.5 text-orange-400">{username}</p>
     <span class="flex flex-row gap-x-2">
       <p class="text-3xs font-light opacity-60">{environment.toUpperCase()}</p>
