@@ -4,6 +4,15 @@
  * The headers for the response, these are frozen to prevent mutation.
  */
 const HEADERS = Object.freeze({
+  SECURITY: {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Content-Security-Policy': "default-src 'self'",
+    'Referrer-Policy': 'no-referrer-when-downgrade',
+    'Permissions-Policy': 'geolocation=(), microphone=()',
+  },
   API: {
     'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -20,7 +29,7 @@ const HEADERS = Object.freeze({
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   },
   get DEFAULT() {
-    return { ...this.API, ...this.CORS }
+    return { ...this.SECURITY, ...this.API, ...this.CORS }
   },
 } as const)
 
