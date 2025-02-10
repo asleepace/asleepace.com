@@ -42,6 +42,12 @@ const TAG = (prefix: string) => chalk.gray(`[${prefix}] ↳ /stream\t`)
  * this should be called before connecting to the shell stream or posting
  * commands to the shell.
  *
+ * @note streams require additional nginx configuration and the endpoints
+ *       must either end in `/events` or `/stream` to be detected as a
+ *       stream.
+ *
+ * @see nginx/asleepace.com.conf
+ *
  */
 export const HEAD: APIRoute = async ({ cookies }) => {
   try {
