@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import clsx from 'clsx'
 import {
   Fragment,
@@ -44,11 +45,15 @@ export type DataTableProps<
 function sortData<T extends DataRecord, K extends keyof T>(
   data: T[] = [],
   sortBy?: K,
-  isAscending = true
+  isAscending?: boolean
 ) {
   if (!sortBy || !data) return data
-  console.log('[DataTable] Sorting data', data, sortBy, isAscending)
-  return [...data].toSorted((a, b) => {
+  console.log(
+    '[DataTable] sorting by',
+    `"${String(sortBy)}"`,
+    isAscending ? 'ascending' : 'descending'
+  )
+  const sortedOutput = data.toSorted((a, b) => {
     const aValue = a[sortBy]
     const bValue = b[sortBy]
 
@@ -61,6 +66,8 @@ function sortData<T extends DataRecord, K extends keyof T>(
       return isAscending ? diff : -diff
     }
   })
+  console.log('[DataTable] sorted:', sortedOutput.length)
+  return sortedOutput
 }
 
 /**
@@ -84,8 +91,8 @@ function useSortedData<T extends DataRecord, K extends keyof T>(
   }, [data, sortBy, isAscending])
 
   const sortWithTransition = useCallback(() => {
-    const sorted = sortData(data, sortBy, isAscending)
     startTransition(() => {
+      const sorted = sortData(data, sortBy, isAscending)
       setSortedData(sorted)
     })
   }, [data, sortBy, isAscending])
@@ -94,7 +101,7 @@ function useSortedData<T extends DataRecord, K extends keyof T>(
     if (data?.length) {
       sortWithTransition()
     }
-  }, [sortWithTransition])
+  }, [data?.length])
 
   return [sortedData.length ? sortedData : initialSort, isPending] as const
 }

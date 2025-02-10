@@ -153,6 +153,12 @@ body {
   width: var(--max-width-article); /* ARTICLE MAX WIDTH  */
   max-width: calc(100%);
 
+  hr {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+  }
+
   h1,
   h2,
   h3,
@@ -179,7 +185,7 @@ body {
   h4 {
     font-size: 1.5em;
     margin-top: var(--padding-sm);
-    margin-bottom: -1em;
+    margin-bottom: -0.8rem;
   }
 
   p {
@@ -248,7 +254,7 @@ body {
     margin-left: 1.5em;
     margin-block-start: var(--padding-sm);
     margin-block-end: 1.2em;
-    padding-inline-start: 1em;
+    padding-inline-start: 0.4em;
     list-style-position: outside;
   }
 
@@ -258,7 +264,7 @@ body {
     padding-inline-start: 1em;
     line-height: 34px;
     font-size: 1em;
-    margin-top: 1em;
+    margin-top: 0;
   }
 
   ol > li {

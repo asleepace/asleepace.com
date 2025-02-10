@@ -1,0 +1,11 @@
+---
+import clsx from 'clsx'
+interface Props {
+  className?: string
+}
+
+const { className } = Astro.props
+
+---
+
+<div class={clsx("self-center h-[0.4px] bg-zinc-800 opacity-70 px-2 w-[calc(100%-1rem)]", className)} />

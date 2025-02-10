@@ -1,3 +1,4 @@
+import { HEADERS } from '@/lib/web/WebResponse'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 
@@ -30,6 +31,14 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
     // --- pre-processing ---
 
     const response = await next()
+
+    console.log(requestTag, chalk.gray('setting headers'))
+
+    // --- add security headers to all responses ---
+
+    Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
+      response.headers.set(header, value)
+    })
 
     // --- post-processing ---
 

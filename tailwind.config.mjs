@@ -19,6 +19,7 @@ export default {
       animation: {},
       keyframes: {},
       fontSize: {
+        'md': '0.9375rem',
         '2xs': '0.625rem',
         '3xs': '0.5rem',
       },

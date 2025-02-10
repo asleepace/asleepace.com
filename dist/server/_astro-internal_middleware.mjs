@@ -7,6 +7,7 @@ import { S as Sessions, A as Analytics } from './chunks/index_cCZ8Gi1v.mjs';
 import chalk from 'chalk';
 import { g as getIpAddressFromHeaders } from './chunks/ipAddress_bVurJUOX.mjs';
 import { P as PATH } from './chunks/consts_-x9zbxjG.mjs';
+import { H as HEADERS } from './chunks/WebResponse_CKUXSAVZ.mjs';
 
 const TAG$3 = chalk.gray("[m] session	");
 const sessionMiddleware = defineMiddleware(async (context, next) => {
@@ -85,6 +86,10 @@ const rootMiddleware = defineMiddleware(async (context, next) => {
     console.log("\n");
     console.log(requestTag, chalk.gray(method), chalk.cyan(path));
     const response = await next();
+    console.log(requestTag, chalk.gray("setting headers"));
+    Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
+      response.headers.set(header, value);
+    });
     return response;
   } catch (e) {
     console.error(requestTag, chalk.red(e));
