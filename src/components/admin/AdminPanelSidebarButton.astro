@@ -1,22 +1,35 @@
 ---
 import clsx from 'clsx'
+import Icons from 'lucide-react'
 
 interface Props {
   href: string
   title: string
   variant?: 'default' | 'primary' | 'destructive'
   active?: boolean
+  icon?: string
+  isFormSubmit?: boolean
 }
 
-const { href, title, variant = 'default', active = false } = Astro.props
----
+const { href, title, variant = 'default', active = false, icon = 'LayoutGrid', isFormSubmit = false } = Astro.props
 
-<a href={href} class="flex flex-col flex-shrink justify-end">
-  <button class={clsx("bg-transparent rounded-md p-2 mx-2", {
-    'hover:bg-red-600': variant === 'destructive',
-    'hover:bg-blue-600': variant === 'primary',
-    'hover:bg-zinc-600': variant === 'default',
+const ButtonIcon = icon && typeof icon === 'string' && icon in Icons ? Icons[icon] : null
+
+// either click a link or submit a form
+const onClickHref = isFormSubmit ? undefined : href
+const onClickForm = isFormSubmit ? 'submit' : undefined
+
+---
+<a href={onClickHref} class={clsx("flex flex-col flex-shrink justify-end", active ? 'opacity-100' : 'opacity-80')}>
+  <button type={onClickForm} class={
+    clsx("flex flex-row gap-x-3 items-center justify-start rounded-md px-2 py-1 mx-2 bg-opacity-0 hover:bg-opacity-70", {
+      'bg-zinc-800': variant === 'default',
+      'bg-red-700': variant === 'destructive',
+      'bg-opacity-50': active,
   })}>
-    <p class={clsx({ 'text-orange-500': active })}>{title}</p>
+    <!-- Icon -->
+    <ButtonIcon name={icon} size={16} />
+    <!-- Title -->
+    <p class={clsx("text-md font-light")}>{title}</p>
   </button>
 </a>

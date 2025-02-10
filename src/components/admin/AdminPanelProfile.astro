@@ -1,0 +1,23 @@
+---
+import clsx from 'clsx'
+
+
+interface Props {
+  username: string
+  environment: string
+  className?: string
+  image?: string
+}
+
+const { username = 'Admin', environment = 'production', className, image = '/images/profile_asleepace.jpg' } = Astro.props
+
+---
+<div class={clsx("gap-x-3 items-center justify-start flex flex-row p-2", className)}>
+  <img src={image} alt="Asleepace Logo" class="w-8 h-8 rounded-lg bg-zinc-800" />
+  <div class="flex flex-col">
+    <p class="text-md font-light -mb-0.5 text-orange-400">{username}</p>
+    <span class="flex flex-row gap-x-2">
+      <p class="text-3xs font-light opacity-60">{environment.toUpperCase()}</p>
+    </span>
+  </div>
+</div>

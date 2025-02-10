@@ -2,22 +2,48 @@
 import { PATH } from '@/consts'
 import Spacer from '../astro/Spacer.astro'
 import AdminPanelSidebarButton from './AdminPanelSidebarButton.astro'
+import AdminPanelProfile from './AdminPanelProfile.astro'
+import Line from '../astro/Line.astro'
 
 interface Props {
   activeTab?: number
-}
+  version?: string
+  environment?: string
+  username?: string
+} 
 
-const { activeTab = 0 } = Astro.props
+const { activeTab = 0, version = '1.0.0', environment = 'production', username = 'Admin' } = Astro.props
+
+const sideBarButtons = [
+  { href: PATH.ADMIN_HOME, title: 'Home', icon: 'LayoutGrid' },
+  { href: PATH.ADMIN_SYSTEM, title: 'System', icon: 'Settings' },
+  { href: PATH.ADMIN_ANALYTICS, title: 'Analytics', icon: 'BarChart' },
+  { href: PATH.CODE_EDITOR, title: 'Code', icon: 'Code' },
+]
 
 ---
 
-<aside class="w-64 bg-black px-2 py-16 pb-4 gap-y-2 flex flex-col text-zinc-300">
-  <AdminPanelSidebarButton href={PATH.ADMIN_HOME} title="Home" active={activeTab === 0} />
-  <AdminPanelSidebarButton href={PATH.ADMIN_SYSTEM} title="System" active={activeTab === 1} />
-  <AdminPanelSidebarButton href={PATH.ADMIN_ANALYTICS} title="Analytics" active={activeTab === 2} />
-  <AdminPanelSidebarButton href={PATH.CODE_EDITOR} title="Code" active={activeTab === 3} />
+<aside class="w-52 bg-black pl-2 pr-4 pb-16 pt-5 gap-y-2 flex flex-col text-zinc-300">
+
+  <AdminPanelProfile environment={environment} username={username} className='ml-1' />
+
+  <Line className="my-2" />
+
+  <!-- admin panel header section -->
+
+  <div class="flex flex-col gap-y-2">
+  {
+    sideBarButtons.map((button, index) => (
+      <AdminPanelSidebarButton href={button.href} title={button.title} active={activeTab === index} icon={button.icon} />
+    ))
+  }
+  </div>
+
+  <!-- admin panel footer section -->
+
   <Spacer direction="vertical" />
+
   <form method="post" action={PATH.CLEAR_SESSION}>
-    <button type="submit" class="bg-red-500 hover:bg-red-400 w-full px-16 text-white rounded-md p-2">Logout</button>
+    <AdminPanelSidebarButton href={PATH.CLEAR_SESSION} title="Logout" icon="LogOut" variant="destructive" isFormSubmit />
   </form>
 </aside>
