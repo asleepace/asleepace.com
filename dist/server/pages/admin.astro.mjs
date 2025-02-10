@@ -1,10 +1,10 @@
 /* empty css                                 */
 import { b as createAstro, c as createComponent, r as renderTemplate, m as maybeRenderHead, e as addAttribute, f as renderSlot, a as renderComponent, d as renderHead } from '../chunks/astro/server_DmNz8cFp.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../chunks/BaseHead_BE74BL6x.mjs';
-import { P as PATH, s as siteData } from '../chunks/consts_-x9zbxjG.mjs';
+import { $ as $$BaseHead } from '../chunks/BaseHead_B0yLrJlA.mjs';
+import { P as PATH, a as siteConfig, s as siteData } from '../chunks/consts_-x9zbxjG.mjs';
 /* empty css                                 */
-import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_B3k0KG75.mjs';
+import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_BDXTWiTU.mjs';
 import clsx from 'clsx';
 import chalk from 'chalk';
 export { renderers } from '../renderers.mjs';
@@ -40,7 +40,7 @@ const $$Index = createComponent(($$result, $$props, $$slots) => {
   const adminPageInfo = {
     ...process.env
   };
-  return renderTemplate`<html lang="en" class="h-full"> <head>${renderComponent($$result, "BaseHead", $$BaseHead, { "title": siteData.title, "description": siteData.description })}${renderHead()}</head> <body class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden"> <main class="flex flex-row h-full flex-1 bg-zinc-950"> <!-- side bar --> ${renderComponent($$result, "AdminPanelSidebar", $$AdminPanelSidebar, { "activeTab": 0 })} <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16"> <!-- welcome message & search bar --> <div class="flex flex-col gap-y-4 flex-1 self-stretch max-w-screen-xl"> <p class="text-6xl font-bold">Admin Panel</p> <p class="tracking-wide text-zinc-400 py-2">Welcome to the admin page <strong>${user.username}!</strong></p> ${renderComponent($$result, "AdminCommandLine", null, { "client:only": "react", "client:component-hydration": "only", "client:component-path": "@/components/admin/AdminCommandLine", "client:component-export": "default" })} </div> ${renderComponent($$result, "ContainerLabeled", $$ContainerLabeled, { "label": "Environment", "className": "basis-1/4 max-w-screen-xs max-h-[600px]" }, { "default": ($$result2) => renderTemplate` ${renderComponent($$result2, "AdminPageInfo", $$AdminPageInfo, { "data": adminPageInfo })} ` })} </div> </main> </body></html>`;
+  return renderTemplate`<html lang="en" class="h-full"> <head>${renderComponent($$result, "BaseHead", $$BaseHead, { "title": siteData.title, "description": siteData.description })}${renderHead()}</head> <body class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden"> <main class="flex flex-row h-full flex-1 bg-zinc-950"> <!-- side bar --> ${renderComponent($$result, "AdminPanelSidebar", $$AdminPanelSidebar, { "activeTab": 0, "username": user.username, "environment": siteConfig.environment, "version": siteConfig.version })} <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16"> <!-- welcome message & search bar --> <div class="flex flex-col gap-y-4 flex-1 self-stretch max-w-screen-xl"> <p class="text-6xl font-bold">Admin Panel</p> <p class="tracking-wide text-zinc-400 py-2">Welcome to the admin page <strong>${user.username}!</strong></p> ${renderComponent($$result, "AdminCommandLine", null, { "client:only": "react", "client:component-hydration": "only", "client:component-path": "@/components/admin/AdminCommandLine", "client:component-export": "default" })} </div> ${renderComponent($$result, "ContainerLabeled", $$ContainerLabeled, { "label": "Environment", "className": "basis-1/4 max-w-screen-xs max-h-[600px]" }, { "default": ($$result2) => renderTemplate` ${renderComponent($$result2, "AdminPageInfo", $$AdminPageInfo, { "data": adminPageInfo })} ` })} </div> </main> </body></html>`;
 }, "/Users/asleepace/dev/asleepace.com/src/pages/admin/index.astro", void 0);
 
 const $$file = "/Users/asleepace/dev/asleepace.com/src/pages/admin/index.astro";

@@ -1,6 +1,6 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { PATH, siteData } from '@/consts'
+import { PATH, siteData, siteConfig } from '@/consts'
 import '@/styles/data-table.css'
 import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
 import AdminPageInfo from '@/components/admin/AdminPageInfo.astro'
@@ -38,7 +38,7 @@ const adminPageInfo = {
   <body class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden">
     <main class="flex flex-row h-full flex-1 bg-zinc-950">
       <!-- side bar -->
-      <AdminPanelSidebar activeTab={0} />
+      <AdminPanelSidebar activeTab={0} username={user.username} environment={siteConfig.environment} version={siteConfig.version} />
       <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16">
         <!-- welcome message & search bar -->
         <div class="flex flex-col gap-y-4 flex-1 self-stretch max-w-screen-xl">
