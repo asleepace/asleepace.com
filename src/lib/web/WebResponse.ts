@@ -1,17 +1,41 @@
 /**
+ * Content Security Directives
+ */
+const CONTENT_SECURITY_DIRECTIVES = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Allow inline scripts and eval
+  "style-src 'self' 'unsafe-inline'", // Allow inline styles
+  "img-src 'self' data: https:", // Allow images from HTTPS sources and data URIs
+  "font-src 'self' data:", // Allow fonts from self and data URIs
+  "connect-src 'self' https:", // Allow connections to HTTPS sources
+  "object-src 'none'", // Block <object>, <embed>, and <applet>
+  "frame-ancestors 'self'", // Only allow framing by same origin
+  "base-uri 'self'", // Restrict <base> tag
+  "form-action 'self'", // Restrict form submissions to same origin
+]
+
+/**
+ * Permissions Policy Directives
+ */
+const PERMISSIONS =
+  'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
+
+/**
  * ## HEADERS
  *
  * The headers for the response, these are frozen to prevent mutation.
  */
-const HEADERS = Object.freeze({
+export const HEADERS = Object.freeze({
   SECURITY: {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
     'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
+    'X-Frame-Options': 'SAMEORIGIN',
+    // 'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
-    'Content-Security-Policy': "default-src 'self'",
+    'Content-Security-Policy': CONTENT_SECURITY_DIRECTIVES.join('; '),
+    // 'Content-Security-Policy': "default-src 'self'",
     'Referrer-Policy': 'no-referrer-when-downgrade',
-    'Permissions-Policy': 'geolocation=(), microphone=()',
+    'Permissions-Policy': PERMISSIONS,
   },
   API: {
     'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, DELETE, OPTIONS',
