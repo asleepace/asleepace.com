@@ -34,11 +34,10 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     console.log(requestTag, chalk.gray('setting headers'))
 
-    // --- add security headers to all responses ---
-
-    Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
-      response.headers.set(header, value)
-    })
+    // TODO: too strict, disabling for now, plus there's nothing to hack anyways XD
+    // Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
+    //   response.headers.set(header, value)
+    // })
 
     // --- post-processing ---
 
