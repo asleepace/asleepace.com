@@ -8,6 +8,7 @@
  */
 export abstract class AppService {
   filePath: string
+  hasUnsavedChanges = false
 
   constructor() {
     process.on('exit', () => this.saveToStorage())
@@ -15,26 +16,33 @@ export abstract class AppService {
     process.on('SIGTERM', () => this.saveToStorage())
   }
 
-  async getPersistedData() {
+  async getPersistedData(
+    callback: (data: typeof this | undefined) => void
+  ): Promise<void> {
     const file = Bun.file(this.filePath)
     const exists = await file.exists()
-    if (!exists) return undefined
+    if (!exists) return callback(undefined)
     const json = await file.json()
     console.log('[AppService] getPersistedData', json)
-    return json as typeof this
+    return callback(json as typeof this)
   }
 
-  async saveToStorage() {
+  async saveToStorage(): Promise<boolean> {
     try {
-      console.log('[AppService] disposing...')
+      if (!this.hasUnsavedChanges) {
+        console.log('[AppService] saveToStorage', 'no unsaved changes')
+        return true
+      }
       const primitiveData = Object.entries(this).reduce((acc, [key, value]) => {
         if (typeof value === 'function') return acc
         return { ...acc, [key]: value }
       }, {})
       const json = JSON.stringify(primitiveData, null, 2)
       await Bun.write(this.filePath, json)
+      return true
     } catch (e) {
       console.error('[AppService] saveToStorage', e)
+      return false
     }
   }
 

@@ -28,22 +28,19 @@ export class ServicePermissions extends AppService {
 
   constructor() {
     super()
-    this.getPersistedData()
-      .then((storage) => {
-        console.log('[ServicePermissions] storage', storage)
-        this.permissions = storage?.permissions ?? {
-          ...DEFAULT_CLIENT_PERMISSIONS,
-        }
-        this.isEnabled = storage?.isEnabled ?? true
-        console.log('[ServicePermissions] initialized', this)
-      })
-      .catch((error) => {
-        console.warn('[ServicePermissions] error', error)
-      })
+    this.getPersistedData((storage) => {
+      console.log('[ServicePermissions] storage', storage)
+      this.permissions = storage?.permissions ?? {
+        ...DEFAULT_CLIENT_PERMISSIONS,
+      }
+      this.isEnabled = storage?.isEnabled ?? true
+      console.log('[ServicePermissions] initialized', this)
+    })
   }
 
   setPermission(permission: keyof ClientPermissions, value: boolean) {
     this.permissions[permission] = value
+    this.hasUnsavedChanges = true
   }
 
   getHeader() {
