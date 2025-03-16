@@ -43,7 +43,7 @@ The code editor appears to be a custom React-based implementation that likely pr
 - Implements selection range management for cursor positioning
 - Includes debug logging with '[caret]' prefix for tracking selection and content states
 
-Note: This appears to be a custom implementation rather than using existing libraries like Monaco or CodeMirror. Without more context, it's difficult to determine the full feature set, but the code suggests it handles basic editor functionality with custom selection and syntax management.
+Note: This is still a work in progress and is mainly just an exploration of how to implement an online code editor with React, HTML, CSS and Tailwind. The hardest part was handling the text selection along with copy / paste.
 
 ### What's next?
 
