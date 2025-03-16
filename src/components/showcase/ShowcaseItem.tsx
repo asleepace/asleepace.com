@@ -17,24 +17,27 @@ function ShowcaseItem(props: ShowcaseItemProps) {
   return (
     <a
       href={props.url}
-      className="flex flex-col rounded-xl sm:w-full md:basis-1/3 hover:shadow-xl md:h-80 transform transition-transform duration-300 hover:scale-105 aspect-square shadow-lg overflow-clip"
+      className="flex flex-col text-pretty rounded-xl w-full hover:shadow-xl transform transition-transform duration-200 hover:scale-105 aspect-square shadow-lg overflow-hidden"
       style={{ backgroundColor }}
     >
       <div
-        className="flex flex-1 bg-cover bg-transparent bg-center aspect-square h-60 flex-grow items-center p-4 shadow-md"
+        className="flex flex-1 bg-cover bg-transparent bg-center aspect-square h-60 items-end shadow-md"
         style={{
           backgroundColor: meta.themeColor || 'black',
           backgroundImage,
         }}
-      ></div>
-      <div className="flex flex-col justify-center overflow-hidden py-2 h-20 px-4 drop-shadow-lg bg-white shadow-md">
-        <p className="text-normal text-gray-800 p-0 font-bold m-0 text-ellipsis line-clamp-1">
-          {meta.title}
-        </p>
-        <p className="text-xs p-0 m-0 text-ellipsis text-gray-400 line-clamp-1">
-          {meta.description}
-        </p>
-        <p className="text-xs font-medium m-0 text-yellow-400">{props.url}</p>
+      >
+        <div className="flex w-full flex-col min-h-36 h-[34%] p-4 drop-shadow-lg justify-between bg-white shadow-md">
+          <span>
+            <p className="text-gray-800 text-2xl md:txt-4xl p-0 font-bold m-0 text-ellipsis line-clamp-1">
+              {meta.title}
+            </p>
+            <p className="text-base p-0 m-0 text-ellipsis text-gray-400 line-clamp-2">
+              {meta.description}
+            </p>
+          </span>
+          <p className="text-base m-0 text-yellow-400">{props.url}</p>
+        </div>
       </div>
     </a>
   )
