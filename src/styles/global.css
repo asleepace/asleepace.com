@@ -177,17 +177,18 @@ body {
     padding-left: var(--padding-sm);
     font-weight: 700;
     display: block;
+    line-height: 1;
+    text-wrap: balance;
   }
 
   h2 {
     font-size: 2.5em;
-    margin-top: var(--padding-lg);
-    margin-bottom: -1rem;
+    padding: 0 8px;
   }
 
   h3 {
     font-size: 2em;
-    margin-bottom: -1rem;
+    padding-top: 1em;
   }
 
   h4 {
@@ -197,6 +198,7 @@ body {
   }
 
   p {
+    font-size: 18px;
     padding: 0 var(--padding-sm);
     margin: 0;
   }
@@ -227,12 +229,14 @@ body {
     background-color: rgb(var(--gray-light));
     border-radius: 4px;
     padding: 2px 5px;
+    font-size: 16px;
   }
 
   /* code box styling */
   pre {
     padding: var(--padding-sm);
     overflow-x: scroll;
+    font-size: 16px;
   }
 
   /* stock chart */
@@ -270,7 +274,7 @@ body {
   ul > li {
     list-style-type: disc;
     font-family: Atkinson, sans-serif;
-    padding-inline-start: 1em;
+    padding-inline-start: 8px;
     line-height: 34px;
     font-size: 1em;
     margin-top: 0;

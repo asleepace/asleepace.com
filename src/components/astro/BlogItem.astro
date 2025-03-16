@@ -31,10 +31,10 @@ const blogDate = data?.pubDate || new Date()
     <div class="py-8 pl-8 pr-3 flex flex-col justify-between w-full">
       <p class="font-bold text-3xl xl:text-4xl">{blogTitle}</p>
       <div class="flex flex-col flex-1 py-4">
-        <p class="text-gray-500 text-sm xl:text-base">{blogDescription}</p>
+        <p class="text-gray-500 text-base line-clamp-3 text-ellipsis">{blogDescription}</p>
       </div>
-      <p class="text-gray-400 text-xs xl:text-sm flex items-center">
-        {"Created on "}<FormattedDate date={blogDate} /><span class="mx-2">{" • "}</span><span class="font-semibold">{"@asleepace"}</span>
+      <p class="text-gray-400 text-sm xl:text-sm flex items-center">
+        <FormattedDate date={blogDate} />
       </p>
     </div>
   </a>
