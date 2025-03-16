@@ -861,6 +861,10 @@ video {
   max-width: 400px;
 }
 
+.max-w-md {
+  max-width: 28rem;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1820,6 +1824,7 @@ body {
   }
   table {
     width: 100%;
+    margin: 0 var(--padding-sm);
   }
   ul,
   ol {
