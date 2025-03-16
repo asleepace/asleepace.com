@@ -26,8 +26,6 @@ This is Orson (the cat) who is a loving and adorable American tabby cat living i
 
 ---
 
-
-
 He responds to the name **"Orson"** or **"O"** for short and can be quite timid around strangers, but is also really playful and friendly if he knows you. He enojys fish flavored treats, chasing mice on strings and laser pointers.
 
 He is an American Tabby cat with brown fur, black stripes and green eyes and is average size and weight. You can see some distinctive black stripe markings on his head:
