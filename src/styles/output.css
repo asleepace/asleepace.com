@@ -872,6 +872,10 @@ video {
   max-width: 400px;
 }
 
+.max-w-screen-md {
+  max-width: 768px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -914,6 +918,10 @@ video {
 
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .flex-row {
@@ -1973,6 +1981,14 @@ body {
   --tw-gradient-to: #fef9c3 var(--tw-gradient-to-position);
 }
 
+.hover\:to-blue-100:hover {
+  --tw-gradient-to: #dbeafe var(--tw-gradient-to-position);
+}
+
+.hover\:to-blue-50:hover {
+  --tw-gradient-to: #eff6ff var(--tw-gradient-to-position);
+}
+
 .hover\:text-blue-500:hover {
   --tw-text-opacity: 1;
   color: rgb(59 130 246 / var(--tw-text-opacity, 1));
@@ -2043,8 +2059,16 @@ body {
 }
 
 @media (min-width: 640px) {
+  .sm\:aspect-video {
+    aspect-ratio: 16 / 9;
+  }
+
   .sm\:w-full {
     width: 100%;
+  }
+
+  .sm\:grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 }
 
@@ -2066,6 +2090,14 @@ body {
     flex-basis: 33.333333%;
   }
 
+  .md\:grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .md\:py-16 {
     padding-top: 4rem;
     padding-bottom: 4rem;
@@ -2083,6 +2115,10 @@ body {
 
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .lg\:flex-row {
@@ -2117,6 +2153,16 @@ body {
   .xl\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+
+  .xl\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .xl\:text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
 }
 

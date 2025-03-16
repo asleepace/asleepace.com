@@ -33,7 +33,7 @@ const posts = blog.sort(
     <main class="flex flex-col flex-grow max-w-screen-lg mx-auto px-4">
       <!-- recent articles (3 most recent) -->
       <Section title="Articles" description="Blog posts, tutorials and more." icon={Boxes}>
-        <BlogPreviewList posts={posts} />
+        <BlogPreviewList posts={posts} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3' />
       </Section>
       <!-- website show case section -->
       <Section title="Showcase" description="A collection of various projects I've done over the years." icon={Boxes}>
