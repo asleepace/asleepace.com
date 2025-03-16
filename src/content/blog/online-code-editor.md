@@ -8,9 +8,9 @@ slug: 'online-code-editor'
 
 Introducing my **Online Code Editor** (v1.0) a simple online code editor which can compile and run typescript code!
 
-<h3 style="text-align: center; color: white; background-color: #222432; padding: 10px; border-radius: 16px;"><a alt="Code Editor" style="color: white;" href="/code"> Click here to try it out!</a></h3>
+<button href="/code" className="bg-blue-500 hover:bg-blue-400 hover:underline w-full py-4 rounded-xl text-white">Click to open online text editor!</button>
 
-## Technical Overview
+### Technical Overview
 
 The code editor appears to be a custom React-based implementation that likely provides in-browser code editing capabilities. It's built using TypeScript and seems to handle several key features:
 

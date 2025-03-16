@@ -1,0 +1,141 @@
+/* Base list styling */
+ul,
+ol {
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+  line-height: 1.6;
+}
+
+/* Unordered list (ul) */
+ul {
+  list-style-type: none;
+}
+
+ul li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--accent);
+}
+
+ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: var(--black);
+}
+
+/* Nested unordered lists */
+ul ul li::before {
+  background-color: var(--black);
+  opacity: 0.8;
+}
+
+ul ul ul li::before {
+  background-color: var(--black);
+  opacity: 0.6;
+}
+
+/* Ordered list (ol) */
+ol {
+  counter-reset: item;
+  list-style-type: none;
+}
+
+ol li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 0.75rem;
+  counter-increment: item;
+  color: var(--accent);
+}
+
+ol li::before {
+  content: counter(item);
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+  background-color: var(--black);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Numbered circles at root level with background */
+.circle-numbers > li {
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 1rem;
+  list-style-type: none;
+}
+
+.circle-numbers > li::before {
+  content: counter(item);
+  counter-increment: item;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1.8rem;
+  width: 1.8rem;
+  background-color: #7290e8;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Reset counter for nested lists */
+.circle-numbers ul,
+.circle-numbers ol {
+  counter-reset: item;
+}
+
+/* For the specific structure in your image with nested items */
+.circle-numbers > li > ul {
+  margin-top: 1rem;
+  padding-left: 0;
+}
+
+.circle-numbers > li > ul > li {
+  counter-increment: none;
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.circle-numbers > li > ul > li::before {
+  content: counter(item, lower-alpha);
+  counter-increment: item;
+  background-color: #90c1f5;
+  height: 1.8rem;
+  width: 1.8rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  ul,
+  ol {
+    padding-left: 1rem;
+  }
+
+  ul li {
+    padding-left: 1.2rem;
+  }
+
+  ol li {
+    padding-left: 1.7rem;
+  }
+}

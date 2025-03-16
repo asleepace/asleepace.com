@@ -1622,6 +1622,7 @@ video {
   --padding-lg: 2rem;
   --max-width-article: 820px;
   --black-30: rgba(0, 0, 0, 0.3);
+  --black-100: #000000;
   /** table styles */
   --table-max-col-width: 120px;
   --table-min-col-width: 2px;
@@ -1773,6 +1774,9 @@ body {
     line-height: 1;
     text-wrap: balance;
   }
+  h1 {
+    font-size: 3em;
+  }
   h2 {
     font-size: 2.5em;
     padding: 0 8px;
@@ -1840,42 +1844,6 @@ body {
   table {
     margin-left: var(--padding-sm);
   }
-  ul,
-  ol {
-    -moz-tab-size: 4;
-      -o-tab-size: 4;
-         tab-size: 4;
-    margin-left: 1.5em;
-    margin-block-start: var(--padding-sm);
-    margin-block-end: 1.2em;
-    padding-inline-start: 0.4em;
-    list-style-position: outside;
-  }
-  ul > li {
-    list-style-type: disc;
-    font-family: Atkinson, sans-serif;
-    padding-inline-start: 8px;
-    line-height: 34px;
-    font-size: 1em;
-    margin-top: 0;
-  }
-  ol > li {
-    list-style-type: decimal;
-    font-family: Atkinson, sans-serif;
-    line-height: 34px;
-    font-size: 1em;
-    margin-top: 1em;
-  }
-  /* article > li {
-    border: none;
-    color: rgb(34, 41, 57);
-    list-style-type: disc;
-    font-family: Atkinson, sans-serif;
-    padding-inline-start: 0.4em;
-    padding-inline-end: 1.2em;
-    line-height: 34px;
-    font-size: 1em;
-  } */
   img {
     overflow: hidden;
     border-radius: 4px;
@@ -1898,6 +1866,61 @@ body {
     margin-bottom: 0em;
     padding-top: 1rem;
     padding-bottom: 1rem;
+  }
+  /* Base list styling */
+  ul,
+  ol {
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    line-height: 1.6;
+  }
+  /* Unordered list (ul) */
+  ul {
+    list-style-type: none;
+  }
+  ul li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: black;
+  }
+  ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7rem;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: var(--black-100);
+  }
+  /* Nested unordered lists */
+  ul ul li::before {
+    background-color: var(--black-100);
+    opacity: 0.8;
+  }
+  ul ul ul li::before {
+    background-color: var(--black-100);
+    opacity: 0.6;
+  }
+  /* Ordered list (ol) */
+  ol {
+    /* counter-reset: item; */
+    list-style-type: decimal;
+    padding-left: 2.5em;
+  }
+  ol li {
+    /* position: relative; */
+    padding-left: 1em;
+    margin-bottom: 0.75rem;
+    counter-increment: item;
+    color: var(--black-100);
+  }
+  ol li p {
+    padding: 0;
+  }
+  ol ul {
+    padding-left: 0;
   }
 }
 
@@ -1958,6 +1981,10 @@ body {
 .hover\:text-green-500:hover {
   --tw-text-opacity: 1;
   color: rgb(34 197 94 / var(--tw-text-opacity, 1));
+}
+
+.hover\:underline:hover {
+  text-decoration-line: underline;
 }
 
 .hover\:shadow-lg:hover {
