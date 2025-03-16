@@ -58,11 +58,18 @@
   font-display: swap;
 }
 
+html,
+body {
+  overflow-x: none;
+  overscroll-behavior-x: none;
+}
+
 body {
   font-family: 'Atkinson', sans-serif;
   margin: 0;
   padding: 0;
   text-align: left;
+  background-color: white;
   background: linear-gradient(var(--gray-gradient)) no-repeat;
   background-size: 100% 600px;
   word-wrap: break-word;
@@ -148,6 +155,7 @@ body {
 #prose {
   display: flex;
   flex-direction: column;
+  background-color: white;
   row-gap: 1rem;
 
   width: var(--max-width-article); /* ARTICLE MAX WIDTH  */
@@ -246,8 +254,7 @@ body {
   }
 
   table {
-    width: 100%;
-    margin: 0 var(--padding-sm);
+    margin-left: var(--padding-sm);
   }
 
   ul,

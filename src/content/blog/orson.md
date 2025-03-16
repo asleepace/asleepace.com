@@ -16,7 +16,7 @@ This is Orson (the cat) who is a loving and adorable American tabby cat living i
 | Tracking number | #991001005376664  |
 | Location        | San Francisco, Ca |
 | Breed           | American Tabby    |
-| Age             | 16 years          |
+| Age             | 12 years          |
 | Sex             | Male              |
 
 ---
@@ -37,3 +37,22 @@ Currently, he is living in Noe Valley in San Francisco, Ca.
 <img alt="Orson Cat" className="max-w-ld shadow-lg mx-auto" src="/images/orson3.jpeg" />
 
 Hopefully this page will never have to be used, but if it is, thank you in advanced!
+
+### Keywords
+
+<span className="text-gray-400">The following section contains keywords to help search engines better index this information.</span>
+
+<div className="flex flex-row flex-wrap gap-x-2 gap-y-2 px-2">
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Missing Cat</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Tabby</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">San Francisco</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Microchip #991001005376664</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Noe Valley</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Orson</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Google</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">To Find My Family</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Brown Hair</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Black Stripes</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">Green Eyes</p>
+  <p className="inline-block bg-blue-500 text-white px-2 py-1 rounded-lg">ASPCA</p>
+</div>
