@@ -1,10 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
-import tailwind from '@astrojs/tailwind'
 import sitemap from '@astrojs/sitemap'
 import react from '@astrojs/react'
 import node from '@astrojs/node'
 import mdx from '@astrojs/mdx'
+
+import tailwindcss from '@tailwindcss/vite'
 
 /**
  *  ## AstroConfiguration
@@ -19,7 +20,10 @@ import mdx from '@astrojs/mdx'
 
 export default defineConfig({
   site: 'https://asleepace.com',
-  integrations: [mdx(), sitemap(), react(), tailwind()],
+  integrations: [mdx(), sitemap(), react()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   adapter: node({
     mode: 'standalone',
   }),

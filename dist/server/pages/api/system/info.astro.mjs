@@ -1,12 +1,10 @@
-import { e as endpoint } from '../../../chunks/index_DAnW_ggU.mjs';
-import { h as http } from '../../../chunks/http_KD2o5bDQ.mjs';
+import { e as endpoint } from '../../../chunks/index_CORsxWON.mjs';
+import { h as http } from '../../../chunks/http_tQBNQEez.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const Seperator = {
   NEW_LINE: "\n",
-  WHITE_SPACE: /\s+/,
-  TAB: "	"
-};
+  WHITE_SPACE: /\s+/};
 const parsers = {
   VSZ: Number,
   PID: Number,
