@@ -1,3 +1,5 @@
+@import 'tailwindcss';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -339,7 +341,6 @@ body {
     /* counter-reset: item; */
     list-style-type: decimal;
     padding-left: 2.5em;
-
   }
 
   ol li {

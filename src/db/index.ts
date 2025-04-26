@@ -167,6 +167,10 @@ export namespace Sessions {
     if (!sessionCookie) throw new Error('No session cookie provided')
 
     const session = findByToken(sessionCookie)
+    if (!session) {
+      throw new Error('Session not found for admin only section!')
+    }
+
     const user = Users.getUserById(session.userId)
 
     if (!user) throw new Error('No user found')
@@ -188,6 +192,7 @@ export namespace Sessions {
   ): Promise<User | undefined> {
     if (!sessionCookie) return undefined
     const session = findByToken(sessionCookie)
+    if (!session) return undefined
     return Users.getUserById(session.userId)
   }
 
@@ -227,8 +232,9 @@ export namespace Sessions {
    * @param sessionToken - the session token to find the user for (Bearer token)
    * @returns the user for the given session token
    */
-  export function findUser(sessionToken: string): User | never {
+  export function findUser(sessionToken: string): User | undefined {
     const session = findByToken(sessionToken)
+    if (!session) return
     const user = Users.getUserById(session.userId)
     if (!user) {
       console.warn('User not found for session!')
@@ -237,7 +243,7 @@ export namespace Sessions {
     return user
   }
 
-  export function findByToken(token: string): UserSession | never {
+  export function findByToken(token: string): UserSession | undefined {
     const session = db
       .query('SELECT * FROM sessions WHERE token = $token')
       .get({
@@ -245,7 +251,8 @@ export namespace Sessions {
       }) as UserSession | undefined
 
     if (!session) {
-      throw new Error('Session not found')
+      console.warn('[findByToken] session not found:', token)
+      return
     }
 
     return session
@@ -329,7 +336,7 @@ export namespace Analytics {
       `
       SELECT 
         *,
-        COUNT(*) OVER() as totalCcount 
+        COUNT(*) OVER() as totalCount 
       FROM analytics 
       ORDER BY createdAt DESC
       LIMIT $limit OFFSET $offset;
