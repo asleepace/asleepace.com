@@ -76,7 +76,6 @@ class ShellProcessManager {
 }
 
 const ETX = {
-  STR: "",
   NUM: 3
 };
 let bufferId = 0;
