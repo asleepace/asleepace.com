@@ -6,7 +6,7 @@ heroImage: '/images/try-catch-cover.jpg'
 slug: 'try'
 ---
 
-Error handling in software engineering is one of those things that's kind of like paying taxes, it's something we all have to do\* and nobody enjoys doing it...
+Error handling in software engineering is a bit like paying taxes –– _it's something we all have to do and something that nobody enjoys doing..._
 
 If you are anything like me, then you are most likely familiar with how tedious and awkward error handling with try / catch statements can feel, especially in languages like Javascript and Typescript. Often times I find myself having to write unwieldy code like the following:
 
@@ -69,7 +69,7 @@ Perhaps you might guess that maybe for a low enough value of count, that it migh
 
 Well if you guessed `undefined` for any number, you would be correct, just imagine the headache if we had multiple nested finally blocks...
 
-## A better way?
+### A better way?
 
 While the above examples may seem a but contrived, they highlight some key issues with try/catch based error handling. If you are familiar with other programming languages like Go or Rust, then you are probably already know where I am going with this –– \*errors as **values\***.
 
@@ -127,7 +127,7 @@ function getUrlFromString(urlString: string): URL | undefined {
 
 Just like that our `getUrlFromString(urlString)` is far more succinct and easy to follow, so much so that we were able to add another case to make the program more robust! The less time we spend fiddling with nested try/catch statements, casting errors and wrangling control flow; the more time we can spend on making programs which crash less!
 
-## Synchronous vs. Asynchronous
+### Synchronous vs. Asynchronous
 
 So far the `tryCatch` utility works great for synchronous error handling. However, most of the time errors tend to stem from asynchronous operations like `fetch()` requests and json decoding. Here is where we run into a little issue with the type system...
 
@@ -199,7 +199,7 @@ const markdownHtml = marked.render(markdown, { async: true })
 
 A library that was able to return either sync or async simply by passing an optional argument to the method. This discovery re-ignited my unyielding thirst for a truly isomorphic try/catch helper and sent me into overdrive. Quickly I rushed to the packages Github source code and began trawling through the dense source code, until finally I noticed the secret.
 
-## Function Overloading
+### Function Overloading
 
 Function overloading in Typescript is most likely one of those things that you probably never think about unless you are a library maintainer or deep in the weeds. It allows for defining multiple variants of the same function or method which can take different arguments and return different values, and works by declaring just the function signature above the implementation.
 
