@@ -197,7 +197,111 @@ I tinkered with this problem for long than I would like to admit, making margina
 const markdownHtml = marked.render(markdown, { async: true })
 ```
 
-A library that was able to return either sync or async simply by passing an optional argument to the method. This discovery re-ignited my unyielding thirst for my isomorphic try/catch helper and sent me into overdrive.
-Quickly I rushed to the packages Github source code and began trawling through the dense source code, until finally I noticed the secret.
+A library that was able to return either sync or async simply by passing an optional argument to the method. This discovery re-ignited my unyielding thirst for a truly isomorphic try/catch helper and sent me into overdrive. Quickly I rushed to the packages Github source code and began trawling through the dense source code, until finally I noticed the secret.
 
 ## Function Overloading
+
+Function overloading in Typescript is most likely one of those things that you probably never think about unless you are a library maintainer or deep in the weeds. It allows for defining muultiple variants of the same function or method which can take different arguments and return different values, and works by declaring just the function signature above the implementation.
+
+For example imagine we have two similar functions which either add two numbers together or concat two strings. The implementation is nearly identical and it would be nice if we just had two write this logic once. The issue we want to avoid is allowing our new `add(a, b)` function to add a number and string or vis-versa.
+
+```ts
+function addString(x: string, y: string): string {
+  return x + y
+}
+
+function addNumber(x: number, y: number): number {
+  return x + y
+}
+```
+
+This is where function overloading comes in handy, we can declare multiple versions of the same function which help narrow the return type when calling directly. The caveat is that the actual implementation must contain the most permissive type which can accomadate any of the values also passed to the overloads.
+
+```ts
+function add(x: number, y: number): number
+function add(x: string, y: string): string
+function add(x: number | string, y: number | string): number | string {
+  if (typeof x === 'string' && typeof y === 'string') return x + y
+  if (typeof x === 'number' && typeof y === 'number') return x + y
+  throw new Error('Mismatched types!')
+}
+
+add(123, 456) // ok!
+add('a', 'b') // ok!
+add(123, 'b') // type-error
+add('a', 456) // type-error
+```
+
+As you can see we had to jump through a lot of hoops to even get this simple example working, but I hope it illustrates how function overloading can be used to declare multiple type variants of the same function. The first two function definition are recognized by the type system as overloads, where the last definition handles the actual implementation.
+
+Bringing this back to the `tryCatch(fn)` helper, let's see how we can leverage function overloads to help distinguish between the synchronous and asynchronous versions of our function.
+
+```ts
+function tryCatch<T>(fn: () => Promise<T>): Promise<Result<T>>
+function tryCatch<T>(fn: () => T | never): Result<T>
+function tryCatch<T>(
+  fn: () => T | never | Promise<T>
+): Result<T> | Promise<Result<T>> {
+  // ...
+}
+```
+
+The first function overload handles our async case where the `fn` passed as an argument returns a promise, this version should also return a promise which can be awaited to obtain the result tuple containing `T` or an `Error`. The second overload handles our synchronous case where the `fn` passed as an argument either returns `T` or `never` (can throw). Finally the last overload combines all three for our implementation.
+
+Ok, this is starting to look fairly _promising_ if I do say so myself... all that is left now is to handle the implementation. The tricky part here is figuring out how to perform a runtime check for an async function and then how to apply our error catching logic to this async function in a synchronous context. Luckily, this is actually what promises are in the first place!
+
+```ts
+try {
+  const output = fn()
+  if (output instanceof Promise) {
+    return output
+      .then((value) => [value, undefined] as ResultOk<T>)
+      .catch((error) => [undefined, error] as ResultError)
+  }
+  return [output, undefined] as ResultOk<T>
+} catch (e) {
+  const error = e instanceof Error ? e : new Error(String(e))
+  return [undefined, error] as ResultError
+}
+```
+
+The first step is execute the `fn()` passed as an argument and then check if the return value `output` is a promise. We can do this using the `instanceof` operator and if `true` we can call the `.then()` and `.catch()` to extract the value and construct our result tuple! This will then return our desired type `Promise<Result<T>>` which can be awaited!
+
+We are almost there now, but as some of you might have already noticed, we haven't properly coerced the async `error` value into the `Error` class. Let's extract the logic we used below in the original version into a seperate helper which can be used by bother versions.
+
+```ts
+const toError = (e: unknown): Error =>
+  e instanceof Error ? e : new Error(String(e))
+```
+
+It's not perfect, but it gets the job done for now. Basically just checks if the error value is already an instance of the `Error` class and if so does nothing, otherwise converts the value to a string which is then used to instantiate an `Error`. Now tying this altogether we should have something that looks like the following:
+
+```ts
+// our ressult types...
+type ResultOk<T> = [T, undefined]
+type ResultError = [undefined, Error]
+type Result<T> = ResultOk<T> | ResultError
+
+// our error handling utility...
+const toError = (e: unknown): Error =>
+  e instanceof Error ? e : new Error(String(e))
+
+// our try/catch overloads and implementation...
+function tryCatch<T>(fn: () => Promise<T>): Promise<Result<T>>
+function tryCatch<T>(fn: () => T | never): Result<T>
+function tryCatch<T>(
+  fn: () => T | never | Promise<T>
+): Result<T> | Promise<Result<T>> {
+  try {
+    const output = fn()
+    if (output instanceof Promise) {
+      return output
+        .then((value) => [value, undefined] as ResultOk<T>)
+        .catch((error) => [undefined, toError(error)] as ResultError)
+    }
+    return [output, undefined] as ResultOk<T>
+  } catch (e) {
+    return [undefined, toError(e)] as ResultError
+  }
+}
+```
