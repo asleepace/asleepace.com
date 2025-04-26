@@ -155,4 +155,49 @@ While we _could_ just create another utility like `tryCatchAsync(fn)` that fits 
 
 ### Advanced Typees
 
-Just like before, let's start by describing what it is we want with types. We roughly know what the async type should be from above, but how can we translate this to our example? Well the first thing to understand is that async/await is merely just syntactic sugar around promises.
+Just like before, let's start by describing what it is we want with types. We roughly know what the async type should be from above, but how can we translate this to our example? Well the first thing to understand is that async/await is merely just syntactic sugar around promises\*.
+
+```ts
+function example1() {
+  return new Promise<string>((resolve) => resolve('abc'))
+}
+
+async function example2() {
+  return 'hello'
+}
+
+type PromiseType = typeof example1 // () => Promise<string>
+type AsyncFnType = typeof example1 // () => Promise<string>
+```
+
+This means that _theoretically_ all we need to do is adjust our `tryCatch(fn)` to distinguish between `T` and `Promise<T>`. If we notice that the return type is a `Promise`, then we can assume the function should be considered async.
+
+```ts
+function tryCatch<T>(
+  fn: () => Promise<T> | T | never
+): Result<Promise<T>> | Result<T> {
+  // ...
+}
+```
+
+Unfortunately, this is where things start getting a bit complicated. If you hover over the result type now you will see the following:
+
+```ts
+const result = tryCatch(someFunc)
+typeof result // ResultError | ResultOk<number[]> | ResultOk<Promise<number[]>>
+```
+
+The issue is the type system isn't able to narrow the type simply by placing an await statement in front of the try/catch. This means functions which should be only synchronous are now appearing as potentially promises and vis-versa...
+
+We need to find a way to narrow the type system such that promises only are returned for async functions and not for synchronous ones, while async functions should only return promises and never synchronous results.
+
+I tinkered with this problem for long than I would like to admit, making marginal gains in one area, only at the cost of regressing in others. For a time I even thought that the technology simply didn't exist yet, until one day I stumbled across the following snippet:
+
+```ts
+const markdownHtml = marked.render(markdown, { async: true })
+```
+
+A library that was able to return either sync or async simply by passing an optional argument to the method. This discovery re-ignited my unyielding thirst for my isomorphic try/catch helper and sent me into overdrive.
+Quickly I rushed to the packages Github source code and began trawling through the dense source code, until finally I noticed the secret.
+
+## Function Overloading
