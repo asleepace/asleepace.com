@@ -305,3 +305,38 @@ function tryCatch<T>(
   }
 }
 ```
+
+Now let's go ahead and test this implementation with a couple different variations to ensure our types are working properly and the code does what we expect it to do for both synchronous and asynchronous operations! Below I've added test cases for synchronous, asynchronous and promise based arguments. For each different variant I've included one that throws and one that returns successfully.
+
+```ts
+async function main() {
+  const result0 = tryCatch(() => 123)
+  const result1 = tryCatch(() => {
+    if (Math.random() < 1.0) throw new Error('thrown sync')
+    return 123
+  })
+  const result2 = await tryCatch(async () => 'abc')
+  const result3 = await tryCatch(async () => {
+    throw new Error('thrown async')
+  })
+  const result4 = await tryCatch(() => new Promise<boolean>((res) => res(true)))
+  const result5 = await tryCatch(
+    () => new Promise((_, reject) => reject('thrown promise'))
+  )
+
+  // output the all the results once finished...
+  const outputs = [result0, result1, result2, result3, result4, result5]
+  outputs.forEach((info, i) => console.log(`Test #${i}: `, info))
+}
+```
+
+Looking at this code in a code editor shows that each of the results indeed have the desired return type, please note that some additional type casting needs to be done for the promises. Running this code also outputs what we expect as well:
+
+```txt
+[LOG] Test #0:  [123, undefined]
+[LOG] Test #1:  [undefined, thrown sync]
+[LOG] Test #2:  ["abc", undefined]
+[LOG] Test #3:  [undefined, thrown async]
+[LOG] Test #4:  [true, undefined]
+[LOG] Test #5:  [undefined, thrown promise]
+```
