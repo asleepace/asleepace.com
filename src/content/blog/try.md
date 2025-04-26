@@ -127,7 +127,7 @@ function getUrlFromString(urlString: string): URL | undefined {
 
 Just like that our `getUrlFromString(urlString)` is far more succinct and easy to follow, so much so that we were able to add another case to make the program more robust! The less time we spend fiddling with nested try/catch statements, casting errors and wrangling control flow; the more time we can spend on making programs which crash less!
 
-## Limitations
+## Synchronous vs. Asynchronous
 
 So far the `tryCatch` utility works great for synchronous error handling. However, most of the time errors tend to stem from asynchronous operations like `fetch()` requests and json decoding. Here is where we run into a little issue with the type system...
 
@@ -139,7 +139,7 @@ const result = tryCatch(async () => {
 typeof result // Result<Promise<number[]>>
 ```
 
-The problem here is that the promise is now inside our result and thus needs to be unpacked before we can call await. However, this also causes another issue as calling await on the result value can throw! Instead what we would like is for the return type to be `Promise<Result<number[]>>` like so
+The problem here is that the promise is now inside our result and thus needs to be unpacked before we can call await. However, this also causes another issue as calling await on the result value can throw! Instead what we would like is for the return type to be `Promise<Result<number[]>>` like so:
 
 ```ts
 const [data, error] = await tryCatch(async () => {
@@ -150,3 +150,9 @@ if (!error) {
   return data.map((num) => num * 10)
 }
 ```
+
+While we _could_ just create another utility like `tryCatchAsync(fn)` that fits these constraints, just look at that beautiful example above, that's what we **want** –– not that _"we have error values at home nonsense"_.
+
+### Advanced Typees
+
+Just like before, let's start by describing what it is we want with types. We roughly know what the async type should be from above, but how can we translate this to our example? Well the first thing to understand is that async/await is merely just syntactic sugar around promises.
