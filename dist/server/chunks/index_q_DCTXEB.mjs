@@ -150,6 +150,9 @@ var Sessions;
   function adminOnly(sessionCookie) {
     if (!sessionCookie) throw new Error("No session cookie provided");
     const session = findByToken(sessionCookie);
+    if (!session) {
+      throw new Error("Session not found for admin only section!");
+    }
     const user = Users.getUserById(session.userId);
     if (!user) throw new Error("No user found");
     if (Users.isAdmin(user) || Users.isSuperAdmin(user)) {
@@ -162,6 +165,7 @@ var Sessions;
   async function getUser(sessionCookie) {
     if (!sessionCookie) return void 0;
     const session = findByToken(sessionCookie);
+    if (!session) return void 0;
     return Users.getUserById(session.userId);
   }
   Sessions2.getUser = getUser;
@@ -184,6 +188,7 @@ var Sessions;
   Sessions2.generateToken = generateToken;
   function findUser(sessionToken) {
     const session = findByToken(sessionToken);
+    if (!session) return;
     const user = Users.getUserById(session.userId);
     if (!user) {
       console.warn("User not found for session!");
@@ -197,7 +202,8 @@ var Sessions;
       $token: token
     });
     if (!session) {
-      throw new Error("Session not found");
+      console.warn("[findByToken] session not found:", token);
+      return;
     }
     return session;
   }
@@ -249,7 +255,7 @@ var Analytics;
       `
       SELECT 
         *,
-        COUNT(*) OVER() as totalCcount 
+        COUNT(*) OVER() as totalCount 
       FROM analytics 
       ORDER BY createdAt DESC
       LIMIT $limit OFFSET $offset;

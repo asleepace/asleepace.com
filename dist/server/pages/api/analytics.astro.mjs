@@ -1,5 +1,5 @@
 import { e as endpoint } from '../../chunks/index_CORsxWON.mjs';
-import { A as Analytics } from '../../chunks/index_cCZ8Gi1v.mjs';
+import { A as Analytics } from '../../chunks/index_q_DCTXEB.mjs';
 import { h as http } from '../../chunks/http_tQBNQEez.mjs';
 import { g as getIpAddressFromHeaders } from '../../chunks/ipAddress_bVurJUOX.mjs';
 export { renderers } from '../../renderers.mjs';
