@@ -340,3 +340,43 @@ Looking at this code in a code editor shows that each of the results indeed have
 [LOG] Test #4:  [true, undefined]
 [LOG] Test #5:  [undefined, thrown promise]
 ```
+
+The result types are looking good and the implementation is working as expected! Lastly, let's try adding some edge-cases to make sure we haven't missed anything. Let's test the following:
+
+1. What happens if `fn()` doesn't return or throw anything
+2. What happens if `fn()` returns an `Error` instead of throwing
+3. What happens if `fn()` never returns and only throws
+
+```ts
+const result6 = tryCatch(() => {})
+const result7 = tryCatch(() => new Error('error as value'))
+const result8 = tryCatch(() => {
+  throw new Error('123')
+})
+```
+
+The first two edge-cases appear to work as we might expect, the first one returns `Result<void>` and the second returns `Result<Error>`, which is reasonable as our function is only concerned with catching errors, but not if the value they return is an error _per se_. However, for `result8` we can see something funky...
+
+```ts
+const result8: Promise<Result<unknown>>
+```
+
+Oh no, what is happening here? Well since this function never returns a value, this signature for `fn` looks like the following `fn: () => never`, which can't easily be matched by our current function overloads. No worries, the fix is quite simple as we just need to add the following overload:
+
+```ts
+function tryCatch<T>(fn: () => never): ResultError
+```
+
+Since the function `never` returns, this means it must throw and thus we can specify the return type to always be the sync `ResultError`. Thankfully, we only need to add this for sync version as the async version will still always return a promise first.
+
+Finally, after the all the things we've tried, we were able to catch a break and create the fabled _isomorphic_ try/catch utility. Well, at least that's what I call it anyways. Isomorphic in this context meaning:
+
+> An isomorphic function, or isomorphism, is a bijection (one-to-one and onto mapping) between two sets or structures that preserves the relevant properties or operations of those structures. In simpler terms, it's a way of showing that two things are essentially the same, even if they look different, by establishing a perfect match between their elements while maintaining their underlying relationships.
+
+Which I found as a fitting way to describe the relationship between the try/catch utility behaving the same in both synchronous and asynchronous contexts. What's even more fitting is that usually function overloading is meant for polymorphism...
+
+Anyways, I hope you enjoyed this article and learned something along the way. The next step is expand on the actual result type, with special methods like `.unwrap()` and `or()`, but I will save that for the next article.
+
+You can play around with a live example of the code here on the [Typescript playground](https://www.typescriptlang.org/play/?target=99#code/FAehAICUFMGcFcA2AXcA3Aho+0C00AnAgewN2XgAdFpxkBPSuYBpqOJZAeQGsAeACoA+cAF5wAbQEAacPAB2AE2gAzAJbzoigLotGtGAhQBRIqTGSFy9ZsWzTJArtYGOKQSPGHOvD+AA+7EbIDqTAoBChBOAAxsTyaISwavFyyGqIagzAcfKwqMjEURYAFNAAXHLyPPLEAO7yAJSVxaIitBr5GPIx0MQq4MUA-OC0lZp1g2YEJQDKyAQaAOZljY3hYOAAYgox6anEiQSIxBiKsOAAZOBqALbU0LfQ8sgY+-IAdF-AKrvvdAR6ABhN4xAAWHhKKnklRKjTEIk0R2aQU4UR+fxS8gBwNBEOEUJh4DhCPAAAUSLc1LBoB4URTiFSaXxvO5hEIMT1-gtcchwZDobD4W1wAIAuAkYQUazkB5OXssTiQXz8UJCULSWLApLooEGUzacJpW5ZcJxfrqbSZR4RABvYDgR048D2p1u2LxfLgYjwZCUX0WaFwh3ux1qAYlH1+gOdV49PoDC00+Gu0PugjQCgEbFR-3IENptMfZBg54lEqYbDQYUiCSVnCyKyqDRabTgDAXGW+I0Fwvuj4xPHlwiOGuWJTN2yyQpRMrTRptjuokzz3tugC+a6dGaz2Ikud9jYnNlb7c7Ju7HI3sSH1ZdW8dO-g2fH1hbdjoRWmq0X5+C6I3YBNwiUU4FQQcaVgcpgA7egenAX4uUVW4MA0ElU0dXJYGIGgBxoDAZnWN0sNQDNggABgsHllXBcsxwARgAJgAZiIp0SPAMjOHoqjARosE6NJDD3XDYkAFk3jBD4CG6RRGRJPhwHIj4AFZ4RLEhJgmKZHBKAByDT6mxWA4JiPS2NDJ8XyY5je3XCyPTyUiTUYiwMDqVCCj4odYPgkkRT0jAACMzIcjiuJQZi3I8rIlR8ky-LHYS3UMrToEmWcDLBTTsV80KH3Aeze3Ck0ABZos8uKVUEkVtKTWkguIHDoG6NUSjIscyJKBYcDWMLPWc4IVIq2LqKHAr-MRdLyUpS0+B1NqAH1ZAzAAraA9k66B1r2fTUuxShZppcyHP6pzOJNAA2XjeVoyaXSK4iBou4IAHYbv4mqpoy78ACIR3MJd62gX61mK56IuQAAOD6h3u5KnVSiVptnX6bNBuz1nB86D2QC5xAkSHyJWk16JJ4JGPJzhmKplBStp5AVIZy6Gdehmod0N1cdgD4VFIYwMDujQ+dkNQxyw5qPhOFYAAMBDA8AAGIABJbTUddKhl0X5D5sHgM2AAReIDIQ0glkzT8b0QRA6DBakAEJgBQtDGiAA) or view the full source code on my Github.
+
+Thanks again for reading and if you have any questions, comments or suggestions feel free to reach out to me on X or Github, happy coding!
