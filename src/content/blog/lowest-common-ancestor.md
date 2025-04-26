@@ -78,7 +78,7 @@ class TreeNode {
 
 The `insert(value: string, parentValue: string)` method will attempt to find a node in the current tree with the `parentValue`, and if found, insert a new node with the given `value` as a child. If the parent node cannot be found, this method will throw an error.
 
-Finally, let's add one more method which will return the values of our tree as an **in-order** array of strings. To do this we will just create an array containing the current nodes value, then we will add all the values of each childs subtree recursively.
+Finally, let's add one more method which will return the values of our tree as an **in-order** array of strings. To do this we will just create an array containing the current nodes value, then we will add all the values of each child's subtree recursively.
 
 ```ts
 class TreeNode {
@@ -194,7 +194,7 @@ Once we find a node that is a direct ancestor of both `value1` and `value2`, all
 console.log(getLCA(root, 'B', 'C')) // outputs "A"
 ```
 
-Awesome, we have now just implemented the logic to check if a node is an ancestor! While this does return an ancestor of two nodes, this is not guarenteed to be the least common ancestor.
+Awesome, we have now just implemented the logic to check if a node is an ancestor! While this does return an ancestor of two nodes, this is not guaranteed to be the least common ancestor.
 
 To check for the least common ancestor, all we need to do is traverse the tree recursively until we find the last node for which our base condition evaluates to `true`.
 

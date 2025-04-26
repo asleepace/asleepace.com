@@ -1,6 +1,6 @@
 ---
-title: 'Typescript - Errors as Values'
-description: 'Simple and powerful error handling which leverages errors as values, result tuples and try/catch utility methods.'
+title: 'The Quest for Isomorphic Error Handling in Typescript'
+description: 'A deep dive into error handling paradigms and advanced Typescript types to create the perfect errors-as-values utility.'
 pubDate: 'April 26 2025'
 heroImage: '/images/abstract-tree.png'
 slug: 'try'
@@ -8,7 +8,7 @@ slug: 'try'
 
 Error handling in software engineering is one of those things that's kind of like paying taxes, it's something we all have to do\* and nobody enjoys doing it...
 
-If you are anything like me, then you are most likely familiar with how tedious and awkward error handling with try / catch statements can feel, especially in languages like Javascript and Typescript. Often times I find myself having to write unweildy code like the following:
+If you are anything like me, then you are most likely familiar with how tedious and awkward error handling with try / catch statements can feel, especially in languages like Javascript and Typescript. Often times I find myself having to write unwieldy code like the following:
 
 ```ts
 function getUrlFromString(urlString: string): URL | undefined {
@@ -32,7 +32,7 @@ And while this might seem like a trivial example and something that could easily
 What I do like about this example, it that it demonstrates several key issues with the try / catch pattern, especially relating to Typescript:
 
 - values are scoped to their respective block
-- errors are not guarenteed to be of type `Error`
+- errors are not guaranteed to be of type `Error`
 - retries can becomes extremely verbose
 - it isn't clear if a function throws
 
@@ -73,7 +73,7 @@ Well if you guessed `undefined` for any number, you would be correct, just imagi
 
 While the above examples may seem a but contrived, they highlight some key issues with try/catch based error handling. If you are familiar with other programming languages like Go or Rust, then you are probably already know where I am going with this –– \*errors as **values\***.
 
-Instead of throwing errors willy-nilly to whoever will catch them, the idea is to treat them as first class citizens and handle as close to the call site as possible. While this article isn't a deep dive into the errors as values paradigm, a lot of the techniques have been inspired by Rust.
+Instead of throwing errors _willy-nilly_ to whoever will catch them, the idea is to treat them as first class citizens and handle as close to the call site as possible. While this article isn't a deep dive into the errors as values paradigm, a lot of the techniques have been inspired by Rust.
 
 Now let's start coding a re-usable solution which can help simplify our error handling process. Since this will be in Typescript let's begin by describing the shape of our data which should either by a generic value `T` or the concrete `Error` class, but not both.
 
@@ -107,7 +107,7 @@ if (error) return console.warn(error.message)
 return url.href // type-safe!
 ```
 
-Since `error` will only be defined when `[undefined, Error]` and we early return if it is defined, the Typescript type system is able to infer that `url` must be defined below! Now let's revisit the same problem I mentioed in the begining of this article and see how this approach does.
+Since `error` will only be defined when `[undefined, Error]` and we early return if it is defined, the Typescript type system is able to infer that `url` must be defined below! Now let's revisit the same problem I mentioned in the beginning of this article and see how this approach does.
 
 ```ts
 function getUrlFromString(urlString: string): URL | undefined {
@@ -153,7 +153,7 @@ if (!error) {
 
 While we _could_ just create another utility like `tryCatchAsync(fn)` that fits these constraints, just look at that beautiful example above, that's what we **want** –– not that _"we have error values at home nonsense"_.
 
-### Advanced Typees
+### Advanced Types
 
 Just like before, let's start by describing what it is we want with types. We roughly know what the async type should be from above, but how can we translate this to our example? Well the first thing to understand is that async/await is merely just syntactic sugar around promises\*.
 
@@ -201,7 +201,7 @@ A library that was able to return either sync or async simply by passing an opti
 
 ## Function Overloading
 
-Function overloading in Typescript is most likely one of those things that you probably never think about unless you are a library maintainer or deep in the weeds. It allows for defining muultiple variants of the same function or method which can take different arguments and return different values, and works by declaring just the function signature above the implementation.
+Function overloading in Typescript is most likely one of those things that you probably never think about unless you are a library maintainer or deep in the weeds. It allows for defining multiple variants of the same function or method which can take different arguments and return different values, and works by declaring just the function signature above the implementation.
 
 For example imagine we have two similar functions which either add two numbers together or concat two strings. The implementation is nearly identical and it would be nice if we just had two write this logic once. The issue we want to avoid is allowing our new `add(a, b)` function to add a number and string or vis-versa.
 
@@ -215,7 +215,7 @@ function addNumber(x: number, y: number): number {
 }
 ```
 
-This is where function overloading comes in handy, we can declare multiple versions of the same function which help narrow the return type when calling directly. The caveat is that the actual implementation must contain the most permissive type which can accomadate any of the values also passed to the overloads.
+This is where function overloading comes in handy, we can declare multiple versions of the same function which help narrow the return type when calling directly. The caveat is that the actual implementation must contain the most permissive type which can accommodate any of the values also passed to the overloads.
 
 ```ts
 function add(x: number, y: number): number
@@ -267,7 +267,7 @@ try {
 
 The first step is execute the `fn()` passed as an argument and then check if the return value `output` is a promise. We can do this using the `instanceof` operator and if `true` we can call the `.then()` and `.catch()` to extract the value and construct our result tuple! This will then return our desired type `Promise<Result<T>>` which can be awaited!
 
-We are almost there now, but as some of you might have already noticed, we haven't properly coerced the async `error` value into the `Error` class. Let's extract the logic we used below in the original version into a seperate helper which can be used by bother versions.
+We are almost there now, but as some of you might have already noticed, we haven't properly coerced the async `error` value into the `Error` class. Let's extract the logic we used below in the original version into a separate helper which can be used by bother versions.
 
 ```ts
 const toError = (e: unknown): Error =>
@@ -277,7 +277,7 @@ const toError = (e: unknown): Error =>
 It's not perfect, but it gets the job done for now. Basically just checks if the error value is already an instance of the `Error` class and if so does nothing, otherwise converts the value to a string which is then used to instantiate an `Error`. Now tying this altogether we should have something that looks like the following:
 
 ```ts
-// our ressult types...
+// our result types...
 type ResultOk<T> = [T, undefined]
 type ResultError = [undefined, Error]
 type Result<T> = ResultOk<T> | ResultError
@@ -374,6 +374,8 @@ Finally, after the all the things we've tried, we were able to catch a break and
 > An isomorphic function, or isomorphism, is a bijection (one-to-one and onto mapping) between two sets or structures that preserves the relevant properties or operations of those structures. In simpler terms, it's a way of showing that two things are essentially the same, even if they look different, by establishing a perfect match between their elements while maintaining their underlying relationships.
 
 Which I found as a fitting way to describe the relationship between the try/catch utility behaving the same in both synchronous and asynchronous contexts. What's even more fitting is that usually function overloading is meant for polymorphism...
+
+<img src="/images/result-tuple.jpg" alt="Isomorphic Try/Catch Error Handling" />
 
 Anyways, I hope you enjoyed this article and learned something along the way. The next step is expand on the actual result type, with special methods like `.unwrap()` and `or()`, but I will save that for the next article.
 
