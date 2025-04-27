@@ -1,5 +1,6 @@
 ---
 import type { Blog } from '@/types'
+import clsx from 'clsx'
 import { BoxIcon, LinkIcon, RssIcon } from 'lucide-react'
 
 export type FeedItem = {
@@ -13,11 +14,12 @@ export type WebsiteItem = {
 }
 
 interface Props {
+  className: string
   featured: Blog
   feed: FeedItem[]
 }
 
-const { featured, feed } = Astro.props
+const { featured, feed, className: classList } = Astro.props
 
 const featuredImage = featured.data.heroImage
 
@@ -56,13 +58,13 @@ const pages: LinkItem[] = [
 ]
 
 ---
-<div class="p-4">
+<div class={clsx("p-4", classList)}>
   <!-- Bento Box Container -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-    <div class="col-span-1 row-span-3 rounded-3xl bg-zinc-900 overflow-hidden">
+    <!-- <div class="col-span-1 row-span-3 rounded-3xl bg-zinc-900 overflow-hidden">
       <p>Left</p>
-    </div>
+    </div> -->
     
     <!-- Featured Box (spans 2 columns on medium screens and up) -->
     <a href={`/blog/${featured.id}`} class="bg-yellow-500/10 overflow-hidden rounded-2xl shadow-md md:row-span-2 md:col-span-2 h-96 relative group">
