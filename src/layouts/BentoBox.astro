@@ -1,4 +1,5 @@
 ---
+import HoverCard from '@/components/astro/HoverCard.astro'
 import type { Blog } from '@/types'
 import clsx from 'clsx'
 import { BoxIcon, LinkIcon, RssIcon } from 'lucide-react'
@@ -47,12 +48,6 @@ const pages: LinkItem[] = [
     name: "Links",
     icon: LinkIcon,
     tint: "oklch(76.9% 0.188 70.08)",
-    href: "/tools"
-  },
-  {
-    name: "Socials",
-    icon: RssIcon,
-    tint: "oklch(51.1% 0.262 276.966)",
     href: "/tools"
   }
 ]
@@ -139,7 +134,9 @@ const pageLinks = [
           )
         })
       }
-    </div>
+      <HoverCard href='/about' alt='About Colin Teahan' image='/images/about-me.jpeg' class:list="basis-1/3">
+        <p class="p-6">About</p>
+      </HoverCard>
   </div>
 </div>
 <style>

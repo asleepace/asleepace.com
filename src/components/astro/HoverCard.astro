@@ -1,0 +1,34 @@
+---
+import clsx from 'clsx'
+
+//  ======================
+//  Hover card
+//  ======================
+
+interface Props {
+  class?: string
+  image?: string
+  href: string
+  alt?: string
+}
+
+const {
+  alt,
+  href,
+  image,
+  class: className
+} = Astro.props
+
+---
+<a aria-label={alt} href={href} class={clsx("flex self-stretch flex-col group bg-zinc-100 relative overflow-hidden rounded-2xl", className)}>
+  {
+    image && (
+      <div 
+        class="inset-0 z-10 absolute bg-cover bg-center transition-transform duration-500 scale-110 group-hover:scale-125" 
+        style={`background-image: url(${image});`} />
+    )
+  }
+  <div class="inset-0 absolute z-20 text-5xl text-white font-black from-white/10 via-transparent to-black/15">
+    <slot />
+  </div>
+</a>
