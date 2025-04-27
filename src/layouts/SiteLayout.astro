@@ -6,20 +6,25 @@ import PageNavigation from '@/components/astro/PageNavigation.astro'
 interface Props {
   title?: string
   description?: string
+  image?: string
 }
 
-const { title = 'Asleepace', description = 'My personal website for everything & anything.' } = Astro.props;
+const { 
+  title = 'Asleepace', 
+  description = 'My personal website for everything & anything.', 
+  image 
+} = Astro.props;
 
 ---
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <BaseHead title={title} description={description} />
+    <BaseHead title={title} description={description} image={image} />
   </head>
   <body class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden">
     <PageNavigation />
-    <main class="container flex flex-col items-center min-h-screen">
+    <main class="w-full flex flex-col items-center min-h-screen">
       <!-- dynamic content -->
       <slot />
     </main>

@@ -8,6 +8,8 @@ import Section from '@/components/astro/Section.astro'
 import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
 import { Newspaper } from 'lucide-react'
 
+import SiteLayout from '@/layouts/SiteLayout.astro'
+
 export const prerender = true
 
 // =====================================
@@ -20,19 +22,10 @@ const posts = blog.sort(
 )
 
 ---
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body class="min-h-screen flex flex-col">
-    <Header />
-    <main class="flex flex-col min-w-[480px] grow max-w-screen-lg mx-auto px-4">
-      <Section title="Articles" description='My thoughts unleashed on the world!' icon={Newspaper}>
-        <BlogPreviewList posts={posts} className='grid md:grid-cols-2 sm:grid-cols-1 max-screen-sm' />
-      </Section>
-    </main>
-    <Footer />
-  </body>
-</html>
+<SiteLayout>
+  <article class="flex flex-col min-w-[480px] grow max-w-screen-xl mx-auto px-4">
+  <Section title="Articles" description='My thoughts unleashed on the world!' icon={Newspaper}>
+    <BlogPreviewList posts={posts} className='grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 max-screen-sm' />
+  </Section>
+  </article>
+</SiteLayout>
