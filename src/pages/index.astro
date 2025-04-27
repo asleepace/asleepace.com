@@ -12,6 +12,7 @@ import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
 
 import SideLayout from '@/layouts/SiteLayout.astro'
 import SiteLayout from '@/layouts/SiteLayout.astro'
+import BentoBox from '@/components/astro/BentoBox.astro'
 
 export const prerender = true;
 
@@ -25,7 +26,6 @@ const posts = blog.sort(
 ).slice(0, 2)
 
 ---
-
 <SiteLayout title="Home">
-
+  <BentoBox />
 </SiteLayout>
