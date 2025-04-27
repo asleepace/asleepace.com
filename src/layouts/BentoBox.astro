@@ -1,12 +1,18 @@
 ---
 import type { Blog } from '@/types'
 
+export type FeedItem = {
+  href: string
+  name: string
+  date: Date
+}
 
 interface Props {
   featured: Blog
+  feed: FeedItem[]
 }
 
-const { featured } = Astro.props
+const { featured, feed } = Astro.props
 
 const featuredImage = featured.data.heroImage
 
@@ -16,7 +22,7 @@ const featuredImage = featured.data.heroImage
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     
     <!-- Featured Box (spans 2 columns on medium screens and up) -->
-    <a href={`/blog/${featured.id}`} class="bg-yellow-500/10 overflow-hidden rounded-lg shadow-md md:col-span-2 h-64 relative group">
+    <a href={`/blog/${featured.id}`} class="bg-yellow-500/10 overflow-hidden rounded-2xl shadow-md md:row-span-2 md:col-span-2 h-96 relative group">
       <!-- Background Image Layer -->
       <div class="absolute inset-0 transform -rotate-3 scale-120 transition-transform duration-700 
               group-hover:scale-125 group-hover:animate-pulse" 
@@ -28,34 +34,32 @@ const featuredImage = featured.data.heroImage
       
       <!-- Content Layer -->
       <div class="relative z-10 flex w-full h-full p-4 flex-col">
-        <div class="flex flex-1"></div>
+        <div class="flex flex-1 gap-y-1"></div>
         <p class="text-4xl font-black text-white text-shadow">{featured.data.title}</p>
         <p class="text-sm line-clamp-1 text-white max-w-3/5 text-ellipsis">{featured.data.description}</p>
       </div>
     </a>
     
-    <!-- Sidebar Box -->
-    <div class="bg-green-100 p-6 rounded-lg shadow-md h-64 flex items-center justify-center">
-      <h2 class="text-xl font-bold">Sidebar</h2>
-    </div>
-    
-    <!-- Small Box 1 -->
-    <div class="bg-red-100 p-6 rounded-lg shadow-md h-48 flex items-center justify-center">
-      <h2 class="text-lg font-bold">Box 1</h2>
-    </div>
-    
-    <!-- Small Box 2 -->
-    <div class="bg-yellow-100 p-6 rounded-lg shadow-md h-48 flex items-center justify-center">
-      <h2 class="text-lg font-bold">Box 2</h2>
-    </div>
-    
-    <!-- Small Box 3 -->
-    <div class="bg-purple-100 p-6 rounded-lg shadow-md h-48 flex items-center justify-center">
-      <h2 class="text-lg font-bold">Box 3</h2>
+    <!-- Sidebar Box (now spans 2 rows) -->
+    <div class="bg-zinc-900 p-6 rounded-2xl md:row-span-2 h-96 overflow-y-auto flex flex-col">
+      <h2 class="text-xl text-blue-400 font-bold mb-4">Activity Feed</h2>
+      <div class="h-1 bg-zinc-700" />
+      <div class="flex-1 overflow-auto inset-1">
+        {
+          feed.map((item) => {
+            return (
+              <a class="flex gap-x-4 flex-row hover:text-yellow-500 transform duration-300 opacity-60 hover:opacity-100 justify-between pt-4" href={item.href}>
+                <p class="text-sm hover:text-yellow-500 font-normal text-white line-clamp-1">{item.name}</p>
+                <p class="text-xs text-white/30">{item.date.toLocaleDateString()}</p>
+              </a>
+            )
+          })
+        }
+      </div>
     </div>
     
     <!-- Wide Box (spans full width) -->
-    <div class="bg-indigo-100 p-6 rounded-lg shadow-md col-span-1 md:col-span-3 h-40 flex items-center justify-center">
+    <div class="bg-zinc-100 p-6 rounded-2xl col-span-1 md:col-span-3 h-40 flex items-center justify-center">
       <h2 class="text-xl font-bold">Full Width Box</h2>
     </div>
   </div>

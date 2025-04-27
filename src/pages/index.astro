@@ -29,7 +29,13 @@ const posts = blog.sort(
 const featured = posts.at(0)!
 console.log(featured)
 
+const feed = posts.slice(1).map(({ data, id } ) => ({
+  name: data.title,
+  date: data.updatedDate ?? data.pubDate,
+  href: `/blog/${id}`
+}))
+
 ---
 <SiteLayout title="Home">
-  <BentoBox featured={featured}>
+  <BentoBox featured={featured} feed={feed}>
 </SiteLayout>
