@@ -6,7 +6,7 @@ heroImage: '/images/try-catch-cover.jpg'
 slug: 'try'
 ---
 
-Error handling in software engineering is a bit like paying taxes –– _it's something we all have to do and something that nobody enjoys doing..._
+Error handling in software engineering is a bit like paying taxes — _it's something that we all have to do and something that nobody enjoys doing..._
 
 If you are anything like me, then you are most likely familiar with how tedious and awkward error handling with try / catch statements can feel, especially in languages like Javascript and Typescript. Often times I find myself having to write unwieldy code like the following:
 
@@ -27,14 +27,14 @@ function getUrlFromString(urlString: string): URL | undefined {
 }
 ```
 
-And while this might seem like a trivial example and something that could easily be abstracted into smaller utility functions, it might surprise you that I've seen stuff like this in corporate production software.
+And while this might seem like a trivial example and something that could easily be abstracted into smaller utility functions, it might surprise you that I've seen numerous examples just like this in corporate production software.
 
 What I do like about this example, it that it demonstrates several key issues with the try / catch pattern, especially relating to Typescript:
 
-- values are scoped to their respective block
+- values are scoped to their respective blocks
 - errors are not guaranteed to be of type `Error`
-- retries can becomes extremely verbose
-- it isn't clear if a function throws
+- retry logic can become extremely verbose
+- it isn't clear if a function can throw or not
 
 Along with this since any function can throw from somewhere deep in the call stack, the control flow of the program can become unpredictable and hard to reason about what is happening and where. In fact, let's take a look at one more example. What do you think this function will return?
 
