@@ -1,4 +1,5 @@
 ---
+import FeaturedCard from '@/components/astro/FeaturedCard.astro'
 import HoverCard from '@/components/astro/HoverCard.astro'
 import type { Blog } from '@/types'
 import clsx from 'clsx'
@@ -82,23 +83,9 @@ const pageLinks = [
     </div>
     
     <!-- Featured Box (spans 2 columns on medium screens and up) -->
-    <a href={`/blog/${featured.id}`} class="bg-yellow-500/10 overflow-hidden rounded-2xl shadow-md md:row-span-2 md:col-span-2 h-96 relative group">
-      <!-- Background Image Layer -->
-      <div class="absolute inset-0 transform -rotate-3 scale-120 transition-transform duration-700 
-              group-hover:scale-125 group-hover:animate-pulse" 
-          style={`background-image: url(${featuredImage}); background-position: center; background-size: cover;`}>
-      </div>
-      
-      <!-- Overlay Layer with Blur -->
-      <div class="absolute inset-0 bg-gradient-to-b to-black/90 from-black/5 via-black/60"></div>
-      
-      <!-- Content Layer -->
-      <div class="relative z-10 flex w-full h-full p-4 flex-col">
-        <div class="flex flex-1 gap-y-1"></div>
-        <p class="text-4xl font-black text-white text-shadow">{featured.data.title}</p>
-        <p class="text-sm line-clamp-1 text-white max-w-3/5 text-ellipsis">{featured.data.description}</p>
-      </div>
-    </a>
+    <FeaturedCard href={`/blog/${featured.id}`} image={featuredImage} name={featured.data.title} 
+      info={featured.data.description}
+    />
     
     <!-- Activity Feed (now spans 2 rows) -->
     <div class="bg-zinc-900 p-6 rounded-2xl md:row-span-2 h-96 overflow-y-auto flex flex-col">
@@ -135,7 +122,7 @@ const pageLinks = [
         })
       }
       <HoverCard href='/about' alt='About Colin Teahan' image='/images/about-me.jpeg' class:list="basis-1/3">
-        <p class="p-6">About</p>
+        <p class="p-6 from-black/10 via-black/0 to-transparent bg-gradient-to-br">About</p>
       </HoverCard>
   </div>
 </div>
