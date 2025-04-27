@@ -72,7 +72,7 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
   }, [ts, execute])
 
   return (
-    <div className="flex flex-1 flex-grow flex-col w-full min-h-screen bg-editor-200">
+    <div className="flex flex-1 grow flex-col w-full min-h-screen bg-editor-200">
       <CodeToolbar onRun={runJs} onSave={onSave} onSettings={onSettings} />
       <Code
         onSubmit={(code) => setCode({ code, lang: 'typescript' })}

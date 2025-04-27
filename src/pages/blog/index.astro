@@ -28,7 +28,7 @@ const posts = blog.sort(
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />
-    <main class="flex flex-col flex-grow max-w-screen-lg mx-auto px-4">
+    <main class="flex flex-col grow max-w-screen-lg mx-auto px-4">
       <Section title="Articles" description='My thoughts unleashed on the world!' icon={Newspaper}>
         <BlogPreviewList posts={posts} className='grid md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 max-screen-sm' />
       </Section>

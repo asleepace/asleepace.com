@@ -4,10 +4,6 @@
  * ==============================
  */
 
- @tailwind base;
- @tailwind components;
- @tailwind utilities;
-
 :root {
   --table-min-col-width: 100px;
   --table-max-col-width: 400px;

@@ -39,7 +39,7 @@ function AdminCommandResultItem({ result }: { result: CommandResult }) {
       ? result.command.join(' ')
       : result.command
   return (
-    <div className="flex flex-col gap-y-1 flex-grow text-sm">
+    <div className="flex flex-col gap-y-1 grow text-sm">
       <p className="tracking-wide font-mono">
         <span className={clsx('text-purple-500', isError && 'text-white')}>
           {result.whoami}

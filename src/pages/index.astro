@@ -30,7 +30,7 @@ const posts = blog.sort(
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     <Header title={siteData.title} />
-    <main class="flex flex-col flex-grow max-w-screen-lg mx-auto px-4">
+    <main class="flex flex-col grow max-w-screen-lg mx-auto px-4">
       <!-- recent articles (3 most recent) -->
       <Section title="Articles" description="Blog posts, tutorials and more." icon={Boxes}>
         <BlogPreviewList posts={posts} className='grid grid-cols-2' />
