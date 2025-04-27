@@ -15,6 +15,16 @@
   --'2xl': 1536px, */
 }
 
+@layer components {
+  .scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
 @layer utilities {
   @media (min-width: 768px) {
     .pop:hover {
