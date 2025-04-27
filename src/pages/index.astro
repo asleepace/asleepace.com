@@ -12,7 +12,8 @@ import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
 
 import SideLayout from '@/layouts/SiteLayout.astro'
 import SiteLayout from '@/layouts/SiteLayout.astro'
-import BentoBox from '@/components/astro/BentoBox.astro'
+import BentoBox from '@/layouts/BentoBox.astro'
+import BlogItem from '@/components/astro/BlogItem.astro'
 
 export const prerender = true;
 
@@ -23,9 +24,12 @@ export const prerender = true;
 const blog = await getCollection('blog')
 const posts = blog.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-).slice(0, 2)
+)
+
+const featured = posts.at(0)!
+console.log(featured)
 
 ---
 <SiteLayout title="Home">
-  <BentoBox />
+  <BentoBox featured={featured}>
 </SiteLayout>

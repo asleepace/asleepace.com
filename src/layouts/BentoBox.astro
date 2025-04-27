@@ -1,0 +1,69 @@
+---
+import type { Blog } from '@/types'
+
+
+interface Props {
+  featured: Blog
+}
+
+const { featured } = Astro.props
+
+const featuredImage = featured.data.heroImage
+
+---
+<div class="p-4">
+  <!-- Bento Box Container -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    
+    <!-- Featured Box (spans 2 columns on medium screens and up) -->
+    <a href={`/blog/${featured.id}`} class="bg-yellow-500/10 overflow-hidden rounded-lg shadow-md md:col-span-2 h-64 relative group">
+      <!-- Background Image Layer -->
+      <div class="absolute inset-0 transform -rotate-3 scale-120 transition-transform duration-700 
+              group-hover:scale-125 group-hover:animate-pulse" 
+          style={`background-image: url(${featuredImage}); background-position: center; background-size: cover;`}>
+      </div>
+      
+      <!-- Overlay Layer with Blur -->
+      <div class="absolute inset-0 bg-gradient-to-b to-black/90 from-black/5 via-black/60"></div>
+      
+      <!-- Content Layer -->
+      <div class="relative z-10 flex w-full h-full p-4 flex-col">
+        <div class="flex flex-1"></div>
+        <p class="text-4xl font-black text-white text-shadow">{featured.data.title}</p>
+        <p class="text-sm line-clamp-1 text-white max-w-3/5 text-ellipsis">{featured.data.description}</p>
+      </div>
+    </a>
+    
+    <!-- Sidebar Box -->
+    <div class="bg-green-100 p-6 rounded-lg shadow-md h-64 flex items-center justify-center">
+      <h2 class="text-xl font-bold">Sidebar</h2>
+    </div>
+    
+    <!-- Small Box 1 -->
+    <div class="bg-red-100 p-6 rounded-lg shadow-md h-48 flex items-center justify-center">
+      <h2 class="text-lg font-bold">Box 1</h2>
+    </div>
+    
+    <!-- Small Box 2 -->
+    <div class="bg-yellow-100 p-6 rounded-lg shadow-md h-48 flex items-center justify-center">
+      <h2 class="text-lg font-bold">Box 2</h2>
+    </div>
+    
+    <!-- Small Box 3 -->
+    <div class="bg-purple-100 p-6 rounded-lg shadow-md h-48 flex items-center justify-center">
+      <h2 class="text-lg font-bold">Box 3</h2>
+    </div>
+    
+    <!-- Wide Box (spans full width) -->
+    <div class="bg-indigo-100 p-6 rounded-lg shadow-md col-span-1 md:col-span-3 h-40 flex items-center justify-center">
+      <h2 class="text-xl font-bold">Full Width Box</h2>
+    </div>
+  </div>
+</div>
+<style>
+#bento-featured {
+  background-image: url(featuredImage);
+  background-position: center;
+  background-size: cover;
+}
+</style>
