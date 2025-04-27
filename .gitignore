@@ -3,6 +3,9 @@
 # generated types
 #.astro/
 
+# Generated files
+src/styles/output.css
+
 # dependencies
 node_modules/
 

@@ -1,8 +1,9 @@
-import { c as createAstro, a as createComponent, d as renderComponent, e as renderHead, r as renderTemplate } from '../../chunks/astro/server_CrxpYex7.mjs';
+import { b as createAstro, c as createComponent, r as renderComponent, e as renderHead, a as renderTemplate } from '../../chunks/astro/server_C-py2KQh.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_BtO3W1Kp.mjs';
-import { $ as $$Header, a as $$Footer } from '../../chunks/Footer_Y9XyPz3P.mjs';
-import { a as siteData } from '../../chunks/consts_CF0Pd1PO.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_B56J8u5W.mjs';
+import { $ as $$Header } from '../../chunks/Header_DV5JftiH.mjs';
+import { a as $$Footer } from '../../chunks/HeaderLink_DYhP_N4z.mjs';
+import { a as siteData } from '../../chunks/consts_DsjtsUmI.mjs';
 import { CircleUser } from 'lucide-react';
 export { renderers } from '../../renderers.mjs';
 
@@ -20,7 +21,7 @@ const $$Login = createComponent(($$result, $$props, $$slots) => {
     unknown: "An unknown error occurred: " + error
   };
   const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error;
-  return renderTemplate`<html lang="en"> <head>${renderComponent($$result, "BaseHead", $$BaseHead, { "title": siteData.title, "description": siteData.description })}${renderHead()}</head> <body class="min-h-screen flex flex-col bg-white"> ${renderComponent($$result, "Header", $$Header, { "title": siteData.title })} <main class="flex flex-col flex-grow max-w-screen-lg justify-center items-center mx-auto p-4"> <div class="flex flex-col items-center gap-2 py-12 border-[1px] bg-white border-gray-300 rounded-md p-4"> ${renderComponent($$result, "CircleUser", CircleUser, { "className": "text-blue-500", "size": 84 })} <p class="text-4xl font-bold text-center">Admin</p> <p class="text-center text-gray-500">Please login to continue.</p> <!-- Login Form --> <form action="/api/auth" class="flex flex-col mt-4 gap-2 w-[300px]" method="post"> <input autofocus class="border border-gray-300 rounded-md p-2" autocomplete="email" id="username" type="text" name="username" placeholder="Username"> <input class="border border-gray-300 rounded-md p-2" autocomplete="current-password" id="password" type="password" name="password" placeholder="Password"> <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button> </form> ${message && renderTemplate`<p class="text-red-500 text-sm">${message}</p>`} </div></main> ${renderComponent($$result, "Footer", $$Footer, {})} </body></html>`;
+  return renderTemplate`<html lang="en"> <head>${renderComponent($$result, "BaseHead", $$BaseHead, { "title": siteData.title, "description": siteData.description })}${renderHead()}</head> <body class="min-h-screen flex flex-col bg-white"> ${renderComponent($$result, "Header", $$Header, { "title": siteData.title })} <main class="flex flex-col grow max-w-screen-lg justify-center items-center mx-auto p-4"> <div class="flex flex-col items-center gap-2 py-12 border-[1px] bg-white border-gray-300 rounded-md p-4"> ${renderComponent($$result, "CircleUser", CircleUser, { "className": "text-blue-500", "size": 84 })} <p class="text-4xl font-bold text-center">Admin</p> <p class="text-center text-gray-500">Please login to continue.</p> <!-- Login Form --> <form action="/api/auth" class="flex flex-col mt-4 gap-2 w-[300px]" method="post"> <input autofocus class="border border-gray-300 rounded-md p-2" autocomplete="email" id="username" type="text" name="username" placeholder="Username"> <input class="border border-gray-300 rounded-md p-2" autocomplete="current-password" id="password" type="password" name="password" placeholder="Password"> <button class="bg-blue-500 text-white rounded-md p-2" type="submit">Login</button> </form> ${message && renderTemplate`<p class="text-red-500 text-sm">${message}</p>`} </div></main> ${renderComponent($$result, "Footer", $$Footer, {})} </body></html>`;
 }, "/Users/asleepace/dev/asleepace.com/src/pages/admin/login.astro", void 0);
 
 const $$file = "/Users/asleepace/dev/asleepace.com/src/pages/admin/login.astro";

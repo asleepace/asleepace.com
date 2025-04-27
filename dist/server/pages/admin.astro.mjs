@@ -1,9 +1,9 @@
-import { c as createAstro, a as createComponent, m as maybeRenderHead, b as addAttribute, r as renderTemplate, f as renderSlot, d as renderComponent, e as renderHead } from '../chunks/astro/server_CrxpYex7.mjs';
+import { b as createAstro, c as createComponent, m as maybeRenderHead, d as addAttribute, a as renderTemplate, g as renderSlot, r as renderComponent, e as renderHead } from '../chunks/astro/server_C-py2KQh.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../chunks/BaseHead_BtO3W1Kp.mjs';
-import { P as PATH, a as siteData, s as siteConfig } from '../chunks/consts_CF0Pd1PO.mjs';
+import { $ as $$BaseHead } from '../chunks/BaseHead_B56J8u5W.mjs';
+import { P as PATH, a as siteData, s as siteConfig } from '../chunks/consts_DsjtsUmI.mjs';
 /* empty css                                 */
-import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_ymjOHjPn.mjs';
+import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_DF8grp0F.mjs';
 import clsx from 'clsx';
 import chalk from 'chalk';
 export { renderers } from '../renderers.mjs';
@@ -14,7 +14,7 @@ const $$AdminPageInfo = createComponent(($$result, $$props, $$slots) => {
   Astro2.self = $$AdminPageInfo;
   const { data } = Astro2.props;
   const entries = Object.entries(data).reverse();
-  return renderTemplate`${maybeRenderHead()}<div class="flex flex-col gap-y-2 p-2 flex-grow"> ${entries.map(([key, value]) => renderTemplate`<div class="flex flex-row gap-x-2 flex-grow items-baseline"${addAttribute(`navigator.clipboard.writeText('${value}')`, "onclick")}> <p class="text-xs text-zinc-300 font-bold font-mono tracking-wider">${key}</p> <pre class="text-xs text-zinc-500">${value}</pre> </div>`)} </div>`;
+  return renderTemplate`${maybeRenderHead()}<div class="flex flex-col gap-y-2 p-2 grow"> ${entries.map(([key, value]) => renderTemplate`<div class="flex flex-row gap-x-2 grow items-baseline"${addAttribute(`navigator.clipboard.writeText('${value}')`, "onclick")}> <p class="text-xs text-zinc-300 font-bold font-mono tracking-wider">${key}</p> <pre class="text-xs text-zinc-500">${value}</pre> </div>`)} </div>`;
 }, "/Users/asleepace/dev/asleepace.com/src/components/admin/AdminPageInfo.astro", void 0);
 
 const $$Astro$1 = createAstro("https://asleepace.com");
@@ -22,7 +22,7 @@ const $$ContainerLabeled = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro$1, $$props, $$slots);
   Astro2.self = $$ContainerLabeled;
   const { textColor = "text-zinc-700", borderColor = "border-zinc-700", className, label } = Astro2.props;
-  return renderTemplate`${maybeRenderHead()}<div${addAttribute(`${label} Section`, "aria-label")}> <p${addAttribute(label, "aria-label")}${addAttribute(clsx(`text-xs font-bold font-mono uppercase rounded-xl tracking-widest inline-block relative top-4 px-2 z-50 bg-zinc-950 ml-6`, textColor), "class")}>${label}</p> <div${addAttribute(clsx(`flex flex-col rounded-2xl border-2 border-solid`, borderColor, className), "class")}> <div class="flex flex-col gap-y-2 p-1 mt-3 pt-0 flex-grow overflow-auto w-full scrollbar-none shadow-inner-lg scrollbar-none"> ${renderSlot($$result, $$slots["default"])} </div> </div> </div>`;
+  return renderTemplate`${maybeRenderHead()}<div${addAttribute(`${label} Section`, "aria-label")}> <p${addAttribute(label, "aria-label")}${addAttribute(clsx(`text-xs font-bold font-mono uppercase rounded-xl tracking-widest inline-block relative top-4 px-2 z-50 bg-zinc-950 ml-6`, textColor), "class")}>${label}</p> <div${addAttribute(clsx(`flex flex-col rounded-2xl border-2 border-solid`, borderColor, className), "class")}> <div class="flex flex-col gap-y-2 p-1 mt-3 pt-0 grow overflow-auto w-full scrollbar-none shadow-inner-lg scrollbar-none"> ${renderSlot($$result, $$slots["default"])} </div> </div> </div>`;
 }, "/Users/asleepace/dev/asleepace.com/src/components/astro/ContainerLabeled.astro", void 0);
 
 const $$Astro = createAstro("https://asleepace.com");

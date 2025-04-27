@@ -1,4 +1,4 @@
-import { C as COOKIE_PATH, P as PATH } from '../../../chunks/consts_CF0Pd1PO.mjs';
+import { C as COOKIE_PATH, P as PATH } from '../../../chunks/consts_DsjtsUmI.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const prerender = false;

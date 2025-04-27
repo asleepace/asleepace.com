@@ -1,4 +1,4 @@
-import { h as http } from '../../../chunks/http_tQBNQEez.mjs';
+import { h as http } from '../../../chunks/http_CogIbPJW.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const prerender = false;

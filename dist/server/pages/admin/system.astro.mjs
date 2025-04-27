@@ -1,10 +1,10 @@
-import { c as createAstro, a as createComponent, d as renderComponent, e as renderHead, b as addAttribute, r as renderTemplate } from '../../chunks/astro/server_CrxpYex7.mjs';
+import { b as createAstro, c as createComponent, r as renderComponent, e as renderHead, d as addAttribute, a as renderTemplate } from '../../chunks/astro/server_C-py2KQh.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_BtO3W1Kp.mjs';
-import { P as PATH, a as siteData } from '../../chunks/consts_CF0Pd1PO.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_B56J8u5W.mjs';
+import { P as PATH, a as siteData } from '../../chunks/consts_DsjtsUmI.mjs';
 /* empty css                                    */
 import clsx from 'clsx';
-import { $ as $$AdminPanelSidebar } from '../../chunks/AdminPanelSidebar_ymjOHjPn.mjs';
+import { $ as $$AdminPanelSidebar } from '../../chunks/AdminPanelSidebar_DF8grp0F.mjs';
 export { renderers } from '../../renderers.mjs';
 
 const $$Astro = createAstro("https://asleepace.com");
