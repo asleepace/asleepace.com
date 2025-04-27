@@ -38,19 +38,19 @@ const pages: LinkItem[] = [
   {
     name: "Apps",
     icon: BoxIcon,
-    tint: "purple",
+    tint: "oklch(72.3% 0.219 149.579)",
     href: "/tools"
   },
   {
     name: "Links",
     icon: LinkIcon,
-    tint: "green",
+    tint: "oklch(76.9% 0.188 70.08)",
     href: "/tools"
   },
   {
     name: "Socials",
     icon: RssIcon,
-    tint: "purple",
+    tint: "oklch(51.1% 0.262 276.966)",
     href: "/tools"
   }
 ]
@@ -58,7 +58,11 @@ const pages: LinkItem[] = [
 ---
 <div class="p-4">
   <!-- Bento Box Container -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+    <div class="col-span-1 row-span-3 rounded-3xl bg-zinc-900 overflow-hidden">
+      <p>Left</p>
+    </div>
     
     <!-- Featured Box (spans 2 columns on medium screens and up) -->
     <a href={`/blog/${featured.id}`} class="bg-yellow-500/10 overflow-hidden rounded-2xl shadow-md md:row-span-2 md:col-span-2 h-96 relative group">
@@ -102,11 +106,11 @@ const pages: LinkItem[] = [
       {
         pages.map((page) => {
           return (
-            <div class="basis-1/3 h-full rounded-2xl bg-zinc-100 flex flex-col items-center justify-center gap-y-4 overflow-hidden"
+            <div class="basis-1/3 h-full rounded-2xl bg-zinc-900 flex flex-col items-center justify-center gap-y-4 overflow-hidden"
                 style={`${page.tint}`}
             >
-              <page.icon size={64} class:list="opacity-70" />
-              <p class="text-3xl font-black text-zinc-900">{page.name}</p>
+              <page.icon color={page.tint} size={64} class:list="opacity-70" />
+              <p class="text-3xl font-black text-white">{page.name}</p>
             </div>
           )
         })
