@@ -77,9 +77,10 @@ const pageLinks = [
 ---
 <div class={clsx("p-4", classList)}>
   <!-- Bento Box Container -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-    <div class="col-span-1 row-span-3 rounded-3xl p-6 overflow-hidden from-pink-400 to-indigo-700 bg-gradient-to-br">
+    <!-- hidden sidebar -->
+    <div class="hidden col-span-1 row-span-3 rounded-3xl p-6 overflow-hidden from-pink-400 to-indigo-700 bg-gradient-to-br">
       <div class="">
         <input type="text" class="w-full h-12 bg-white/30 ring-0 border-none outline-none rounded-2xl px-4 placeholder:text-white/50" placeholder="Search ..." />
       </div>
