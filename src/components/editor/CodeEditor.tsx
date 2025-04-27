@@ -15,7 +15,7 @@ export type CodeEditorProps = {
 /**
  * # Code Editor
  *
- * A full code editor with WYSIWYG support which can handle different themese and customizations.
+ * A full code editor with WYSIWYG support which can handle different themes and customizations.
  * Displays a side bar with a list of different code blocks and allows the user to select a code block.
  *
  */
@@ -39,7 +39,10 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
   const onSave = useCallback(() => {
     console.log('save code')
     setCode({ code: data.code, lang: 'typescript' })
-    const saveFileName = window.prompt('Save file as:', `code_snippet_${Date.now()}.ts`)
+    const saveFileName = window.prompt(
+      'Save file as:',
+      `code_snippet_${Date.now()}.ts`
+    )
     if (!saveFileName) return
     const blob = new Blob([data.code ?? ''], {
       type: 'text/plain',
@@ -72,7 +75,7 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
   }, [ts, execute])
 
   return (
-    <div className="flex flex-1 flex-grow flex-col w-full min-h-screen bg-editor-200">
+    <div className="flex flex-1 grow flex-col w-full min-h-screen bg-editor-200">
       <CodeToolbar onRun={runJs} onSave={onSave} onSettings={onSettings} />
       <Code
         onSubmit={(code) => setCode({ code, lang: 'typescript' })}

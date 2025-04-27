@@ -17,27 +17,26 @@ function ShowcaseItem(props: ShowcaseItemProps) {
   return (
     <a
       href={props.url}
-      className="flex flex-col text-pretty rounded-xl w-full hover:shadow-xl transform transition-transform duration-200 hover:scale-105 aspect-square shadow-lg overflow-hidden"
-      style={{ backgroundColor }}
+      className="aspect-square relative overflow-hidden w-full h-64"
     >
       <div
-        className="flex flex-1 bg-cover bg-transparent bg-center aspect-square h-60 items-end shadow-md"
+        className="absolute inset-0 transform scale-120 transition-transform duration-700 
+              group-hover:scale-125 group-hover:animate-pulse"
         style={{
-          backgroundColor: meta.themeColor || 'black',
-          backgroundImage,
+          backgroundColor: backgroundColor,
+          backgroundImage: backgroundImage,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
         }}
-      >
-        <div className="flex w-full flex-col min-h-36 h-[34%] p-4 drop-shadow-lg justify-between bg-white shadow-md">
-          <span>
-            <p className="text-gray-800 text-2xl md:txt-4xl p-0 font-bold m-0 text-ellipsis line-clamp-1">
-              {meta.title}
-            </p>
-            <p className="text-base p-0 m-0 text-ellipsis text-gray-400 line-clamp-2">
-              {meta.description}
-            </p>
-          </span>
-          <p className="text-base m-0 text-yellow-400">{props.url}</p>
-        </div>
+      ></div>
+
+      <div className="absolute inset-0 bg-gradient-to-b to-[] from-black/5 via-black/60"></div>
+
+      <div className="relative z-10 flex w-full h-full p-4 flex-col">
+        <div className="flex flex-1 gap-y-1"></div>
+        <p className="text-2xl font-black text-white text-shadow">
+          {meta.title}
+        </p>
       </div>
     </a>
   )

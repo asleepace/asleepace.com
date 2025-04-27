@@ -1,0 +1,36 @@
+---
+import clsx from 'clsx'
+
+interface Props {
+  href: string
+  image?: string
+  class?: string
+  name: string
+  info: string
+}
+
+const {
+  name,
+  info,
+  href,
+  image,
+  class: className
+} = Astro.props
+
+---
+<a href={href} class={clsx("bg-zinc-100 flex flex-col items-end grow justify-end overflow-hidden rounded-2xl md:row-span-2 md:col-span-2 h-96 relative group", className)}>
+  <!-- Background Image Layer -->
+  <div class="absolute inset-0 transform -rotate-3 scale-120 transition-transform duration-700 
+          group-hover:scale-125 group-hover:animate-pulse bg-cover bg-center" 
+      style={`background-image: url(${image})`}>
+  </div>
+  
+  <!-- Overlay Layer with Blur -->
+  <div class="absolute inset-0 bg-gradient-to-b to-black/90 from-black/5 via-black/60"></div>
+  
+  <!-- Content Layer -->
+  <div class="relative z-10 justify-start flex flex-col gap-y-4 items-start p-6">
+    <p class="text-4xl max-w-3/4 font-black text-white text-shadow">{name}</p>
+    <p class="text-sm line-clamp-1 text-white max-w-3/5 text-ellipsis">{info}</p>
+  </div>
+</a>

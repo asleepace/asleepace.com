@@ -61,7 +61,7 @@ export function Code({
   return (
     <div
       className={clsx(
-        'flex flex-col flex-1 flex-grow h-full bg-transparent',
+        'flex flex-col flex-1 grow h-full bg-transparent',
         className
       )}
     >

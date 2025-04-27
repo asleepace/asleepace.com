@@ -5,7 +5,7 @@ import CodeEditor from '@/components/editor/CodeEditor'
 export const prerender = true;
 
 // =====================================
-// Copde Page
+// Cope Page
 // =====================================
 
 ---
@@ -16,8 +16,8 @@ export const prerender = true;
     <BaseHead title={"Code"} description={"a simple online code playground."} />
     <link type="text/css" rel="stylesheet" href="/styles/material-palenight.css">
   </head>
-  <body class="min-h-screen flex flex-1 flex-col bg-editor-200">
-    <div class="flex flex-1 flex-grow flex-col w-full min-h-screen bg-editor-200">
+  <body class="min-h-screen min-w-screen flex flex-1 flex-col bg-editor-200">
+    <div class="flex flex-1 grow flex-col w-full min-h-screen bg-editor-200">
       <CodeEditor code={''} client:only="react" />
     </div>
   </body>
