@@ -78,6 +78,7 @@
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
+    --breakpoint-xs: 30rem;
   }
 }
 @layer base {
@@ -278,6 +279,9 @@
   }
   .container {
     width: 100%;
+    @media (width >= 30rem) {
+      max-width: 30rem;
+    }
     @media (width >= 40rem) {
       max-width: 40rem;
     }
@@ -290,8 +294,11 @@
     @media (width >= 80rem) {
       max-width: 80rem;
     }
-    @media (width >= 96rem) {
-      max-width: 96rem;
+    @media (width >= 100rem) {
+      max-width: 100rem;
+    }
+    @media (width >= 120rem) {
+      max-width: 120rem;
     }
   }
   .m-0 {
@@ -473,6 +480,9 @@
   }
   .max-w-screen-xl {
     max-width: var(--breakpoint-xl);
+  }
+  .max-w-screen-xs {
+    max-width: var(--breakpoint-xs);
   }
   .min-w-\[480px\] {
     min-width: 480px;
@@ -1249,6 +1259,16 @@
     &:focus-visible {
       --tw-outline-style: none;
       outline-style: none;
+    }
+  }
+  .xs\:block {
+    @media (width >= 30rem) {
+      display: block;
+    }
+  }
+  .xs\:hidden {
+    @media (width >= 30rem) {
+      display: none;
     }
   }
   .sm\:block {
