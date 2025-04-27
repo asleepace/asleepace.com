@@ -4,17 +4,17 @@ import { SITE_TITLE } from '@/consts'
 ---
 
 <header>
-  <nav>
+  <nav class="flex flex-row justify-between items-center min-w-full h-20 overflow-y-hidden">
     <div class="title-and-logo">
       <img src="/images/logo.png" width="44" height="44" />
-      <h2 class="xs:hidden"><a class="font-black text-lg" href="/">{SITE_TITLE}</a></h2>
+      <h2 class="min-w-sm:hidden"><a class="font-black text-lg" href="/">{SITE_TITLE}</a></h2>
     </div>
-    <div class="internal-links">
+    <div class="internal-links overflow-hidden">
       <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/blog">Blog</HeaderLink>
       <HeaderLink href="/about">About</HeaderLink>
     </div>
-    <div class="social-links">
+    <div class="social-links md:hidden">
       <a href="https://twitter.com/asleepace" target="_blank">
         <span class="sr-only">Follow Asleepace on Twitter</span>
         <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" -

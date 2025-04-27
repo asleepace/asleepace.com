@@ -16,10 +16,10 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props
   <head>
     <BaseHead title={title} description={description} image={heroImage} />
   </head>
-  <body class="w-full bg-white">
+  <body class="min-w-full bg-white text-black">
     <Header />
     <main id="article" class="flex flex-col flex-1 w-full lg:pt-16 pb-8 items-center">
-      <article class="flex flex-col items-center w-full max-w-screen-lg text-gray-800">
+      <article class="flex flex-col items-center w-full max-w-screen-md text-gray-800">
         <HeroImage src={heroImage} alt={title} />
         <HeroTitle title={title} pubDate={pubDate} updatedDate={updatedDate} />
         <Prose>

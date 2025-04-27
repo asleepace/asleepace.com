@@ -1,5 +1,16 @@
 @import 'tailwindcss';
 
+@theme {
+  --xs: 400px,
+  --sm: 640px,
+  --md: 768px,
+  --md2x: 800px,
+  --md3x: 960px,
+  --lg: 1024px,
+  --xl: 1280px,
+  --'2xl': 1536px,
+}
+
 @layer utilities {
   @media (min-width: 768px) {
     .pop:hover {
@@ -61,6 +72,7 @@ html,
 body {
   overflow-x: none;
   overscroll-behavior-x: none;
+  min-width: 320px;
 }
 
 body {

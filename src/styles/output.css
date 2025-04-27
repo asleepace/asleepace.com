@@ -396,6 +396,9 @@
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
+  .h-20 {
+    height: calc(var(--spacing) * 20);
+  }
   .h-60 {
     height: calc(var(--spacing) * 60);
   }
@@ -404,6 +407,9 @@
   }
   .h-\[34\%\] {
     height: 34%;
+  }
+  .h-\[78px\] {
+    height: 78px;
   }
   .h-full {
     height: 100%;
@@ -459,11 +465,23 @@
   .max-w-screen-lg {
     max-width: var(--breakpoint-lg);
   }
+  .max-w-screen-md {
+    max-width: var(--breakpoint-md);
+  }
   .max-w-screen-sm {
     max-width: var(--breakpoint-sm);
   }
   .max-w-screen-xl {
     max-width: var(--breakpoint-xl);
+  }
+  .min-w-\[480px\] {
+    min-width: 480px;
+  }
+  .min-w-full {
+    min-width: 100%;
+  }
+  .min-w-screen {
+    min-width: 100vw;
   }
   .flex-1 {
     flex: 1;
@@ -555,6 +573,9 @@
   .gap-16 {
     gap: calc(var(--spacing) * 16);
   }
+  .gap-x-1 {
+    column-gap: calc(var(--spacing) * 1);
+  }
   .gap-x-2 {
     column-gap: calc(var(--spacing) * 2);
   }
@@ -629,6 +650,9 @@
   }
   .overflow-x-hidden {
     overflow-x: hidden;
+  }
+  .overflow-y-hidden {
+    overflow-y: hidden;
   }
   .rounded-2xl {
     border-radius: var(--radius-2xl);
@@ -920,6 +944,9 @@
   }
   .text-ellipsis {
     text-overflow: ellipsis;
+  }
+  .text-black {
+    color: var(--color-black);
   }
   .text-blue-500 {
     color: var(--color-blue-500);
@@ -1224,6 +1251,16 @@
       outline-style: none;
     }
   }
+  .sm\:block {
+    @media (width >= 40rem) {
+      display: block;
+    }
+  }
+  .sm\:flex {
+    @media (width >= 40rem) {
+      display: flex;
+    }
+  }
   .sm\:grid-cols-1 {
     @media (width >= 40rem) {
       grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -1232,6 +1269,11 @@
   .md\:my-8 {
     @media (width >= 48rem) {
       margin-block: calc(var(--spacing) * 8);
+    }
+  }
+  .md\:hidden {
+    @media (width >= 48rem) {
+      display: none;
     }
   }
   .md\:grid-cols-2 {
@@ -1347,6 +1389,7 @@
 html, body {
   overflow-x: none;
   overscroll-behavior-x: none;
+  min-width: 320px;
 }
 body {
   font-family: 'Atkinson', sans-serif;

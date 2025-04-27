@@ -1,0 +1,42 @@
+---
+import BaseHead from '@/components/astro/BaseHead.astro'
+import Header from '@/components/astro/Header.astro'
+import Footer from '@/components/astro/Footer.astro'
+import { siteData } from '@/consts'
+import MainFeed from '@/components/feed/MainFeed'
+import Showcase from '@/components/showcase/Showcase'
+import Section from '@/components/astro/Section.astro'
+import { Boxes, BellRing } from 'lucide-react'
+import { getCollection } from 'astro:content'
+import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
+
+import SideLayout from '@/layouts/SiteLayout.astro'
+import SiteLayout from '@/layouts/SiteLayout.astro'
+
+export const prerender = true;
+
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={siteData.title} description={siteData.description} />
+  </head>
+  <body class="min-h-screen min-w-screen flex flex-col bg-white">
+    <Header title={siteData.title} />
+    <main class="flex flex-col grow max-w-screen-lg mx-auto px-4">
+      <!-- recent articles (3 most recent) -->
+      <Section title="Articles" description="Blog posts, tutorials and more." icon={Boxes}>
+        <BlogPreviewList posts={[]} className='grid grid-cols-2' />
+      </Section>
+      <!-- website show case section -->
+      <Section title="Showcase" description="A collection of various projects I've done over the years." icon={Boxes}>
+        <Showcase urls={siteData.showcaseLinks} client:load />
+      </Section>
+      <!-- recent activity section -->
+      <Section title="Recent Activity" description="Recent activity on this site." icon={BellRing}>
+        <MainFeed />
+      </Section>
+    </main>
+    <Footer />
+  </body>
+</html>
