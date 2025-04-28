@@ -8,7 +8,7 @@ slug: 'try'
 
 Error handling in software engineering is a bit like paying taxes — _it's something that we all have to do and something that nobody enjoys doing..._
 
-If you are anything like me, then you are most likely familiar with how tedious and awkward error handling with try / catch statements can feel, especially in languages like Javascript and Typescript. Often times I find myself having to write unwieldy code like the following:
+If you are anything like me, then you are most likely familiar with how tedious and awkward error handling with try / catch statements can feel especially in languages like Javascript & Typescript. Often times I find myself having to write unwieldy code like the following:
 
 ```ts
 function getUrlFromString(urlString: string): URL | undefined {
@@ -27,16 +27,16 @@ function getUrlFromString(urlString: string): URL | undefined {
 }
 ```
 
-And while this might seem like a trivial example and something that could easily be abstracted into smaller utility functions, it might surprise you that I've seen numerous examples just like this in corporate production software.
+And while this might seem like a contrived example or something that could easily be abstracted into smaller utility functions, it might surprise you how many times I've see code just like this in production software.
 
-What I do like about this example, it that it demonstrates several key issues with the try / catch pattern, especially relating to Typescript:
+What I do like about the code snippet above is that it demonstrates several key issues with the try / catch pattern, especially relating to Typescript:
 
 - values are scoped to their respective blocks
-- errors are not guaranteed to be of type `Error`
+- errors are not guaranteed to be an `Error` instance
 - retry logic can become extremely verbose
-- it isn't clear if a function can throw or not
+- it isn't clear when something can throw
 
-Along with this since any function can throw from somewhere deep in the call stack, the control flow of the program can become unpredictable and hard to reason about what is happening and where. In fact, let's take a look at one more example. What do you think this function will return?
+Since any function can throw from somewhere deep in the call stack, the control flow of the program can become unpredictable and hard to reason about. In fact, let's take a look at one more example. What do you think this function will return?
 
 ```ts
 function generateOddNumbers(count: number) {
@@ -65,17 +65,22 @@ function generateOddNumbers(count: number) {
 }
 ```
 
-Perhaps you might guess that maybe for a low enough value of count, that it might return an array of only odd numbers once in a while. That would make send right?
+Perhaps you might have guessed that when the argument `count` is small enough it might return an array of only odd numbers once in a while. That would make send right?
 
-Well if you guessed `undefined` for any number, you would be correct, just imagine the headache if we had multiple nested finally blocks...
+Well if you guessed `undefined` for any number, you would be correct. This is because the `finally` block will always execute after the `try` and `catch` blocks, no matter what.
+
+> The try...catch statement is comprised of a try block and either a catch block, a finally block, or both. The code in the try block is executed first, and if it throws an exception, the code in the catch block will be executed. The code in the finally block will always be executed before control flow exits the entire construct.
+> [[source]](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch)
+
+If this seems confusing to you, don't worry you are not alone.
 
 ### A better way?
 
-While the above examples may seem a but contrived, they highlight some key issues with try/catch based error handling. If you are familiar with other programming languages like Go or Rust, then you are probably already know where I am going with this –– \*errors as **values\***.
+If you are familiar with other programming languages like Go or Rust, then you probably already know where I am going with this — _errors as **values**_.
 
-Instead of throwing errors _willy-nilly_ to whoever will catch them, the idea is to treat them as first class citizens and handle as close to the call site as possible. While this article isn't a deep dive into the errors as values paradigm, a lot of the techniques have been inspired by Rust.
+Instead of throwing errors _willy-nilly_ to whoever will catch them, the idea is to treat errors as first class citizens and handle them as close to the call site as possible. While this article isn't a deep dive into the errors as values paradigm, a lot of the techniques for code written in this article have been inspired by [Rust](https://doc.rust-lang.org/book/ch09-00-error-handling.html).
 
-Now let's start coding a re-usable solution which can help simplify our error handling process. Since this will be in Typescript let's begin by describing the shape of our data which should either by a generic value `T` or the concrete `Error` class, but not both.
+Now let's start coding a re-usable solution which can help simplify our error handling logic. Since this will be in Typescript let's begin by describing the shape of our data which should either by a generic value `T` or the concrete `Error` class, but not both.
 
 ```ts
 type ResultOk<T> = [T, undefined]

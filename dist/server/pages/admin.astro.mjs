@@ -1,9 +1,9 @@
-import { b as createAstro, c as createComponent, m as maybeRenderHead, d as addAttribute, a as renderTemplate, g as renderSlot, r as renderComponent, e as renderHead } from '../chunks/astro/server_C-py2KQh.mjs';
+import { b as createAstro, c as createComponent, m as maybeRenderHead, d as addAttribute, a as renderTemplate, f as renderSlot, r as renderComponent, e as renderHead } from '../chunks/astro/server_ovZ0PNjA.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../chunks/BaseHead_B56J8u5W.mjs';
+import { $ as $$BaseHead } from '../chunks/BaseHead_C8Na_iTb.mjs';
 import { P as PATH, a as siteData, s as siteConfig } from '../chunks/consts_DsjtsUmI.mjs';
 /* empty css                                 */
-import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_DF8grp0F.mjs';
+import { $ as $$AdminPanelSidebar } from '../chunks/AdminPanelSidebar_vH5xKf-D.mjs';
 import clsx from 'clsx';
 import chalk from 'chalk';
 export { renderers } from '../renderers.mjs';

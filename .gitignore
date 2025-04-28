@@ -1,7 +1,7 @@
 # build output
-# dist/
+dist/
 # generated types
-#.astro/
+.astro/
 
 # Generated files
 src/styles/output.css

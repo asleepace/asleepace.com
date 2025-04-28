@@ -1,8 +1,8 @@
-import { b as createAstro, c as createComponent, r as renderComponent, e as renderHead, a as renderTemplate } from '../../chunks/astro/server_C-py2KQh.mjs';
+import { b as createAstro, c as createComponent, r as renderComponent, e as renderHead, a as renderTemplate } from '../../chunks/astro/server_ovZ0PNjA.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_B56J8u5W.mjs';
-import { $ as $$Header } from '../../chunks/Header_DV5JftiH.mjs';
-import { a as $$Footer } from '../../chunks/HeaderLink_DYhP_N4z.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_C8Na_iTb.mjs';
+import { $ as $$Header } from '../../chunks/Header_DeAew9a9.mjs';
+import { a as $$Footer } from '../../chunks/HeaderLink_CWQkStuH.mjs';
 import { a as siteData } from '../../chunks/consts_DsjtsUmI.mjs';
 import { CircleUser } from 'lucide-react';
 export { renderers } from '../../renderers.mjs';
