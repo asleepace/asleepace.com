@@ -80,7 +80,7 @@ If you are familiar with other programming languages like Go or Rust, then you p
 
 Instead of throwing errors _willy-nilly_ to whoever will catch them, the idea is to treat errors as first class citizens and handle them as close to the call site as possible. While this article isn't a deep dive into the errors as values paradigm, a lot of the techniques for code written in this article have been inspired by [Rust](https://doc.rust-lang.org/book/ch09-00-error-handling.html).
 
-Now let's start coding a re-usable solution which can help simplify our error handling logic. Since this will be in Typescript let's begin by describing the shape of our data which should either by a generic value `T` or the concrete `Error` class, but not both.
+Now let's start coding a re-usable solution which can help simplify our error handling logic. Since this will be in Typescript let's begin by describing the shape of our data, which should either be a generic value `T` or the concrete `Error` class, but not both.
 
 ```ts
 type ResultOk<T> = [T, undefined]
@@ -88,7 +88,9 @@ type ResultError = [undefined, Error]
 type Result<T> = ResultOk<T> | ResultError
 ```
 
-The above types are just tuples with either contain the value `T | undefined` in the first position and `undefined | Error` in the second position. The last type represents the union between these two values and will help us with type narrowing later. Next we will create a simple utility to convert our try/catch based errors into result tuples:
+The above types are just [tuples](https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types) which either contain the generic value `T` or `undefined` in the first position and `Error` or `undefined` in the second position. The last type is a [discriminated union](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html#discriminated-unions) of both the `ResultOk<T>` and `ResultError` types.
+
+Next we will create a simple utility function which takes a function as an argument, execute that function inside a try/catch expression, and returns the output wrapped in our `Result<T>` type:
 
 ```ts
 function tryCatch<T>(fn: () => T | never): Result<T> {
@@ -102,7 +104,7 @@ function tryCatch<T>(fn: () => T | never): Result<T> {
 }
 ```
 
-The `tryCatch(fn)` utility takes a function to be invoked and wraps it inside a try/catch statement. If the function throws then the exception will be caught and converted to an error if needed, otherwise it will return the value. Since each branch returns a type which is narrower than the `Result<T>` the result tuple is easy to unpack and check for errors.
+If the function throws then the exception will be caught and converted to an error if needed, otherwise it will return the value. Since each branch returns a type which is narrower than the `Result<T>` the result tuple is easy to unpack and check for errors.
 
 ```ts
 const [url, error] = tryCatch(() => new URL(maybeUrl))
@@ -112,7 +114,7 @@ if (error) return console.warn(error.message)
 return url.href // type-safe!
 ```
 
-Since `error` will only be defined when `[undefined, Error]` and we early return if it is defined, the Typescript type system is able to infer that `url` must be defined below! Now let's revisit the same problem I mentioned in the beginning of this article and see how this approach does.
+By checking if the `error` value is defined and early returning if so, the Typescript type system is able to infer that `url` must be defined below, because `error` will only be defined when `Result<T>` is `[undefined, Error]`! Now let's revisit the same problem I mentioned in the beginning of this article and see how this approach does:
 
 ```ts
 function getUrlFromString(urlString: string): URL | undefined {
@@ -130,11 +132,13 @@ function getUrlFromString(urlString: string): URL | undefined {
 }
 ```
 
-Just like that our `getUrlFromString(urlString)` is far more succinct and easy to follow, so much so that we were able to add another case to make the program more robust! The less time we spend fiddling with nested try/catch statements, casting errors and wrangling control flow; the more time we can spend on making programs which crash less!
+Just like that our `getUrlFromString(urlString)` is far more succinct and easy to follow, so much so that we were able to add another case to make the program even more robust!
+
+The less time we spend fiddling with nested try/catch statements, casting errors and wrangling control flow; the more time we can spend on making programs which crash less!
 
 ### Synchronous vs. Asynchronous
 
-So far the `tryCatch` utility works great for synchronous error handling. However, most of the time errors tend to stem from asynchronous operations like `fetch()` requests and json decoding. Here is where we run into a little issue with the type system...
+So far the `tryCatch` utility works great for synchronous error handling. However, most of the time errors tend to stem from asynchronous operations like `fetch()` requests and JSON decoding. Here is where we run into a little issue with the type system...
 
 ```ts
 const result = tryCatch(async () => {
@@ -144,7 +148,7 @@ const result = tryCatch(async () => {
 typeof result // Result<Promise<number[]>>
 ```
 
-The problem here is that the promise is now inside our result and thus needs to be unpacked before we can call await. However, this also causes another issue as calling await on the result value can throw! Instead what we would like is for the return type to be `Promise<Result<number[]>>` like so:
+The problem is that the promise is now inside our result `Result<Promise<number[]>>` and thus needs to be unpacked before we can call **await**. However, this also causes another issue as calling await on the result value can throw! Instead what we would like is for the return type to be `Promise<Result<number[]>>` so we can do the following:
 
 ```ts
 const [data, error] = await tryCatch(async () => {
@@ -156,7 +160,7 @@ if (!error) {
 }
 ```
 
-While we _could_ just create another utility like `tryCatchAsync(fn)` that fits these constraints, just look at that beautiful example above, that's what we **want** –– not that _"we have error values at home nonsense"_.
+While we _could_ just create another utility like `tryCatchAsync(fn)` that fits these constraints, just look at that beautiful example above, that's what we **want** — not that _"we have error values at home nonsense"_.
 
 ### Advanced Types
 
