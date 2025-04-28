@@ -164,7 +164,7 @@ While we _could_ just create another utility like `tryCatchAsync(fn)` that fits 
 
 ### Advanced Types
 
-Just like before, let's start by describing what it is we want with types. We roughly know what the async type should be from above, but how can we translate this to our example? Well the first thing to understand is that async/await is merely just syntactic sugar around promises\*.
+Just like before, let's start by describing what it is we want via types. We know what the async type should be from above example, but how can we translate this to our code? Well the first thing to understand is that async / await is merely just syntactic sugar around promises\*.
 
 ```ts
 function example1() {
@@ -196,23 +196,28 @@ const result = tryCatch(someFunc)
 typeof result // ResultError | ResultOk<number[]> | ResultOk<Promise<number[]>>
 ```
 
-The issue is the type system isn't able to narrow the type simply by placing an await statement in front of the try/catch. This means functions which should be only synchronous are now appearing as potentially promises and vis-versa...
+The issue is the type system isn't able to narrow the type simply by placing an await statement in front of the try/catch. This means functions which should only be synchronous are now appearing as potentially async and vis-versa...
 
-We need to find a way to narrow the type system such that promises only are returned for async functions and not for synchronous ones, while async functions should only return promises and never synchronous results.
+We need to find a way to narrow the type system such that promises are only returned for async functions and not for the synchronous ones, while async functions should only return promises and never synchronous results.
 
-I tinkered with this problem for long than I would like to admit, making marginal gains in one area, only at the cost of regressing in others. For a time I even thought that the technology simply didn't exist yet, until one day I stumbled across the following snippet:
+Having tinkered with this problem for longer than I would like to admit and making marginal gains in one area only to regress in others, for a time I thought the technology simply didn't exist, until one day I stumbled across the following [code snippet](https://github.com/markedjs/marked/blob/ea13bbe1e6a6318ea7c9aecaef3403ad1c5a0369/src/marked.ts#L26):
 
 ```ts
-const markdownHtml = marked.render(markdown, { async: true })
+// https://github.com/markedjs/marked
+const example1 = marked.render(markdown, { async: false })
+const example2 = marked.render(markdown, { async: true })
+
+typeof example1 // string
+typeof example2 // Promise<string>
 ```
 
-A library that was able to return either sync or async simply by passing an optional argument to the method. This discovery re-ignited my unyielding thirst for a truly isomorphic try/catch helper and sent me into overdrive. Quickly I rushed to the packages Github source code and began trawling through the dense source code, until finally I noticed the secret.
+A library that was able to return either sync or async values simply by changing the value of an argument! This discovery re-ignited my unyielding thirst for a truly isomorphic try / catch helper and sent me into overdrive. Quickly, I rushed to the Github source code and began trawling through every line until finally I noticed the secret...
 
 ### Function Overloading
 
-Function overloading in Typescript is most likely one of those things that you probably never think about unless you are a library maintainer or deep in the weeds. It allows for defining multiple variants of the same function or method which can take different arguments and return different values, and works by declaring just the function signature above the implementation.
+[Function overloading](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions) in Typescript is most likely one of those things you probably never think about unless you are a library maintainer or deep in the weeds. It allows for defining multiple variants of the same function (or method) with different arguments and return types.
 
-For example imagine we have two similar functions which either add two numbers together or concat two strings. The implementation is nearly identical and it would be nice if we just had two write this logic once. The issue we want to avoid is allowing our new `add(a, b)` function to add a number and string or vis-versa.
+For example imagine we have two similar functions which either add two numbers together or concat two strings. The implementation is nearly identical and it would be nice if we just had two write this logic once. The issue we want to avoid is allowing our new `add(a, b)` function to add a number to a string or vis-versa.
 
 ```ts
 function addString(x: string, y: string): string {
@@ -224,7 +229,7 @@ function addNumber(x: number, y: number): number {
 }
 ```
 
-This is where function overloading comes in handy, we can declare multiple versions of the same function which help narrow the return type when calling directly. The caveat is that the actual implementation must contain the most permissive type which can accommodate any of the values also passed to the overloads.
+This is where function overloading comes in handy, we can declare multiple versions of the same function to help the Typescript type system narrow the return type. The caveat is that the actual implementation must contain the most permissive type which can accommodate any of the values also passed to the overloads.
 
 ```ts
 function add(x: number, y: number): number
@@ -241,7 +246,7 @@ add(123, 'b') // type-error
 add('a', 456) // type-error
 ```
 
-As you can see we had to jump through a lot of hoops to even get this simple example working, but I hope it illustrates how function overloading can be used to declare multiple type variants of the same function. The first two function definition are recognized by the type system as overloads, where the last definition handles the actual implementation.
+As you can see we had to jump through a lot of hoops just to get this simple example working, but it illustrates how function overloading can be used to declare multiple type variants of the same function. The first two function definition are recognized by the type system as overloads, where the last definition handles the actual implementation.
 
 Bringing this back to the `tryCatch(fn)` helper, let's see how we can leverage function overloads to help distinguish between the synchronous and asynchronous versions of our function.
 
@@ -255,9 +260,9 @@ function tryCatch<T>(
 }
 ```
 
-The first function overload handles our async case where the `fn` passed as an argument returns a promise, this version should also return a promise which can be awaited to obtain the result tuple containing `T` or an `Error`. The second overload handles our synchronous case where the `fn` passed as an argument either returns `T` or `never` (can throw). Finally the last overload combines all three for our implementation.
+The first function overload handles our async case where the `fn` argument returns a promise, this version should also return a promise which can then be awaited to obtain our result tuple containing `T` or `Error`. The second overload handles our synchronous case where the `fn` argument either returns `T` or `never` (can throw). Finally the last overload combines all three and the actual function implementation.
 
-Ok, this is starting to look fairly _promising_ if I do say so myself... all that is left now is to handle the implementation. The tricky part here is figuring out how to perform a runtime check for an async function and then how to apply our error catching logic to this async function in a synchronous context. Luckily, this is actually what promises are in the first place!
+Ok, this is starting to look fairly _promising_ if I do say so myself... all that is left now is the logic. The tricky part here is figuring out how to perform a runtime check for an async function and then how to apply our error catching logic to and async function in a synchronous context. Luckily, this is actually what promises are in the first place!
 
 ```ts
 try {
@@ -274,16 +279,16 @@ try {
 }
 ```
 
-The first step is execute the `fn()` passed as an argument and then check if the return value `output` is a promise. We can do this using the `instanceof` operator and if `true` we can call the `.then()` and `.catch()` to extract the value and construct our result tuple! This will then return our desired type `Promise<Result<T>>` which can be awaited!
+The first step is execute the `fn()` argument and check if `output` is an instance of a promise. We can do this using the `instanceof` operator and if `true` we can call the `.then()` and `.catch()` methods to extract the value and construct our result tuple! This will then return our desired type `Promise<Result<T>>` when awaited!
 
-We are almost there now, but as some of you might have already noticed, we haven't properly coerced the async `error` value into the `Error` class. Let's extract the logic we used below in the original version into a separate helper which can be used by bother versions.
+We are almost there now, but as some of you might have already noticed, we haven't properly coerced the async `error` value into the `Error` class. Let's extract the logic we used below in the original version into a separate helper which can be used by both versions.
 
 ```ts
 const toError = (e: unknown): Error =>
   e instanceof Error ? e : new Error(String(e))
 ```
 
-It's not perfect, but it gets the job done for now. Basically just checks if the error value is already an instance of the `Error` class and if so does nothing, otherwise converts the value to a string which is then used to instantiate an `Error`. Now tying this altogether we should have something that looks like the following:
+It's not perfect, but it gets the job done for now. Basically, it just checks if the error value is already an instance of the `Error` class and if so does nothing, otherwise it converts the value to a string which is then used to instantiate a new `Error`. Tying this altogether we should have something that looks like the following:
 
 ```ts
 // our result types...
@@ -315,7 +320,7 @@ function tryCatch<T>(
 }
 ```
 
-Now let's go ahead and test this implementation with a couple different variations to ensure our types are working properly and the code does what we expect it to do for both synchronous and asynchronous operations! Below I've added test cases for synchronous, asynchronous and promise based arguments. For each different variant I've included one that throws and one that returns successfully.
+Let's go ahead and test this implementation with a couple different variations to ensure our types are working properly and the code does what is expected for both synchronous and asynchronous operations! Below I've added test cases for synchronous, asynchronous and promise based `fn` arguments. For each different variant I've included one that throws and one that returns successfully:
 
 ```ts
 async function main() {
@@ -367,12 +372,14 @@ const result8 = tryCatch(() => {
 The first two edge-cases appear to work as we might expect, the first one returns `Result<void>` and the second returns `Result<Error>`, which is reasonable as our function is only concerned with catching errors, but not if the value they return is an error _per se_. However, for `result8` we can see something funky...
 
 ```ts
+// this wasn't from an async function?!
 const result8: Promise<Result<unknown>>
 ```
 
-Oh no, what is happening here? Well since this function never returns a value, this signature for `fn` looks like the following `fn: () => never`, which can't easily be matched by our current function overloads. No worries, the fix is quite simple as we just need to add the following overload:
+Oh no, what is happening here? Well since this function _**never**_ returns a value, the signature for the `fn` looks like the following `fn: () => never`, which can't easily be matched by our current function overloads. No worries, the fix is quite simple and we just need to add the following overload:
 
 ```ts
+// handle edge case where function never returns
 function tryCatch<T>(fn: () => never): ResultError
 ```
 
@@ -390,14 +397,11 @@ Anyways, I hope you enjoyed this article and learned something along the way. Th
 
 You can play around with a live example of the code here on the [Typescript playground](https://www.typescriptlang.org/play/?target=99#code/FAehAICUFMGcFcA2AXcA3Aho+0C00AnAgewN2XgAdFpxkBPSuYBpqOJZAeQGsAeACoA+cAF5wAbQEAacPAB2AE2gAzAJbzoigLotGtGAhQBRIqTGSFy9ZsWzTJArtYGOKQSPGHOvD+AA+7EbIDqTAoBChBOAAxsTyaISwavFyyGqIagzAcfKwqMjEURYAFNAAXHLyPPLEAO7yAJSVxaIitBr5GPIx0MQq4MUA-OC0lZp1g2YEJQDKyAQaAOZljY3hYOAAYgox6anEiQSIxBiKsOAAZOBqALbU0LfQ8sgY+-IAdF-AKrvvdAR6ABhN4xAAWHhKKnklRKjTEIk0R2aQU4UR+fxS8gBwNBEOEUJh4DhCPAAAUSLc1LBoB4URTiFSaXxvO5hEIMT1-gtcchwZDobD4W1wAIAuAkYQUazkB5OXssTiQXz8UJCULSWLApLooEGUzacJpW5ZcJxfrqbSZR4RABvYDgR048D2p1u2LxfLgYjwZCUX0WaFwh3ux1qAYlH1+gOdV49PoDC00+Gu0PugjQCgEbFR-3IENptMfZBg54lEqYbDQYUiCSVnCyKyqDRabTgDAXGW+I0Fwvuj4xPHlwiOGuWJTN2yyQpRMrTRptjuokzz3tugC+a6dGaz2Ikud9jYnNlb7c7Ju7HI3sSH1ZdW8dO-g2fH1hbdjoRWmq0X5+C6I3YBNwiUU4FQQcaVgcpgA7egenAX4uUVW4MA0ElU0dXJYGIGgBxoDAZnWN0sNQDNggABgsHllXBcsxwARgAJgAZiIp0SPAMjOHoqjARosE6NJDD3XDYkAFk3jBD4CG6RRGRJPhwHIj4AFZ4RLEhJgmKZHBKAByDT6mxWA4JiPS2NDJ8XyY5je3XCyPTyUiTUYiwMDqVCCj4odYPgkkRT0jAACMzIcjiuJQZi3I8rIlR8ky-LHYS3UMrToEmWcDLBTTsV80KH3Aeze3Ck0ABZos8uKVUEkVtKTWkguIHDoG6NUSjIscyJKBYcDWMLPWc4IVIq2LqKHAr-MRdLyUpS0+B1NqAH1ZAzAAraA9k66B1r2fTUuxShZppcyHP6pzOJNAA2XjeVoyaXSK4iBou4IAHYbv4mqpoy78ACIR3MJd62gX61mK56IuQAAOD6h3u5KnVSiVptnX6bNBuz1nB86D2QC5xAkSHyJWk16JJ4JGPJzhmKplBStp5AVIZy6Gdehmod0N1cdgD4VFIYwMDujQ+dkNQxyw5qPhOFYAAMBDA8AAGIABJbTUddKhl0X5D5sHgM2AAReIDIQ0glkzT8b0QRA6DBakAEJgBQtDGiAA) or view the full source code on my Github.
 
-Thanks again for reading and if you have any questions, comments or suggestions feel free to reach out to me on X or Github, happy coding!
+Thanks again for reading and if you have any questions, comments or suggestions feel free to reach out to me on X or Github; happy coding!
 
 **UPDATE**: This code is now available as a npm package: https://www.npmjs.com/package/@asleepace/try
 
 ```bash
+# install npm package
 npm i @asleepace/try
-# or
-yarn add @asleepace/try
-# or
-bun i @asleepace/try
 ```
