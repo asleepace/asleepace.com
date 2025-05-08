@@ -1,8 +1,8 @@
-import { b as createAstro, c as createComponent, r as renderComponent, e as renderHead, d as addAttribute, a as renderTemplate } from '../../chunks/astro/server_ovZ0PNjA.mjs';
+import { b as createAstro, c as createComponent, r as renderComponent, e as renderHead, d as addAttribute, a as renderTemplate } from '../../chunks/astro/server_C-py2KQh.mjs';
 import 'kleur/colors';
-import { $ as $$BaseHead } from '../../chunks/BaseHead_C8Na_iTb.mjs';
-import { $ as $$Header } from '../../chunks/Header_DeAew9a9.mjs';
-import { a as $$Footer } from '../../chunks/HeaderLink_CWQkStuH.mjs';
+import { $ as $$BaseHead } from '../../chunks/BaseHead_COvkD7e2.mjs';
+import { $ as $$Header } from '../../chunks/Header_BVpOvgBI.mjs';
+import { a as $$Footer } from '../../chunks/HeaderLink_Cjqde-9W.mjs';
 import { P as PATH, a as siteData } from '../../chunks/consts_DsjtsUmI.mjs';
 export { renderers } from '../../renderers.mjs';
 

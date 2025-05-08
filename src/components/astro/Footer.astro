@@ -7,12 +7,16 @@ const today = new Date()
 const fullYear = today.getFullYear()
 ---
 
-<footer class="flex flex-col min-h-16 grow pt-6 pb-8 gap-y-2 items-center justify-center self-stretch">
+<footer class="w-full flex flex-col shrink items-center justify-center min-h-16 pt-6 pb-8 gap-y-4">
   <div class="flex gap-x-4">
     <SocialLinkTwitter />
     <SocialLinkGithub />
   </div>
-  <p class="text-sm text-center">&copy; {fullYear} Colin Teahan.<br /><span class="text-xs">All rights reserved.</span></p>
+  <p class="text-sm text-center">
+    <span>&copy; {fullYear} Colin Teahan.</span>
+    <br />
+    <span class="text-xs">All rights reserved.</span>
+  </p>
   <!-- perform some simple analytics tracking -->
   <Analytics />
 </footer>

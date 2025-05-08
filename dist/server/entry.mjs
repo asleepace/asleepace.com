@@ -1,6 +1,6 @@
 import { renderers } from './renderers.mjs';
-import { c as createExports, s as serverEntrypointModule } from './chunks/_@astrojs-ssr-adapter_uNL-AiFq.mjs';
-import { manifest } from './manifest_iRsFYHwn.mjs';
+import { c as createExports, s as serverEntrypointModule } from './chunks/_@astrojs-ssr-adapter_BdcOh6Mv.mjs';
+import { manifest } from './manifest_DlV6wvO7.mjs';
 
 const serverIslandMap = new Map();;
 
@@ -24,8 +24,9 @@ const _page16 = () => import('./pages/api.astro.mjs');
 const _page17 = () => import('./pages/blog.astro.mjs');
 const _page18 = () => import('./pages/blog/_---slug_.astro.mjs');
 const _page19 = () => import('./pages/code.astro.mjs');
-const _page20 = () => import('./pages/rss.xml.astro.mjs');
-const _page21 = () => import('./pages/index.astro.mjs');
+const _page20 = () => import('./pages/playground.astro.mjs');
+const _page21 = () => import('./pages/rss.xml.astro.mjs');
+const _page22 = () => import('./pages/index.astro.mjs');
 const pageMap = new Map([
     ["node_modules/astro/dist/assets/endpoint/generic.js", _page0],
     ["src/pages/about.astro", _page1],
@@ -47,8 +48,9 @@ const pageMap = new Map([
     ["src/pages/blog/index.astro", _page17],
     ["src/pages/blog/[...slug].astro", _page18],
     ["src/pages/code/index.astro", _page19],
-    ["src/pages/rss.xml.js", _page20],
-    ["src/pages/index.astro", _page21]
+    ["src/pages/playground.astro", _page20],
+    ["src/pages/rss.xml.js", _page21],
+    ["src/pages/index.astro", _page22]
 ]);
 
 const _manifest = Object.assign(manifest, {

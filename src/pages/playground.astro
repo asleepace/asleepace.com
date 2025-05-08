@@ -1,0 +1,59 @@
+---
+import SiteLayout from "@/layouts/SiteLayout.astro"
+
+export const prerender = true
+
+---
+<SiteLayout className="justify-center grow">
+  <h1 class="text-5xl font-black">Web Component</h1>
+  <p class="mb-8 mt-4 text-zinc-600">The following is an example of a custom web component in Astro!</p>
+
+
+  <page-metrics class="flex gap-x-4 pb-1 pt-2 px-4 min-w-32 justify-around border-1 rounded-2xl border-black/10">
+    <button class="text-gray-700 tracking-wide justify-center items-center flex grow hover:scale-125 transform duration-150" aria-label="Views"></button>
+    <button class="text-gray-700 tracking-wide justify-center items-center flex grow hover:scale-125 transform duration-150" aria-label="Likes"></button>
+  </page-metrics>
+</SiteLayout>
+<script>
+  type PageHandler = () => void
+
+  class PageMetrics extends HTMLElement {
+    static readonly TAG: string = 'page-metrics'
+    private pageViews: HTMLButtonElement
+    private pageLikes: HTMLButtonElement
+    private state = {
+      likes: 0,
+      views: 1
+    }
+
+    public onLikeHandler: PageHandler = () => {
+      this.state.likes += 1
+      this.render()
+    }
+
+    public onViewHandler: PageHandler = () => {
+      this.state.views += 1
+      this.render()
+    }
+
+    private render() {
+      const { likes, views } = this.state
+      this.pageViews.innerHTML = `<span>👀</span><span class="text-sm ml-1">${views}</span>`
+      this.pageLikes.innerHTML = `<span>❤️</span><span class="text-sm ml-1">${likes}</span>`
+    }
+
+    protected connectedCallback() {
+      const container = this.querySelectorAll('button')
+      this.pageViews = container.item(0)
+      this.pageLikes = container.item(1)
+      this.pageLikes.addEventListener('click', this.onLikeHandler)
+      this.render()
+    }
+
+    protected disconnectedCallback() {
+      this.onViewHandler()
+    }
+  }
+
+  customElements.define(PageMetrics.TAG, PageMetrics);
+</script>
