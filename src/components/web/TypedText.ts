@@ -25,18 +25,22 @@ export class TypedText extends WebComponent<State> {
     this.textRef.className = 'py-4'
   }
 
-  public render({ text }: State) {
-    console.log(`[TypedText] render called: "${text}"`)
-    requestAnimationFrame(() => {
-      const characters = text.split('')
-      for (let i = 0; i < characters.length; i++) {
-        const char = characters[i]
-        setTimeout(() => {
-          this.textRef.textContent += char
-        }, i * 16)
-      }
+  animateText(text: string, duration: number = 300) {
+    const chars = text.split('')
+    const interval = duration / (chars.length || 1)
+    return chars.map((char, i) => {
+      const { promise, resolve } = Promise.withResolvers<void>()
+      const offset = i * interval
+      setTimeout(() => { 
+        this.textRef.textContent += char       
+        resolve()
+      }, offset)
+      return promise
     })
+  }
 
+  public render({ text }) {
+    requestAnimationFrame(() => this.animateText(text, 500))
     return this.textRef
   }
 }
