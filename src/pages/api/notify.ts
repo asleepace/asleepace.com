@@ -54,25 +54,17 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (payload.isErr()) {
     return new Response(INVALID_BODY, {
-      statusText: 'Missing or invalid body',
+      statusText: 'Invalid Body',
       status: 500,
     })
   }
 
-  const data = payload.unwrap()
-
-  if (!isNotification(data)) {
-    return new Response(INVALID_BODY, {
-      statusText: 'Invalid notification type',
-      status: 500,
-    })
-  }
-
+  const data = payload.unwrap() as Record<string, string>
   // broadcast notification here...
 
   sendEmailNotification({
-    subject: `${capitalize(data.type)} Notification`,
-    message: data.message,
+    subject: `${capitalize(data?.type ?? 'Asleepace')} Notification`,
+    message: data?.message || String(data),
   })
 
   console.log('[notify] incoming notification:', data)
