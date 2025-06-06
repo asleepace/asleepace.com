@@ -31,8 +31,8 @@ export class TypedText extends WebComponent<State> {
     return chars.map((char, i) => {
       const { promise, resolve } = Promise.withResolvers<void>()
       const offset = i * interval
-      setTimeout(() => { 
-        this.textRef.textContent += char       
+      setTimeout(() => {
+        this.textRef.textContent += char
         resolve()
       }, offset)
       return promise
