@@ -29,6 +29,20 @@ const capitalize = (str: string) => {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()
 }
 
+export const GET: APIRoute = async () => {
+  return fetch('/api/notify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      type: 'deploy',
+      subject: 'Testing!',
+      message: 'This is a test notification',
+    }),
+  })
+}
+
 /**
  * POST /api/notify
  *
