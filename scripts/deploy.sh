@@ -14,15 +14,15 @@ WHITE="\033[37m"
 set -e
 
 # pretty print function for output
-pretty_print() {
+pp() {
   local text="$1"
   echo -e "\n${GREEN} • ${text}${RESET}"
 }
 
 # print some memory stats
-pretty_print "📊 current memory usage: \n$(free -h)"
-pretty_print "💽 current disk usage: \n$(df -h)"
-pretty_print "⛳ fetching latest changes from git..."
+pp "📊 current memory usage: \n$(free -h)"
+pp "💽 current disk usage: \n$(df -h)"
+pp "⛳ fetching latest changes from git..."
 
 # pull latest changes from Github
 git fetch origin
@@ -38,36 +38,38 @@ if ! git diff-index --quiet HEAD -- || [ -n "$(git ls-files --others --exclude-s
 fi
 
 # Ensure we're on main branch and reset to match remote exactly
-pretty_print "🔄 switching to main branch and syncing with remote..."
+pp "🔄 switching to main branch and syncing with remote..."
 git checkout main
 git reset --hard origin/main
 
 # Clean any remaining untracked files
 git clean -fd
 
-pretty_print "🚀 installing environment..."
+pp "⚙️ installing environment..."
 
 # asdf install any deps
 asdf install
 
-pretty_print "📦 installing node modules..."
+pp "📦 installing packages..."
 
 # install node modules
 bun i
 
-pretty_print "🎨 building tailwind styles..."
+pp "🎨 bundling styles..."
 
 # build tailwind and project
 bun run build:tailwind
 
-pretty_print "🔨 building application..."
+pp "🛠️ building application..."
 
+# build astro project
 bun run build
 
-pretty_print "🚀 restarting server..."
+pp "🔋 restarting server..."
 
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pretty_print "📋 current commit: $(git log --oneline -1)"
-pretty_print "✅ success!"
+pp "📋 current commit: $(git log --oneline -1)"
+pp "🕒 deployed at: $(date)"
+pp "✅ success!"
