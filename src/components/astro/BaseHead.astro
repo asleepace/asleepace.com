@@ -3,7 +3,7 @@
 // all pages through the use of the <BaseHead /> component.
 import '@/styles/global.css'
 import { siteConfig } from '@/consts'
-import CoverImage from '@/assets/about-me.jpeg'
+import DefaultCoverImage from '@/assets/about-me.jpeg'
 
 interface Props {
   title: string
@@ -19,7 +19,7 @@ const {
   image = '/images/blog-placeholder-1.jpg',
 } = Astro.props
 
-const coverImage = new URL(image, Astro.url)
+const coverImage = image ? image : DefaultCoverImage.src
 ---
 
 <!-- Global Metadata -->
@@ -69,14 +69,14 @@ const coverImage = new URL(image, Astro.url)
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={CoverImage.src} />
+<meta property="og:image" content={coverImage} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={CoverImage.src} />
+<meta property="twitter:image" content={coverImage} />
 
 <!-- Sitemap -->
 <link rel="sitemap" href="/sitemap-index.xml" />
