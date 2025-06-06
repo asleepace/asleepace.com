@@ -8,10 +8,14 @@ interface Props {
   anchorTag?: string
 }
 
-console.log('[Section.astro] rendering section...')
-
-const { title, anchorTag, description, icon: SectionIcon = Lucide.FileWarning } = Astro.props
+const {
+  title,
+  anchorTag,
+  description,
+  icon: SectionIcon = Lucide.FileWarning,
+} = Astro.props
 ---
+
 <section class="flex flex-col gap-y-16 pt-16" id={anchorTag}>
   <div class="text-center flex flex-col items-center">
     <SectionIcon className="text-7xl text-gray-300" size={96} />
@@ -20,7 +24,9 @@ const { title, anchorTag, description, icon: SectionIcon = Lucide.FileWarning } 
       {description}
     </p>
   </div>
-  <div class="flex flex-col py-8 md:py-16 border-[1px] border-gray-200 border-r-transparent border-l-transparent grow bg-[radial-gradient(circle,rgba(0,0,0,0.04),rgba(255,255,255,1))] after:blur-[20px]">
+  <div
+    class="flex flex-col py-8 md:py-16 border-[1px] border-gray-200 border-r-transparent border-l-transparent grow bg-[radial-gradient(circle,rgba(0,0,0,0.04),rgba(255,255,255,1))] after:blur-[20px]"
+  >
     <slot />
   </div>
 </section>

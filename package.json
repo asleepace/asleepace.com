@@ -46,6 +46,7 @@
     "@types/react": "^19.0.4",
     "@types/react-dom": "^19.0.2",
     "astro": "^5.7.5",
+    "canvas-confetti": "^1.9.3",
     "chalk": "^5.4.1",
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
