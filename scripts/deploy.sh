@@ -14,36 +14,62 @@ WHITE="\033[37m"
 set -e
 
 # pretty print function for output
-pretty_print() {
+pp() {
   local text="$1"
-  echo -e "\n${MAGENTA} • deploy ${RESET}  -  ${WHITE}${text}${RESET}\n"
+  echo -e "\n${GREEN} • ${text}${RESET}"
 }
 
 # print some memory stats
-pretty_print "[memory] $(free -h)"
-pretty_print "[disk] $(df -h)"
+pp "📊 current memory usage: \n$(free -h)"
+pp "💽 current disk usage: \n$(df -h)"
+pp "⛳ fetching latest changes from git..."
 
-pretty_print "[1/5] fetching latest changes from git..."
-
+# pull latest changes from Github
 git fetch origin
+git status --short
+
+# Store current branch
+CURRENT_BRANCH=$(git branch --show-current)
+
+# Stash any local changes (including untracked files)
+if ! git diff-index --quiet HEAD -- || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+    pretty_print "📚 stashing local changes and untracked files..."
+    git stash push --include-untracked -m "Auto-stash before deploy $(date)"
+fi
+
+# Ensure we're on main branch and reset to match remote exactly
+pp "🔄 switching to main branch and syncing with remote..."
 git checkout main
-git pull
+git reset --hard origin/main
 
-pretty_print "[2/5] installing ASDF plugins..."
+# Clean any remaining untracked files
+git clean -fd
 
+pp "⚙️ installing environment..."
+
+# asdf install any deps
 asdf install
 
-pretty_print "[3/5] installing node modules..."
+pp "📦 installing packages..."
 
-bun run install
+# install node modules
+bun i
 
-pretty_print "[4/5] building application..."
+pp "🎨 bundling styles..."
 
+# build tailwind and project
 bun run build:tailwind
-bun run build:debug
 
-pretty_print "[5/5] restarting server..."
+pp "🛠️ building application..."
 
+# build astro project
+bun run build
+
+pp "🔋 restarting server..."
+
+# restart pm2 server
 pm2 restart "asleepace.com"
 
-pretty_print "[ ✅ ] success!"
+pp "📋 current commit: $(git log --oneline -1)"
+pp "🕒 deployed at: $(date)"
+pp "✅ success!"

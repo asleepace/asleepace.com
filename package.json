@@ -8,7 +8,7 @@
     "check": "bun --bun astro check",
     "dev": "bunx --bun astro dev",
     "start": "bunx --bun astro build --port 4321 && bunx --bun astro preview --port 4321",
-    "build": "bunx --bun astro build",
+    "build": "bunx --bun astro build --verbose",
     "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
     "preview": "bunx --bun astro preview",
     "build:tailwind": "npx @tailwindcss/cli -i ./src/styles/global.css -o ./src/styles/output.css",
