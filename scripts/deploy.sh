@@ -76,7 +76,7 @@ pp "🔋 restarting server..."
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pp "📋 ${YELLOW}$(git log --oneline -1)${RESET}"
-pp "📅 ${WHITE}$(date)${RESET}"
+pp "📋 commit: ${YELLOW}$(git log --oneline -1)${RESET}"
+pp "📅 time: ${WHITE}$(date)${RESET}"
 pp "✅ success!"
 reset_output
