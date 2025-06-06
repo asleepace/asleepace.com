@@ -44,7 +44,7 @@ echo "Testing" | mail -s "Notification" \
  * })
  * ```
  */
-async function sendEmailNotification({
+export async function sendEmailNotification({
   to: toEmail = 'colin_teahan@yahoo.com',
   from: fromEmail = 'notifications@asleepace.com',
   name = 'Asleepace Notification',

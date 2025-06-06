@@ -1,17 +1,13 @@
 import type { APIRoute } from 'astro'
 import { Try } from '@asleepace/try'
+import { sendEmailNotification } from '@/lib/mail/sendNotification'
 
 export const prerender = false
 
 interface Notification {
   type: 'deploy'
+  subject: string
   message: string
-}
-
-interface DeployNotification extends Notification {
-  type: 'deploy'
-  message: string
-  commit: string
 }
 
 const INVALID_BODY = JSON.stringify({
@@ -28,6 +24,17 @@ const isNotification = (data: unknown): data is Notification => {
   return Boolean(data && typeof data === 'object' && 'type' in data)
 }
 
+const capitalize = (str: string) => {
+  if (str.length === 1) return str.toUpperCase()
+  return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+/**
+ * POST /api/notify
+ *
+ * This endpoint will dispatch an email notifcation with the given payload.
+ *
+ */
 export const POST: APIRoute = async ({ request }) => {
   const payload = await Try.catch(() => request.json())
 
@@ -48,6 +55,11 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   // broadcast notification here...
+
+  sendEmailNotification({
+    subject: `${capitalize(data.type)} Notification`,
+    message: data.message,
+  })
 
   console.log('[notify] incoming notification:', data)
   return new Response(SUCESS_BODY)
