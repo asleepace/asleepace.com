@@ -29,3 +29,10 @@ jobs:
 
       - name: Run deploy script
         run: ssh staging '~/asleepace.com/scripts/deploy.sh'
+
+      - name: Success Notification
+        if: success()
+        run: |
+          curl -X POST "https://asleepace.com/api/notify" \
+            -H "Content-Type: application/json" \
+            -d '{"type": "deploy", "message": "Deploy successful!", "commit": "${{ github.sha }}"}'

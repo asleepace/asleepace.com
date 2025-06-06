@@ -34,7 +34,7 @@
     "free": "free -h"
   },
   "dependencies": {
-    "@asleepace/try": "^0.2.0",
+    "@asleepace/try": "^0.2.1",
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "4.0.3",
     "@astrojs/node": "9.0.0",
