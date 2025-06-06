@@ -23,7 +23,7 @@ pp() {
 }
 
 reset_output() {
-  echo "${RESET}\n"
+  echo -e "${RESET}\n"
 }
 
 # print some memory stats
