@@ -19,12 +19,12 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "${RESET}${DIM}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${PURPLE} ${text}${RESET}"
+  echo -e "${RESET}${DIM}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${PURPLE} ${text}${RESET}${DIM}"
 }
 
 # print some memory stats
-pp "📊 current memory usage: \n\n${DIM}$(free -h)${RESET}"
-pp "💽 current disk usage: \n\n${DIM}$(df -h)${RESET}"
+pp "📊 current memory usage: \n${DIM_GRAY}$(free -h)${RESET}"
+pp "💽 current disk usage: \n${DIM_GRAY}$(df -h)${RESET}"
 pp "⛳ fetching latest changes from git..."
 
 # pull latest changes from Github
