@@ -17,7 +17,7 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "${RESET}\n${CYAN} ${text}${RESET}\n"
+  echo -e "${RESET}\n${CYAN} ${text}${RESET}"
 }
 
 # print some memory stats
