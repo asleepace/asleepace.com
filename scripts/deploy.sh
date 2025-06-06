@@ -1,6 +1,6 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
-# Define ANSI escape codes for colors
+# custom ansi colors
 RESET="\033[0m"
 RED="\033[31m"
 GREEN="\033[32m"
@@ -9,6 +9,7 @@ BLUE="\033[34m"
 MAGENTA="\033[35m"
 CYAN="\033[36m"
 WHITE="\033[37m"
+DIM="\033[2m"
 
 # early exit if any command fails
 set -e
@@ -16,12 +17,12 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "\n${GREEN} • ${text}${RESET}"
+  echo -e "\n${CYAN} ${text}${RESET}\n"
 }
 
 # print some memory stats
-pp "📊 current memory usage: \n$(free -h)"
-pp "💽 current disk usage: \n$(df -h)"
+pp "📊 current memory usage: \n\n${DIM}$(free -h)${RESET}"
+pp "💽 current disk usage: \n\n${DIM}$(df -h)${RESET}"
 pp "⛳ fetching latest changes from git..."
 
 # pull latest changes from Github
@@ -33,7 +34,7 @@ CURRENT_BRANCH=$(git branch --show-current)
 
 # Stash any local changes (including untracked files)
 if ! git diff-index --quiet HEAD -- || [ -n "$(git ls-files --others --exclude-standard)" ]; then
-    pretty_print "📚 stashing local changes and untracked files..."
+    pp "📚 stashing local changes and untracked files..."
     git stash push --include-untracked -m "Auto-stash before deploy $(date)"
 fi
 
