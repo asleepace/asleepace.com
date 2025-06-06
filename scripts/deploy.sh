@@ -17,7 +17,7 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "\n${CYAN} ${text}${RESET}\n"
+  echo -e "${RESET}\n${CYAN} ${text}${RESET}\n"
 }
 
 # print some memory stats
@@ -71,6 +71,6 @@ pp "🔋 restarting server..."
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pp "📋 current commit: $(git log --oneline -1)"
-pp "🕒 deployed at: $(date)"
+pp "📋 current commit: ${WHITE}$(git log --oneline -1)${RESET}"
+pp "🕒 deployed at: ${WHITE}$(date)${RESET}"
 pp "✅ success!"
