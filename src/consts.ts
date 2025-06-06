@@ -16,6 +16,7 @@ export type SiteConfig = {
   mongodbUri: string
   sqliteUri: string
   version: string
+  themeColor: string
 }
 
 // --- check environment variables ---
@@ -61,6 +62,8 @@ export const siteConfig: SiteConfig = {
   cookieDomain: `.${baseUrl.hostname}` as const,
   /** NOTE: used when creating and deleting cookies */
   cookiePath: '/',
+  /** Extended theme styling */
+  themeColor: '#FFFFFF',
 }
 
 Object.entries(siteConfig).forEach(([key, value]) => {
@@ -115,5 +118,3 @@ export const PATH = {
   CODE_EDITOR: '/code',
   CLEAR_SESSION: '/api/auth/clearSession',
 }
-
-console.log('\n')

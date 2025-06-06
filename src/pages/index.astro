@@ -15,7 +15,6 @@ const posts = blog.sort(
 )
 
 const featured = posts.at(0)!
-console.log(featured)
 
 const feed = posts.slice(1).map(({ data, id }) => ({
   name: data.title,

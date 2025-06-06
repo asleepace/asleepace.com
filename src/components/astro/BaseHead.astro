@@ -2,6 +2,8 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import '@/styles/global.css'
+import { siteConfig } from '@/consts'
+import CoverImage from '@/assets/about-me.jpeg'
 
 interface Props {
   title: string
@@ -16,6 +18,8 @@ const {
   description,
   image = '/images/blog-placeholder-1.jpg',
 } = Astro.props
+
+const coverImage = new URL(image, Astro.url)
 ---
 
 <!-- Global Metadata -->
@@ -52,27 +56,27 @@ const {
 <meta name="description" content={description} />
 
 <!-- Theme content -->
- <!-- Yellow Theme -->
+<!-- Yellow Theme -->
 <!-- <meta name="theme-color" content="#f0b000"> -->
-<meta name="theme-color" content="#FFFFFF">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="msapplication-navbutton-color" content="#FFFFFF">
-<meta name="msapplication-TileColor" content="#FFFFFF">
+<meta name="theme-color" content={siteConfig.themeColor} />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="msapplication-navbutton-color" content={siteConfig.themeColor} />
+<meta name="msapplication-TileColor" content={siteConfig.themeColor} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:image" content={CoverImage.src} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.url)} />
+<meta property="twitter:image" content={CoverImage.src} />
 
 <!-- Sitemap -->
 <link rel="sitemap" href="/sitemap-index.xml" />

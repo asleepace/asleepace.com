@@ -251,7 +251,7 @@ export namespace Sessions {
       }) as UserSession | undefined
 
     if (!session) {
-      console.warn('[findByToken] session not found:', token)
+      // console.warn('[findByToken] session not found:', token)
       return
     }
 
