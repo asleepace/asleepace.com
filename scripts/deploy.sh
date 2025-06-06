@@ -7,6 +7,7 @@ GREEN="\033[32m"
 YELLOW="\033[33m"
 BLUE="\033[34m"
 MAGENTA="\033[35m"
+PURPLE="\033[95m"
 CYAN="\033[36m"
 WHITE="\033[37m"
 DIM="\033[2m"
@@ -18,7 +19,7 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "${RESET}${DIM}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${WHITE} ${text}${RESET}"
+  echo -e "${RESET}${DIM}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${PURPLE} ${text}${RESET}"
 }
 
 # print some memory stats
@@ -72,6 +73,6 @@ pp "🔋 restarting server..."
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pp "📋 current commit: \"${WHITE}$(git log --oneline -1)${RESET}\""
-pp "🕒 deployed at: ${WHITE}$(date)${RESET}"
+pp "📋 deployed commit: ${YELLOW}$(git log --oneline -1)${RESET}"
+pp "📅 deployed at: ${WHITE}$(date)${RESET}"
 pp "✅ success!"
