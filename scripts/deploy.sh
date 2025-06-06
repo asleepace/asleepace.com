@@ -25,9 +25,18 @@ pretty_print "[disk] $(df -h)"
 
 pretty_print "[1/5] fetching latest changes from git..."
 
+# pull latest changes from Github
 git fetch origin
+git status --short
+
+# stash any local changes
+if ! git diff-index --quiet HEAD --; then
+    pretty_print "[1/5] stashing local changes..."
+    git stash push -m "Auto-stash before deploy $(date)"
+fi
+
 git checkout main
-git pull
+git pull origin main
 
 pretty_print "[2/5] installing ASDF plugins..."
 
@@ -35,12 +44,12 @@ asdf install
 
 pretty_print "[3/5] installing node modules..."
 
-bun run install
+bun i
 
 pretty_print "[4/5] building application..."
 
 bun run build:tailwind
-bun run build:debug
+bun run build
 
 pretty_print "[5/5] restarting server..."
 
