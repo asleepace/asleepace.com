@@ -77,5 +77,7 @@ export async function sendEmailNotification({
     await proc.exited
   } catch (err) {
     console.warn('[sendEmailNotificaiton] error:', err)
+  } finally {
+    console.log('[sendEmailNotificaiton] finished!')
   }
 }
