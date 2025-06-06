@@ -18,7 +18,7 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "${RESET}${DIM_GRAY}$(date +%H:%M:%S) ${CYAN}[deploy]${WHITE} ${text}${RESET}"
+  echo -e "${RESET}${DIM_GRAY}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${WHITE} ${text}${RESET}"
 }
 
 # print some memory stats
