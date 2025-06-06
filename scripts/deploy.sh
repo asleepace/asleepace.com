@@ -16,14 +16,14 @@ set -e
 # pretty print function for output
 pretty_print() {
   local text="$1"
-  echo -e "\n${MAGENTA} • deploy ${RESET}  -  ${WHITE}${text}${RESET}\n"
+  echo -e "\n${MAGENTA} • deploy ${RESET}  -  ${WHITE}${text}${RESET}"
 }
 
 # print some memory stats
-pretty_print "[memory] $(free -h)"
-pretty_print "[disk] $(df -h)"
+pretty_print "[💽] $(free -h)"
+pretty_print "[💾] $(df -h)"
 
-pretty_print "[1/5] fetching latest changes from git..."
+pretty_print "[⛳] fetching latest changes from git..."
 
 # pull latest changes from Github
 git fetch origin
@@ -31,28 +31,36 @@ git status --short
 
 # stash any local changes
 if ! git diff-index --quiet HEAD --; then
-    pretty_print "[1/5] stashing local changes..."
+    pretty_print "[📚] stashing local changes..."
     git stash push -m "Auto-stash before deploy $(date)"
 fi
 
+# pull latest changes from main
 git checkout main
 git pull origin main
 
-pretty_print "[2/5] installing ASDF plugins..."
+pretty_print "[🚀] installing environment..."
 
+# asdf install any deps
 asdf install
 
-pretty_print "[3/5] installing node modules..."
+pretty_print "[📦] installing node modules..."
 
+# install node modules
 bun i
 
-pretty_print "[4/5] building application..."
+pretty_print "[🎨] building tailwind styles..."
 
+# build tailwind and project
 bun run build:tailwind
+
+pretty_print "[🔨] building application..."
+
 bun run build
 
-pretty_print "[5/5] restarting server..."
+pretty_print "[🚀] restarting server..."
 
+# restart pm2 server
 pm2 restart "asleepace.com"
 
-pretty_print "[ ✅ ] success!"
+pretty_print "[✅] success!"
