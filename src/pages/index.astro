@@ -1,10 +1,9 @@
 ---
-
 import { getCollection } from 'astro:content'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import BentoBox from '@/layouts/BentoBox.astro'
 
-export const prerender = true;
+export const prerender = true
 
 // =====================================
 // Home Page
@@ -18,13 +17,13 @@ const posts = blog.sort(
 const featured = posts.at(0)!
 console.log(featured)
 
-const feed = posts.slice(1).map(({ data, id } ) => ({
+const feed = posts.slice(1).map(({ data, id }) => ({
   name: data.title,
   date: data.updatedDate ?? data.pubDate,
-  href: `/blog/${id}`
+  href: `/blog/${id}`,
 }))
-
 ---
-<SiteLayout title="Home">
-  <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed}>
+
+<SiteLayout title="Home" className="justify-center grow bg-white">
+  <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
 </SiteLayout>
