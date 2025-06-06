@@ -10,6 +10,7 @@ MAGENTA="\033[35m"
 CYAN="\033[36m"
 WHITE="\033[37m"
 DIM="\033[2m"
+DIM_GRAY="\033[2;37m"
 
 # early exit if any command fails
 set -e
@@ -17,7 +18,7 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "$(date +%H:%M:%S) ${MAGENTA}[deploy]${CYAN} ${text}${RESET}"
+  echo -e "${RESET}${DIM_GRAY}$(date +%H:%M:%S) ${CYAN}[deploy]${WHITE} ${text}${RESET}"
 }
 
 # print some memory stats
@@ -71,6 +72,6 @@ pp "🔋 restarting server..."
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pp "📋 current commit: ${WHITE}$(git log --oneline -1)${RESET}"
+pp "📋 current commit: \"${WHITE}$(git log --oneline -1)${RESET}\""
 pp "🕒 deployed at: ${WHITE}$(date)${RESET}"
 pp "✅ success!"
