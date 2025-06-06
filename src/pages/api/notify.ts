@@ -50,7 +50,10 @@ export const GET: APIRoute = async () => {
  *
  */
 export const POST: APIRoute = async ({ request }) => {
-  const payload = await Try.catch(() => request.json())
+  const payload = await Try.catch(async () => {
+    const json = await request.json().catch(() => request.text())
+    return json
+  })
 
   if (payload.isErr()) {
     return new Response(INVALID_BODY, {
@@ -62,8 +65,10 @@ export const POST: APIRoute = async ({ request }) => {
   const data = payload.unwrap() as Record<string, string>
   // broadcast notification here...
 
+  const prefix = capitalize(data?.type ?? 'Asleepace')
+
   sendEmailNotification({
-    subject: `${capitalize(data?.type ?? 'Asleepace')} Notification`,
+    subject: `${prefix} Notification`,
     message: data?.message || String(data),
   })
 
