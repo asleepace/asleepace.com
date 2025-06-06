@@ -19,11 +19,7 @@ set -e
 # pretty print function for output
 pp() {
   local text="$1"
-  echo -e "${RESET}${DIM}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${PURPLE} ${text}${RESET}${DIM}"
-}
-
-dim_output() {
-  echo "${RESET}${DIM_GRAY}"
+  echo -e "${RESET}${DIM}$(date +%H:%M:%S)${RESET} ${CYAN}[deploy]${PURPLE} ${text}${RESET}${DIM_GRAY}"
 }
 
 reset_output() {
@@ -34,7 +30,6 @@ reset_output() {
 pp "📊 current memory usage: \n$(free -h)"
 pp "💽 current disk usage: \n${DIM_GRAY}$(df -h)${RESET}"
 pp "⛳ fetching latest changes from git..."
-dim_output
 
 # pull latest changes from Github
 git fetch origin
@@ -46,8 +41,7 @@ CURRENT_BRANCH=$(git branch --show-current)
 # Stash any local changes (including untracked files)
 if ! git diff-index --quiet HEAD -- || [ -n "$(git ls-files --others --exclude-standard)" ]; then
     pp "📚 stashing local changes and untracked files..."
-    dim_output
-    git stash push --include-untracked -m "Auto-stash before deploy $(date)"
+    git stash push --include-untracked -m "auto-stash before deploy $(date)"
 fi
 
 # Ensure we're on main branch and reset to match remote exactly
@@ -58,38 +52,31 @@ git reset --hard origin/main
 git clean -fd
 
 pp "⚙️ installing environment..."
-dim_output
 
 # asdf install any deps
 asdf install
 
 pp "📦 installing packages..."
-dim_output
 
 # install node modules
 bun i
 
 pp "🎨 bundling styles..."
-dim_output
 
 # build tailwind and project
 bun run build:tailwind
 
 pp "🛠️ building application..."
-dim_output
 
 # build astro project
 bun run build
 
-pp "🔋 restarting server..."xwxW
-dim_output
+pp "🔋 restarting server..."
 
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pp "📋 commit: ${YELLOW}$(git log --oneline -1)${RESET}"
-dim_output
-pp "📅 on: ${WHITE}$(date)${RESET}"
-dim_output
+pp "📋 ${YELLOW}$(git log --oneline -1)${RESET}"
+pp "📅 ${WHITE}$(date)${RESET}"
 pp "✅ success!"
 reset_output
