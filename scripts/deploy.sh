@@ -27,7 +27,7 @@ reset_output() {
 }
 
 # print some memory stats
-pp "📊 current memory usage: \n$(free -h)"
+pp "📊 current memory usage: \n${DIM_GRAY}$(free -h)${RESET}"
 pp "💽 current disk usage: \n${DIM_GRAY}$(df -h)${RESET}"
 pp "⛳ fetching latest changes from git..."
 
