@@ -41,7 +41,6 @@ if ! git diff-index --quiet HEAD -- || [ -n "$(git ls-files --others --exclude-s
 fi
 
 # Ensure we're on main branch and reset to match remote exactly
-pp "🔄 switching to main branch and syncing with remote..."
 git checkout main
 git reset --hard origin/main
 
@@ -73,6 +72,6 @@ pp "🔋 restarting server..."
 # restart pm2 server
 pm2 restart "asleepace.com"
 
-pp "📋 deployed commit: ${YELLOW}$(git log --oneline -1)${RESET}"
-pp "📅 deployed at: ${WHITE}$(date)${RESET}"
+pp "📋 commit: ${YELLOW}$(git log --oneline -1)${RESET}"
+pp "📅 on: ${WHITE}$(date)${RESET}"
 pp "✅ success!"
