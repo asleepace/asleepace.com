@@ -1,14 +1,7 @@
 ---
-import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { siteData, PATH, siteConfig } from '@/consts'
-import type { User } from '@/db/types'
-import chalk from 'chalk'
-
-const TAG =
-  chalk.white('[@] ' + Astro.request.method + ' ') +
-  chalk.gray(Astro.url.pathname) +
-  '\t'
+import { siteData } from '@/consts'
+import { MenuIcon, SearchIcon, Settings } from 'lucide-react'
 
 export const prerender = false
 
@@ -32,29 +25,266 @@ const quickLinks = [
   <head>
     <BaseHead title={siteData.title} description={siteData.description} />
   </head>
-  <body
-    class="flex flex-1 min-h-full w-full bg-black text-white overflow-hidden"
-  >
-    <div
-      class="min-w-64 overflow-x-hidden bg-neutral-800 flex drop-shadow-md px-6 py-16"
-    >
-      <ul class="gap-4 flex flex-col">
-        {
-          quickLinks.map(([title, link]) => {
-            return (
-              <li class="text-neutral-500 hover:text-neutral-400 text-sm font-thin">
-                <a href={link}>{title}</a>
-              </li>
-            )
+  <body class="h-full bg-black text-white overflow-hidden">
+    <div class="flex h-full">
+      <!-- Sidebar -->
+      <div
+        id="sidebar"
+        class="sidebar-expanded bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-col"
+      >
+        <!-- Header -->
+        <div
+          class="sidebar-header p-4 flex justify-between items-center min-h-[60px]"
+        >
+          <button
+            id="menu-toggle"
+            class="menu-button p-2.5 hover:bg-neutral-700 transition-colors duration-150 rounded-full"
+            title=""
+          >
+            <MenuIcon className="w-5 h-5 text-neutral-300" />
+          </button>
+          <button
+            class="search-button p-2 hover:bg-neutral-700 transition-colors duration-150 rounded-full"
+          >
+            <SearchIcon className="w-4 h-4 text-neutral-300" />
+          </button>
+        </div>
+
+        <!-- Chat History -->
+        <div class="sidebar-content flex-1 px-4 pb-4 overflow-hidden">
+          <div class="chat-history overflow-y-auto h-full">
+            <h3 class="history-title text-neutral-400 text-base font-thin mb-4">
+              History
+            </h3>
+            <ul class="space-y-2">
+              {
+                quickLinks.map(([title, link]) => (
+                  <li>
+                    <a
+                      href={link}
+                      class="history-item block py-2 px-2 text-sm font-thin text-neutral-500 hover:text-neutral-300 hover:bg-neutral-700 rounded transition-colors duration-150 truncate"
+                    >
+                      {title}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        <!-- spacer -->
+        <div class="flex-1"></div>
+
+        <!-- Settings -->
+        <div class="sidebar-footer p-4 min-h-[60px]">
+          <button
+            class="settings-button w-full flex items-center gap-3 p-2 hover:bg-neutral-700 transition-colors duration-150 rounded"
+            title=""
+          >
+            <Settings className="w-5 h-5 text-neutral-400 flex-shrink-0" />
+            <span
+              class="settings-text text-neutral-400 font-thin text-base truncate"
+              >Settings</span
+            >
+          </button>
+        </div>
+      </div>
+
+      <!-- Main content area -->
+      <div class="flex-1 bg-neutral-900 overflow-auto">
+        <slot />
+      </div>
+    </div>
+
+    <script>
+      class SidebarToggle {
+        public sidebar: HTMLElement
+        public toggleButton: HTMLElement
+        public isExpanded: boolean = true
+        constructor() {
+          this.sidebar = document.getElementById('sidebar')!
+          this.toggleButton = document.getElementById('menu-toggle')!
+          this.isExpanded = true
+
+          this.init()
+        }
+
+        init() {
+          // Toggle button click
+          this.toggleButton?.addEventListener('click', () => this.toggle())
+
+          // Keyboard shortcut (Cmd/Ctrl + B)
+          document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+              e.preventDefault()
+              this.toggle()
+            }
           })
         }
-      </ul>
-    </div>
-    <slot />
+
+        toggle() {
+          this.isExpanded = !this.isExpanded
+
+          if (this.isExpanded) {
+            this.expand()
+          } else {
+            this.collapse()
+          }
+        }
+
+        expand() {
+          this.sidebar?.classList.remove('sidebar-collapsed')
+          this.sidebar?.classList.add('sidebar-expanded')
+
+          // Remove tooltips
+          document
+            .querySelectorAll('.sidebar-collapsed [title]')
+            .forEach((el) => {
+              el.removeAttribute('title')
+            })
+        }
+
+        collapse() {
+          this.sidebar?.classList.remove('sidebar-expanded')
+          this.sidebar?.classList.add('sidebar-collapsed')
+
+          // Add tooltips
+          this.toggleButton?.setAttribute('title', 'Toggle Menu (⌘B)')
+          document
+            .querySelector('.settings-button')
+            ?.setAttribute('title', 'Settings')
+        }
+      }
+
+      // Initialize when DOM is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        new SidebarToggle()
+      })
+    </script>
   </body>
 </html>
+
 <style>
-  :root {
-    overscroll-behavior: none;
+  /* Sidebar States */
+  .sidebar-expanded {
+    width: 16rem; /* 256px */
+  }
+
+  .sidebar-collapsed {
+    width: 4rem; /* 64px */
+  }
+
+  /* Collapsed state styling */
+  .sidebar-collapsed .sidebar-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 0.5rem;
+    align-items: center;
+  }
+
+  .sidebar-collapsed .sidebar-content {
+    display: none;
+  }
+
+  .sidebar-collapsed .sidebar-footer {
+    padding: 1rem 0.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .sidebar-collapsed .settings-button {
+    width: auto;
+    justify-content: center;
+    position: relative;
+  }
+
+  .sidebar-collapsed .menu-button {
+    position: relative;
+  }
+
+  .sidebar-collapsed .search-button {
+    position: relative;
+  }
+
+  .sidebar-collapsed .settings-text {
+    display: none;
+  }
+
+  .sidebar-collapsed .history-title,
+  .sidebar-collapsed .history-item {
+    display: none;
+  }
+
+  /* Tooltip styles */
+  [title]:not([title='']):hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 6px 12px;
+    background: rgba(23, 23, 23, 0.95);
+    color: #e5e5e5;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    animation: tooltipFadeIn 200ms ease-in-out;
+  }
+
+  [title]:not([title='']):hover::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 2px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px 6px 6px 0;
+    border-color: transparent rgba(23, 23, 23, 0.95) transparent transparent;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  @keyframes tooltipFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Custom scrollbar */
+  .chat-history::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-history::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-history::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .chat-history::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Smooth transitions */
+  #sidebar {
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-header,
+  .sidebar-footer {
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 </style>
