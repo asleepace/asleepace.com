@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 echo "DEPLOYMENT: ${whoami} @ ${pwd}"
 
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Change to project directory
+cd "$PROJECT_DIR" || exit 1
+
 # custom ansi colors
 RESET="\033[0m"
 RED="\033[31m"
