@@ -1,15 +1,12 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
+import { ButtonRoundIcon } from '@/components/library/'
 import { siteData } from '@/consts'
-import { MenuIcon, SearchIcon, Settings } from 'lucide-react'
+import { Settings } from 'lucide-react'
+
+import Sidebar from '@/components/library/Sidebar.astro'
 
 export const prerender = false
-
-interface Props {
-  user: Record<string, string>
-}
-
-const { user } = Astro.props
 
 const quickLinks = [
   ['Show me the latest error logs', '/asdfasf'],
@@ -28,27 +25,12 @@ const quickLinks = [
   <body class="h-full bg-black text-white overflow-hidden">
     <div class="flex h-full">
       <!-- Sidebar -->
-      <div
-        id="sidebar"
-        class="sidebar-expanded bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-col"
-      >
+      <Sidebar>
         <!-- Header -->
-        <div
-          class="sidebar-header p-4 flex justify-between items-center min-h-[60px]"
-        >
-          <button
-            id="menu-toggle"
-            class="menu-button p-2.5 hover:bg-neutral-700 transition-colors duration-150 rounded-full"
-            title=""
-          >
-            <MenuIcon className="w-5 h-5 text-neutral-300" />
-          </button>
-          <button
-            class="search-button p-2 hover:bg-neutral-700 transition-colors duration-150 rounded-full"
-          >
-            <SearchIcon className="w-4 h-4 text-neutral-300" />
-          </button>
-        </div>
+        <Fragment slot="sidebar-header">
+          <ButtonRoundIcon icon="Menu" />
+          <ButtonRoundIcon icon="Search" />
+        </Fragment>
 
         <!-- Chat History -->
         <div class="sidebar-content flex-1 px-4 pb-4 overflow-hidden">
@@ -89,7 +71,7 @@ const quickLinks = [
             >
           </button>
         </div>
-      </div>
+      </Sidebar>
 
       <!-- Main content area -->
       <div class="flex-1 bg-neutral-900 overflow-auto">

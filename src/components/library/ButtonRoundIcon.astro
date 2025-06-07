@@ -1,0 +1,41 @@
+---
+import { cn } from '@/utils/cn'
+import {
+  type LucideIconName,
+  type AstroButtonProps,
+} from '@/components/library/types'
+import { getDynamicIcon } from './getDynamicIcon'
+
+interface Props extends AstroButtonProps {
+  onPress?: string
+  icon: LucideIconName
+  className?: string
+  size?: number
+}
+
+const { icon, onPress, size = 24, className, ...buttonProps } = Astro.props
+
+const DisplayedIcon = await getDynamicIcon(icon)
+
+console.log('[ButtonRoundIcon] onPress:', onPress)
+---
+
+<button
+  onclick={String(onPress)}
+  class={cn(
+    'rounded-full p-2.5 hover:bg-neutral-700 hover:*:text-neutral-200 transition-colors duration-300',
+    className
+  )}
+  {...buttonProps}
+>
+  <DisplayedIcon
+    className={cn('text-neutral-400 w-5 h-5')}
+    name={icon}
+    size={size}
+  />
+</button>
+<script>
+  document.addEventListener('click', () => {
+    console.log('[ButtonRoundIcon] click:')
+  })
+</script>
