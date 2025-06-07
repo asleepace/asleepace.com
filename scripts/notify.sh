@@ -56,6 +56,7 @@ send_notification() {
       echo "$email_content" | mail -s "$subject" \
         -a "From: Notifications <notifications@asleepace.com>" \
         -a "Reply-To: notifications@asleepace.com" \
+        -a "Content-Type: text/html; charset=UTF-8" \
         "$recipient"
     else
       # macOS or BSD mail (no -a flag)

@@ -90,6 +90,10 @@ pp "✅ success!"
 reset_output
 
 # send an email notification (make sure to source)
-source "${SCRIPT_DIR}/notify.sh"
+#source "${SCRIPT_DIR}/notify.sh"
+#send_notification "Deployment" "$(git log --oneline -1)"
 
-send_notification "Deployment" "$(git log --oneline -1)"
+echo "$(git log --oneline -1)" | mail -s "Asleepace Notifications" \
+  -a "From: Successful Deployment <notifications@asleepace.com>" \
+  -a "Reply-To: notifications@asleepace.com" \
+  "colin_teahan@hotmail.com"
