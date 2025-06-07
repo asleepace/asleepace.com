@@ -89,11 +89,31 @@ pp "📋 ${YELLOW}$(git log --oneline -1)${RESET}"
 pp "✅ success!"
 reset_output
 
-# send an email notification (make sure to source)
-#source "${SCRIPT_DIR}/notify.sh"
-#send_notification "Deployment" "$(git log --oneline -1)"
-
-echo "$(git log --oneline -1)" | mail -s "Asleepace Notifications" \
+# send a simple notification once finished
+mail -s "Asleepace.com - Deployment Notification" \
   -a "From: Successful Deployment <notifications@asleepace.com>" \
   -a "Reply-To: notifications@asleepace.com" \
-  "colin_teahan@hotmail.com"
+  "colin_teahan@hotmail.com" <<EOF
+Deployment completed at: $(date)
+
+Latest Commit: 
+===================
+#$(git log --oneline -1)
+
+Memory Usage:
+===================
+$(free -h)
+
+Disk Usage:
+===================
+$(df -h)
+
+Active Processes:
+===================
+$(ps aux --sort=-%mem | head -n 10)
+
+Logs
+===================
+$(pm2 logs asleepace.com --last 20)
+
+EOF
