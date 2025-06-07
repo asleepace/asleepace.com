@@ -80,3 +80,8 @@ pp "📅 ${WHITE}$(date)${RESET}"
 pp "📋 ${YELLOW}$(git log --oneline -1)${RESET}"
 pp "✅ success!"
 reset_output
+
+# send an email notification (make sure to source)
+source ./notify.sh
+
+send_notification "Deployment" "$(git log --oneline -1)"
