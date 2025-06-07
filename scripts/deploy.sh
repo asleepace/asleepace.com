@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo "DEPLOYMENT: ${whoami} @ ${pwd}"
 
 # custom ansi colors
 RESET="\033[0m"
