@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# NOTE: make sure to source this file in the file where it will be used.
+# source ./notify.sh
+
 set -e
 
 send_notification() {
