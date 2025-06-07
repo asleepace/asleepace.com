@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 # NOTE: make sure to source this file in the file where it will be used.
-# source ./notify.sh
+# source ./notify.sh.
+#
+# This will not work on MacOS and must be used in a linux environment, since
+# the -a headers don't work well.
+#
 
 send_notification() {
   local subject="$1"
