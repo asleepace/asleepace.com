@@ -1,11 +1,18 @@
 import { PATH } from '@/consts'
+import { consoleTag } from '@/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 
-const TAG = chalk.gray('[m] security\t')
-
-const whitelist = ['/admin/logout', '/admin/login', '/api/proxy']
+const whitelist = [
+  '/admin/logout',
+  '/admin/login',
+  '/admin/panel',
+  '/api/proxy',
+  '/api/analytics',
+]
 const blacklist = ['/api', '/admin']
+
+const handleLog = consoleTag('security', chalk.yellow)
 
 /**
  *  ## securityMiddleware
@@ -28,14 +35,12 @@ export const securityMiddleware = defineMiddleware(async (context, next) => {
 
   // skip checks for whitelisted paths
   if (isWhitelisted) {
-    console.log(TAG, chalk.gray(path), chalk.white(`(whitelisted)`))
     return next()
     // authorized users only
   } else if (isBlacklisted) {
-    console.log(TAG, chalk.gray(path), chalk.red(`(blacklisted)`))
+    handleLog('unauthorized access to blacklisted path:', path)
     return context.redirect(PATH.ADMIN_LOGIN(), 302)
   } else {
-    console.log(TAG, chalk.gray(path), chalk.gray(`(skipping...)`))
     return next()
   }
 })

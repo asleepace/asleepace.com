@@ -1,0 +1,60 @@
+---
+import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
+import BaseHead from '@/components/astro/BaseHead.astro'
+import { siteData, PATH, siteConfig } from '@/consts'
+import type { User } from '@/db/types'
+import chalk from 'chalk'
+
+const TAG =
+  chalk.white('[@] ' + Astro.request.method + ' ') +
+  chalk.gray(Astro.url.pathname) +
+  '\t'
+
+export const prerender = false
+
+interface Props {
+  user: Record<string, string>
+}
+
+const { user } = Astro.props
+
+const quickLinks = [
+  ['Show me the latest error logs', '/asdfasf'],
+  ['Show me possible security issues', '/asdfasf'],
+  ['When was the last deployment', '/asdfasf'],
+  ['How to send an email', '/asdfasf'],
+  ['Show me the latest commit from the other day....', '/asdsfsd'],
+]
+---
+
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <BaseHead title={siteData.title} description={siteData.description} />
+  </head>
+  <body
+    class="flex flex-1 min-h-full w-full bg-black text-white overflow-hidden"
+  >
+    <div
+      class="min-w-64 overflow-x-hidden bg-neutral-800 flex drop-shadow-md px-6 py-16"
+    >
+      <ul class="gap-4 flex flex-col">
+        {
+          quickLinks.map(([title, link]) => {
+            return (
+              <li class="text-neutral-500 hover:text-neutral-400 text-sm font-thin">
+                <a href={link}>{title}</a>
+              </li>
+            )
+          })
+        }
+      </ul>
+    </div>
+    <slot />
+  </body>
+</html>
+<style>
+  :root {
+    overscroll-behavior: none;
+  }
+</style>

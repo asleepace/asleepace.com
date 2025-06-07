@@ -1,8 +1,9 @@
 import { defineMiddleware } from 'astro:middleware'
 import { Sessions } from '@/db/index'
 import chalk from 'chalk'
+import { consoleTag } from '@/utils/tagTime'
 
-const TAG = chalk.gray('[m] session\t')
+const handleLog = consoleTag('session')
 
 /**
  *  ## sessionMiddleware
@@ -16,17 +17,11 @@ const TAG = chalk.gray('[m] session\t')
 export const sessionMiddleware = defineMiddleware(async (context, next) => {
   if (context.isPrerendered) return next() // skip pre-renders
 
-  console.log(
-    TAG,
-    chalk.gray(context.url.pathname),
-    chalk.gray(`(${context.request.method.toLowerCase()})`)
-  )
-
   const sessionCookie = context.cookies.get('session')
   const cookieString = sessionCookie?.value
 
   const user = await Sessions.getUser(cookieString).catch((e) => {
-    console.warn(TAG, chalk.red('BAD_COOKIE:'), sessionCookie, e)
+    handleLog('bad cookie:', e)
     return undefined
   })
 

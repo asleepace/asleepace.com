@@ -1,10 +1,11 @@
 import { HEADERS } from '@/lib/web/WebResponse'
+import { tagTime, consoleTag } from '@/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 
-let numberOfRequests = 0
+const handleLog = consoleTag('middleware')
 
-const TAG = (id: number) => chalk.gray(`[m]` + chalk.magenta(` REQ #${id}\t`))
+const skipMiddleware = []
 
 /**
  *  ## Root Middleware
@@ -15,24 +16,17 @@ const TAG = (id: number) => chalk.gray(`[m]` + chalk.magenta(` REQ #${id}\t`))
  *
  */
 export const rootMiddleware = defineMiddleware(async (context, next) => {
-  let requestId = numberOfRequests++
-  let requestTag = TAG(requestId)
   try {
+    const isSSR = context.isPrerendered
+    handleLog(isSSR ? chalk.magenta('[ssr]') : '', context.url.pathname)
     if (context.isPrerendered) return next()
-
-    context.locals.requestId = requestId
 
     const method = context.request.method
     const path = context.url.pathname
 
-    console.log('\n')
-    console.log(requestTag, chalk.gray(method), chalk.cyan(path))
-
     // --- pre-processing ---
 
     const response = await next()
-
-    console.log(requestTag, chalk.gray('setting headers'))
 
     // TODO: too strict, disabling for now, plus there's nothing to hack anyways XD
     // Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
@@ -43,14 +37,13 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     return response
   } catch (e) {
-    console.error(requestTag, chalk.red(e))
+    console.error('', chalk.red(e))
 
     // TODO: write error to database
 
     return new Response(e?.message, { status: 500 })
   } finally {
     // TODO: handle any cleanup
-
-    console.log(chalk.gray(`[m][closed] REQ #${requestId}`))
+    // console.log(chalk.gray(`[m][closed] REQ #${requestId}`))
   }
 })
