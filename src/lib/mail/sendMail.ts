@@ -59,6 +59,14 @@ class SMTP {
   }
 }
 
+/**
+ *  @deprecated this api has been deprecated and should no longer be used,
+ *  please switch to using the new `sendEmailNotification()` api.
+ *
+ *  This file will be removed in a future release.
+ *
+ *  June 6th, 2025
+ */
 export const sendMail = async (options: EmailOptions) => {
   const mail = new SMTP()
   const resp = await mail.send(options)
