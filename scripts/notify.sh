@@ -3,11 +3,11 @@
 # NOTE: make sure to source this file in the file where it will be used.
 # source ./notify.sh
 
-set -e
-
 send_notification() {
   local subject="$1"
   local message="$2"
+
+  echo "[notify.sh] sending notification!"
 
   sed -e "s/{{SUBJECT}}/$subject/g" \
       -e "s/{{MESSAGE}}/$message/g" \
