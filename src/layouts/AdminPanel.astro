@@ -80,69 +80,70 @@ const quickLinks = [
     </div>
 
     <script>
-      class SidebarToggle {
-        public sidebar: HTMLElement
-        public toggleButton: HTMLElement
-        public isExpanded: boolean = true
-        constructor() {
-          this.sidebar = document.getElementById('sidebar')!
-          this.toggleButton = document.getElementById('menu-toggle')!
-          this.isExpanded = true
+      //   class SidebarToggle {
+      //     public sidebar: HTMLElement
+      //     public toggleButton: HTMLElement
+      //     public isExpanded: boolean = true
+      //     constructor() {
+      //       this.sidebar = document.getElementById('sidebar')!
+      //       this.toggleButton = document.getElementById('menu-toggle')!
+      //       this.isExpanded = true
 
-          this.init()
-        }
+      //       this.init()
+      //     }
 
-        init() {
-          // Toggle button click
-          this.toggleButton?.addEventListener('click', () => this.toggle())
+      //     init() {
+      //       // Toggle button click
+      //       this.toggleButton?.addEventListener('click', () => this.toggle())
 
-          // Keyboard shortcut (Cmd/Ctrl + B)
-          document.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
-              e.preventDefault()
-              this.toggle()
-            }
-          })
-        }
+      //       // Keyboard shortcut (Cmd/Ctrl + B)
+      //       document.addEventListener('keydown', (e) => {
+      //         if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+      //           e.preventDefault()
+      //           this.toggle()
+      //         }
+      //       })
+      //     }
 
-        toggle() {
-          this.isExpanded = !this.isExpanded
+      //     toggle() {
+      //       this.isExpanded = !this.isExpanded
 
-          if (this.isExpanded) {
-            this.expand()
-          } else {
-            this.collapse()
-          }
-        }
+      //       if (this.isExpanded) {
+      //         this.expand()
+      //       } else {
+      //         this.collapse()
+      //       }
+      //     }
 
-        expand() {
-          this.sidebar?.classList.remove('sidebar-collapsed')
-          this.sidebar?.classList.add('sidebar-expanded')
+      //     expand() {
+      //       this.sidebar?.classList.remove('sidebar-collapsed')
+      //       this.sidebar?.classList.add('sidebar-expanded')
 
-          // Remove tooltips
-          document
-            .querySelectorAll('.sidebar-collapsed [title]')
-            .forEach((el) => {
-              el.removeAttribute('title')
-            })
-        }
+      //       // Remove tooltips
+      //       document
+      //         .querySelectorAll('.sidebar-collapsed [title]')
+      //         .forEach((el) => {
+      //           el.removeAttribute('title')
+      //         })
+      //     }
 
-        collapse() {
-          this.sidebar?.classList.remove('sidebar-expanded')
-          this.sidebar?.classList.add('sidebar-collapsed')
+      //     collapse() {
+      //       this.sidebar?.classList.remove('sidebar-expanded')
+      //       this.sidebar?.classList.add('sidebar-collapsed')
 
-          // Add tooltips
-          this.toggleButton?.setAttribute('title', 'Toggle Menu (⌘B)')
-          document
-            .querySelector('.settings-button')
-            ?.setAttribute('title', 'Settings')
-        }
-      }
+      //       // Add tooltips
+      //       this.toggleButton?.setAttribute('title', 'Toggle Menu (⌘B)')
+      //       document
+      //         .querySelector('.settings-button')
+      //         ?.setAttribute('title', 'Settings')
+      //     }
+      //   }
 
-      // Initialize when DOM is ready
-      document.addEventListener('DOMContentLoaded', () => {
-        new SidebarToggle()
-      })
+      //   // Initialize when DOM is ready
+      //   document.addEventListener('DOMContentLoaded', () => {
+      //     new SidebarToggle()
+      //   })
+      //
     </script>
   </body>
 </html>

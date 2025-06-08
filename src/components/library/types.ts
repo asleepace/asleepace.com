@@ -15,3 +15,7 @@ export type LucideIconName = keyof LucideIconsExports
 export type LucideIcon = LucideIconsExports['Search'] // pick a random icon to get props
 
 export type AstroButtonProps = astroHTML.JSX.ButtonHTMLAttributes
+
+export type Prettify<T> = {
+  [K in keyof T]: T[K]
+} & {}

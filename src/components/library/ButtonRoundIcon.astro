@@ -16,8 +16,6 @@ interface Props extends AstroButtonProps {
 const { icon, onPress, size = 24, className, ...buttonProps } = Astro.props
 
 const DisplayedIcon = await getDynamicIcon(icon)
-
-console.log('[ButtonRoundIcon] onPress:', onPress)
 ---
 
 <button
@@ -34,8 +32,3 @@ console.log('[ButtonRoundIcon] onPress:', onPress)
     size={size}
   />
 </button>
-<script>
-  document.addEventListener('click', () => {
-    console.log('[ButtonRoundIcon] click:')
-  })
-</script>

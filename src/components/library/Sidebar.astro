@@ -4,37 +4,22 @@ import { cn } from '@/utils/cn'
 interface Props {
   className?: string
 }
-
-const { className } = Astro.props
 ---
 
 <script>
   import { z } from 'astro:schema'
   import { defineComponent } from './defineComponent'
 
-  defineComponent({
-    tagName: 'rx-side-bar',
-    props: z.object({
-      isOpen: z.boolean().default(true),
-    }),
-    render(state) {
-      console.log('[rx-element] render:', state)
-      return `<aside>
-      <slot />
-    </aside>`
-    },
-    onConnected() {
-      console.log('connected')
-    },
+  defineComponent(`<rx-side-bar data-state='{"open":true}'>`, (element) => {
+    console.log('attached:', element)
   })
 </script>
+
 <rx-side-bar
+  data-state="{open:true}"
   className="bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-col"
 >
-  <div
-    data-is-open="true"
-    class="sticky top-0 p-4 flex justify-between items-center min-h-[60px]"
-  >
+  <div class="sticky top-0 p-4 flex justify-between items-center min-h-[60px]">
     <slot name="sidebar-header" />
   </div>
   <slot />
