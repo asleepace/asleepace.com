@@ -53,7 +53,10 @@ export interface RxInstance<T> extends HTMLElement {
   shadowRoot: ShadowRoot
   state: T
   handlers: ((state: T) => any)[]
-  attach(this, method: (this, state: T) => void): RxMethodHandle
+  attach(
+    this: RxInstance<T>,
+    method: (this: RxInstance<T>, state: T) => void
+  ): RxMethodHandle
 }
 
 const findInStr = (str: string, regex: RegExp) => {
@@ -88,24 +91,36 @@ export function defineComponent<S extends string, T extends StateString<S>>(
     public htmlString: S
     public shadowRoot: ShadowRoot
     public state: T = {} as T
-    public handlers: ((this, state: T) => any)[] = []
-    // public htmlString = htmlStrintg
+    public handlers: ((this: ThisType<RxInstance<T>>, state: T) => any)[] = []
     constructor() {
       super()
       this.shadowRoot = this.attachShadow({ mode: 'open' })
       this.shadowRoot.innerHTML = '<slot />'
-      // const initialData = findDataState(htmlString)
 
-      const initialData = this.getAttribute('data-state')
-      if (initialData) {
-        eval(`this.state = ${initialData}`)
-        console.log({ initialData, state: this.state })
+      const initialProps = this.getAttribute('data-state')
+      console.log({ initialProps })
+
+      const initialState = JSON.parse(initialProps || '{}')
+
+      const setState = (nextState: Partial<T>) => {
+        const updatedState = { ...this.state, ...nextState }
+        console.log({ updatedState })
+        this.setAttribute('data-state', JSON.stringify(updatedState))
       }
+
+      this.state = new Proxy(initialState, {
+        set(target, prop, value, recv) {
+          setState({ [prop]: value } as any)
+          return Reflect.set(target, prop, value, recv)
+        },
+      })
     }
     public self() {
       return 'this.getRootNode().host'
     }
-    public attach(method: (state) => void): RxMethodHandle {
+    public attach(
+      method: (this: ThisType<RxInstance<T>>, state: T) => void
+    ): RxMethodHandle {
       const methodId = this.handlers.length
       this.handlers.push(() => method.call(this))
       const handleId = `this.getRootNode().host.handlers[${methodId}]()`
@@ -128,7 +143,7 @@ export function defineComponent<S extends string, T extends StateString<S>>(
       newValue: string | null
     ) {
       if (!this.isConnected || oldValue === newValue) return
-      // this.setState({ [name]: newValue } as any)
+      this.setState({ [name]: newValue } as any)
     }
   }
   // return class for optional use

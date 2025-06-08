@@ -7,21 +7,22 @@ interface Props {
 ---
 
 <script>
-  import { z } from 'astro:schema'
   import { defineComponent } from './defineComponent'
 
   defineComponent(`<rx-side-bar data-state='{"open":true}'>`, (element) => {
     console.log('attached:', element)
 
+    const { state } = element
+
     element.onclick = () => {
-      console.log('clicked:', element.state)
-      element.state.open = false
+      console.log('clicked:', state)
+      state.open = !state.open
     }
   })
 </script>
 
 <rx-side-bar
-  data-state="{open:true}"
+  data-state='{"open":true}'
   className="bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-col"
 >
   <div class="sticky top-0 p-4 flex justify-between items-center min-h-[60px]">
