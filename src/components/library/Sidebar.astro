@@ -12,6 +12,11 @@ interface Props {
 
   defineComponent(`<rx-side-bar data-state='{"open":true}'>`, (element) => {
     console.log('attached:', element)
+
+    element.onclick = () => {
+      console.log('clicked:', element.state)
+      element.state.open = false
+    }
   })
 </script>
 
