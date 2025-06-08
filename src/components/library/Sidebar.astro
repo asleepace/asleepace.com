@@ -22,10 +22,13 @@ interface Props {
 </script>
 
 <rx-side-bar
-  data-state='{"open":true}'
+  rx-open="this.state.open"
   className="bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-col"
 >
-  <div class="sticky top-0 p-4 flex justify-between items-center min-h-[60px]">
+  <div
+    rx-open
+    class="[&[rx-open='true']]:bg-red-500 rx-open:bg-blue-500 sticky top-0 p-4 flex justify-between items-center min-h-[60px]"
+  >
     <slot name="sidebar-header" />
   </div>
   <slot />

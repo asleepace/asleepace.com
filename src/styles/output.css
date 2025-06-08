@@ -37,6 +37,7 @@
     --color-zinc-800: oklch(27.4% 0.006 286.033);
     --color-zinc-900: oklch(21% 0.006 285.885);
     --color-zinc-950: oklch(14.1% 0.005 285.823);
+    --color-neutral-200: oklch(92.2% 0 0);
     --color-neutral-300: oklch(87% 0 0);
     --color-neutral-400: oklch(70.8% 0 0);
     --color-neutral-500: oklch(55.6% 0 0);
@@ -274,6 +275,9 @@
   }
   .inset-1 {
     inset: calc(var(--spacing) * 1);
+  }
+  .top-0 {
+    top: calc(var(--spacing) * 0);
   }
   .top-4 {
     top: calc(var(--spacing) * 4);
@@ -946,6 +950,9 @@
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
+  .p-2\.5 {
+    padding: calc(var(--spacing) * 2.5);
+  }
   .p-3 {
     padding: calc(var(--spacing) * 3);
   }
@@ -978,9 +985,6 @@
   }
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
-  }
-  .py-1\.5 {
-    padding-block: calc(var(--spacing) * 1.5);
   }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
@@ -1447,6 +1451,15 @@
       }
     }
   }
+  .hover\:\*\:text-neutral-200 {
+    &:hover {
+      @media (hover: hover) {
+        :is(& > *) {
+          color: var(--color-neutral-200);
+        }
+      }
+    }
+  }
   .\*\:hover\:opacity-75 {
     :is(& > *) {
       &:hover {
@@ -1584,6 +1597,11 @@
   .\[\&\:\:-webkit-scrollbar\]\:hidden {
     &::-webkit-scrollbar {
       display: none;
+    }
+  }
+  .\[\&\[rx-open\=\'true\'\]\]\:bg-red-500 {
+    &[rx-open='true'] {
+      background-color: var(--color-red-500);
     }
   }
 }
