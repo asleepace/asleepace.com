@@ -9,15 +9,15 @@ interface Props {
 <script>
   import { defineComponent } from './defineComponent'
 
-  defineComponent(`<rx-side-bar data-state='{"open":true}'>`, (element) => {
-    console.log('attached:', element)
-
-    const { state } = element
-
-    element.onclick = () => {
-      console.log('clicked:', state)
-      state.open = !state.open
-    }
+  defineComponent({
+    tagName: 'rx-side-bar',
+    state: { open: true },
+    attach(state) {
+      this.onclick = () => {
+        this.state.open = !this.state.open
+        console.log('clicked:', state)
+      }
+    },
   })
 </script>
 
