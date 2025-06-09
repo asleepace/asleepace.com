@@ -20,12 +20,12 @@ const DisplayedIcon = await getDynamicIcon(icon)
 
 <button
   class={cn(
-    'text-neutral-400 w-full flex items-center gap-3 px-3 py-2 hover:bg-neutral-700 rounded-full',
+    'text-neutral-400 w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-700 rounded-full',
     'transition-colors duration-150',
     className
   )}
   {...buttonProps}
 >
-  <DisplayedIcon size={size} className="w-5 h-5 flex-shrink-0" />
+  <DisplayedIcon size={size} className="w-5 h-5" />
   <span class="font-thin text-base truncate">Settings</span>
 </button>
