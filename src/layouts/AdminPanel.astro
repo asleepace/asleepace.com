@@ -1,6 +1,10 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { ButtonRoundIcon } from '@/components/library/'
+import {
+  ButtonRoundIcon,
+  ButtonIconWithText,
+  ListTextLinks,
+} from '@/components/library/'
 import { siteData } from '@/consts'
 import { Settings } from 'lucide-react'
 
@@ -8,13 +12,13 @@ import Sidebar from '@/components/library/Sidebar.astro'
 
 export const prerender = false
 
-const quickLinks = [
+const chatHistoryLinks = [
   ['Show me the latest error logs', '/asdfasf'],
   ['Show me possible security issues', '/asdfasf'],
   ['When was the last deployment', '/asdfasf'],
   ['How to send an email', '/asdfasf'],
   ['Show me the latest commit from the other day....', '/asdsfsd'],
-]
+] as [string, string][]
 ---
 
 <!doctype html>
@@ -23,7 +27,7 @@ const quickLinks = [
     <BaseHead title={siteData.title} description={siteData.description} />
   </head>
   <body class="h-full bg-black text-white overflow-hidden">
-    <div class="flex h-full">
+    <div class="flex flex-1 h-full">
       <!-- Sidebar -->
       <Sidebar>
         <!-- Header -->
@@ -33,46 +37,13 @@ const quickLinks = [
         </Fragment>
 
         <!-- Chat History -->
-        <div class="sidebar-content flex-1 px-4 pb-4 overflow-hidden">
-          <div class="chat-history overflow-y-auto h-full">
-            <h3
-              rx-open
-              class="history-title text-neutral-400 text-base font-thin mb-4"
-            >
-              History
-            </h3>
-            <ul class="space-y-2">
-              {
-                quickLinks.map(([title, link]) => (
-                  <li>
-                    <a
-                      href={link}
-                      class="history-item block py-2 px-2 text-sm font-thin text-neutral-500 hover:text-neutral-300 hover:bg-neutral-700 rounded transition-colors duration-150 truncate"
-                    >
-                      {title}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </div>
-
-        <!-- spacer -->
-        <div class="flex-1"></div>
+        <ListTextLinks title="Chat History" data={chatHistoryLinks} />
 
         <!-- Settings -->
-        <div class="sidebar-footer p-4 min-h-[60px]">
-          <button
-            class="settings-button w-full flex items-center gap-3 p-2 hover:bg-neutral-700 transition-colors duration-150 rounded"
-            title=""
-          >
-            <Settings className="w-5 h-5 text-neutral-400 flex-shrink-0" />
-            <span
-              class="settings-text text-neutral-400 font-thin text-base truncate"
-              >Settings</span
-            >
-          </button>
+        <div
+          class="flex flex-col shrink p-4 pt-2 border-t-1 border-t-neutral-700"
+        >
+          <ButtonIconWithText icon="Settings" name="Settings" />
         </div>
       </Sidebar>
 
@@ -82,126 +53,11 @@ const quickLinks = [
       </div>
     </div>
 
-    <script>
-      //   class SidebarToggle {
-      //     public sidebar: HTMLElement
-      //     public toggleButton: HTMLElement
-      //     public isExpanded: boolean = true
-      //     constructor() {
-      //       this.sidebar = document.getElementById('sidebar')!
-      //       this.toggleButton = document.getElementById('menu-toggle')!
-      //       this.isExpanded = true
-
-      //       this.init()
-      //     }
-
-      //     init() {
-      //       // Toggle button click
-      //       this.toggleButton?.addEventListener('click', () => this.toggle())
-
-      //       // Keyboard shortcut (Cmd/Ctrl + B)
-      //       document.addEventListener('keydown', (e) => {
-      //         if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
-      //           e.preventDefault()
-      //           this.toggle()
-      //         }
-      //       })
-      //     }
-
-      //     toggle() {
-      //       this.isExpanded = !this.isExpanded
-
-      //       if (this.isExpanded) {
-      //         this.expand()
-      //       } else {
-      //         this.collapse()
-      //       }
-      //     }
-
-      //     expand() {
-      //       this.sidebar?.classList.remove('sidebar-collapsed')
-      //       this.sidebar?.classList.add('sidebar-expanded')
-
-      //       // Remove tooltips
-      //       document
-      //         .querySelectorAll('.sidebar-collapsed [title]')
-      //         .forEach((el) => {
-      //           el.removeAttribute('title')
-      //         })
-      //     }
-
-      //     collapse() {
-      //       this.sidebar?.classList.remove('sidebar-expanded')
-      //       this.sidebar?.classList.add('sidebar-collapsed')
-
-      //       // Add tooltips
-      //       this.toggleButton?.setAttribute('title', 'Toggle Menu (⌘B)')
-      //       document
-      //         .querySelector('.settings-button')
-      //         ?.setAttribute('title', 'Settings')
-      //     }
-      //   }
-
-      //   // Initialize when DOM is ready
-      //   document.addEventListener('DOMContentLoaded', () => {
-      //     new SidebarToggle()
-      //   })
-      //
-    </script>
+    <script></script>
   </body>
 </html>
 
 <style>
-  /* Sidebar States */
-  .sidebar-expanded {
-    width: 16rem; /* 256px */
-  }
-
-  .sidebar-collapsed {
-    width: 4rem; /* 64px */
-  }
-
-  /* Collapsed state styling */
-  .sidebar-collapsed .sidebar-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem 0.5rem;
-    align-items: center;
-  }
-
-  .sidebar-collapsed .sidebar-content {
-    display: none;
-  }
-
-  .sidebar-collapsed .sidebar-footer {
-    padding: 1rem 0.5rem;
-    display: flex;
-    justify-content: center;
-  }
-
-  .sidebar-collapsed .settings-button {
-    width: auto;
-    justify-content: center;
-    position: relative;
-  }
-
-  .sidebar-collapsed .menu-button {
-    position: relative;
-  }
-
-  .sidebar-collapsed .search-button {
-    position: relative;
-  }
-
-  .sidebar-collapsed .settings-text {
-    display: none;
-  }
-
-  .sidebar-collapsed .history-title,
-  .sidebar-collapsed .history-item {
-    display: none;
-  }
-
   /* Tooltip styles */
   [title]:not([title='']):hover::after {
     content: attr(title);

@@ -22,6 +22,7 @@ function collectBoundChildren(
   child.childNodes.forEach((next) => {
     if (next.nodeType === Node.ELEMENT_NODE) {
       const attrs = getRxAttrs(next as HTMLElement)
+      if (!attrs.length) return
       attrs.forEach((attr) => {
         const current = found.get(attr.name) || ([] as HTMLElement[])
         found.set(attr.name, [...current, child])
