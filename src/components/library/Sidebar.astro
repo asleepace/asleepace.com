@@ -1,6 +1,4 @@
 ---
-import { cn } from '@/utils/cn'
-
 interface Props {
   className?: string
 }
@@ -10,27 +8,30 @@ interface Props {
   import { defineComponent } from './defineComponent'
 
   defineComponent({
-    tagName: 'rx-side-bar',
-    state: { open: true },
-    attach(state) {
+    tagName: 'app-side-bar',
+    state: {
+      open: true,
+    },
+    attach({ open }) {
+      console.log('[Sidebar] attached!')
       this.onclick = () => {
-        this.state.open = !this.state.open
-        console.log('clicked:', state)
+        console.log('[SideBar] onclicked called!')
+        this.state.open = !open
       }
     },
   })
 </script>
 
-<rx-side-bar
-  rx-open="this.state.open"
+<app-side-bar
+  rx-open="1"
   className="bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-col"
 >
   <div
-    rx-open
-    class="[&[rx-open='true']]:bg-red-500 rx-open:bg-blue-500 sticky top-0 p-4 flex justify-between items-center min-h-[60px]"
+    rx-open="1"
+    class="[&[rx-open='1']]:bg-red-500 rx-open:bg-blue-500 sticky top-0 p-4 flex justify-between items-center min-h-[60px]"
   >
     <slot name="sidebar-header" />
   </div>
   <slot />
   <slot name="sidebar-footer" />
-</rx-side-bar>
+</app-side-bar>

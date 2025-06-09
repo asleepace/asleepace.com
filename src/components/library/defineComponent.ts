@@ -1,9 +1,3 @@
-declare const BrandSymbol: unique symbol
-
-type RxMethodHandle = string & {
-  [BrandSymbol]: string
-}
-
 type RxHandlers<T> = ((this: ThisType<RxInstance<T>>, state: T) => any)[]
 
 export interface RxInstance<T> extends HTMLElement {
@@ -18,6 +12,8 @@ const getRxAttrs = (elem: HTMLElement): Attr[] => {
   return [...elem.attributes].filter((attr) => attr.name.startsWith('rx-'))
 }
 
+// iterate all child elements which have rx-* attributes and update
+// accordingly, if none are found early return.
 function collectBoundChildren(
   child: HTMLElement | undefined,
   found: Map<string, HTMLElement[]> = new Map()
@@ -25,9 +21,7 @@ function collectBoundChildren(
   if (!child) return found
   child.childNodes.forEach((next) => {
     if (next.nodeType === Node.ELEMENT_NODE) {
-      const child = next as HTMLElement
-      const attrs = getRxAttrs(child)
-      if (!attrs.length) return
+      const attrs = getRxAttrs(next as HTMLElement)
       attrs.forEach((attr) => {
         const current = found.get(attr.name) || ([] as HTMLElement[])
         found.set(attr.name, [...current, child])
@@ -48,14 +42,22 @@ const attachProxy = <T extends {}>(state: T, didUpdate?: (state: T) => void) =>
 
 export function defineComponent<T extends {}>({
   tagName,
-  state: initialState,
+  state: initialState = {} as T,
   attach,
 }: {
   tagName: string
   state: T
   attach: (this: RxInstance<T>, state: T) => any | void
 }) {
-  const RxElement = class extends HTMLElement implements RxInstance<T> {
+  // NOTE: That RxElement may not be defined until after the connectedCallback
+  // has triggerd, in order to set the instances we can define this helpers.
+  const shared = {
+    tagName,
+    instances: new Set(),
+  }
+  // Define a Custom Web Component which will automatically register itself in
+  // the DOM with the provided tagName, state and a callback for attaching.
+  const CustomComponent = class extends HTMLElement implements RxInstance<T> {
     static readonly observedAttributes = Object.keys(initialState)
     static {
       // automatically register the element
@@ -70,6 +72,7 @@ export function defineComponent<T extends {}>({
       super()
       this.shadowRoot = this.attachShadow({ mode: 'open' })
       this.shadowRoot.innerHTML = '<slot />'
+      this.updateBoundChildren()
     }
     public self() {
       return 'this.getRootNode().host'
@@ -90,7 +93,17 @@ export function defineComponent<T extends {}>({
         .entries()
         .forEach(([boundAttr, children]) => {
           const current = this.getBoundAttribute(boundAttr)
-          children.forEach((ch) => ch.setAttribute(boundAttr, current))
+          console.log({ boundAttr, current, children })
+          children.forEach((ch) => {
+            console.log(
+              'updated child:',
+              ch,
+              boundAttr,
+              current,
+              ch.getAttributeNames()
+            )
+            ch.setAttribute(boundAttr, current)
+          })
         })
     }
     public getBoundAttribute(boundAttr: string) {
@@ -103,6 +116,11 @@ export function defineComponent<T extends {}>({
       attach.call(this, this.state)
       // update all reactive-child
       this.render()
+      // register instance
+      shared.instances.add(this)
+    }
+    public disconnectedCallback() {
+      shared.instances.delete(this)
     }
     public attributeChangedCallback(
       name: string,
@@ -116,6 +134,10 @@ export function defineComponent<T extends {}>({
       }
     }
   }
-  // return class for optional use
-  return RxElement
+  // NOTE: return shared state with instances and class
+  // definition to be use by the caller of this function.
+  return {
+    class: CustomComponent,
+    ...shared,
+  }
 }

@@ -825,6 +825,9 @@
   .bg-neutral-900 {
     background-color: var(--color-neutral-900);
   }
+  .bg-red-500 {
+    background-color: var(--color-red-500);
+  }
   .bg-red-700 {
     background-color: var(--color-red-700);
   }
@@ -1599,9 +1602,39 @@
       display: none;
     }
   }
+  .\[rx-hide\=\'0\'\]\:bg-blue-500 {
+    &:is(rx-hide='0') {
+      background-color: var(--color-blue-500);
+    }
+  }
+  .\[rx-hide\=\'true\'\]\:bg-blue-500 {
+    &:is(rx-hide='true') {
+      background-color: var(--color-blue-500);
+    }
+  }
+  .\[rx-open\=\'0\'\]\:bg-blue-500 {
+    &:is(rx-open='0') {
+      background-color: var(--color-blue-500);
+    }
+  }
+  .\[\&\[rx-open\=\'1\'\]\]\:bg-red-500 {
+    &[rx-open='1'] {
+      background-color: var(--color-red-500);
+    }
+  }
   .\[\&\[rx-open\=\'true\'\]\]\:bg-red-500 {
     &[rx-open='true'] {
       background-color: var(--color-red-500);
+    }
+  }
+  .\[\&\[rx-open\=1\]\]\:bg-red-500 {
+    &[rx-open=1] {
+      background-color: var(--color-red-500);
+    }
+  }
+  .\[\&\[rx-open\]\]\:bg-\[var\(--color-true\)\] {
+    &[rx-open] {
+      background-color: var(--color-true);
     }
   }
 }
