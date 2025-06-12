@@ -1,5 +1,4 @@
-import { HEADERS } from '@/lib/web/WebResponse'
-import { tagTime, consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 
@@ -21,8 +20,8 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
     handleLog(isSSR ? chalk.magenta('[ssr]') : '', context.url.pathname)
     if (context.isPrerendered) return next()
 
-    const method = context.request.method
-    const path = context.url.pathname
+    // const method = context.request.method
+    // const path = context.url.pathname
 
     // --- pre-processing ---
 

@@ -1,13 +1,12 @@
-import { boolean } from 'astro:schema'
-
-interface AttachedElement<T extends {}> extends HTMLElement {}
-
 // --- simple attach method ---
 
 export function define<T extends {} = {}>(tagName: string, state: T = {} as T) {
   const shared = {
     instances: new Set(),
     tagName,
+    instance: {} as {
+      new (...args: any[]): HTMLElement
+    },
   }
   // --- dynamic class definition
   const instance = class extends HTMLElement {
@@ -42,6 +41,8 @@ export function define<T extends {} = {}>(tagName: string, state: T = {} as T) {
       newValue: string | null
     ) {}
   }
+
+  shared.instance = instance
 
   return shared
 }
