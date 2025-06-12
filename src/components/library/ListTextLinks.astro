@@ -1,0 +1,33 @@
+---
+import { cn } from '@/utils/cn'
+
+export type ListItemData = [title: string, href: string]
+
+interface Props {
+  className?: string
+  title: string
+  data: ListItemData[]
+}
+
+const { data, className } = Astro.props
+---
+
+<div class={cn('px-4 flex flex-col flex-1 w-full h-full', className)}>
+  <p class="text-neutral-400 text-base font-thin mb-4 ml-3">History</p>
+  <div class="flex-1 overflow-y-auto gap-y-2">
+    <ul class="flex flex-col gap-y-2">
+      {
+        data.map(([title, link]) => (
+          <li class="text-neutral-500 hover:text-neutral-300 hover:bg-neutral-700 rounded-full transition-colors duration-150 ">
+            <a
+              href={link}
+              class="block text-sm font-thin truncate p-4 line-clamp-1 leading-1"
+            >
+              {title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>

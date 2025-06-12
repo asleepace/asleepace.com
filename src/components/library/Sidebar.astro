@@ -1,0 +1,39 @@
+---
+import { cn } from '@/utils/cn'
+
+interface Props {
+  className?: string
+}
+
+const { className } = Astro.props
+---
+
+<app-side-bar
+  className={cn(
+    'bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-1 flex-col max-w-64',
+    className
+  )}
+>
+  <div class="sticky top-0 p-4 flex justify-between items-center">
+    <slot name="sidebar-header" />
+  </div>
+  <slot />
+  <slot name="sidebar-footer" />
+</app-side-bar>
+<script>
+  import { defineComponent } from './defineComponent'
+
+  defineComponent({
+    tagName: 'app-side-bar',
+    state: {
+      open: true,
+    },
+    attach({ open }) {
+      console.log('[Sidebar] attached!')
+      this.onclick = () => {
+        console.log('[SideBar] onclicked called!')
+        this.state.open = !open
+      }
+    },
+  })
+</script>
