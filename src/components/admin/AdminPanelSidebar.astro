@@ -10,9 +10,14 @@ interface Props {
   version?: string
   environment?: string
   username?: string
-} 
+}
 
-const { activeTab = 0, version = '1.0.0', environment = 'production', username = 'Admin' } = Astro.props
+const {
+  activeTab = 0,
+  version = '1.0.0',
+  environment = 'production',
+  username = 'Admin',
+} = Astro.props
 
 const sideBarButtons = [
   { href: PATH.ADMIN_HOME, title: 'Home', icon: 'LayoutGrid' },
@@ -21,22 +26,31 @@ const sideBarButtons = [
   { href: PATH.CODE_EDITOR, title: 'Code', icon: 'Code' },
 ]
 
+console.log('[AdminPanelSidebar] version:', version)
 ---
 
 <aside class="w-52 bg-black pl-2 pr-4 py-8 gap-y-2 flex flex-col text-zinc-300">
-
-  <AdminPanelProfile environment={environment} username={username} className='ml-1' />
+  <AdminPanelProfile
+    environment={environment}
+    username={username}
+    className="ml-1"
+  />
 
   <Line className="my-2" />
 
   <!-- admin panel header section -->
 
   <div class="flex flex-col gap-y-2">
-  {
-    sideBarButtons.map((button, index) => (
-      <AdminPanelSidebarButton href={button.href} title={button.title} active={activeTab === index} icon={button.icon} />
-    ))
-  }
+    {
+      sideBarButtons.map((button, index) => (
+        <AdminPanelSidebarButton
+          href={button.href}
+          title={button.title}
+          active={activeTab === index}
+          icon={button.icon}
+        />
+      ))
+    }
   </div>
 
   <!-- admin panel footer section -->
@@ -44,6 +58,12 @@ const sideBarButtons = [
   <Spacer direction="vertical" />
 
   <form method="post" action={PATH.CLEAR_SESSION}>
-    <AdminPanelSidebarButton href={PATH.CLEAR_SESSION} title="Logout" icon="LogOut" variant="destructive" isFormSubmit />
+    <AdminPanelSidebarButton
+      href={PATH.CLEAR_SESSION}
+      title="Logout"
+      icon="LogOut"
+      variant="destructive"
+      isFormSubmit
+    />
   </form>
 </aside>

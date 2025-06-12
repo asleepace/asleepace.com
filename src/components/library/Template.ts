@@ -39,7 +39,13 @@ export function define<T extends {} = {}>(tagName: string, state: T = {} as T) {
       name: string,
       oldValue: string | null,
       newValue: string | null
-    ) {}
+    ) {
+      console.log('[Template] attibuteChangedCallback:', {
+        name,
+        oldValue,
+        newValue,
+      })
+    }
   }
 
   shared.instance = instance
