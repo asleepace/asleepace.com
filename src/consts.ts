@@ -18,7 +18,8 @@ export type SiteConfig = {
   version: string
   themeColor: string
   coverImage: string
-  path: {
+  readonly path: {
+    adminLogin(searchParams: Record<string, string>): string
     adminLogout: '/admin/logout'
     adminHome: '/admin'
     adminSystem: '/admin/system'
@@ -77,6 +78,12 @@ export const siteConfig: SiteConfig = {
   coverImage: '/images/about-me.jpeg',
   /** paths */
   path: {
+    adminLogin(searchParams: Record<string, string> = {}) {
+      const query = new URLSearchParams(searchParams)
+      const hasParams = Object.keys(searchParams).length > 0
+      const queryString = hasParams ? `?${query.toString()}` : ''
+      return '/admin/login' + queryString
+    },
     adminLogout: '/admin/logout',
     adminHome: '/admin',
     adminSystem: '/admin/system',

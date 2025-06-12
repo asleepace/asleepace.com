@@ -1,6 +1,6 @@
 import { defineComponent, type RxInstance } from './defineComponent'
 
-export type BoundMethod<T> = (this: RxInstance<T>, T) => any | void
+export type BoundMethod<T> = (this: RxInstance<T>, state: T) => any | void
 
 const getSanitizedAttributes = (template: TemplateStringsArray) =>
   template
