@@ -13,7 +13,7 @@ const getSanitizedAttributes = (template: TemplateStringsArray) =>
  * @param strings
  * @param expressions
  */
-export function defineTemplate<T extends {}>(
+export function defineTemplate(
   template: TemplateStringsArray,
   ...props: any[]
 ) {
