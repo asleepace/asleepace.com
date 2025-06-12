@@ -20,9 +20,9 @@ const SUCESS_BODY = JSON.stringify({
   ok: true,
 })
 
-const isNotification = (data: unknown): data is Notification => {
-  return Boolean(data && typeof data === 'object' && 'type' in data)
-}
+// const isNotification = (data: unknown): data is Notification => {
+//   return Boolean(data && typeof data === 'object' && 'type' in data)
+// }
 
 const capitalize = (str: string) => {
   if (str.length === 1) return str.toUpperCase()

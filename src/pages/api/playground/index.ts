@@ -6,13 +6,11 @@ import type { APIRoute } from 'astro'
 
 export const prerender = false
 
-
 /**
  * Example External Data
  */
 
-const subscriptions = new Set();
-
+// const subscriptions = new Set();
 
 /**
  *  Get a list of new data from last check.
@@ -46,5 +44,3 @@ export const DELETE: APIRoute = async ({ request }) => {
   console.log('[playground] new incoming url: ', url)
   return Response.json({ ok: true })
 }
-
-
