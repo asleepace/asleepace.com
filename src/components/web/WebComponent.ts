@@ -51,10 +51,14 @@ export abstract class WebComponent<
     this.handleRender()
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    newValue: string | null
+  ) {
     console.log('[WebComponent] attribute chaned:', { [name]: newValue })
     if (oldValue === newValue) return
-    if (name in this.state) {
+    if (name in this.state && newValue) {
       this.setState({ [name]: newValue })
     }
   }
