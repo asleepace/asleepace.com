@@ -31,12 +31,6 @@ const { featured, feed, className: classList } = Astro.props
 
 const featuredImage = featured.data.heroImage
 
-const websites = [
-  'https://soladex.co',
-  'https://consoledump.io',
-  'https://polyblog.com',
-]
-
 export type LinkItem = {
   name: string
   icon: typeof BoxIcon | typeof LinkIcon | typeof RssIcon
@@ -44,20 +38,20 @@ export type LinkItem = {
   href: string
 }
 
-const pages: LinkItem[] = [
-  {
-    name: 'Apps',
-    icon: BoxIcon,
-    tint: 'oklch(92.5% 0.084 155.995)',
-    href: '/tools',
-  },
-  {
-    name: 'Links',
-    icon: LinkIcon,
-    tint: 'oklch(76.9% 0.188 70.08)',
-    href: '/tools',
-  },
-]
+// const pages: LinkItem[] = [
+//   {
+//     name: 'Apps',
+//     icon: BoxIcon,
+//     tint: 'oklch(92.5% 0.084 155.995)',
+//     href: '/tools',
+//   },
+//   {
+//     name: 'Links',
+//     icon: LinkIcon,
+//     tint: 'oklch(76.9% 0.188 70.08)',
+//     href: '/tools',
+//   },
+// ]
 ---
 
 <div class={clsx('p-4', classList)}>

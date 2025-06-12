@@ -2,6 +2,7 @@
 import BaseHead from '@/components/astro/BaseHead.astro'
 import Footer from '@/components/astro/Footer.astro'
 import PageNavigation from '@/components/astro/PageNavigation.astro'
+import { siteConfig } from '@/consts'
 import clsx from 'clsx'
 
 interface Props {
@@ -15,7 +16,7 @@ const {
   title = 'Asleepace',
   description = 'My personal website for everything & anything.',
   className,
-  image = '/images/about-me.jpeg',
+  image = siteConfig.coverImage,
 } = Astro.props
 ---
 

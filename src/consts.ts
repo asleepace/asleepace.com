@@ -17,6 +17,15 @@ export type SiteConfig = {
   sqliteUri: string
   version: string
   themeColor: string
+  coverImage: string
+  path: {
+    adminLogout: '/admin/logout'
+    adminHome: '/admin'
+    adminSystem: '/admin/system'
+    adminAnalytics: '/admin/analytics'
+    codeEditor: '/code'
+    clearSession: '/api/auth/clearSession'
+  }
 }
 
 // --- check environment variables ---
@@ -64,6 +73,17 @@ export const siteConfig: SiteConfig = {
   cookiePath: '/',
   /** Extended theme styling */
   themeColor: '#FFFFFF',
+  /** default cover photo */
+  coverImage: '/images/about-me.jpeg',
+  /** paths */
+  path: {
+    adminLogout: '/admin/logout',
+    adminHome: '/admin',
+    adminSystem: '/admin/system',
+    adminAnalytics: '/admin/analytics',
+    codeEditor: '/code',
+    clearSession: '/api/auth/clearSession',
+  },
 }
 
 Object.entries(siteConfig).forEach(([key, value]) => {

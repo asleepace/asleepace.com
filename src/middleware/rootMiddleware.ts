@@ -4,8 +4,6 @@ import chalk from 'chalk'
 
 const handleLog = consoleTag('middleware')
 
-const skipMiddleware = []
-
 /**
  *  ## Root Middleware
  *
