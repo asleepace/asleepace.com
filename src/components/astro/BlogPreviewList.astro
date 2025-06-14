@@ -1,5 +1,4 @@
 ---
-import { type Blog } from '@/types'
 import BlogItem from './BlogItem.astro'
 import clsx from 'clsx'
 
@@ -9,12 +8,8 @@ interface Props {
 }
 
 const { posts, className } = Astro.props
-
 ---
-<ul class={clsx("flex flex-1 gap-8", className)}>
-  {
-    posts.map(({ data, id }) => (
-      <BlogItem data={data} slug={id} />
-    ))
-  }
+
+<ul class={clsx('flex flex-1 gap-8', className)}>
+  {posts.map(({ data, id }) => <BlogItem data={data} slug={id} />)}
 </ul>

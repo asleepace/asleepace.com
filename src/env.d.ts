@@ -1,7 +1,12 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
+import { type CollectionEntry } from 'astro:content'
 
-type ToString = { toString(): string }
+declare global {
+  type ToString = { toString(): string }
+
+  type Blog = CollectionEntry<'blog'>
+}
 
 interface Env {
   DATABASE_URL: string
@@ -28,3 +33,5 @@ declare namespace App {
     requestId: number
   }
 }
+
+export {}
