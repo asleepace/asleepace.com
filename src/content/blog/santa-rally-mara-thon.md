@@ -3,6 +3,7 @@ title: 'Santa Rally Mara-thon'
 description: 'Marathon Digital soars over 51% this past week as inflation cools and speculation around a Bitcoin ETF rises, all in time for the holidays!'
 pubDate: 'Dec 22 2023'
 heroImage: '/images/santa-rally.png'
+hashTags: 'Finance, Stocks'
 author: 'Colin Teahan'
 slug: 'santa-rally-mara-thon'
 ---

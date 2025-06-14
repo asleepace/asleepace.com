@@ -4,6 +4,7 @@ description: 'A simple algorithm for extracting strings and replacing values wri
 author: 'Colin Teahan'
 pubDate: 'Dec 16 2022'
 heroImage: '/images/blog-placeholder-3.jpg'
+hashTags: 'Technical, Algorithm, Typescript'
 slug: 'clever-extract-replace-algorithm'
 ---
 

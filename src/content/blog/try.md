@@ -3,6 +3,7 @@ title: 'The Quest for Isomorphic Error Handling in Typescript'
 description: 'A deep dive into error handling paradigms and advanced Typescript types to create the perfect errors-as-values utility.'
 pubDate: 'April 26 2025'
 heroImage: '/images/try-catch-cover.jpg'
+hashTags: 'Technical, Typescript, NPM'
 slug: 'try'
 ---
 

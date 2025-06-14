@@ -4,6 +4,7 @@ description: 'How to build a simple website using React, Bun and Elysia with ser
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
 heroImage: '/images/bun-elysia-react-banner.png'
+hashTags: 'Technical, Bun, Elysia, React'
 slug: 'ssr-with-bun-elysia-react'
 ---
 

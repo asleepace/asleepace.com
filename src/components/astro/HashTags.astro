@@ -1,25 +1,20 @@
 ---
 import { cn } from '@/utils/cn'
+import { siteConfig } from '@/consts'
 
 interface Props {
   hashTags?: string | undefined
 }
 
 const hashTags = Astro.props.hashTags || ''
-const tags = hashTags.split(',').map((item) => item.trim())
+const tags = hashTags
+  .toLowerCase()
+  .split(',')
+  .map((item) => item.trim())
 const hasHashTags = Boolean(tags.length > 0)
 
 const getColor = (tag: string) => {
-  switch (tag.toLowerCase()) {
-    case 'technical':
-      return 'bg-blue-400 hover:bg-sky-400'
-    case 'bash':
-      return 'bg-green-400 hover:bg-emerald-400'
-    case 'macoss':
-      return 'bg-orange-500 hover:bg-amber-400'
-    default:
-      return 'bg-gray-300 hover:bg-gray-400'
-  }
+  return siteConfig.hashTagColors[tag] || siteConfig.hashTagColors.default
 }
 ---
 
