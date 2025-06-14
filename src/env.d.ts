@@ -1,6 +1,8 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
+type ToString = { toString(): string }
+
 interface Env {
   DATABASE_URL: string
   SECRET: string

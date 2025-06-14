@@ -6,6 +6,10 @@
   --breakpoint-3xl: 120rem;
 
   --color-dark-gray: #282a2c;
+  --color-editor-100: #292d3e;
+  --color-editor-200: #212432;
+
+  --spacing-thin: 1px;
 }
 
 @layer components {
@@ -15,6 +19,49 @@
     &::-webkit-scrollbar {
       display: none;
     }
+  }
+
+  .bg-glass {
+    @apply relative;
+    --glass-color: var(--bg-neutral-200);
+    --glass-edge: color-mix(in srgb, var(--glass-color), 50%, transparent);
+    --glass-center: color-mix(in srgb, var(--glass-edge), 10%, transparent);
+    --glass-direction: to bottom;
+  }
+
+  .bg-glass::before,
+  .bg-glass::after {
+    @apply content-[''] absolute inset-0 backdrop-blur-xl pointer-events-none;
+  }
+
+  .bg-glass::before {
+    @apply top-0;
+    background-color: color-mix(in srgb, var(--glass-edge), 10%, transparent);
+    mask: linear-gradient(
+      var(--glass-direction),
+      var(--glass-edge),
+      var(--glass-center),
+      var(--glass-edge)
+    );
+  }
+
+  .bg-glass::after {
+    @apply bottom-0 backdrop-blur-xl;
+    mask: linear-gradient(
+      var(--glass-direction),
+      var(--glass-edge),
+      var(--glass-center),
+      var(--glass-edge)
+    );
+  }
+
+  .bg-glass-light {
+    --glass-color: rgba(255, 255, 255, 1);
+    --glass-direction: to bottom;
+  }
+  .bg-glass-dark {
+    --glass-color: rgba(0, 0, 0, 0.9);
+    --glass-direaction: to bottom;
   }
 }
 
