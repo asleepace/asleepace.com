@@ -2,9 +2,15 @@
 import SiteLayout from '@/layouts/SiteLayout.astro'
 
 export const prerender = true
+
+function CustomElement() {
+  return `<p class="py-8 font-black">Playground</p>`
+}
 ---
 
 <SiteLayout className="justify-center grow">
+  <!-- custom html string element -->
+  <Fragment set:html={CustomElement()} />
   <h1 class="text-5xl font-black">Astro + Web Components</h1>
   <p class="mb-8 mt-4 text-zinc-600">
     The following is an example of a custom web component rendered in Astro!
