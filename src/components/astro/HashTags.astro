@@ -19,6 +19,14 @@ const hasHashTags = Boolean(tags.length > 0)
 const getColor = (tag: string) => {
   return siteConfig.hashTagColors[tag] || siteConfig.hashTagColors.default
 }
+
+const capitalize = (tag: string) => {
+  if (tag.length === 0) return ''
+  if (tag.length === 1) return tag.toUpperCase()
+  if (tag.length === 3) return tag.toUpperCase()
+  if (tag.length === 3) return tag.toUpperCase()
+  return tag.slice(0, 1).toUpperCase() + tag.slice(1).toLowerCase()
+}
 ---
 
 <Fragment>
@@ -34,12 +42,12 @@ const getColor = (tag: string) => {
           return (
             <a
               class={cn(
-                'px-4 py-2 min-w-34 rounded-full flex-1 font-semibold font-mono text-center text-white tracking-wide leading-4 text-sm',
+                'px-4 py-2 min-w-28 opacity-70 hover:opacity-100 transition-opacity duration-300 rounded-full flex-1 font-semibold font-mono text-center text-white tracking-wide leading-4 text-xs line-clamp-1',
                 getColor(tag)
               )}
               href={`/blog?tags=${tag}`}
             >
-              {tag}
+              {capitalize(tag)}
             </a>
           )
         })}

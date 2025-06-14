@@ -28,7 +28,7 @@ const { title, pubDate, updatedDate, hashTags } = Astro.props
     }
   </div>
   <p class="text-5xl text-balance font-black mb-2">{title}</p>
-  { hashTags && <HashTags hashTags={hashTags} /> }
+  { hashTags && <HashTags hashTags={hashTags} className='mt-4' /> }
   <hr
     class="border-b-none border-t-[1px] w-full border-t-gray-200 my-4 mb-8 md:my-8"
   />
