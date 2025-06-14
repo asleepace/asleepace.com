@@ -42,7 +42,9 @@ const capitalize = (tag: string) => {
           return (
             <a
               class={cn(
-                'px-4 py-2 min-w-28 opacity-70 hover:opacity-100 transition-opacity duration-300 rounded-full flex-1 font-semibold font-mono text-center text-white tracking-wide leading-4 text-xs line-clamp-1',
+                'px-4 py-2 min-w-28 opacity-70 hover:opacity-100 transition-opacity duration-300 rounded-full flex-1',
+                'text-white line-clamp-1 text-ellipsis text-xs leading-4 tracking-wide font-mono, font-semibold',
+                'hover:drop-shadow-sm',
                 getColor(tag)
               )}
               href={`/blog?tags=${tag}`}
