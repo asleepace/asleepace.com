@@ -1,6 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
 import { Sessions } from '@/db/index'
-import chalk from 'chalk'
 import { consoleTag } from '@/utils/tagTime'
 
 const handleLog = consoleTag('session')

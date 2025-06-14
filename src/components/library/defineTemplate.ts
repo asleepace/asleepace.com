@@ -1,6 +1,6 @@
 import { defineComponent, type RxInstance } from './defineComponent'
 
-export type BoundMethod<T> = (this: RxInstance<T>, T) => any | void
+export type BoundMethod<T> = (this: RxInstance<T>, state: T) => any | void
 
 const getSanitizedAttributes = (template: TemplateStringsArray) =>
   template
@@ -13,7 +13,7 @@ const getSanitizedAttributes = (template: TemplateStringsArray) =>
  * @param strings
  * @param expressions
  */
-export function defineTemplate<T extends {}, M extends BoundMethod<T>>(
+export function defineTemplate(
   template: TemplateStringsArray,
   ...props: any[]
 ) {
@@ -33,7 +33,9 @@ export function defineTemplate<T extends {}, M extends BoundMethod<T>>(
   const shared = defineComponent({
     tagName: elemName,
     state,
-    attach(state) {},
+    attach(state) {
+      console.log('[defineTemplate] state attached:', state)
+    },
   })
 
   // --- attach bindings ----

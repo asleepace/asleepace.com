@@ -4,12 +4,6 @@ import { sendEmailNotification } from '@/lib/mail/sendNotification'
 
 export const prerender = false
 
-interface Notification {
-  type: 'deploy'
-  subject: string
-  message: string
-}
-
 const INVALID_BODY = JSON.stringify({
   error: 'invalid_body',
   message: 'request body must be valid json.',
@@ -19,10 +13,6 @@ const INVALID_BODY = JSON.stringify({
 const SUCESS_BODY = JSON.stringify({
   ok: true,
 })
-
-const isNotification = (data: unknown): data is Notification => {
-  return Boolean(data && typeof data === 'object' && 'type' in data)
-}
 
 const capitalize = (str: string) => {
   if (str.length === 1) return str.toUpperCase()

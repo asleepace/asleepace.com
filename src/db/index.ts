@@ -144,7 +144,7 @@ export namespace Users {
   try {
     const allUsers = fetchUsers()
     const numberOfUsers = allUsers.length
-    console.log('DB_USERS:', allUsers)
+    console.log('TOTAL DB_USERS:', allUsers.length)
     console.assert(numberOfUsers > 0, 'ASSERT_USERS_EXISTS')
   } catch (e) {
     console.error('[db] error:', e)

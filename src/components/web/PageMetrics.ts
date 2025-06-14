@@ -49,7 +49,11 @@ class PageMetricButton extends HTMLElement {
     this.render()
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    newValue: string | null
+  ) {
     if (oldValue === newValue) return
     if (name in this.state) {
       this.state[name] = newValue

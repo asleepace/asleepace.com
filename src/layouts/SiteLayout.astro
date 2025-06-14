@@ -2,6 +2,7 @@
 import BaseHead from '@/components/astro/BaseHead.astro'
 import Footer from '@/components/astro/Footer.astro'
 import PageNavigation from '@/components/astro/PageNavigation.astro'
+import { siteConfig } from '@/consts'
 import clsx from 'clsx'
 
 interface Props {
@@ -11,28 +12,29 @@ interface Props {
   className?: string
 }
 
-const { 
-  title = 'Asleepace', 
+const {
+  title = 'Asleepace',
   description = 'My personal website for everything & anything.',
   className,
-  image 
-} = Astro.props;
-
+  image = siteConfig.coverImage,
+} = Astro.props
 ---
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <BaseHead title={title} description={description} image={image} />
   </head>
-  <body class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden">
+  <body
+    class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden"
+  >
     <PageNavigation />
-    <main class={clsx("w-full flex flex-col items-center", className)}>
+    <main class={clsx('w-full flex flex-col items-center', className)}>
       <!-- dynamic content -->
       <slot />
     </main>
     <Footer />
   </body>
 </html>
-<!DOCTYPE html>

@@ -1,7 +1,5 @@
 import * as LucideIcons from 'lucide-react'
-
 export type LucideIconsExports = typeof LucideIcons
-
 export type LucideIconName = keyof LucideIconsExports
 
 /**
@@ -13,7 +11,6 @@ export type LucideIconName = keyof LucideIconsExports
  *
  */
 export type LucideIcon = LucideIconsExports['Search'] // pick a random icon to get props
-
 export type AstroButtonProps = astroHTML.JSX.ButtonHTMLAttributes
 
 export type Prettify<T> = {

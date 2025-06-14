@@ -1,4 +1,3 @@
-import chalk from 'chalk'
 import clsx from 'clsx'
 import {
   Fragment,
