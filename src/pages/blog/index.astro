@@ -6,16 +6,31 @@ import { Newspaper } from 'lucide-react'
 
 import SiteLayout from '@/layouts/SiteLayout.astro'
 
-export const prerender = true
+export const prerender = false
 
 // =====================================
 // Blog Page
 // =====================================
 
+console.log({ Astro })
+
+// Extract any filters from the url
+const tagFilters = Astro.url.searchParams
+  .get('tags')
+  ?.toLowerCase()
+  .split(',')
+  .filter(Boolean)
+  .map((tag) => tag.trim())
+
 const blog = await getCollection('blog')
-const posts = blog.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-)
+const posts = blog
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .filter((blog) => {
+    if (!tagFilters) return blog
+    if (!blog.data.hashTags) return false
+    const hashTags = blog.data.hashTags.toLowerCase()
+    return tagFilters.every((tag) => hashTags.includes(tag))
+  })
 ---
 
 <SiteLayout>

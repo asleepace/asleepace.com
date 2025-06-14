@@ -4,15 +4,27 @@ import HeroImage from '@/components/astro/HeroImage.astro'
 import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import SiteLayout from './SiteLayout.astro'
+import HashTags from '@/components/astro/HashTags.astro'
 
 type Props = CollectionEntry<'blog'>['data']
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  hashTags = '',
+} = Astro.props
 ---
+
 <SiteLayout title={title} description={description} image={heroImage}>
-  <article class="flex flex-col items-center w-full max-w-screen-md text-gray-800 md:pt-16 pb-8">
+  <article
+    class="flex flex-col items-center w-full max-w-screen-md text-gray-800 md:pt-16 pb-8"
+  >
     <HeroImage src={heroImage} alt={title} />
     <HeroTitle title={title} pubDate={pubDate} updatedDate={updatedDate} />
+    <HashTags hashTags={hashTags} />
     <Prose>
       <slot />
     </Prose>

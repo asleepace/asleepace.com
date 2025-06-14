@@ -1,0 +1,46 @@
+---
+import { cn } from '@/utils/cn'
+
+interface Props {
+  hashTags?: string | undefined
+}
+
+const hashTags = Astro.props.hashTags || ''
+const tags = hashTags.split(',').map((item) => item.trim())
+const hasHashTags = Boolean(tags.length > 0)
+
+const getColor = (tag: string) => {
+  switch (tag.toLowerCase()) {
+    case 'technical':
+      return 'bg-blue-400 hover:bg-sky-400'
+    case 'bash':
+      return 'bg-green-400 hover:bg-emerald-400'
+    case 'macoss':
+      return 'bg-orange-500 hover:bg-amber-400'
+    default:
+      return 'bg-gray-300 hover:bg-gray-400'
+  }
+}
+---
+
+<Fragment>
+  {
+    hasHashTags ? (
+      <div class="w-[50%] flex flex-row items-center gap-4 pb-6 justify-center">
+        {tags.map((tag) => {
+          return (
+            <a
+              class={cn(
+                'px-4 py-2 rounded-full flex-1 font-semibold font-mono text-center text-white tracking-wide leading-4 text-sm',
+                getColor(tag)
+              )}
+              href={`/blog?tags=${tag}`}
+            >
+              {tag}
+            </a>
+          )
+        })}
+      </div>
+    ) : null
+  }
+</Fragment>

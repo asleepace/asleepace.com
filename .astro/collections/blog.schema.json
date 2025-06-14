@@ -45,6 +45,9 @@
         "heroImage": {
           "type": "string"
         },
+        "hashTags": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         }

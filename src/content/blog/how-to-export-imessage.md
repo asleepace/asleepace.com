@@ -2,8 +2,9 @@
 title: 'How to Export iMessage Chat History'
 description: 'How to export your iMessage chat history to a text file which can be uploaded and analyzed with Ai.'
 pubDate: 'June 14 2025'
-heroImage: '/images/try-catch-cover.jpg'
-slug: 'ai-imessage'
+heroImage: '/images/blog-export-imessage.png'
+hashTags: 'Technical, MacOS, Bash'
+slug: 'how-to-export-imessage'
 ---
 
 The other day the group chat my friends and I use to talk about stocks, trading and investing devolved into pure political chaos. Desperate to find the culprit who kept steering the conversation towards politics, we turned to Ai.
