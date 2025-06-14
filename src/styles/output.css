@@ -356,6 +356,9 @@
       max-width: 120rem;
     }
   }
+  .m-auto {
+    margin: auto;
+  }
   .mx-2 {
     margin-inline: calc(var(--spacing) * 2);
   }
@@ -550,6 +553,9 @@
   }
   .max-w-screen-xs {
     max-width: var(--breakpoint-xs);
+  }
+  .min-w-34 {
+    min-width: calc(var(--spacing) * 34);
   }
   .min-w-44 {
     min-width: calc(var(--spacing) * 44);
@@ -1329,6 +1335,9 @@
   .text-blue-500 {
     color: var(--color-blue-500);
   }
+  .text-gray-200 {
+    color: var(--color-gray-200);
+  }
   .text-gray-300 {
     color: var(--color-gray-300);
   }
@@ -1738,6 +1747,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-neutral-300);
+      }
+    }
+  }
+  .hover\:text-sky-400 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-sky-400);
       }
     }
   }

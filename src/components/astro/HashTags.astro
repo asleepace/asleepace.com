@@ -3,14 +3,17 @@ import { cn } from '@/utils/cn'
 import { siteConfig } from '@/consts'
 
 interface Props {
+  className?: string
   hashTags?: string | undefined
 }
 
-const hashTags = Astro.props.hashTags || ''
+const { className, hashTags = '' } = Astro.props
+
 const tags = hashTags
   .toLowerCase()
   .split(',')
   .map((item) => item.trim())
+
 const hasHashTags = Boolean(tags.length > 0)
 
 const getColor = (tag: string) => {
@@ -21,12 +24,17 @@ const getColor = (tag: string) => {
 <Fragment>
   {
     hasHashTags ? (
-      <div class="w-[50%] flex flex-row items-center gap-4 pb-6 justify-center">
+      <div
+        class={cn(
+          'mx-auto flex flex-row items-center gap-4 justify-center',
+          className
+        )}
+      >
         {tags.map((tag) => {
           return (
             <a
               class={cn(
-                'px-4 py-2 rounded-full flex-1 font-semibold font-mono text-center text-white tracking-wide leading-4 text-sm',
+                'px-4 py-2 min-w-34 rounded-full flex-1 font-semibold font-mono text-center text-white tracking-wide leading-4 text-sm',
                 getColor(tag)
               )}
               href={`/blog?tags=${tag}`}
