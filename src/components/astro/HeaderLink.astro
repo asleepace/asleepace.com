@@ -10,13 +10,23 @@ const subpath = pathname.match(/[^\/]+/g);
 const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 ---
 
-<a href={href} class:list={[className, { active: isActive }]} {...props}>
+<a href={href} data-text={Astro.slots.default} class:list={[className, { active: isActive }]} {...props}>
   <slot />
 </a>
 <style>
   a {
     display: inline-block;
     text-decoration: none;
+  }
+  a::before {
+    content: attr(data-text);
+    font-weight: bold;
+    height: 0;
+    visibility: hidden;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+    display: block;
   }
   a.active {
     font-weight: bolder;

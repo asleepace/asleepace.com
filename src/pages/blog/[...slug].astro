@@ -22,5 +22,5 @@ const { Content } = await render(post)
 
 <BlogPost {...post.data}>
   <!-- override built-in elements -->
-  <Content {components} />
+  <Content {...post} {components} />
 </BlogPost>

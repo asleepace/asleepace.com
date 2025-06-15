@@ -108,7 +108,6 @@ export const siteConfig: SiteConfig = {
 
 Object.entries(siteConfig).forEach(([key, value]) => {
   const tag = chalk.gray(`>>  [${key}]`)
-
   if (value instanceof URL) {
     console.log(tag, chalk.cyan(value.toString()))
   } else if (typeof value === 'string') {
@@ -117,8 +116,6 @@ Object.entries(siteConfig).forEach(([key, value]) => {
     console.log(tag, value)
   }
 })
-
-// console.log('[consts] config:', siteConfig)
 
 export const SITE_TITLE = 'Asleepace'
 export const SITE_DESCRIPTION = 'a random collection of internet treasures'

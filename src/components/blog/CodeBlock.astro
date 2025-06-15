@@ -1,48 +1,97 @@
 ---
+import { Client } from '@/lib/frontend'
+import { cn } from '@/utils/cn'
+
 // src/components/CodeBlock.astro
 export interface Props {
-  code?: string;
-  lang?: string;
-  title?: string;
-  filename?: string;
-  showLineNumbers?: boolean;
-  highlightLines?: number[];
+  code?: string
+  title?: string
+  filename?: string
+  showLineNumbers?: boolean
+  highlightLines?: number[]
+  'data-language'?: string
 }
 
-const { 
-  code, 
-  lang = 'text', 
-  title, 
+const {
+  code,
+  title,
   filename,
   showLineNumbers = false,
-  highlightLines = []
-} = Astro.props;
+  highlightLines = [],
+  'data-language': lang = 'ts',
+  ...rest
+} = Astro.props
+
+const props = Astro.props
+
+console.log(Astro.props)
+
+const codeRef = Client.uniqueRef()
 ---
 
-<div class="code-container inset-shadow-2xs">
-  {(title || filename) && (
-    <div class="code-header">
-      {filename && <span class="code-filename">{filename}</span>}
-      {title && <span class="code-title">{title}</span>}
-      <span class="code-lang">{lang}</span>
-    </div>
+<div
+  id="code-container"
+  class={cn(
+    'code-container inset-shadow-2xs border-transparent ring-0 transition-all duration-400 ease-in-out',
+    '[&[data-copied]]:scale-[1.01] [&[data-copied]]:opacity-80 [&[data-copied]]:ring-4 [&[data-copied]]:ring-amber-300 [&[data-copied]]:shadow-lg'
   )}
-  <div class="code-wrapper">
-    <pre class={`language-${lang}`} data-line-numbers={showLineNumbers}><code><slot /></code></pre>
+>
+  {
+    (title || filename) && (
+      <div class="code-header">
+        {filename && <span class="code-filename">{filename}</span>}
+        {title && <span class="code-title">{title}</span>}
+        <span class="code-lang">{lang}</span>
+      </div>
+    )
+  }
+  <div id={codeRef} class="code-wrapper">
+    <pre {...props}><slot /></pre>
   </div>
 </div>
+<script is:inline define:vars={{ codeRef }}>
+  const codeWrapper = document.getElementById(codeRef)
+
+  // copy to clipboard on double click...
+  codeWrapper?.addEventListener('dblclick', async () => {
+    try {
+      const code = document.querySelector(`#${codeRef} pre > code`)
+      navigator.clipboard.writeText(code.textContent)
+      codeWrapper.parentElement.setAttribute('data-copied', '1')
+    } catch (err) {
+      console.warn('[code] failed to save code:', err)
+    } finally {
+      //codeWrapper.parentElement.removeAttribute('data-copied')
+      setTimeout(() => {
+        codeWrapper.parentElement.removeAttribute('data-copied')
+      }, 300)
+    }
+  })
+</script>
 
 <style>
+  .astro-code,
+  .astro-code span,
+  .astro-code code,
+  .astro-code code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+    /* Optional, if you also want font styles */
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+    /* background-color: var(--shiki-dark-bg) !important; */
+  }
+
   .code-container pre > code {
     all: unset;
   }
 
   .code-container {
+    background-color: oklab(0.29 0 -0.02) !important;
     border-radius: 18px;
     overflow: hidden;
     margin: 1.5rem 0;
-    color: var(--color-neutral-400);
-    background: var(--color-editor-100);
   }
 
   .code-header {
@@ -109,15 +158,15 @@ const {
   }
 
   /* Line numbers */
-  pre[data-line-numbers="true"] {
+  pre[data-line-numbers='true'] {
     counter-reset: line;
   }
 
-  pre[data-line-numbers="true"] code {
+  pre[data-line-numbers='true'] code {
     counter-increment: line;
   }
 
-  pre[data-line-numbers="true"] code::before {
+  pre[data-line-numbers='true'] code::before {
     content: counter(line);
     display: inline-block;
     width: 2em;

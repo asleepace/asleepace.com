@@ -1,6 +1,10 @@
 {
   "files.associations": {
-    "*.css": "tailwindcss"
+    "*.css": "tailwindcss",
+    "*.mdx": "mdx"
+  },
+  "emmet.includeLanguages": {
+    "mdx": "jsx"
   },
   "editor.quickSuggestions": {
     "strings": true
