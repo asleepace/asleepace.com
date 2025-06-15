@@ -30,6 +30,20 @@ You can find more detailed documentation for this project in the [services](serv
 
 ## Quick Start
 
+```bash
+# open the dev container in vscode / cursor
+# CMD + SHIT + P -> Dev Containers: Rebuild & Open in Dev Container
+
+# check nginx status
+nginx-status
+
+# start website
+bun install
+bun run dev -- --host 0.0.0.0
+```
+
+## Manual Build & Installation
+
 The following is mainly just a reference for myself, but feel free to use it if you find it helpful!
 
 ```bash

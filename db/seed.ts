@@ -1,6 +1,15 @@
-import { db } from 'astro:db';
+import { db, PageMetrics } from 'astro:db'
 
 // https://astro.build/db/seed
 export default async function seed() {
-	// TODO
+  await db.insert(PageMetrics).values([
+    {
+      route: '/',
+      views: 1000,
+      likes: 12,
+      comments: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ])
 }

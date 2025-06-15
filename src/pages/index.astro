@@ -2,6 +2,8 @@
 import { getCollection } from 'astro:content'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import BentoBox from '@/layouts/BentoBox.astro'
+import { db, PageMetrics } from 'astro:db'
+import { eq } from 'astro:db'
 
 export const prerender = true
 
@@ -15,12 +17,15 @@ const posts = blog.sort(
 )
 
 const featured = posts.at(0)!
+const metrics = await db.select().from(PageMetrics).where(eq(PageMetrics.route, '/'))
 
 const feed = posts.slice(1).map(({ data, id }) => ({
   name: data.title,
   date: data.updatedDate ?? data.pubDate,
   href: `/blog/${id}`,
 }))
+
+console.log({ metrics })
 ---
 
 <SiteLayout

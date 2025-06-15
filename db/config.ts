@@ -1,15 +1,15 @@
-import { defineDb, defineTable, column } from 'astro:db'
+import { defineDb, defineTable, column, NOW } from 'astro:db'
 
-const PageMetrics = defineTable({
+export const PageMetrics = defineTable({
   columns: {
-    id: column.number({ primaryKey: true }),
-    route: column.text({ unique: true }),
-    views: column.number(),
-    likes: column.number(),
-    comments: column.json(),
-    createdAt: column.date(),
-    updatedAt: column.date(),
+    route: column.text({ unique: true, primaryKey: true }),
+    views: column.number({ default: 0 }),
+    likes: column.number({ default: 0 }),
+    comments: column.json({ default: [] }),
+    createdAt: column.date({ default: NOW }),
+    updatedAt: column.date({ default: NOW }),
   },
+  indexes: [{ on: ['route'] }],
 })
 
 // https://astro.build/db/config

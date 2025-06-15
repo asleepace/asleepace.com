@@ -3,6 +3,12 @@ dist/
 # generated types
 .astro/
 
+# Local database files
+local.db
+local.db-*
+*.sqlite
+*.sqlite3
+
 # Generated files
 src/styles/output.css
 
