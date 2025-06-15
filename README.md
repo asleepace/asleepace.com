@@ -40,6 +40,11 @@ nginx-status
 # start website
 bun install
 bun run dev -- --host 0.0.0.0
+
+# seed the database
+# add the following in your (.env)
+# ASTRO_DB_REMOTE_URL=memory:
+bun run astro db push
 ```
 
 ## Manual Build & Installation
