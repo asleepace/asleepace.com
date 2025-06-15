@@ -1,6 +1,6 @@
-FROM ubuntu:23.10
+FROM ubuntu:24.04
 
-# Install essential packages
+# Install essential packages and NGINX
 RUN apt-get update && apt-get install -y \
     zsh \
     curl \
@@ -8,66 +8,44 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     sudo \
     wget \
-    gnupg \
+    unzip \
     ca-certificates \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
 
-# Create vscode user
-RUN useradd -m -s /bin/zsh vscode && \
-    echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Create cursor user
+RUN useradd -m -s /bin/zsh cursor && \
+    echo "cursor ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Install MongoDB
-RUN wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | apt-key add - && \
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list && \
-    apt-get update && \
-    apt-get install -y mongodb-org && \
-    rm -rf /var/lib/apt/lists/*
-
-# Configure MongoDB
-RUN mkdir -p /data/db && \
-    chown -R mongodb:mongodb /data/db
-
-# Switch to vscode user
-USER vscode
-WORKDIR /home/vscode
+# Switch to cursor user
+USER cursor
+WORKDIR /home/cursor
 
 # Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-# Install ASDF v16.0+
-RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.16.0
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
 
-# Configure ASDF for ZSH (v16.0+ method)
-RUN echo '# ASDF Configuration' >> ~/.zshrc && \
-    echo 'export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"' >> ~/.zshrc && \
-    echo '' >> ~/.zshrc && \
-    echo '# ASDF completions' >> ~/.zshrc && \
-    echo 'fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)' >> ~/.zshrc && \
-    echo 'autoload -Uz compinit && compinit' >> ~/.zshrc
+# Add Bun to PATH
+RUN echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.zshrc
 
-# Set up ASDF completions
-RUN mkdir -p "${HOME}/.asdf/completions" && \
-    ~/.asdf/bin/asdf completion zsh > "${HOME}/.asdf/completions/_asdf"
-
-# Install Node.js via ASDF
-RUN ~/.asdf/bin/asdf plugin add nodejs && \
-    ~/.asdf/bin/asdf install nodejs latest && \
-    ~/.asdf/bin/asdf global nodejs latest
-
-# Install PM2 (using the shim path)
-RUN export PATH="${HOME}/.asdf/shims:$PATH" && npm install -g pm2
+# Install PM2 using Bun
+RUN /home/cursor/.bun/bin/bun install -g pm2
 
 # Set zsh as default shell
 USER root
-RUN chsh -s /bin/zsh vscode
+RUN chsh -s /bin/zsh cursor
 
-USER vscode
+USER cursor
 WORKDIR /workspace
 
-# Add helpful aliases to .zshrc
+# Add helpful aliases
 RUN echo '' >> ~/.zshrc && \
     echo '# Custom aliases' >> ~/.zshrc && \
     echo 'alias ll="ls -la"' >> ~/.zshrc && \
-    echo 'alias mongodb-start="sudo service mongodb start"' >> ~/.zshrc && \
-    echo 'alias mongodb-stop="sudo service mongodb stop"' >> ~/.zshrc && \
-    echo 'alias mongodb-status="sudo service mongodb status"' >> ~/.zshrc
+    echo 'alias nginx-start="sudo service nginx start"' >> ~/.zshrc && \
+    echo 'alias nginx-stop="sudo service nginx stop"' >> ~/.zshrc && \
+    echo 'alias nginx-restart="sudo service nginx restart"' >> ~/.zshrc && \
+    echo 'alias nginx-status="sudo service nginx status"' >> ~/.zshrc && \
+    echo 'alias bun-dev="bun --watch"' >> ~/.zshrc

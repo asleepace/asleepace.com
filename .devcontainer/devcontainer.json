@@ -1,17 +1,19 @@
 {
-  "name": "Ubuntu 23.10 Dev",
+  "name": "Ubuntu 24.04 Dev",
   "build": {
     "dockerfile": "Dockerfile"
   },
   "customizations": {
     "vscode": {
       "extensions": [
+        "anysphere.remote-containers",
         "ms-vscode.vscode-typescript-next",
-        "mongodb.mongodb-vscode"
+        "astro-build.astro-vscode",
+        "esbenp.prettier-vscode"
       ]
     }
   },
-  "forwardPorts": [3000, 8000, 27017],
-  "postCreateCommand": "sudo service mongodb start",
-  "remoteUser": "vscode"
+  "forwardPorts": [3000, 8000, 80, 443],
+  "postCreateCommand": "sudo service nginx start",
+  "remoteUser": "cursor"
 }
