@@ -36,8 +36,6 @@ if (metrics) {
     .update(PageMetrics)
     .set({ views: sql`views + 1`, updatedAt: new Date() })
     .where(eq(PageMetrics.route, '/'))
-
-  console.log({ metrics })
 }
 ---
 
