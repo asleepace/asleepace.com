@@ -6,12 +6,6 @@
     "*.css": "tailwindcss",
     "*.mdx": "mdx"
   },
-  "emmet.includeLanguages": {
-    "mdx": "jsx"
-  },
-  "editor.quickSuggestions": {
-    "strings": true
-  },
   "typescript.inlayHints.parameterNames.enabled": "all",
   "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",

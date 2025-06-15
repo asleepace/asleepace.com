@@ -1,12 +1,12 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
+
 import { type CollectionEntry } from 'astro:content'
 
-declare global {
-  type ToString = { toString(): string }
-
-  type Blog = CollectionEntry<'blog'>
-}
+// declare global {
+//   type ToString = { toString(): string }
+//   type Blog = CollectionEntry<'blog'>
+// }
 
 interface Env {
   DATABASE_URL: string
@@ -26,11 +26,15 @@ interface Env {
   COOKIE_DOMAIN: string
 }
 
-declare namespace App {
-  export interface Locals {
-    isLoggedIn: boolean
-    user: Record<string, any> | undefined
-    requestId: number
+declare global {
+  type ToString = { toString(): string }
+  type Blog = CollectionEntry<'blog'>
+  namespace App {
+    export interface Locals {
+      isLoggedIn: boolean
+      user: Record<string, any> | undefined
+      requestId: number
+    }
   }
 }
 

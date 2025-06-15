@@ -115,6 +115,7 @@
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --breakpoint-xs: 30rem;
+    --color-editor-100: oklab(0.29 0 -0.02);
     --color-editor-200: #292d3e;
     --color-accent: #ffbf00;
     --color-accent-dark: #ffac1c;
@@ -473,6 +474,9 @@
   .h-full {
     height: 100%;
   }
+  .h-screen {
+    height: 100vh;
+  }
   .h-thin {
     height: var(--spacing-thin);
   }
@@ -527,6 +531,9 @@
   .w-full {
     width: 100%;
   }
+  .w-screen {
+    width: 100vw;
+  }
   .max-w-4\/5 {
     max-width: calc(4/5 * 100%);
   }
@@ -562,9 +569,6 @@
   }
   .min-w-full {
     min-width: 100%;
-  }
-  .min-w-screen {
-    min-width: 100vw;
   }
   .min-w-xs {
     min-width: var(--container-xs);
@@ -771,6 +775,9 @@
   .overflow-y-hidden {
     overflow-y: hidden;
   }
+  .overscroll-none {
+    overscroll-behavior: none;
+  }
   .rounded {
     border-radius: 0.25rem;
   }
@@ -883,6 +890,9 @@
   }
   .bg-blue-500 {
     background-color: var(--color-blue-500);
+  }
+  .bg-editor-100 {
+    background-color: var(--color-editor-100);
   }
   .bg-editor-200 {
     background-color: var(--color-editor-200);

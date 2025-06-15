@@ -44,14 +44,16 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
     class="min-h-screen flex flex-col bg-white bg-cover bg-fixed"
     style="background: url(/images/bg-login.jpeg); background-position: center; background-attachment: fixed;"
   >
-    <Header title={siteData.title} class:list="drop-shadow-lg" />
+    <Header
+      title={siteData.title}
+      class:list="before:bg-glass"
+    />
     <main
-      class="flex flex-col inset-shadow grow self-stretch w-full justify-center items-center mx-auto p-4 bg-contain bg-center from-neutral-200 via-white/40 to-neutral-200 bg-gradient-to-r"
+      class="flex flex-col inset-shadow-2xs grow self-stretch w-full justify-center items-center mx-auto p-4 from-neutral-200 via-white/40 to-neutral-200 bg-gradient-to-r"
     >
-      <div class="absolute inset-shadow -z-10 inset-0 bg-glass bg-glass-light">
-      </div>
+      <div class="absolute bg-glass inset-shadow -z-10 inset-0"></div>
       <div
-        class="flex shadow-sm flex-col items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-colors duration-300 rounded-2xl p-4"
+        class="flex flex-col items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-colors duration-300 rounded-2xl p-4"
       >
         <div class="flex flex-col items-center justify-center py-4">
           <LockKeyholeIcon

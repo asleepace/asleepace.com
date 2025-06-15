@@ -41,6 +41,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       rollupOptions: {
+        // ignore these files when bundling...
         external: [/highlight\.js\/styles\/.+\.css$/, /typescript\.js/],
       },
     },

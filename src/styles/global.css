@@ -32,20 +32,23 @@
   .bg-glass {
     @apply relative;
     --glass-color: var(--bg-neutral-200);
-    --glass-edge: color-mix(in srgb, var(--glass-color), 50%, transparent);
-    --glass-center: color-mix(in srgb, var(--glass-edge), 10%, transparent);
+    --glass-edge: color-mix(in srgb, var(--glass-color), 90%);
+    --glass-center: color-mix(in srgb, var(--glass-edge), 0%, transparent);
     --glass-direction: to bottom;
   }
 
   .bg-glass::before,
   .bg-glass::after {
-    @apply content-[''] absolute inset-0 backdrop-blur-xl pointer-events-none;
+    @apply content-[''] absolute inset-0 pointer-events-none;
   }
 
   .bg-glass::before {
     @apply top-0;
-    background-color: color-mix(in srgb, var(--glass-edge), 10%, transparent);
-    mask: linear-gradient(
+    transition: all;
+    transition-duration: 300ms;
+    background: linear-gradient(var(--gray-gradient)) no-repeat;
+    color: color-mix(in srgb, var(--gray), 1%, transparent);
+    mask: radial-gradient(
       var(--glass-direction),
       var(--glass-edge),
       var(--glass-center),
@@ -54,8 +57,13 @@
   }
 
   .bg-glass::after {
-    @apply bottom-0 backdrop-blur-xl;
-    mask: linear-gradient(
+    @apply bottom-0 backdrop-blur-xs;
+    background: linear-gradient(
+        color-mix(in srgb, var(--gray-gradient), 10%, transparent)
+      )
+      no-repeat;
+    background-color: color-mix(in srgb, var(--glass-edge), 10%, transparent);
+    mask: radial-gradient(
       var(--glass-direction),
       var(--glass-edge),
       var(--glass-center),
