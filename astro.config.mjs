@@ -20,7 +20,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://asleepace.com',
-  integrations: [mdx(), sitemap(), react()],
+  integrations: [mdx({
+    syntaxHighlight: 'shiki',
+    shikiConfig: {
+      theme: 'dracula-soft',
+      wrap: true
+    }
+  }), sitemap(), react()],
   vite: {
     plugins: [tailwindcss()],
   },
@@ -29,6 +35,9 @@ export default defineConfig({
   }),
   security: {
     checkOrigin: false, // CORS
+  },
+  markdown: {
+
   },
   server: {
     // NOTE: These don't appear to work, see CORS middleware instead

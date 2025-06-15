@@ -4,11 +4,9 @@
   --breakpoint-xs: 30rem;
   --breakpoint-2xl: 100rem;
   --breakpoint-3xl: 120rem;
-
   --color-dark-gray: #282a2c;
   --color-editor-100: #292d3e;
   --color-editor-200: #212432;
-
   --spacing-thin: 1px;
 }
 
@@ -62,6 +60,12 @@
   .bg-glass-dark {
     --glass-color: rgba(0, 0, 0, 0.9);
     --glass-direaction: to bottom;
+  }
+
+  .scrollbar-horizontal {
+    overflow-x: auto;
+    scroll-snap-align: stable;
+    scrollbar-color: red;
   }
 }
 
@@ -128,6 +132,8 @@ body {
   overscroll-behavior-x: none;
   min-width: 320px;
 }
+
+
 
 body {
   font-family: 'Atkinson', sans-serif;
@@ -286,26 +292,6 @@ body {
 
   strong {
     font-weight: 550;
-  }
-
-  /* reset default styles */
-  pre > code {
-    all: unset;
-  }
-
-  /* inline code styling */
-  code {
-    background-color: rgb(var(--gray-light));
-    border-radius: 4px;
-    padding: 2px 5px;
-    font-size: 16px;
-  }
-
-  /* code box styling */
-  pre {
-    padding: var(--padding-sm);
-    overflow-x: scroll;
-    font-size: 16px;
   }
 
   /* stock chart */

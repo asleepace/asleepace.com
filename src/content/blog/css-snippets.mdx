@@ -1,0 +1,54 @@
+---
+title: 'CSS Snippets'
+description: 'CSS snippets for everyday use which can be easily copied and pasted.'
+pubDate: 'June 14 2025'
+heroImage: '/images/css.png'
+hashTags: 'Technical, Snippets, CSS'
+slug: 'css-snippets'
+---
+
+### Colors
+
+```css
+:root {
+  --primary-color: #ff0000;
+  --opacity: 50%;
+}
+
+.element {
+  background: color-mix(in srgb, var(--primary-color) var(--opacity), transparent);
+}
+```
+
+### Scrollbar None
+
+```css
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+```
+
+### Scrollbar Gutter
+
+```css
+/* Example #1: Apply globally to prevent layout shifts () */
+html {
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Example #2: Stable with fallback */
+.scrollbar-stable {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  
+  /* Fallback for older browsers */
+  @supports not (scrollbar-gutter: stable) {
+    padding-right: 17px; /* Approximate scrollbar width */
+    margin-right: -17px;
+  }
+}
+```

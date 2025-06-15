@@ -1,0 +1,16 @@
+---
+import CodeBlock from './blog/CodeBlock.astro'
+import StockChart from './blog/StockChart.astro'
+
+//  NOTE: This file is loaded in `./blogs/[slug].astro` and passed
+//  as props to `<Content {component} />`. This allows overriding
+//  custom elements.
+
+export const components = {
+  pre: CodeBlock,
+  StockChart: StockChart
+  // You can also override other elements
+  // blockquote: CustomBlockquote,
+  // img: CustomImage,
+}
+---
