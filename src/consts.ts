@@ -27,6 +27,7 @@ export type SiteConfig = {
     codeEditor: '/code'
     clearSession: '/api/auth/clearSession'
   }
+  hashTagColors: Record<string, string>
 }
 
 // --- check environment variables ---
@@ -73,7 +74,7 @@ export const siteConfig: SiteConfig = {
   /** NOTE: used when creating and deleting cookies */
   cookiePath: '/',
   /** Extended theme styling */
-  themeColor: '#FFFFFF',
+  themeColor: 'oklch(82.8% 0.189 84.429)',
   /** default cover photo */
   coverImage: '/images/about-me.jpeg',
   /** paths */
@@ -91,11 +92,22 @@ export const siteConfig: SiteConfig = {
     codeEditor: '/code',
     clearSession: '/api/auth/clearSession',
   },
+  hashTagColors: {
+    technical: 'bg-indigo-500',
+    typescript: 'bg-blue-500',
+    algorithm: 'bg-yellow-500',
+    investing: 'bg-teal-500',
+    finance: 'bg-green-500',
+    stocks: 'bg-emerald-500',
+    snippets: 'bg-orange-400',
+    npm: 'bg-red-400',
+    bash: 'bg-green-500',
+    default: 'bg-slate-500',
+  },
 }
 
 Object.entries(siteConfig).forEach(([key, value]) => {
   const tag = chalk.gray(`>>  [${key}]`)
-
   if (value instanceof URL) {
     console.log(tag, chalk.cyan(value.toString()))
   } else if (typeof value === 'string') {
@@ -104,8 +116,6 @@ Object.entries(siteConfig).forEach(([key, value]) => {
     console.log(tag, value)
   }
 })
-
-// console.log('[consts] config:', siteConfig)
 
 export const SITE_TITLE = 'Asleepace'
 export const SITE_DESCRIPTION = 'a random collection of internet treasures'

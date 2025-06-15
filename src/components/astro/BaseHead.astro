@@ -2,24 +2,27 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import '@/styles/global.css'
-import { siteConfig } from '@/consts'
+import { siteConfig, siteData } from '@/consts'
 import DefaultCoverImage from '@/assets/about-me.jpeg'
+import { ClientRouter } from 'astro:transitions'
 
 interface Props {
+  url?: string
   title: string
   description: string
   image?: string
+  htmx?: boolean
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
 const {
-  title,
-  description,
-  image = '/images/blog-placeholder-1.jpg',
+  url = Astro.url,
+  title = siteData.title,
+  description = siteData.description,
+  image = DefaultCoverImage.src,
+  htmx = false,
 } = Astro.props
-
-const coverImage = image ? image : DefaultCoverImage.src
 ---
 
 <!-- Global Metadata -->
@@ -45,7 +48,7 @@ const coverImage = image ? image : DefaultCoverImage.src
 />
 
 <!-- Scripts -->
-<script is:inline type="text/javascript" src="/scripts/htmx.min.js"></script>
+{htmx && <script is:inline type="text/javascript" src="/scripts/htmx.min.js" />}
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -66,17 +69,28 @@ const coverImage = image ? image : DefaultCoverImage.src
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={coverImage} />
+<meta property="og:image" content={image} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:url" content={url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={coverImage} />
+<meta property="twitter:image" content={image} />
 
 <!-- Sitemap -->
 <link rel="sitemap" href="/sitemap-index.xml" />
+
+<!-- RSS Feed -->
+<link
+  rel="alternate"
+  title={title}
+  type="application/rss+xml"
+  href={new URL('rss.xml', Astro.site)}
+/>
+
+<!-- Client Router -->
+<ClientRouter />

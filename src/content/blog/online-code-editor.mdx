@@ -3,6 +3,7 @@ title: 'Online Code Editor'
 description: 'a simple online code editor which can compile and run typescript code.'
 pubDate: 'Jan 15 2025'
 heroImage: '/images/online-editor-cover.jpg'
+hashTags: 'Application'
 slug: 'online-code-editor'
 ---
 

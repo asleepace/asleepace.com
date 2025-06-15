@@ -23,6 +23,10 @@ const feed = posts.slice(1).map(({ data, id }) => ({
 }))
 ---
 
-<SiteLayout title="Home" className="justify-center grow bg-white">
+<SiteLayout
+  title="Home"
+  className="justify-center grow"
+  transition:animate="none"
+>
   <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
 </SiteLayout>

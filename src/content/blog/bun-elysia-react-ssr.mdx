@@ -4,6 +4,7 @@ description: 'How to build a simple website using React, Bun and Elysia with ser
 author: 'Colin Teahan'
 pubDate: 'Sep 13 2023'
 heroImage: '/images/bun-elysia-react-banner.png'
+hashTags: 'Technical, Bun, Elysia, React'
 slug: 'ssr-with-bun-elysia-react'
 ---
 
@@ -47,14 +48,14 @@ And the following when you visit [http://localhost:3000](http://localhost:3000)
 
 Next lets go ahead and define two more folders in our project which will hold our static files and react code.
 
-```bash
+```sh
 mkdir public
 mkdir src/react
 ```
 
 You project structure should now look like this
 
-```bash
+```sh
 ├── ./your-project-name
 │   ├── node_modules
 │   ├── public            # client-side static files
@@ -71,13 +72,13 @@ You project structure should now look like this
 
 We want to be able to return static files from our server, so lets go ahead and add the following **Elysia** static plugin.
 
-```bash
+```sh
 bun add @elysiajs/static
 ```
 
 This will allow the client to request static files from our server such as images, css, js, etc. Now replace the contents of your `src/index.ts` file with
 
-```ts
+```tsx
 // src/index.ts
 import { Elysia } from 'elysia'
 import { staticPlugin } from '@elysiajs/static'
@@ -96,7 +97,7 @@ The static plugin default folder is public, and registered with `/public` prefix
 
 The next thing we want to do is be able to render our React code on the server, so let's go ahead and add the following dependencies
 
-```bash
+```sh
 bun add react react-dom  # article is using 18.2.0
 ```
 
@@ -129,7 +130,7 @@ export default function App() {
 
 Now back in our `./src/index.ts` let's import this component by adding the following line
 
-```ts
+```tsx
 // src/index.ts
 import App from './react/App'
 ```
@@ -140,7 +141,7 @@ Don't worry if you see a type error, we will fix in the next section.
 
 At this point you should see a couple type errors since we haven't specified how our project should handle JSX and React types. To fix this add the following dev dependencies
 
-```bash
+```sh
 bun add -d @types/react @types/react-dom
 ```
 
@@ -160,7 +161,7 @@ For more information refer to the [Bun JSX documentation](https://bun.sh/docs/ru
 
 Now back in our `./src/index.ts` let's go ahead and render our React component by adding the following
 
-```ts
+```tsx
 // src/index.ts
 import { Elysia } from 'elysia'
 import { staticPlugin } from '@elysiajs/static'
@@ -189,7 +190,7 @@ const app = new Elysia()
 
 Make sure your local dev server is still running if you closed your IDE earlier by running the following from your project root
 
-```bash
+```sh
 bun run dev
 ```
 

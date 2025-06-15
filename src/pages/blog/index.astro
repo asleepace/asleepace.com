@@ -5,17 +5,32 @@ import BlogPreviewList from '@/components/astro/BlogPreviewList.astro'
 import { Newspaper } from 'lucide-react'
 
 import SiteLayout from '@/layouts/SiteLayout.astro'
+import HashTags from '@/components/astro/HashTags.astro'
+import { cn } from '@/utils/cn'
 
-export const prerender = true
+export const prerender = false
 
 // =====================================
 // Blog Page
 // =====================================
 
+// Extract any filters from the url
+const hashTagParams = Astro.url.searchParams.get('tags') ?? undefined
+const tagFilters = hashTagParams
+  ?.toLowerCase()
+  .split(',')
+  .filter(Boolean)
+  .map((tag) => tag.trim())
+
 const blog = await getCollection('blog')
-const posts = blog.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-)
+const posts = blog
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .filter((blog) => {
+    if (!tagFilters) return blog
+    if (!blog.data.hashTags) return false
+    const hashTags = blog.data.hashTags.toLowerCase()
+    return tagFilters.every((tag) => hashTags.includes(tag))
+  })
 ---
 
 <SiteLayout>
@@ -23,11 +38,15 @@ const posts = blog.sort(
     <Section
       title="Articles"
       description="My thoughts unleashed on the world!"
+      hashTags={hashTagParams}
       icon={Newspaper}
     >
       <BlogPreviewList
         posts={posts}
-        className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 max-screen-sm"
+        className={cn(
+          'grid grid-cols-1 max-screen-sm',
+          posts.length === 1 ? 'grid-cols-1' : 'xl:grid-cols-3 lg:grid-cols-2'
+        )}
       />
     </Section>
   </article>

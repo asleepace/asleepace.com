@@ -1,0 +1,60 @@
+---
+import { cn } from '@/utils/cn'
+import { siteConfig } from '@/consts'
+
+interface Props {
+  className?: string
+  hashTags?: string | undefined
+}
+
+const { className, hashTags = '' } = Astro.props
+
+const tags = hashTags
+  .toLowerCase()
+  .split(',')
+  .filter(Boolean)
+  .map((item) => item.trim())
+
+const hasHashTags = Boolean(tags.length > 0)
+
+const getColor = (tag: string) => {
+  return siteConfig.hashTagColors[tag] || siteConfig.hashTagColors.default
+}
+
+const capitalize = (tag: string) => {
+  if (tag.length === 0) return ''
+  if (tag.length === 1) return tag.toUpperCase()
+  if (tag.length === 3) return tag.toUpperCase()
+  if (tag.length === 3) return tag.toUpperCase()
+  return tag.slice(0, 1).toUpperCase() + tag.slice(1).toLowerCase()
+}
+---
+
+<Fragment>
+  {
+    hasHashTags ? (
+      <div
+        class={cn(
+          'flex flex-row shrink items-center gap-4 justify-center',
+          className
+        )}
+      >
+        {tags.map((tag) => {
+          return (
+            <a
+              href={`/blog?tags=${tag}`}
+              class={cn(
+                'px-4 py-2 flex max-w-44 shrink opacity-70 hover:opacity-100 transition-all duration-300 rounded-full',
+                'text-white line-clamp-1 text-ellipsis text-sm leading-5 tracking-wider font-mono font-semibold',
+                'hover:scale-105 active:scale-95',
+                getColor(tag)
+              )}
+            >
+              {capitalize(tag)}
+            </a>
+          )
+        })}
+      </div>
+    ) : null
+  }
+</Fragment>

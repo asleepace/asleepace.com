@@ -1,11 +1,23 @@
 @import 'tailwindcss';
 
 @theme {
+  --font-size-md: 0.9375rem;
+  --font-size-2xs: 0.625rem;
+  --font-size-3xs: 0.5rem;
+
   --breakpoint-xs: 30rem;
   --breakpoint-2xl: 100rem;
   --breakpoint-3xl: 120rem;
 
   --color-dark-gray: #282a2c;
+  --color-editor-100: oklab(0.29 0 -0.02);
+  --color-editor-200: #292d3e;
+  --color-editor-300: #212432;
+  --color-accent: #ffbf00;
+  --color-accent-dark: #ffac1c;
+
+  --spacing-thin: 1px;
+  --size-thin: 1px;
 }
 
 @layer components {
@@ -15,6 +27,59 @@
     &::-webkit-scrollbar {
       display: none;
     }
+  }
+
+  .bg-glass {
+    @apply relative;
+    --glass-color: var(--bg-neutral-200);
+    --glass-edge: color-mix(in srgb, var(--glass-color), 10%);
+    --glass-center: color-mix(in srgb, var(--glass-edge), 0%, transparent);
+    --glass-direction: to bottom;
+  }
+
+  .bg-glass::before,
+  .bg-glass::after {
+    @apply content-[''] absolute inset-0 pointer-events-none;
+  }
+
+  .bg-glass::before {
+    @apply top-0;
+    transition: all;
+    transition-duration: 300ms;
+    background: linear-gradient(var(--gray-gradient)) no-repeat;
+    color: color-mix(in srgb, var(--gray), 1%, transparent);
+    mask: radial-gradient(
+      ellipse at center,
+      var(--glass-edge),
+      var(--glass-center),
+      var(--glass-edge)
+    );
+  }
+
+  .bg-glass::after {
+    @apply bottom-0 backdrop-blur-xs;
+    background-color: color-mix(in srgb, var(--glass-edge), 1%, transparent);
+    mask: radial-gradient(
+      ellipse at center,
+      var(--glass-edge),
+      var(--glass-center),
+      var(--glass-edge)
+    );
+  }
+
+  .bg-glass-light {
+    --glass-color: rgba(255, 255, 255, 0.5);
+    --glass-direction: to bottom;
+  }
+  .bg-glass-dark {
+    --glass-color: rgba(0, 0, 0, 0.9);
+    --glass-direction: to bottom;
+  }
+
+  .scrollbar-horizontal {
+    overflow-x: auto;
+    scroll-snap-align: stable;
+    scrollbar-color: red;
   }
 }
 
@@ -28,8 +93,8 @@
 }
 
 :root {
-  --accent: #ffbf00;
-  --accent-dark: #ffac1c;
+  --accent: var(--color-accent);
+  --accent-dark: var(--color-accent-dark);
   --black: 15, 18, 25;
   --gray: 96, 115, 159;
   --gray-light: 229, 233, 240;
@@ -239,26 +304,6 @@ body {
 
   strong {
     font-weight: 550;
-  }
-
-  /* reset default styles */
-  pre > code {
-    all: unset;
-  }
-
-  /* inline code styling */
-  code {
-    background-color: rgb(var(--gray-light));
-    border-radius: 4px;
-    padding: 2px 5px;
-    font-size: 16px;
-  }
-
-  /* code box styling */
-  pre {
-    padding: var(--padding-sm);
-    overflow-x: scroll;
-    font-size: 16px;
   }
 
   /* stock chart */

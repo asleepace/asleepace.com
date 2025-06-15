@@ -1,16 +1,14 @@
 ---
-import { type Blog } from '@/types'
 import FormattedDate from '@/components/astro/FormattedDate.astro'
 
 // ==============================
 //
 //  BlogPreviewItem.astro
-// 
+//
 //  This component is used to render a preview of a blog post in the blog index page.
 //  components should be stack horizontally in full screen and vertically in smaller screens.
 //
 // ==============================
-
 
 interface Props {
   data: Blog['data']
@@ -23,11 +21,17 @@ const bgImage = data?.heroImage || '/images/placeholder-5.jpg'
 const blogTitle = data?.title || 'Blog 404'
 const blogDescription = data?.description || 'This blog post does not exist.'
 const blogDate = data?.pubDate || new Date()
-
 ---
-<li class="w-full min-w-xs rounded-2xl hover:pop hover:shadow-lg bg-white hover:shadow-gray-300 hover:from-white transition-all duration-300 shadow-xl border-[1px] hover:border-transparent border-solid border-gray-100 overflow-clip">
+
+<li
+  class="w-full min-w-xs rounded-2xl hover:pop hover:shadow-lg bg-white hover:shadow-gray-300 hover:from-white transition-all duration-300 shadow-xl border-[1px] hover:border-transparent border-solid border-gray-100 overflow-clip"
+>
   <a href={`/blog/${slug}/`} class="flex flex-col h-full">
-    <div class="flex w-full bg-cover bg-center aspect-video" style=`background-image: url('${bgImage}')` />
+    <div
+      class="flex w-full bg-cover bg-center aspect-video"
+      style=`background-image: url('${bgImage}')`
+    >
+    </div>
     <div class="py-8 pl-8 pr-3 flex flex-col justify-between w-full">
       <p class="font-bold text-3xl xl:text-4xl">{blogTitle}</p>
       <div class="flex flex-col grow flex-1 py-4">

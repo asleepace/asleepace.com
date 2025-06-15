@@ -1,13 +1,16 @@
 ---
-
 interface Props {
   src?: string
   alt?: string
 }
 
 const { src, alt } = Astro.props
-
 ---
+
 <div class="flex flex-1 items-center justify-center w-full">
-  <img src={src} alt={alt} class="md:rounded-3xl md:shadow-2xl aspect-video md:max-w-screen-md w-full" />
+  <img
+    src={src}
+    alt={alt}
+    class="md:rounded-3xl md:shadow-2xl object-cover aspect-video md:max-w-screen-md w-full"
+  />
 </div>

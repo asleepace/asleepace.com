@@ -3,6 +3,7 @@ import BaseHead from '@/components/astro/BaseHead.astro'
 import Footer from '@/components/astro/Footer.astro'
 import PageNavigation from '@/components/astro/PageNavigation.astro'
 import { siteConfig } from '@/consts'
+import type { TransitionAnimationValue } from 'astro'
 import clsx from 'clsx'
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
   description?: string
   image?: string
   className?: string
+  transition?: TransitionAnimationValue
 }
 
 const {
@@ -17,21 +19,23 @@ const {
   description = 'My personal website for everything & anything.',
   className,
   image = siteConfig.coverImage,
+  transition = 'initial',
 } = Astro.props
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:name="root" transition:animate="initial">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <BaseHead title={title} description={description} image={image} />
   </head>
   <body
     class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden"
   >
     <PageNavigation />
-    <main class={clsx('w-full flex flex-col items-center', className)}>
+    <main
+      class={clsx('w-full flex flex-col items-center', className)}
+      transition:animate={transition}
+    >
       <!-- dynamic content -->
       <slot />
     </main>

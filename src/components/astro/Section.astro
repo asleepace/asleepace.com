@@ -1,17 +1,20 @@
 ---
 import * as Lucide from 'lucide-react'
+import HashTags from './HashTags.astro'
 
 interface Props {
   title: string
   description: string
   icon?: typeof Lucide.Newspaper
   anchorTag?: string
+  hashTags?: string | undefined
 }
 
 const {
   title,
   anchorTag,
   description,
+  hashTags = undefined,
   icon: SectionIcon = Lucide.FileWarning,
 } = Astro.props
 ---
@@ -23,9 +26,11 @@ const {
     <p class="text-lg text-gray-500">
       {description}
     </p>
+    { hashTags && <HashTags hashTags={hashTags} className='pt-6' /> }
+    { hashTags && <a class="text-gray-300 hover:text-sky-400 font-bold py-4" href="/blog">Clear Filters</a> }
   </div>
   <div
-    class="flex flex-col py-8 md:py-16 border-[1px] border-gray-200 border-r-transparent border-l-transparent grow bg-[radial-gradient(circle,rgba(0,0,0,0.04),rgba(255,255,255,1))] after:blur-[20px]"
+    class="flex flex-col py-8 md:py-16 border-thin border-gray-200 border-r-transparent border-l-transparent grow bg-[radial-gradient(circle,rgba(0,0,0,0.04),rgba(255,255,255,1))] after:blur-[20px]"
   >
     <slot />
   </div>

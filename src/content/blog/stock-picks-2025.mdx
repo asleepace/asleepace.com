@@ -3,6 +3,7 @@ title: 'Top Stock Picks for 2025'
 description: 'Investment Opportunities for 2025 focusing on quantum computing, renewable energy, artificial intelligence, and emerging technologies.'
 pubDate: 'Dec 24 2024'
 heroImage: '/images/stock-picks-2025.png'
+hashTags: 'Finance, Stocks'
 slug: 'stock-picks-2025'
 ---
 

@@ -1,62 +1,17 @@
 {
+  "[mdx]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode"
+  },
   "files.associations": {
-    "*.css": "tailwindcss"
+    "*.css": "tailwindcss",
+    "*.mdx": "mdx"
   },
-  "editor.quickSuggestions": {
-    "strings": true
-  },
+  "typescript.inlayHints.parameterNames.enabled": "all",
   "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.format.semicolons": "remove",
   "prettier.singleQuote": true,
   "prettier.semi": false,
-  "editor.formatOnSave": true,
-  "cSpell.ignoreWords": [
-    "Astro",
-    "Codespaces",
-    "Elysia",
-    "asleepace",
-    "astrojs",
-    "bunx",
-    "changefreq",
-    "classNames",
-    "consts",
-    "elysiajs",
-    "frontmatter",
-    "htmx",
-    "lastmod",
-    "mkdir",
-    "outdir",
-    "preact",
-    "rgb",
-    "rgba",
-    "rngs",
-    "tailwindcss",
-    "tsconfigs"
-  ],
-  "cSpell.words": [
-    "Ballin",
-    "beara",
-    "Bento",
-    "bidi",
-    "clsx",
-    "extar",
-    "grayscale",
-    "KHTML",
-    "lucide",
-    "mailgod",
-    "nanostores",
-    "ncdu",
-    "nilly",
-    "nowrap",
-    "oklch",
-    "overscroll",
-    "palenight",
-    "Prerendered",
-    "resizer",
-    "Segoe",
-    "smushed",
-    "Substree"
-  ]
+  "editor.formatOnSave": true
 }
