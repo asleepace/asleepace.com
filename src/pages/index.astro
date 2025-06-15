@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import BentoBox from '@/layouts/BentoBox.astro'
-import { db, PageMetrics } from 'astro:db'
+import { db, sql, PageMetrics } from 'astro:db'
 import { eq } from 'astro:db'
 
 export const prerender = true
@@ -30,6 +30,15 @@ const feed = posts.slice(1).map(({ data, id }) => ({
 }))
 
 const metrics = pageMetricsData.at(0)
+
+if (metrics) {
+  await db
+    .update(PageMetrics)
+    .set({ views: sql`views + 1`, updatedAt: new Date() })
+    .where(eq(PageMetrics.route, '/'))
+
+  console.log({ metrics })
+}
 ---
 
 <SiteLayout
