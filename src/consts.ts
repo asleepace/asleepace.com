@@ -121,9 +121,6 @@ export const SITE_TITLE = 'Asleepace'
 export const SITE_DESCRIPTION = 'a random collection of internet treasures'
 export const SITE_URL = 'https://asleepace.com'
 
-// NOTE: Must be set when both creating and deleting cookies!
-export const COOKIE_PATH = '/'
-
 export const siteData = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,

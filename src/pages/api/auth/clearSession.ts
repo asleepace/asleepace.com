@@ -1,4 +1,4 @@
-import { COOKIE_PATH, PATH } from '@/consts'
+import { siteConfig } from '@/consts'
 import type { APIRoute } from 'astro'
 
 export const prerender = false
@@ -17,7 +17,6 @@ export const route = '/api/auth/clearSession'
  */
 
 export const POST: APIRoute = async ({ cookies, redirect }) => {
-  console.log(`\nPOST ${route} clearSession: '${COOKIE_PATH}'`)
-  cookies.delete('session', { path: COOKIE_PATH }) // IMPORTANT: must match path that was set!
-  return redirect(PATH.ADMIN_LOGIN())
+  cookies.delete('session', { path: '/' }) // IMPORTANT: must match path that was set!
+  return redirect(siteConfig.path.adminLogin({}))
 }

@@ -1,0 +1,35 @@
+---
+import AdminPanel from '@/layouts/AdminPanel.astro'
+import { Try } from '@asleepace/try'
+
+export const prerender = false
+
+const { isLoggedIn, user } = Astro.locals
+
+if (!isLoggedIn || !user) {
+  return Astro.redirect(redirectTo, 302)
+}
+
+const getLogsPM2 = async () => {
+  const { stdout } = Bun.spawn(['pm2', 'jlist'], {
+    stdout: 'pipe',
+    stderr: 'pipe',
+  })
+  return new Response(stdout)
+}
+
+const [value, error] = await Try.catch(getLogsPM2)
+
+let output = ''
+
+if (value) {
+  output = await value.text()
+}
+---
+
+<AdminPanel>
+  <div class="p-4 rounded-full bg-gray">
+    {error && <p class="text-red-500">{error.message}</p>}
+    {value && <p class="text-black">{output}</p>}
+  </div>
+</AdminPanel>

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { Users, Sessions } from '@/db/index'
-import { COOKIE_PATH, PATH } from '@/consts'
+import { PATH, siteConfig } from '@/consts'
 
 export const prerender = false
 export const route = '/api/auth'
@@ -93,7 +93,7 @@ export const POST: APIRoute = async ({
 
     const cookieOptions = {
       /** where the cookie is valid (must match to delete) */
-      path: COOKIE_PATH,
+      path: siteConfig.cookiePath,
       /** the domain that the cookie is valid for */
       domain: cookieDomain,
       /** javascript cannot access the cookie */

@@ -1,32 +1,30 @@
 ---
-import BaseHead from "@/components/astro/BaseHead.astro"
-import Header from "@/components/astro/Header.astro"
-import Footer from "@/components/astro/Footer.astro"
-import { PATH, siteData } from '@/consts'
+import BaseHead from '@/components/astro/BaseHead.astro'
+import Header from '@/components/astro/Header.astro'
+import Footer from '@/components/astro/Footer.astro'
+import { siteData, siteConfig } from '@/consts'
 
 export const prerender = false
 
-const COOKIE_PATH = '/'
-
 /**
  *  NOTE: This page should clear the session cookie and redirect to the login page.
- * 
+ *
  *  The html should be rendered as a normal page, not as a redirect.
- * 
+ *
  *  @note the astro redirect() might act strange on this page.
- * 
+ *
  *  @note the path needs to match the path that was set in the cookie.
- * 
+ *
  */
 console.warn('[/admin/logout] clearing session...')
 
 Astro.cookies.delete('session', {
-  path: COOKIE_PATH, // IMPORTANT: must match the path that was set in the cookie.
+  path: siteConfig.cookiePath, // IMPORTANT: must match the path that was set in the cookie.
 })
 
-Astro.redirect(PATH.ADMIN_LOGIN())
-
+Astro.redirect(siteConfig.path.adminLogin({}))
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -34,17 +32,25 @@ Astro.redirect(PATH.ADMIN_LOGIN())
   </head>
   <body class="min-h-screen flex flex-col bg-white">
     <Header title={siteData.title} />
-    <main class="flex flex-col grow max-w-screen-lg justify-center items-center mx-auto p-4">
-      <div class="flex flex-col items-center gap-4 bg-white rounded-md p-8 py-12 min-w-screen-sm">
-        <p class="text-7xl">👋</p>  
+    <main
+      class="flex flex-col grow max-w-screen-lg justify-center items-center mx-auto p-4"
+    >
+      <div
+        class="flex flex-col items-center gap-4 bg-white rounded-md p-8 py-12 min-w-screen-sm"
+      >
+        <p class="text-7xl">👋</p>
         <p class="text-5xl font-bold text-center">Goodbye!</p>
-        <p class="text-center px-2">Come back soon.</p>  
+        <p class="text-center px-2">Come back soon.</p>
         <div class="flex flex-col items-center gap-2">
-          <a href={PATH.ADMIN_LOGIN()}>
-            <button class="bg-blue-500 hover:bg-blue-400 w-full px-16 text-white rounded-md p-2">Go to login</button>
+          <a href={siteConfig.path.adminLogin({})}>
+            <button
+              class="bg-blue-500 hover:bg-blue-400 w-full px-16 text-white rounded-md p-2"
+              >Go to login</button
+            >
           </a>
         </div>
+      </div>
+      <Footer />
     </main>
-    <Footer />
   </body>
 </html>
