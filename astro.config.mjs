@@ -7,6 +7,8 @@ import mdx from '@astrojs/mdx'
 
 import tailwindcss from '@tailwindcss/vite'
 
+import db from '@astrojs/db';
+
 /**
  *  ## AstroConfiguration
  *
@@ -20,23 +22,19 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://asleepace.com',
-  integrations: [
-    mdx({
-      optimize: {
-        // NOTE: Ignore custom components:
-        // https://docs.astro.build/en/guides/integrations-guide/mdx/#optimize
-        ignoreElementNames: ['StockChart', 'pre', 'code'],
-      },
-      extendMarkdownConfig: false,
-      syntaxHighlight: 'shiki',
-      shikiConfig: {
-        theme: 'dracula',
-        wrap: true,
-      },
-    }),
-    sitemap(),
-    react(),
-  ],
+  integrations: [mdx({
+    optimize: {
+      // NOTE: Ignore custom components:
+      // https://docs.astro.build/en/guides/integrations-guide/mdx/#optimize
+      ignoreElementNames: ['StockChart', 'pre', 'code'],
+    },
+    extendMarkdownConfig: false,
+    syntaxHighlight: 'shiki',
+    shikiConfig: {
+      theme: 'dracula',
+      wrap: true,
+    },
+  }), sitemap(), react(), db()],
   vite: {
     plugins: [tailwindcss()],
     build: {

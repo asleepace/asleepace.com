@@ -1,0 +1,17 @@
+{
+  "name": "Ubuntu 23.10 Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "mongodb.mongodb-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [3000, 8000, 27017],
+  "postCreateCommand": "sudo service mongodb start",
+  "remoteUser": "vscode"
+}
