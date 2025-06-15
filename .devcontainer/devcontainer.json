@@ -14,6 +14,9 @@
     }
   },
   "forwardPorts": [3000, 8000, 80, 443],
-  "postCreateCommand": "sudo service nginx start",
-  "remoteUser": "cursor"
+  "postCreateCommand": "sudo service nginx start && chmod 600 ~/.ssh/id_* && ssh-add ~/.ssh/id_*",
+  "remoteUser": "cursor",
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/cursor/.ssh,type=bind,consistency=cached"
+  ]
 }
