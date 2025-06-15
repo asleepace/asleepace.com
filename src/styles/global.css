@@ -32,7 +32,7 @@
   .bg-glass {
     @apply relative;
     --glass-color: var(--bg-neutral-200);
-    --glass-edge: color-mix(in srgb, var(--glass-color), 90%);
+    --glass-edge: color-mix(in srgb, var(--glass-color), 10%);
     --glass-center: color-mix(in srgb, var(--glass-edge), 0%, transparent);
     --glass-direction: to bottom;
   }
@@ -49,7 +49,7 @@
     background: linear-gradient(var(--gray-gradient)) no-repeat;
     color: color-mix(in srgb, var(--gray), 1%, transparent);
     mask: radial-gradient(
-      var(--glass-direction),
+      ellipse at center,
       var(--glass-edge),
       var(--glass-center),
       var(--glass-edge)
@@ -58,13 +58,9 @@
 
   .bg-glass::after {
     @apply bottom-0 backdrop-blur-xs;
-    background: linear-gradient(
-        color-mix(in srgb, var(--gray-gradient), 10%, transparent)
-      )
-      no-repeat;
-    background-color: color-mix(in srgb, var(--glass-edge), 10%, transparent);
+    background-color: color-mix(in srgb, var(--glass-edge), 1%, transparent);
     mask: radial-gradient(
-      var(--glass-direction),
+      ellipse at center,
       var(--glass-edge),
       var(--glass-center),
       var(--glass-edge)
@@ -72,12 +68,12 @@
   }
 
   .bg-glass-light {
-    --glass-color: rgba(255, 255, 255, 1);
+    --glass-color: rgba(255, 255, 255, 0.5);
     --glass-direction: to bottom;
   }
   .bg-glass-dark {
     --glass-color: rgba(0, 0, 0, 0.9);
-    --glass-direaction: to bottom;
+    --glass-direction: to bottom;
   }
 
   .scrollbar-horizontal {
