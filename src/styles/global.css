@@ -12,6 +12,8 @@
   --color-dark-gray: #282a2c;
   --color-editor-100: #292d3e;
   --color-editor-200: #212432;
+  --color-accent: #ffbf00;
+  --color-accent-dark: #ffac1c;
 
   --spacing-thin: 1px;
   --size-thin: 1px;
@@ -86,8 +88,8 @@
 }
 
 :root {
-  --accent: #ffbf00;
-  --accent-dark: #ffac1c;
+  --accent: var(--color-accent);
+  --accent-dark: var(--color-accent-dark);
   --black: 15, 18, 25;
   --gray: 96, 115, 159;
   --gray-light: 229, 233, 240;
@@ -139,8 +141,6 @@ body {
   overscroll-behavior-x: none;
   min-width: 320px;
 }
-
-
 
 body {
   font-family: 'Atkinson', sans-serif;
