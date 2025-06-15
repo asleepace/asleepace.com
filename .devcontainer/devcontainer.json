@@ -1,22 +1,19 @@
 {
-  "name": "Ubuntu 24.04 Dev",
+  "name": "asleepace.com Dev",
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "runArgs": ["--hostname=asleepace.local"],
   "customizations": {
     "vscode": {
       "extensions": [
-        "anysphere.remote-containers",
         "ms-vscode.vscode-typescript-next",
         "astro-build.astro-vscode",
         "esbenp.prettier-vscode"
       ]
     }
   },
-  "forwardPorts": [3000, 8000, 80, 443],
-  "postCreateCommand": "sudo service nginx start && chmod 600 ~/.ssh/id_* && ssh-add ~/.ssh/id_*",
-  "remoteUser": "cursor",
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/cursor/.ssh,type=bind,consistency=cached"
-  ]
+  "forwardPorts": [80, 4321, 3030],
+  "postCreateCommand": "sudo service nginx start && git config --global user.name 'asleepace' && git config --global user.email 'colin_teahan@yahoo.com'",
+  "remoteUser": "cursor"
 }

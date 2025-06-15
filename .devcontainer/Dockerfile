@@ -17,6 +17,11 @@ RUN apt-get update && apt-get install -y \
 RUN useradd -m -s /bin/zsh cursor && \
     echo "cursor ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# Copy and configure NGINX
+COPY nginx-dev.conf /etc/nginx/sites-available/asleepace.local
+RUN ln -s /etc/nginx/sites-available/asleepace.local /etc/nginx/sites-enabled/ && \
+    rm -f /etc/nginx/sites-enabled/default
+
 # Switch to cursor user
 USER cursor
 WORKDIR /home/cursor
@@ -48,4 +53,6 @@ RUN echo '' >> ~/.zshrc && \
     echo 'alias nginx-stop="sudo service nginx stop"' >> ~/.zshrc && \
     echo 'alias nginx-restart="sudo service nginx restart"' >> ~/.zshrc && \
     echo 'alias nginx-status="sudo service nginx status"' >> ~/.zshrc && \
-    echo 'alias bun-dev="bun --watch"' >> ~/.zshrc
+    echo 'alias nginx-reload="sudo service nginx reload"' >> ~/.zshrc && \
+    echo 'alias astro-dev="bun run dev"' >> ~/.zshrc && \
+    echo 'alias logs-nginx="sudo tail -f /var/log/nginx/error.log"' >> ~/.zshrc
