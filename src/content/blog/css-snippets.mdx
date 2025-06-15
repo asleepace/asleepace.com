@@ -20,6 +20,21 @@ slug: 'css-snippets'
 }
 ```
 
+### Conditionals
+
+```css
+@import 'tailwindcss';
+/* Only style code NOT inside pre tags */
+code:not(pre code) {
+  @apply bg-slate-100 text-[#FF79C6] px-1.5 py-1.5 rounded font-black text-sm font-mono;
+}
+
+/* Ensure code blocks keep their styling */
+pre code {
+  @apply bg-transparent text-inherit p-0 rounded-none;
+}
+```
+
 ### Scrollbar None
 
 ```css

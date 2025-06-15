@@ -33,6 +33,7 @@ const stockSymbol = `${stockExchange}:${ticker}`.toUpperCase()
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script
+  is:inline
   define:vars={{ stockSymbol, theme, chartStyle, chartInterval }}
 >
   new TradingView.widget({

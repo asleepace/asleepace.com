@@ -20,19 +20,23 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://asleepace.com',
-  integrations: [mdx({
-    optimize: {
-      // NOTE: Ignore custom components:
-      // https://docs.astro.build/en/guides/integrations-guide/mdx/#optimize
-      ignoreElementNames: ['StockChart', 'pre', 'code']
-    },
-    extendMarkdownConfig: true,
-    syntaxHighlight: 'shiki',
-    shikiConfig: {
-      theme: 'dracula',
-      wrap: true
-    },
-  }), sitemap(), react()],
+  integrations: [
+    mdx({
+      optimize: {
+        // NOTE: Ignore custom components:
+        // https://docs.astro.build/en/guides/integrations-guide/mdx/#optimize
+        ignoreElementNames: ['StockChart', 'pre', 'code'],
+      },
+      extendMarkdownConfig: false,
+      syntaxHighlight: 'shiki',
+      shikiConfig: {
+        theme: 'dracula',
+        wrap: true,
+      },
+    }),
+    sitemap(),
+    react(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
@@ -41,10 +45,6 @@ export default defineConfig({
   }),
   security: {
     checkOrigin: false, // CORS
-  },
-  markdown: {
-    syntaxHighlight: 'shiki',
-    gfm: true
   },
   server: {
     // NOTE: These don't appear to work, see CORS middleware instead
