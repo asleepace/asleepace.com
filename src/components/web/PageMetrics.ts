@@ -3,7 +3,7 @@ import confetti from 'canvas-confetti'
 
 const Styles = {
   button:
-    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-125 transform duration-150',
+    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-105 transform duration-150',
 }
 
 type PageMetricButtonProps = {
@@ -17,7 +17,7 @@ class PageMetricButton extends HTMLElement {
   static TAG = 'page-metric-button'
 
   static get observedAttributes() {
-    return ['icon', 'text']
+    return ['icon', 'text', 'views', 'likes', 'comments']
   }
 
   static register() {
@@ -110,6 +110,14 @@ export class PageMetrics extends HTMLElement {
   }
 
   protected connectedCallback() {
+
+    const views = Number(this.getAttribute('views') ?? '0')
+    const likes = Number(this.getAttribute('likes') ?? '0')
+    // const comments = JSON.parse(this.getAttribute('comments') ?? '[]')
+
+    this.state.views = views
+    this.state.likes = likes
+    // this.state.comments = comments
     this.render()
   }
 

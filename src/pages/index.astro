@@ -17,7 +17,11 @@ const posts = blog.sort(
 )
 
 const featured = posts.at(0)!
-const metrics = await db.select().from(PageMetrics).where(eq(PageMetrics.route, '/'))
+const pageMetricsData = await db
+  .select()
+  .from(PageMetrics)
+  .where(eq(PageMetrics.route, '/'))
+  .limit(1)
 
 const feed = posts.slice(1).map(({ data, id }) => ({
   name: data.title,
@@ -25,7 +29,7 @@ const feed = posts.slice(1).map(({ data, id }) => ({
   href: `/blog/${id}`,
 }))
 
-console.log({ metrics })
+const metrics = pageMetricsData.at(0)
 ---
 
 <SiteLayout
@@ -34,4 +38,13 @@ console.log({ metrics })
   transition:animate="none"
 >
   <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
+  <page-metrics
+    views={metrics?.views}
+    likes={metrics?.likes}
+    comments={metrics?.comments}></page-metrics>
 </SiteLayout>
+<script>
+  import { PageMetrics } from '@/components/web/PageMetrics'
+
+  PageMetrics.register()
+</script>
