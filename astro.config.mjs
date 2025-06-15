@@ -39,6 +39,11 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        external: [/highlight\.js\/styles\/.+\.css$/, /typescript\.js/],
+      },
+    },
   },
   adapter: node({
     mode: 'standalone',
@@ -46,13 +51,5 @@ export default defineConfig({
   security: {
     checkOrigin: false, // CORS
   },
-  server: {
-    // NOTE: These don't appear to work, see CORS middleware instead
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*',
-    //   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
-    //   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    //   'Access-Control-Allow-Credentials': 'true',
-    // },
-  },
+  server: {},
 })

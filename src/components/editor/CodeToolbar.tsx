@@ -5,6 +5,8 @@ export type CodeToolbarProps = {
   onSave: () => void
   onRun: () => void
   onSettings: () => void
+  isCompiling: boolean
+  errors: string[]
 }
 
 export function CodeToolbar(props: CodeToolbarProps) {

@@ -10,8 +10,9 @@
   --breakpoint-3xl: 120rem;
 
   --color-dark-gray: #282a2c;
-  --color-editor-100: #292d3e;
-  --color-editor-200: #212432;
+  --color-editor-100: oklab(0.29 0 -0.02);
+  --color-editor-200: #292d3e;
+  --color-editor-300: #212432;
   --color-accent: #ffbf00;
   --color-accent-dark: #ffac1c;
 

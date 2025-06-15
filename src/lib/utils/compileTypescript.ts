@@ -1,5 +1,3 @@
-import tsc, { type TranspileOptions, type CompilerOptions } from 'typescript'
-
 /**
  * ## Compile TypeScript
  *
@@ -22,11 +20,12 @@ import tsc, { type TranspileOptions, type CompilerOptions } from 'typescript'
  * compileTypescript(code)
  * ```
  */
-export function compileTypescript(
+export async function compileTypescript(
   code: string,
-  compilerOptions: CompilerOptions = {},
-  transpileOptions: TranspileOptions = {}
+  compilerOptions: any = {},
+  transpileOptions: any = {}
 ) {
+  const tsc = await import('typescript')
   return tsc.transpileModule(code, {
     compilerOptions: {
       module: tsc.ModuleKind.NodeNext,
