@@ -11,9 +11,20 @@ const { class: className } = Astro.props
 ---
 
 <div class={cn('h-[78px]', className)}>
-  <page-metrics views="0" likes="0"></page-metrics>
+  <page-metrics></page-metrics>
 </div>
 <script>
   import { PageMetrics } from '@/components/web/PageMetrics'
+  import { actions } from 'astro:actions'
   PageMetrics.register()
+
+  document.addEventListener('astro:page-load', () => {
+    actions.onPageView({ referer: window.location.href }).then(({ data }) => {
+      if (!data) return
+      PageMetrics.collectElements().forEach((elem) => {
+        elem.setAttribute('likes', String(data.likes))
+        elem.setAttribute('views', String(data.views))
+      })
+    })
+  })
 </script>

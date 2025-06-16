@@ -1,12 +1,8 @@
 import clsx from 'clsx'
 import confetti from 'canvas-confetti'
 
-const Styles = {
-  button:
-    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-105 transform duration-150',
-}
-
 type PageMetricButtonProps = {
+  hoverIcon: string | undefined
   icon: string
   text: string
   ariaLabel?: string
@@ -17,7 +13,7 @@ class PageMetricButton extends HTMLElement {
   static TAG = 'page-metric-button'
 
   static get observedAttributes() {
-    return ['icon', 'text', 'views', 'likes', 'comments']
+    return ['icon', 'text', 'onclick']
   }
 
   static register() {
@@ -27,18 +23,39 @@ class PageMetricButton extends HTMLElement {
   }
 
   private state: PageMetricButtonProps = {
+    hoverIcon: undefined,
     icon: '',
     text: '',
   }
 
+  className: string =
+    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-105 transform duration-150'
+
   constructor() {
     super()
-    this.className = Styles.button
+    this.state.hoverIcon = this.getAttribute('hover:icon') ?? undefined
+    if (this.state.hoverIcon) {
+      this.addEventListener('mouseover', this.onHoverEnter)
+      this.addEventListener('mouseleave', this.onHoverLeave)
+    }
+  }
+
+  onHoverEnter = () => {
+    const iconElement = this.getElementsByTagName('span').item(0)
+    if (!iconElement || !this.state.hoverIcon) return
+    iconElement.textContent = this.state.hoverIcon
+  }
+
+  onHoverLeave = () => {
+    const iconElement = this.getElementsByTagName('span').item(0)
+    if (!iconElement) return
+    iconElement.textContent = this.state.icon
   }
 
   public render() {
+    const onclick = this.getAttribute('onclick')
     this.innerHTML = `
-      <button class="${Styles.button}">
+      <button onclick="${onclick}" class="${this.className}">
         <span class="mr-1">${this.state.icon}</span>
         <span class="text-sm">${this.state.text}</span>
       </button>
@@ -57,8 +74,9 @@ class PageMetricButton extends HTMLElement {
     if (oldValue === newValue) return
     if (name in this.state) {
       this.state[name] = newValue
+    } else if (name === 'onclick') {
     } else {
-      console.warn('missing attribute:', name)
+      // console.warn('missing attribute:', name)
     }
   }
 }
@@ -92,29 +110,6 @@ export class PageMetrics extends HTMLElement {
   constructor() {
     super()
     this.className = [this.className, PageMetrics.parentStyle].join(' ')
-    document.addEventListener('astro:page-load', this.onPageLoad)
-  }
-
-  onPageLoad = () => this.fetchPageMetrics()
-
-  async fetchPageMetrics() {
-    return fetch('/api/metrics', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-page-metrics': window.location.href,
-        Accept: 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((metrics) => {
-        console.log('[PageMetrics] loaded:', metrics)
-        this.state.likes = metrics.likes
-        this.state.views = metrics.views
-        this.state.comments = metrics.comments
-        this.render()
-      })
-      .catch(console.warn)
   }
 
   public onLikeHandler = () => {
@@ -131,15 +126,16 @@ export class PageMetrics extends HTMLElement {
   private render() {
     const { likes, views, comments } = this.state
     const cmnts = comments.length
+    const onLike = 'this.parentElement?.onLikeHandler?.()'
     this.innerHTML = `
       <page-metric-button icon="👀" text="${views}"></page-metric-button>
-      <page-metric-button icon="🤍" text="${likes}"></page-metric-button>
+      <page-metric-button onclick="${onLike}" icon="🤍" hover:icon="❤️" text="${likes}"></page-metric-button>
       <page-metric-button icon="💬" text="${cmnts}"></page-metric-button>
     `
   }
 
   protected connectedCallback() {
-    // this.fetchPageMetrics()
+    this.getNextStateAndRender()
   }
 
   protected disconnectedCallback() {
@@ -159,6 +155,6 @@ export class PageMetrics extends HTMLElement {
     oldValue: string | null,
     newValue: string | null
   ) {
-    // this.getNextStateAndRender()
+    this.getNextStateAndRender()
   }
 }

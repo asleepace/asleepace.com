@@ -4,15 +4,18 @@ import { db, PageMetrics, sql } from 'astro:db'
 
 export const onPageView = defineAction({
   input: z.object({
-    route: z.string(),
+    referer: z.string().optional(),
   }),
   async handler(input, context) {
     try {
-      console.log('[actions] onPageView:', context.url)
+      const referer = input.referer ?? context.request.headers.get('referer')
 
-      // use route as unique key
-      // const route = context.url.pathname
-      const route = input.route
+      if (!referer) throw new Error('Missing referer!')
+
+      const route = new URL(referer).pathname
+      console.log('[actions] onPageView:', route)
+
+      if (!route) throw new Error('Missing route or referer!')
 
       // insert or update page metrics and incrament
       const pageMetrics = await db
@@ -40,7 +43,7 @@ export const onPageView = defineAction({
 
       return pageMetrics
     } catch (e) {
-      console.warn('[actions] failed to update page metrics:', e)
+      console.warn('[actions] onPageView:', e)
       return undefined
     }
   },
