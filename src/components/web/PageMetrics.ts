@@ -82,16 +82,27 @@ class PageMetricButton extends HTMLElement {
 }
 
 export class PageMetrics extends HTMLElement {
-  static readonly observedAttributes = [
-    'views',
-    'likes',
-    'comments',
-    'class',
-    'hasLiked',
-  ]
+  static readonly observedAttributes = ['views', 'likes', 'comments', 'class']
   static readonly TAG: string = 'page-metrics'
   static readonly events = {
     onLikedPage: 'client:on-liked-page',
+  }
+
+  static storageKeys = {
+    get hasLiked() {
+      return `liked:${window.location.pathname}`
+    },
+  }
+
+  static toggleLiked() {
+    const toggled = !PageMetrics.isLiked()
+    localStorage.setItem(this.storageKeys.hasLiked, String(toggled))
+    return toggled
+  }
+
+  static isLiked(): boolean {
+    const hasLikedData = localStorage.getItem(this.storageKeys.hasLiked)
+    return hasLikedData === 'true'
   }
 
   static register() {
@@ -111,7 +122,7 @@ export class PageMetrics extends HTMLElement {
   )
 
   private state = {
-    hasLiked: false,
+    hasLiked: PageMetrics.isLiked(),
     comments: [],
     likes: 0,
     views: 1,
@@ -121,23 +132,21 @@ export class PageMetrics extends HTMLElement {
     super()
     this.className = [this.className, PageMetrics.parentStyle].join(' ')
     const savedLiked = localStorage.getItem(`liked:${window.location.pathname}`)
-    this.state.hasLiked = savedLiked === "true"
+    this.state.hasLiked = savedLiked === 'true'
   }
 
   public onLikeHandler = () => {
+    this.state.hasLiked = PageMetrics.toggleLiked()
     this.dispatchEvent(
       new CustomEvent(PageMetrics.events.onLikedPage, {
-        detail: {},
+        detail: {
+          unliked: this.state.hasLiked === false
+        },
         bubbles: true,
       })
     )
     this.render()
     confetti()
-  }
-
-  public onViewHandler = () => {
-    this.state.views += 1
-    this.render()
   }
 
   private render() {
@@ -160,16 +169,17 @@ export class PageMetrics extends HTMLElement {
   }
 
   protected disconnectedCallback() {
-    this.onViewHandler()
+    localStorage.setItem(
+      PageMetrics.storageKeys.hasLiked,
+      String(this.state.hasLiked)
+    )
   }
 
   getNextStateAndRender() {
     const views = Number(this.getAttribute('views') ?? '0')
     const likes = Number(this.getAttribute('likes') ?? '0')
-    const hasLiked = this.getAttribute('hasLiked') ?? 'false'
     this.state.views = views
     this.state.likes = likes
-    this.state.hasLiked = Boolean(hasLiked === 'true')
     this.render()
   }
 
