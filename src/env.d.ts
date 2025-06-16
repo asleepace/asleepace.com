@@ -3,6 +3,14 @@
 
 import { type CollectionEntry } from 'astro:content'
 
+export type PageMetrics = {
+  views: number
+  likes: number
+  comments: unknown
+  createdAt: Date
+  updatedAt: Date
+}
+
 // declare global {
 //   type ToString = { toString(): string }
 //   type Blog = CollectionEntry<'blog'>
@@ -34,6 +42,7 @@ declare global {
       isLoggedIn: boolean
       user: Record<string, any> | undefined
       requestId: number
+      pageMetrics: PageMetrics
     }
   }
 }

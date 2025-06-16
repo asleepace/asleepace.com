@@ -2,10 +2,8 @@
 import { getCollection } from 'astro:content'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import BentoBox from '@/layouts/BentoBox.astro'
-import { db, sql, PageMetrics } from 'astro:db'
-import { eq } from 'astro:db'
 
-export const prerender = true
+export const prerender = false
 
 // =====================================
 // Home Page
@@ -17,26 +15,12 @@ const posts = blog.sort(
 )
 
 const featured = posts.at(0)!
-const pageMetricsData = await db
-  .select()
-  .from(PageMetrics)
-  .where(eq(PageMetrics.route, '/'))
-  .limit(1)
 
 const feed = posts.slice(1).map(({ data, id }) => ({
   name: data.title,
   date: data.updatedDate ?? data.pubDate,
   href: `/blog/${id}`,
 }))
-
-const metrics = pageMetricsData.at(0)
-
-if (metrics) {
-  await db
-    .update(PageMetrics)
-    .set({ views: sql`views + 1`, updatedAt: new Date() })
-    .where(eq(PageMetrics.route, '/'))
-}
 ---
 
 <SiteLayout
@@ -45,13 +29,19 @@ if (metrics) {
   transition:animate="none"
 >
   <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
-  <page-metrics
-    views={metrics?.views}
-    likes={metrics?.likes}
-    comments={metrics?.comments}></page-metrics>
+  <page-metrics views={1000} likes={12} comments={""}></page-metrics>
 </SiteLayout>
 <script>
   import { PageMetrics } from '@/components/web/PageMetrics'
+  import { actions } from 'astro:actions'
 
   PageMetrics.register()
+
+  actions.onPageView({ route: '/' }).then(({ data: metrics }) => {
+    if (!metrics) return
+    PageMetrics.collectElements().map((page) => {
+      page.setAttribute('views', String(metrics.views))
+      page.setAttribute('likes', String(metrics.likes))
+    })
+  })
 </script>

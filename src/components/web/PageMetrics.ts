@@ -64,6 +64,7 @@ class PageMetricButton extends HTMLElement {
 }
 
 export class PageMetrics extends HTMLElement {
+  static readonly observedAttributes = ['views', 'likes', 'comments']
   static readonly TAG: string = 'page-metrics'
 
   static register() {
@@ -71,6 +72,11 @@ export class PageMetrics extends HTMLElement {
     if (customElements.get(PageMetrics.TAG)) return
     window.customElements.define(PageMetrics.TAG, PageMetrics)
     PageMetricButton.register()
+  }
+
+  static collectElements() {
+    const elements = document.getElementsByTagName(this.TAG)
+    return [...elements] as PageMetrics[]
   }
 
   static readonly parentStyle = clsx(
@@ -110,18 +116,22 @@ export class PageMetrics extends HTMLElement {
   }
 
   protected connectedCallback() {
-
-    const views = Number(this.getAttribute('views') ?? '0')
-    const likes = Number(this.getAttribute('likes') ?? '0')
-    // const comments = JSON.parse(this.getAttribute('comments') ?? '[]')
-
-    this.state.views = views
-    this.state.likes = likes
-    // this.state.comments = comments
-    this.render()
+    this.getNextStateAndRender()
   }
 
   protected disconnectedCallback() {
     this.onViewHandler()
+  }
+
+  getNextStateAndRender() {
+    const views = Number(this.getAttribute('views') ?? '0')
+    const likes = Number(this.getAttribute('likes') ?? '0')
+    this.state.views = views
+    this.state.likes = likes
+    this.render()
+  }
+
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
+    this.getNextStateAndRender()
   }
 }

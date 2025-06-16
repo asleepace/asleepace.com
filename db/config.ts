@@ -2,7 +2,7 @@ import { defineDb, defineTable, column, NOW } from 'astro:db'
 
 export const PageMetrics = defineTable({
   columns: {
-    route: column.text({ unique: true, primaryKey: true }),
+    route: column.text({ primaryKey: true }),
     views: column.number({ default: 0 }),
     likes: column.number({ default: 0 }),
     comments: column.json({ default: [] }),
