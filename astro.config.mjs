@@ -21,6 +21,7 @@ import db from '@astrojs/db';
  */
 
 export default defineConfig({
+  output: 'server',
   site: 'https://asleepace.com',
   integrations: [mdx({
     optimize: {

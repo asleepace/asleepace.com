@@ -27,21 +27,20 @@ const feed = posts.slice(1).map(({ data, id }) => ({
   title="Home"
   className="justify-center grow"
   transition:animate="none"
+  htmx
 >
   <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
-  <page-metrics views={1000} likes={12} comments={""}></page-metrics>
+  <div class="pb-4">
+    <page-metrics
+      views="0"
+      likes="0"
+      hx-swap="outerHTML"
+      hx-trigger="load"
+      hx-post="/api/metrics"></page-metrics>
+  </div>
 </SiteLayout>
 <script>
   import { PageMetrics } from '@/components/web/PageMetrics'
-  import { actions } from 'astro:actions'
 
   PageMetrics.register()
-
-  actions.onPageView({ route: '/' }).then(({ data: metrics }) => {
-    if (!metrics) return
-    PageMetrics.collectElements().map((page) => {
-      page.setAttribute('views', String(metrics.views))
-      page.setAttribute('likes', String(metrics.likes))
-    })
-  })
 </script>

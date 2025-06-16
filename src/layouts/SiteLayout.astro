@@ -12,6 +12,7 @@ interface Props {
   image?: string
   className?: string
   transition?: TransitionAnimationValue
+  htmx?: boolean
 }
 
 const {
@@ -20,13 +21,19 @@ const {
   className,
   image = siteConfig.coverImage,
   transition = 'initial',
+  htmx = false,
 } = Astro.props
 ---
 
 <!doctype html>
 <html lang="en" transition:name="root" transition:animate="initial">
   <head>
-    <BaseHead title={title} description={description} image={image} />
+    <BaseHead
+      title={title}
+      description={description}
+      image={image}
+      htmx={htmx}
+    />
   </head>
   <body
     class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden"
