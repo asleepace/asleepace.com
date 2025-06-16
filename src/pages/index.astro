@@ -30,17 +30,4 @@ const feed = posts.slice(1).map(({ data, id }) => ({
   htmx
 >
   <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
-  <div class="pb-4">
-    <page-metrics
-      views="0"
-      likes="0"
-      hx-swap="outerHTML"
-      hx-trigger="load"
-      hx-post="/api/metrics"></page-metrics>
-  </div>
 </SiteLayout>
-<script>
-  import { PageMetrics } from '@/components/web/PageMetrics'
-
-  PageMetrics.register()
-</script>

@@ -1,0 +1,20 @@
+---
+import { cn } from '@/utils/cn'
+
+export const prerender = false
+
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<div class={cn(className)}>
+  <page-metrics views="0" likes="0"></page-metrics>
+</div>
+<script>
+  import { PageMetrics } from '@/components/web/PageMetrics'
+  PageMetrics.register()
+  PageMetrics.collectElements().map((elem) => {})
+</script>

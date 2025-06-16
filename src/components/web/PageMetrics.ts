@@ -64,7 +64,7 @@ class PageMetricButton extends HTMLElement {
 }
 
 export class PageMetrics extends HTMLElement {
-  static readonly observedAttributes = ['views', 'likes', 'comments']
+  static readonly observedAttributes = ['views', 'likes', 'comments', 'class']
   static readonly TAG: string = 'page-metrics'
 
   static register() {
@@ -91,7 +91,30 @@ export class PageMetrics extends HTMLElement {
 
   constructor() {
     super()
-    this.className = PageMetrics.parentStyle
+    this.className = [this.className, PageMetrics.parentStyle].join(' ')
+    document.addEventListener('astro:page-load', this.onPageLoad)
+  }
+
+  onPageLoad = () => this.fetchPageMetrics()
+
+  async fetchPageMetrics() {
+    return fetch('/api/metrics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-page-metrics': window.location.href,
+        Accept: 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((metrics) => {
+        console.log('[PageMetrics] loaded:', metrics)
+        this.state.likes = metrics.likes
+        this.state.views = metrics.views
+        this.state.comments = metrics.comments
+        this.render()
+      })
+      .catch(console.warn)
   }
 
   public onLikeHandler = () => {
@@ -116,7 +139,7 @@ export class PageMetrics extends HTMLElement {
   }
 
   protected connectedCallback() {
-    this.getNextStateAndRender()
+    // this.fetchPageMetrics()
   }
 
   protected disconnectedCallback() {
@@ -131,7 +154,11 @@ export class PageMetrics extends HTMLElement {
     this.render()
   }
 
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
-    this.getNextStateAndRender()
+  attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    newValue: string | null
+  ) {
+    // this.getNextStateAndRender()
   }
 }

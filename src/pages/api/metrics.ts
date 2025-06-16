@@ -3,26 +3,21 @@ import type { APIRoute } from 'astro'
 import { actions } from 'astro:actions'
 
 export const POST: APIRoute = async (ctx) => {
-  const referer = ctx.request.headers.get('referer')
+  console.log(ctx.request.headers)
 
-  if (!referer) throw new Error('Missing referer for page metrics!')
+  const xPageMetrics = ctx.request.headers.get('x-page-metrics')
+  if (!xPageMetrics) throw new Error(`Missing header x-page-metrics: "${xPageMetrics}"`)
 
-  const route = new URL(referer).pathname
-  console.log({ route })
+  const route = new URL(xPageMetrics).pathname
+
+  if (!route) throw new Error(`Missing route for page metrics: "${route}"`)
 
   const { data: metrics, error } = await ctx.callAction(actions.onPageView, {
     route,
   })
 
   if (error) throw error
-  if (!metrics) throw new Error('Failed to load metrics for route:' + route)
+  if (!metrics) throw new Error(`Missing metrics for route: "${route}"`)
 
-  const htmlTemplate = `<page-metrics views="${metrics.views}" likes="${metrics.likes}" comments="[]"></page-metrics>`
-
-  return new Response(htmlTemplate, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html',
-    },
-  })
+  return Response.json(metrics)
 }
