@@ -19,12 +19,41 @@ const { class: className } = Astro.props
   PageMetrics.register()
 
   document.addEventListener('astro:page-load', () => {
-    actions.onPageView({ referer: window.location.href }).then(({ data }) => {
+    const referer = window.location.href
+    const likedStorageKey = `liked:${window.location.pathname}`
+
+    function onUpdatePageMetrics(
+      data: { views: number; likes: number } | undefined
+    ) {
       if (!data) return
       PageMetrics.collectElements().forEach((elem) => {
+        const hasLiked = !!localStorage.getItem(likedStorageKey)
         elem.setAttribute('likes', String(data.likes))
         elem.setAttribute('views', String(data.views))
+        elem.setAttribute('hasLiked', String(hasLiked))
       })
+    }
+
+    document.addEventListener(PageMetrics.events.onLikedPage, () => {
+      console.log('[client] on liked page!')
+      const isLiked = !!localStorage.getItem(likedStorageKey)
+
+      if (isLiked) {
+        localStorage.removeItem(likedStorageKey)
+      } else {
+        localStorage.setItem(likedStorageKey, 'true')
+      }
+
+      actions
+        .onPageLike({ referer, unliked: isLiked })
+        .then(({ data, error }) => {
+          console.log('[client] on liked page:', { data, error })
+          onUpdatePageMetrics(data)
+        })
+    })
+
+    actions.onPageView({ referer }).then(({ data }) => {
+      onUpdatePageMetrics(data)
     })
   })
 </script>
