@@ -27,27 +27,23 @@ const { class: className } = Astro.props
     ) {
       if (!data) return
       PageMetrics.collectElements().forEach((elem) => {
-        const hasLiked = !!localStorage.getItem(likedStorageKey)
+        const hasLiked = localStorage.getItem(likedStorageKey) ?? "false"
         elem.setAttribute('likes', String(data.likes))
         elem.setAttribute('views', String(data.views))
-        elem.setAttribute('hasLiked', String(hasLiked))
+        elem.setAttribute('hasLiked', hasLiked)
       })
     }
 
     document.addEventListener(PageMetrics.events.onLikedPage, () => {
       console.log('[client] on liked page!')
-      const isLiked = !!localStorage.getItem(likedStorageKey)
-
-      if (isLiked) {
-        localStorage.removeItem(likedStorageKey)
-      } else {
-        localStorage.setItem(likedStorageKey, 'true')
-      }
+      const cachedLikeStatus = localStorage.getItem(likedStorageKey) ?? "false"
+      const isLiked = cachedLikeStatus === "true"
 
       actions
         .onPageLike({ referer, unliked: isLiked })
         .then(({ data, error }) => {
           console.log('[client] on liked page:', { data, error })
+          localStorage.setItem(likedStorageKey, isLiked ? "false" : "true")
           onUpdatePageMetrics(data)
         })
     })

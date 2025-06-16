@@ -29,7 +29,7 @@ class PageMetricButton extends HTMLElement {
   }
 
   className: string =
-    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-105 transform duration-150'
+    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-110 transform duration-150'
 
   constructor() {
     super()
@@ -55,7 +55,7 @@ class PageMetricButton extends HTMLElement {
   public render() {
     const onclick = this.getAttribute('onclick')
     this.innerHTML = `
-      <button onclick="${onclick}" class="${this.className}">
+      <button onclick="${onclick}" class="min-w-10 ${this.className}">
         <span class="mr-1">${this.state.icon}</span>
         <span class="text-sm">${this.state.text}</span>
       </button>
@@ -122,29 +122,16 @@ export class PageMetrics extends HTMLElement {
     this.className = [this.className, PageMetrics.parentStyle].join(' ')
   }
 
-  public onUnlikeHandler = () => {
-    this.state.likes -= 1
-    this.render()
-    confetti()
-    this.dispatchEvent(
-      new CustomEvent(PageMetrics.events.onLikedPage, {
-        detail: {},
-        bubbles: true,
-      })
-    )
-  }
-
   public onLikeHandler = () => {
     console.log('[client] on liked!')
-    this.state.likes += 1
-    this.render()
-    confetti()
     this.dispatchEvent(
       new CustomEvent(PageMetrics.events.onLikedPage, {
         detail: {},
         bubbles: true,
       })
     )
+    this.render()
+    confetti()
   }
 
   public onViewHandler = () => {
@@ -156,12 +143,13 @@ export class PageMetrics extends HTMLElement {
     const { likes, views, comments, hasLiked } = this.state
     const cmnts = comments.length
     const onLike = 'this.parentElement?.onLikeHandler?.()'
-    const onUnlike = 'this.parentElement?.onUnlikeHandler?.()'
+    const onUnlike = 'this.parentElement?.onLikeHandler?.()'
+    this.innerHTML = ""
     this.innerHTML = `
       <page-metric-button icon="👀" text="${views}"></page-metric-button>
       ${
         hasLiked
-          ? `<page-metric-button onclick="${onUnlike}" icon="❤️" hover:icon="🤍" text="${likes}"></page-metric-button>`
+          ? `<page-metric-button onclick="${onUnlike}" icon="❤️" hover:icon="💔" text="${likes}"></page-metric-button>`
           : `<page-metric-button onclick="${onLike}" icon="🤍" hover:icon="❤️" text="${likes}"></page-metric-button>`
       }
       <page-metric-button icon="💬" text="${cmnts}"></page-metric-button>
@@ -179,10 +167,10 @@ export class PageMetrics extends HTMLElement {
   getNextStateAndRender() {
     const views = Number(this.getAttribute('views') ?? '0')
     const likes = Number(this.getAttribute('likes') ?? '0')
-    const hasLiked = this.getAttribute('hasLiked')
+    const hasLiked = this.getAttribute('hasLiked') ?? "false"
     this.state.views = views
     this.state.likes = likes
-    this.state.hasLiked = Boolean(hasLiked && hasLiked === 'true')
+    this.state.hasLiked = Boolean(hasLiked === 'true')
     this.render()
   }
 
