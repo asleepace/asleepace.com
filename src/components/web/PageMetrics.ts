@@ -29,7 +29,7 @@ class PageMetricButton extends HTMLElement {
   }
 
   className: string =
-    'flex grow justify-center items-center text-gray-700 tracking-wide hover:scale-110 transform duration-150'
+    'flex grow justify-center transition-all duration-300 items-center text-gray-700 tracking-wide hover:scale-110 transform'
 
   constructor() {
     super()
@@ -120,10 +120,11 @@ export class PageMetrics extends HTMLElement {
   constructor() {
     super()
     this.className = [this.className, PageMetrics.parentStyle].join(' ')
+    const savedLiked = localStorage.getItem(`liked:${window.location.pathname}`)
+    this.state.hasLiked = savedLiked === "true"
   }
 
   public onLikeHandler = () => {
-    console.log('[client] on liked!')
     this.dispatchEvent(
       new CustomEvent(PageMetrics.events.onLikedPage, {
         detail: {},
@@ -143,14 +144,12 @@ export class PageMetrics extends HTMLElement {
     const { likes, views, comments, hasLiked } = this.state
     const cmnts = comments.length
     const onLike = 'this.parentElement?.onLikeHandler?.()'
-    const onUnlike = 'this.parentElement?.onLikeHandler?.()'
-    this.innerHTML = ""
     this.innerHTML = `
       <page-metric-button icon="👀" text="${views}"></page-metric-button>
       ${
         hasLiked
-          ? `<page-metric-button onclick="${onUnlike}" icon="❤️" hover:icon="💔" text="${likes}"></page-metric-button>`
-          : `<page-metric-button onclick="${onLike}" icon="🤍" hover:icon="❤️" text="${likes}"></page-metric-button>`
+          ? `<page-metric-button key="unlike" onclick="${onLike}" icon="❤️" hover:icon="💔" text="${likes}"></page-metric-button>`
+          : `<page-metric-button key="like" onclick="${onLike}" icon="🤍" hover:icon="❤️" text="${likes}"></page-metric-button>`
       }
       <page-metric-button icon="💬" text="${cmnts}"></page-metric-button>
     `
@@ -167,7 +166,7 @@ export class PageMetrics extends HTMLElement {
   getNextStateAndRender() {
     const views = Number(this.getAttribute('views') ?? '0')
     const likes = Number(this.getAttribute('likes') ?? '0')
-    const hasLiked = this.getAttribute('hasLiked') ?? "false"
+    const hasLiked = this.getAttribute('hasLiked') ?? 'false'
     this.state.views = views
     this.state.likes = likes
     this.state.hasLiked = Boolean(hasLiked === 'true')

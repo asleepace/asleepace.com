@@ -16,8 +16,6 @@ export const onPageLike = defineAction({
     const route = new URL(referer).pathname
     if (!route) throw new Error('Missing route or referer!')
 
-    console.log('[onPageLike] called:', route)
-
     const pageMetrics = await db
       .insert(PageMetrics)
       .values({
@@ -50,10 +48,7 @@ export const onPageView = defineAction({
   async handler(input, context) {
     const referer = input.referer ?? context.request.headers.get('referer')
     if (!referer) throw new Error('Missing referer!')
-
     const route = new URL(referer).pathname
-    console.log('[actions] onPageView:', route)
-
     if (!route) throw new Error('Missing route or referer!')
 
     // insert or update page metrics and incrament
@@ -74,11 +69,6 @@ export const onPageView = defineAction({
       })
       .returning()
       .get()
-
-    console.log('[actions] page metrics:', pageMetrics)
-
-    // set context locals for page metrics
-    context.locals.pageMetrics = pageMetrics
 
     return pageMetrics
   },

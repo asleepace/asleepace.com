@@ -42,7 +42,6 @@ declare global {
       isLoggedIn: boolean
       user: Record<string, any> | undefined
       requestId: number
-      pageMetrics: PageMetrics
     }
   }
 }

@@ -15,7 +15,15 @@ const handleLog = consoleTag('middleware')
 export const rootMiddleware = defineMiddleware(async (context, next) => {
   try {
     const isSSR = context.isPrerendered
-    handleLog(isSSR ? chalk.magenta('[ssr]') : '', context.url.pathname)
+    const isAction = context.url.pathname.startsWith('/_actions/')
+    handleLog(
+      isSSR
+        ? chalk.magenta('[ssr]')
+        : isAction
+        ? chalk.magenta('[action]')
+        : '',
+      context.url.pathname
+    )
     if (context.isPrerendered) return next()
 
     // const method = context.request.method
