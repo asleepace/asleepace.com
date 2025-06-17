@@ -36,11 +36,7 @@ export type SiteConfig = {
 const ENVIRONMENT = process.env.ENVIRONMENT as SiteEnvironment
 const MONGODB_URI = process.env.MONGODB_URI as string
 
-console.assert(ENVIRONMENT, 'ASSERT_ENVIRONMENT is not set!')
-console.assert(MONGODB_URI, 'ASSERT_MONGODB_URI is not set!')
-console.log(
-  chalk.white('\n+' + '-'.repeat(60) + '--[ configuration ]' + '----+\n')
-)
+console.assert(MONGODB_URI, 'warning: MONGODB_URI (.env) is not set!')
 
 const DEFAULT_CONFIGURATIONS = {
   production: {
