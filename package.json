@@ -10,7 +10,7 @@
     "start": "bunx --bun astro build --port 4321 && bunx --bun astro preview --port 4321",
     "build": "bunx --bun astro build",
     "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
-    "preview": "bunx --bun astro preview",
+    "preview": "bunx --bun astro preview --port 4321",
     "astro:upgrade": "npx @astrojs/upgrade",
     "build:tailwind": "npx @tailwindcss/cli -i ./src/styles/global.css -o ./src/styles/output.css",
     "watch:tailwind": "npx @tailwindcss/cli -i ./src/styles/global.css -o ./src/styles/output.css --watch",

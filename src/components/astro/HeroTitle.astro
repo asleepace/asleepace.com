@@ -1,7 +1,6 @@
 ---
 import FormattedDate from './FormattedDate.astro'
 import HashTags from './HashTags.astro'
-import PageMetrics from './PageMetrics.astro'
 // =====================================
 // Hero Title
 // =====================================
@@ -28,7 +27,7 @@ const { title, pubDate, updatedDate, hashTags } = Astro.props
     }
   </div>
   <p class="text-5xl text-balance font-black mb-2">{title}</p>
-  { hashTags && <HashTags hashTags={hashTags} className='' /> }
+  {hashTags && <HashTags hashTags={hashTags} className="" />}
   <hr
     class="border-b-none border-t-[1px] w-full border-t-gray-200 my-4 mb-8 md:my-6"
   />

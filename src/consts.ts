@@ -2,6 +2,7 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 import chalk from 'chalk'
 import packageJson from '../package.json'
+import { tagTime } from './utils/tagTime'
 
 export type SiteCookieDomain = `.${string}` // example: ".asleepace.com"
 export type SiteCookiePath = `/${string}` // example: "/"
@@ -74,7 +75,7 @@ export const siteConfig: SiteConfig = {
   /** NOTE: used when creating and deleting cookies */
   cookiePath: '/',
   /** Extended theme styling */
-  themeColor: 'oklch(82.8% 0.189 84.429)',
+  themeColor: '#ffbf00',
   /** default cover photo */
   coverImage: '/images/about-me.jpeg',
   /** paths */
@@ -107,13 +108,13 @@ export const siteConfig: SiteConfig = {
 }
 
 Object.entries(siteConfig).forEach(([key, value]) => {
-  const tag = chalk.gray(`>>  [${key}]`)
+  const tag = () => tagTime(chalk.magenta('[config]'))
   if (value instanceof URL) {
-    console.log(tag, chalk.cyan(value.toString()))
+    console.log(tag(), chalk.cyan(value.toString()))
   } else if (typeof value === 'string') {
-    console.log(tag, `"${value}"`)
+    console.log(tag(), chalk.white(value))
   } else {
-    console.log(tag, value)
+    console.log(tag(), value)
   }
 })
 

@@ -51,8 +51,8 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
   const ts = useTypescript({
     code: data.code,
     compilerOptions: {
-      target: 2, // ES2015
-      module: 1, // CommonJS
+      // target: 2, // ES2015
+      // module: 1, // CommonJS
       ...DEFAULT_COMPILER_OPTIONS,
     },
   })
