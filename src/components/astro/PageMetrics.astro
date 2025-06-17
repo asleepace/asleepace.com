@@ -18,8 +18,10 @@ const { class: className } = Astro.props
   import { actions } from 'astro:actions'
   PageMetrics.register()
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('astro:after-swap', () => {
     const referer = window.location.href
+
+    console.log('[PageMetrics] route:', referer)
 
     function onUpdatePageMetrics(
       data: { views: number; likes: number } | undefined

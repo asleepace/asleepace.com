@@ -4,7 +4,7 @@ import HeroImage from '@/components/astro/HeroImage.astro'
 import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import SiteLayout from './SiteLayout.astro'
-import PageMetrics from '@/components/astro/PageMetrics.astro'
+import { PageMetrics } from '@/components/blog/PageMetrics'
 
 type Props = CollectionEntry<'blog'>['data']
 
@@ -39,5 +39,5 @@ const {
       <slot />
     </Prose>
   </article>
-  <PageMetrics class='self-center shrink flex pb-8' />
+  <PageMetrics className='mb-8' client:only="react" />
 </SiteLayout>
