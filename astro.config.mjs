@@ -56,5 +56,7 @@ export default defineConfig({
   security: {
     checkOrigin: false, // CORS
   },
-  server: {},
+  server: {
+
+  },
 })
