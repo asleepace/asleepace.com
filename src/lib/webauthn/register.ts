@@ -3,6 +3,9 @@ import { randomBytes } from 'node:crypto'
 const challenges = new Map<string, string>()
 const users = new Map<string, any>()
 
+const RP_ID = 'localhost'
+const USER_VERIFICATION = 'required' as const
+
 /**
  * Start the login process.
  */
@@ -18,8 +21,8 @@ export function loginStart({
     {
       challenge,
       timeout: 60000,
-      rpId: 'localhost', // Change to your domain
-      userVerification: 'preferred',
+      rpId: RP_ID, // Change to your domain
+      userVerification: USER_VERIFICATION,
       allowCredentials: [],
     }
 
@@ -67,7 +70,10 @@ export function registerStart({
 }: {
   username: string
 }): PublicKeyCredentialCreationOptionsJSON {
-  const challenge = randomBytes(32).toBase64({ alphabet: 'base64url', omitPadding: true })
+  const challenge = randomBytes(32).toBase64({
+    alphabet: 'base64url',
+    omitPadding: true,
+  })
   challenges.set(username, challenge)
 
   const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptionsJSON =
@@ -75,7 +81,7 @@ export function registerStart({
       challenge,
       rp: {
         name: 'Asleepace',
-        id: 'localhost', // Change to your domain
+        id: RP_ID, // Change to your domain
       },
       user: {
         id: randomBytes(16).toBase64({
@@ -87,18 +93,27 @@ export function registerStart({
       },
       pubKeyCredParams: [
         { alg: -7, type: 'public-key' },
-        { alg: -256, type: 'public-key' },
+        { alg: -257, type: 'public-key' },
       ],
       excludeCredentials: [],
       authenticatorSelection: {
         authenticatorAttachment: 'platform',
-        requireResidentKey: true,
+        requireResidentKey: false,
+        userVerification: USER_VERIFICATION,
       },
       attestation: 'none',
       timeout: 60000,
     }
 
   return publicKeyCredentialCreationOptions
+}
+
+const deocdeBase64 = (base64: string): string => {
+  return Buffer.from(base64, 'base64url').toString('utf-8')
+}
+
+const deocdeBase64JSON = (base64: string): any => {
+  return JSON.parse(deocdeBase64(base64))
 }
 
 /**
@@ -110,7 +125,7 @@ export function registerComplete({
   credential,
 }: {
   username: string
-  credential: PublicKeyCredential
+  credential: PublicKeyCredentialJSON
 }) {
   const challengeForUser = challenges.get(username)
 
@@ -118,20 +133,22 @@ export function registerComplete({
 
   if (!challengeForUser) throw new Error('Missing challenge for user')
 
+  console.log('[WebAuthN] challengeForUser', challengeForUser)
+
   const { response } = credential
 
-  const clientDataBuffer = Buffer.from(response.clientDataJSON).toBase64({
-    alphabet: 'base64url',
-  })
-  const clientDataJson = JSON.parse(clientDataBuffer)
+  const clientDataJSON = deocdeBase64JSON(response.clientDataJSON)
+  // const attestionObject = deocdeBase64JSON(response.attestationObject)
+  // const authenticatorData = deocdeBase64JSON(response.authenticatorData)
+  const publicKey = response.publicKey
 
   const hasChallenge =
-    'challenge' in clientDataJson &&
-    typeof clientDataJson.challenge === 'string'
+    'challenge' in clientDataJSON &&
+    typeof clientDataJSON.challenge === 'string'
 
   if (!hasChallenge) throw new Error('Missing challenge in client data')
 
-  if (clientDataJson.challenge !== challengeForUser) {
+  if (clientDataJSON.challenge !== challengeForUser) {
     throw new Error('Challenge mismatch!')
   }
 
@@ -139,8 +156,8 @@ export function registerComplete({
 
   users.set(username, {
     credentialId: credential.id,
-    publicKey: credential.rawId,
-    counter: credential.getClientExtensionResults(),
+    publicKey,
+    counter: 0,
   })
 
   challenges.delete(username)

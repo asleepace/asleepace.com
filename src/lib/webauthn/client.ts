@@ -16,7 +16,8 @@ export class WebAuthnClient {
         body: JSON.stringify({ username }),
       })
 
-      const json = await startResponse.json() as PublicKeyCredentialCreationOptionsJSON
+      const json =
+        (await startResponse.json()) as PublicKeyCredentialCreationOptionsJSON
       console.log('[WebAuthnClient] register response:', json)
 
       const options = PublicKeyCredential.parseCreationOptionsFromJSON(json)
@@ -38,7 +39,6 @@ export class WebAuthnClient {
 
       // Create credential
       const credential = (await navigator.credentials.create({
-
         publicKey: options,
       })) as PublicKeyCredential
 
@@ -50,7 +50,7 @@ export class WebAuthnClient {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username,
-          credential: this.credentialToJSON(credential),
+          credential,
         }),
       })
 
@@ -70,19 +70,22 @@ export class WebAuthnClient {
         body: JSON.stringify({ username }),
       })
 
-      const options = await startResponse.json()
-      options.challenge = this.base64urlToBuffer(options.challenge)
+      const json =
+        (await startResponse.json()) as PublicKeyCredentialRequestOptionsJSON
+      const options = PublicKeyCredential.parseRequestOptionsFromJSON(json)
 
-      const abortSignle = new AbortController()
+      const abort = new AbortController()
 
       // Get credential
-      const credential = (await navigator.credentials.get({
-        signal: abortSignle.signal,
+      const credential = await navigator.credentials.get({
+        signal: abort.signal,
         mediation: 'conditional',
         publicKey: options,
-      })) as PublicKeyCredential
+      })
 
       if (!credential) throw new Error('Failed to get credential')
+
+      console.log('[WebAuthN] credential:', credential)
 
       // Complete login
       const completeResponse = await fetch('/api/webauthn/login-complete', {
@@ -90,9 +93,11 @@ export class WebAuthnClient {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username,
-          credential: this.credentialToJSON(credential),
+          credential: credential,
         }),
       })
+
+      console.log({ completeResponse })
 
       return completeResponse.ok
     } catch (error) {
