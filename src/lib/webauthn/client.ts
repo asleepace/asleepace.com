@@ -4,21 +4,41 @@
 export class WebAuthnClient {
   async register(username: string): Promise<boolean> {
     try {
+      console.log('[WebAuthnClient] registering:', username)
+
       // Start registration
       const startResponse = await fetch('/api/webauthn/register-start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
         body: JSON.stringify({ username }),
       })
 
-      const options = await startResponse.json()
+      const json = await startResponse.json() as PublicKeyCredentialCreationOptionsJSON
+      console.log('[WebAuthnClient] register response:', json)
+
+      const options = PublicKeyCredential.parseCreationOptionsFromJSON(json)
+      console.log('[WebAuthnClient] register response:', { json })
+      console.log('[WebAuthnClient] options:', { options })
 
       // Convert challenge to Uint8Array
-      options.challenge = this.base64urlToBuffer(options.challenge)
-      options.user.id = this.base64urlToBuffer(options.user.id)
+      // let options: PublicKeyCredentialCreationOptions = {
+      //   ...json,
+      //   challenge: this.base64urlToBuffer(json.challenge),
+      //   user: {
+      //     ...json.user,
+      //     id: this.base64urlToBuffer(json.user.id),
+      //   },
+      //   attestation: 'direct',
+      // }
+      // options.challenge = this.base64urlToBuffer(json.challenge)
+      // options.user.id = this.base64urlToBuffer(json.user.id)
 
       // Create credential
       const credential = (await navigator.credentials.create({
+
         publicKey: options,
       })) as PublicKeyCredential
 
@@ -53,8 +73,12 @@ export class WebAuthnClient {
       const options = await startResponse.json()
       options.challenge = this.base64urlToBuffer(options.challenge)
 
+      const abortSignle = new AbortController()
+
       // Get credential
       const credential = (await navigator.credentials.get({
+        signal: abortSignle.signal,
+        mediation: 'conditional',
         publicKey: options,
       })) as PublicKeyCredential
 
@@ -77,23 +101,37 @@ export class WebAuthnClient {
     }
   }
 
-  private base64urlToBuffer(base64url: string): ArrayBuffer {
-    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/')
-    const binary = atob(base64)
-    const buffer = new ArrayBuffer(binary.length)
-    const view = new Uint8Array(buffer)
-    for (let i = 0; i < binary.length; i++) {
-      view[i] = binary.charCodeAt(i)
+  base64urlToBuffer(base64url: string): ArrayBuffer {
+    try {
+      console.log({ base64url })
+      // Convert base64url to base64
+      let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/')
+
+      // Add proper padding
+      while (base64.length % 4) {
+        base64 += '='
+      }
+
+      // Decode to binary string
+      const binaryString = window.atob(base64)
+
+      // Convert to ArrayBuffer
+      const buffer = new ArrayBuffer(binaryString.length)
+      const view = new Uint8Array(buffer)
+
+      for (let i = 0; i < binaryString.length; i++) {
+        view[i] = binaryString.charCodeAt(i)
+      }
+
+      return buffer
+    } catch (error) {
+      console.error('Failed to decode base64url:', base64url, error)
+      throw new Error('Invalid base64url string')
     }
-    return buffer
   }
 
   private bufferToBase64url(buffer: ArrayBuffer): string {
-    const binary = String.fromCharCode(...new Uint8Array(buffer))
-    return btoa(binary)
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '')
+    return new Uint8Array(buffer).toBase64({ alphabet: 'base64url' })
   }
 
   private credentialToJSON(credential: PublicKeyCredential) {

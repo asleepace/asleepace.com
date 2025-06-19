@@ -19,7 +19,8 @@ export function loginStart({
       challenge,
       timeout: 60000,
       rpId: 'localhost', // Change to your domain
-      userVerification: 'required' as const,
+      userVerification: 'preferred',
+      allowCredentials: [],
     }
 
   return publicKeyCredentialRequestOptions
@@ -61,8 +62,12 @@ export function loginComplete({
  * @param param0
  * @returns
  */
-export function registerStart({ username }: { username: string }) {
-  const challenge = randomBytes(32).toBase64({ alphabet: 'base64url' })
+export function registerStart({
+  username,
+}: {
+  username: string
+}): PublicKeyCredentialCreationOptionsJSON {
+  const challenge = randomBytes(32).toBase64({ alphabet: 'base64url', omitPadding: true })
   challenges.set(username, challenge)
 
   const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptionsJSON =
@@ -73,19 +78,27 @@ export function registerStart({ username }: { username: string }) {
         id: 'localhost', // Change to your domain
       },
       user: {
-        id: randomBytes(16).toBase64({ alphabet: 'base64url' }),
+        id: randomBytes(16).toBase64({
+          alphabet: 'base64url',
+          omitPadding: true,
+        }),
         name: username,
         displayName: username,
       },
-      pubKeyCredParams: [{ alg: -7, type: 'public-key' as const }],
+      pubKeyCredParams: [
+        { alg: -7, type: 'public-key' },
+        { alg: -256, type: 'public-key' },
+      ],
+      excludeCredentials: [],
       authenticatorSelection: {
-        authenticatorAttachment: 'platform' as const,
-        userVerification: 'required' as const,
+        authenticatorAttachment: 'platform',
+        requireResidentKey: true,
       },
+      attestation: 'none',
       timeout: 60000,
     }
 
-  return JSON.stringify(publicKeyCredentialCreationOptions)
+  return publicKeyCredentialCreationOptions
 }
 
 /**
@@ -100,6 +113,8 @@ export function registerComplete({
   credential: PublicKeyCredential
 }) {
   const challengeForUser = challenges.get(username)
+
+  console.log('[WebAuthN] registration complete:', username)
 
   if (!challengeForUser) throw new Error('Missing challenge for user')
 

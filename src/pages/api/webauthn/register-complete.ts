@@ -10,9 +10,5 @@ export const POST: APIRoute = async (ctx) => {
     credential,
   })
 
-  return new Response(JSON.stringify({ success }), {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return Response.json({ success })
 }

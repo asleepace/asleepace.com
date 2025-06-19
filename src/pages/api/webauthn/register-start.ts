@@ -9,9 +9,5 @@ export const POST: APIRoute = async (ctx) => {
     username,
   })
 
-  return new Response(JSON.stringify(challenge), {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return Response.json(challenge)
 }

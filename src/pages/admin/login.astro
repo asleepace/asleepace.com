@@ -86,7 +86,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
           <input
             autofocus
             class="border border-gray-300 bg-transparent mix-blend-multiply text-center focus:ring-0 outline-none focus:border-blue-400 focus:placeholder:opacity-0 rounded-md p-2 text-sm"
-            autocomplete="email"
+            autocomplete="email webauthn"
             id="username"
             type="text"
             name="username"
@@ -129,14 +129,14 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
 
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          const username = usernameInput.value
-          const success = await client.register(username)
+          const success = await client.register("colin_teahan@yahoo.com")
           console.log('[client] registered:', success)
         } catch (e) {
           console.warn('[client] register error:', e)
         }
       })
 
+      // https://web.dev/articles/passkey-form-autofill
       registerButton.addEventListener('click', async () => {
         try {
           const username = usernameInput.value

@@ -9,6 +9,10 @@ const whitelist = [
   '/admin/panel',
   '/api/proxy',
   '/api/analytics',
+  '/api/webauthn/login-start',
+  '/api/webauthn/login-complete',
+  '/api/webauthn/register-start',
+  '/api/webauthn/register-complete',
 ]
 const blacklist = ['/api', '/admin']
 

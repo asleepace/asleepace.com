@@ -6,9 +6,5 @@ export const POST: APIRoute = async (ctx) => {
 
   const challenge = loginStart({ username })
 
-  return new Response(JSON.stringify(challenge), {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return Response.json(challenge)
 }
