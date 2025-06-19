@@ -86,7 +86,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
           <input
             autofocus
             class="border border-gray-300 bg-transparent mix-blend-multiply text-center focus:ring-0 outline-none focus:border-blue-400 focus:placeholder:opacity-0 rounded-md p-2 text-sm"
-            autocomplete="email webauthn"
+            autocomplete="username webauthn"
             id="username"
             type="text"
             name="username"
@@ -94,7 +94,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
           />
           <input
             class="border border-gray-300 bg-transparent mix-blend-multiply focus:backdrop-blur-2xl text-center focus:ring-0 outline-none focus:border-blue-400 rounded-md focus:placeholder:opacity-0 p-2 text-sm"
-            autocomplete="current-password"
+            autocomplete="current-password webauthn"
             id="password"
             type="password"
             name="password"
@@ -129,8 +129,12 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
 
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          const success = await client.register("colin_teahan@yahoo.com")
-          console.log('[client] registered:', success)
+          // const success = await client.register("colin_teahan@yahoo.com")
+          // console.log('[client] registered:', success)
+
+          // const success = await client.login(usernameInput.value)
+          await client.signIn()
+
         } catch (e) {
           console.warn('[client] register error:', e)
         }

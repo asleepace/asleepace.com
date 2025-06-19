@@ -13,6 +13,7 @@ const whitelist = [
   '/api/webauthn/login-complete',
   '/api/webauthn/register-start',
   '/api/webauthn/register-complete',
+  '/api/webauthn/challenge'
 ]
 const blacklist = ['/api', '/admin']
 

@@ -3,8 +3,98 @@ import { randomBytes } from 'node:crypto'
 const challenges = new Map<string, string>()
 const users = new Map<string, any>()
 
+const unpaired = new Set<string>()
+
 const RP_ID = 'localhost'
 const USER_VERIFICATION = 'required' as const
+
+const deocdeBase64 = (base64: string): string => {
+  return Buffer.from(base64, 'base64url').toString('utf-8')
+}
+
+const deocdeBase64JSON = (base64: string): any => {
+  return JSON.parse(deocdeBase64(base64))
+}
+
+/**
+ * Decodes the Authenticator Data present in the Public Key Credential
+ * https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse/authenticatorData
+ * @param {AuthenticatorAssertionResponse} credential - JSON form.
+ * @returns
+ */
+const decodeAuthenticatorData = ({ response }: PublicKeyCredentialJSON) => {
+  const buffer = Buffer.from(response.authenticatorData, 'base64url')
+  let offset = 0
+
+  // rpIdHash (32 bytes) - SHA256 hash of the RP ID
+  const rpIdHash = buffer.subarray(offset, offset + 32)
+  offset += 32
+
+  // flags (1 byte)
+  const flagsByte = buffer[offset]
+  offset += 1
+
+  // Parse flags
+  const flags = {
+    userPresent: !!(flagsByte & 0x01), // UP - User Present
+    userVerified: !!(flagsByte & 0x04), // UV - User Verified
+    attestedCredentialDataIncluded: !!(flagsByte & 0x40), // AT - Attested credential data included
+    extensionDataIncluded: !!(flagsByte & 0x80), // ED - Extension data included
+  } as const
+
+  // signCount (4 bytes, big-endian)
+  const signCount = buffer.readUInt32BE(offset)
+  offset += 4
+
+  console.log('[AuthenticatorData] rpIdHash:', rpIdHash.toString('hex'))
+  console.log('[AuthenticatorData] flags:', flags)
+  console.log('[AuthenticatorData] signCount:', signCount)
+
+  return {
+    rpIdHash,
+    flags,
+    signCount,
+    buffer, // Keep original buffer for signature verification
+  } as const
+}
+
+export function getRandomChallenge(): PublicKeyCredentialRequestOptionsJSON {
+  const challenge = randomBytes(16).toBase64({
+    alphabet: 'base64url',
+    omitPadding: true,
+  })
+
+  console.log('[register] created challenge:', challenge)
+  unpaired.add(challenge)
+
+  return {
+    challenge,
+    timeout: 60_000,
+    rpId: RP_ID,
+    userVerification: USER_VERIFICATION,
+    allowCredentials: [],
+  }
+}
+
+export function checkRandomChallenge({ response }: PublicKeyCredentialJSON) {
+  console.log('[WebAuthN] checkRandomChallenge:', response)
+  const clientData = JSON.parse(
+    Buffer.from(response.clientDataJSON, 'base64url').toString('utf-8')
+  )
+
+  // decode authenticator data
+  const authenticatorData = decodeAuthenticatorData(response)
+
+  console.log('[WebAuthN] authenticatorData:', authenticatorData)
+
+  const { userHandle } = response // TODO: match this to one set during registration.
+  console.log('[WebAuthN] userHandle:', userHandle)
+
+  const isSignedIn = unpaired.has(clientData.challenge)
+
+  console.log('[WebAuthN] clientData:', { clientData, isSignedIn })
+  return isSignedIn
+}
 
 /**
  * Start the login process.
@@ -106,14 +196,6 @@ export function registerStart({
     }
 
   return publicKeyCredentialCreationOptions
-}
-
-const deocdeBase64 = (base64: string): string => {
-  return Buffer.from(base64, 'base64url').toString('utf-8')
-}
-
-const deocdeBase64JSON = (base64: string): any => {
-  return JSON.parse(deocdeBase64(base64))
 }
 
 /**
