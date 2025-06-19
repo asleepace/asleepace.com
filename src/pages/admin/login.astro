@@ -46,11 +46,11 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
   >
     <Header title="" class:list="before:bg-glass overflow-hidden" />
     <main
-      class="flex flex-col inset-shadow-2xs grow self-stretch w-full justify-center items-center mx-auto p-4 from-neutral-200 via-white/40 to-neutral-200 bg-gradient-to-r"
+      class="flex flex-col inset-shadow-2xs grow self-stretch w-full justify-center items-center mx-auto p-4 from-neutral-200/30 via-white/0 to-neutral-200/30 bg-gradient-to-r"
     >
       <div class="absolute bg-glass inset-shadow -z-10 inset-0"></div>
       <div
-        class="flex flex-col focus-within:-translate-y-16 items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-all duration-300 rounded-2xl p-4"
+        class="flex flex-col items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-all duration-300 rounded-2xl p-4"
       >
         <div class="flex flex-col items-center justify-center py-4">
           <LockKeyholeIcon
@@ -76,6 +76,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
         </div>
         <!-- Login Form -->
         <form
+          id="login-form"
           action="/api/auth"
           class="flex flex-col mt-4 gap-2 w-[300px] *:transition-colors *:duration-100"
           method="post"
@@ -110,5 +111,124 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
     <div class="backdrop-blur-lg">
       <Footer />
     </div>
+    <script>
+      async function createSecureCredentials() {
+        // Check if WebAuthn is supported
+        if (!window.PublicKeyCredential) {
+          console.log('WebAuthn not supported')
+          return
+        }
+
+        // Registration options
+        const registrationOptions: PublicKeyCredentialCreationOptions = {
+          challenge: new Uint8Array(32), // Get from your server
+          rp: {
+            name: 'Asleepace',
+            id: 'asleepace.com',
+          },
+          user: {
+            id: new TextEncoder().encode('user123'),
+            name: 'colin_teahan@yahoo.com',
+            displayName: 'Colin Teahan',
+          },
+          pubKeyCredParams: [
+            {
+              type: 'public-key',
+              alg: -7, // ES256 algorithm
+            },
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform', // For built-in biometrics
+            userVerification: 'required',
+          },
+          timeout: 60000,
+          attestation: 'direct',
+        }
+
+        // Create credential
+        try {
+          const credential = await navigator.credentials.create({
+            publicKey: registrationOptions,
+          })
+
+          if (!credential?.id) throw new Error('Missing credential id!')
+          if (!credential?.rawId) throw new Error('Missing credential id!')
+
+          // Send credential to your server for storage
+          const response = await fetch('/register-webauthn', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: credential.id,
+              rawId: Array.from(new Uint8Array(credential.rawId)),
+              response: {
+                attestationObject: Array.from(
+                  new Uint8Array(credential.response.attestationObject)
+                ),
+                clientDataJSON: Array.from(
+                  new Uint8Array(credential.response.clientDataJSON)
+                ),
+              },
+            }),
+          })
+        } catch (error) {
+          console.log('Registration failed:', error)
+        }
+      }
+
+      async function isBiometricAvailable() {
+        return (
+          window.PublicKeyCredential &&
+          (await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())
+        )
+      }
+
+      async function handlePublicKeyLogin() {
+        // Authentication options
+        const authenticationOptions: CredentialRequestOptions = {
+          challenge: new Uint8Array(32), // Get from your server
+          timeout: 60000,
+          rpId: 'asleepace.com',
+          userVerification: 'required',
+        }
+        try {
+          const assertion = await navigator.credentials.get({
+            publicKey: authenticationOptions,
+          })
+
+          // Send assertion to server for verification
+          const response = await fetch('/verify-webauthn', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: assertion.id,
+              rawId: Array.from(new Uint8Array(assertion.rawId)),
+              response: {
+                authenticatorData: Array.from(
+                  new Uint8Array(assertion.response.authenticatorData)
+                ),
+                clientDataJSON: Array.from(
+                  new Uint8Array(assertion.response.clientDataJSON)
+                ),
+                signature: Array.from(
+                  new Uint8Array(assertion.response.signature)
+                ),
+              },
+            }),
+          })
+
+          if (response.ok) {
+            // User authenticated successfully
+            window.location.href = '/dashboard'
+          }
+        } catch (error) {
+          console.log('Authentication failed:', error)
+        }
+      }
+
+      document.getElementById('login-form')?.addEventListener('focusin', () => {
+        handlePublicKeyLogin().then(console.log).catch(console.warn)
+      })
+    </script>
   </body>
 </html>
