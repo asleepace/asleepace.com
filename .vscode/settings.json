@@ -13,5 +13,6 @@
   "typescript.format.semicolons": "remove",
   "prettier.singleQuote": true,
   "prettier.semi": false,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "prettier.tabWidth": 2
 }
