@@ -1,6 +1,13 @@
 import Database from 'bun:sqlite'
 import type { User } from './types'
 
+export type Passkey = {
+  userId: number
+  passkey: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export function attachPasskeysTable(db: Database) {
   return {
     /**
@@ -45,6 +52,12 @@ export function attachPasskeysTable(db: Database) {
         console.error('[passkey] failed to get user by passkey:', error)
         return undefined
       }
+    },
+    /**
+     *  Get all passkeys for a specific user.
+     */
+    getPasskeysForUser({ id }: User) {
+      return db.query(`SELECT * FROM passkeys WHERE userId = $id`).all({ $id: id }) as Passkey[]
     },
   }
 }

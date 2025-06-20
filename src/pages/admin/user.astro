@@ -1,20 +1,82 @@
 ---
+import { passkeys } from '@/db'
 import AdminPanel from '@/layouts/AdminPanel.astro'
+
+export const prerender = false
+
+if (!Astro.locals.user) {
+  return Astro.redirect('/admin/login', 302)
+}
+
+const userPasskeys = passkeys.getPasskeysForUser(Astro.locals.user) ?? []
+
+const sanitized = userPasskeys.map((pk, index) => {
+  return {
+    index,
+    preview: pk.passkey.slice(0, 4) + '...' + pk.passkey.slice(-4),
+    createdAt: new Date(pk.createdAt),
+    updatedAt: new Date(pk.updatedAt),
+  }
+})
+
+console.log({ userPasskeys })
 ---
 
 <AdminPanel>
-  <main>
-    <p>Register Passkey</p>
+  <main class="p-16 flex flex-col gap-y-4 text-neutral-200">
+    <ul class="flex flex-col gap-y-8 *:flex *:flex-col *:gap-y-2">
+      <li>
+        <p>Register Passkey</p>
+        <p class="text-sm text-neutral-400">
+          Click the button below to register a new WebAuthN passkey for this account. <br />
+          You account can have multiple passkeys.
+        </p>
+        <button
+          id="register-passkey"
+          class="bg-blue-500 my-4 shadow-sm hover:bg-blue-400 transition-all duration-300 text-sm p-2 max-w-lg rounded-xl"
+          >Register new passkey</button
+        >
+      </li>
+      <li>
+        <p>Account Passkeys</p>
+        <p class="text-sm text-neutral-400">Below are the currently registered passkeys for this account.</p>
+        <div class="flex flex-col gap-y-2 max-w-lg text-neutral-400">
+          {
+            sanitized.map((pk) => (
+              <div class="flex flex-row items-center font-mono gap-x-4 text-sm bg-neutral-800 rounded-xl px-4 py-2.5">
+                <p class="text-neutral-600">{pk.index}</p>
+                <p>
+                  <span class="text-xs uppercase">Identifier</span>{' '}
+                  <span class="text-blue-500 tracking-widest font-bold">{pk.preview}</span>
+                </p>
+                <div class="flex-1" />
+                <p>
+                  <span class="text-xs uppercase">Created</span>{' '}
+                  <span class="text-neutral-500">
+                    {pk.updatedAt.toLocaleDateString('en-US', {
+                      dateStyle: 'medium',
+                    })}
+                  </span>
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </li>
+    </ul>
   </main>
 </AdminPanel>
 
 <script>
   import { webAuthnClient } from '@/lib/webauthn/client'
 
-  document.addEventListener('DOMContentLoaded', async () => {
+  const registerPasskey = document.getElementById('register-passkey') as HTMLButtonElement
+
+  registerPasskey.addEventListener('click', async () => {
     try {
       const result = await webAuthnClient.register()
       console.log('[admin][webauthn] result:', result)
+      window.alert('Success')
     } catch (e) {
       console.warn('[admin][webauthn] error:', e)
     }
