@@ -10,10 +10,7 @@ import chalk from 'chalk'
 
 export const prerender = false
 
-const TAG =
-  chalk.white('[@] ' + Astro.request.method + ' ') +
-  chalk.gray(Astro.url.pathname) +
-  '\t'
+const TAG = chalk.white('[@] ' + Astro.request.method + ' ') + chalk.gray(Astro.url.pathname) + '\t'
 
 const redirectTo = siteConfig.path.adminLogin({
   trackUser: '1', // does nothing lol
@@ -40,9 +37,7 @@ const adminPageInfo = {
   <head>
     <BaseHead title={siteData.title} description={siteData.description} />
   </head>
-  <body
-    class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden"
-  >
+  <body class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden">
     <main class="flex flex-row h-full flex-1 bg-zinc-950">
       <!-- side bar -->
       <AdminPanelSidebar
@@ -51,9 +46,7 @@ const adminPageInfo = {
         environment={siteConfig.environment}
         version={siteConfig.version}
       />
-      <div
-        class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16"
-      >
+      <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16">
         <!-- welcome message & search bar -->
         <div class="flex flex-col gap-y-4 flex-1 self-stretch max-w-screen-xl">
           <p class="text-white text-6xl font-bold">Admin Panel</p>
@@ -62,13 +55,22 @@ const adminPageInfo = {
           </p>
           <AdminCommandLine client:only="react" />
         </div>
-        <ContainerLabeled
-          label="Environment"
-          className="basis-1/4 max-w-screen-xs max-h-[600px]"
-        >
+        <ContainerLabeled label="Environment" className="basis-1/4 max-w-screen-xs max-h-[600px]">
           <AdminPageInfo data={adminPageInfo} />
         </ContainerLabeled>
       </div>
     </main>
+    <script>
+      import { webAuthnClient } from '@/lib/webauthn/client'
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const result = await webAuthnClient.register()
+          console.log('[admin][webauthn] result:', result)
+        } catch (e) {
+          console.warn('[admin][webauthn] error:', e)
+        }
+      })
+    </script>
   </body>
 </html>

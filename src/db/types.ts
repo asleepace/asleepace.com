@@ -77,3 +77,22 @@ export const ANALYTICS_INIT = `
       referrer TEXT
   );
 `
+
+export type Passkeys = {
+  id: number
+  userId: number
+  passkey: string
+  createdAt: Date
+  updatedAt: string
+}
+
+export const PASSKEYS_INIT = `
+  CREATE TABLE IF NOT EXISTS passkeys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL,
+      passkey TEXT NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  );
+`

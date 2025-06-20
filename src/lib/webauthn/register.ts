@@ -1,4 +1,9 @@
+import type { User } from '@/db/types'
 import { randomBytes } from 'node:crypto'
+import { passkeys } from '@/db'
+
+const registrationChallenges = new Map<number, string>()
+const passkeyForChallenge = new Map<string, string>()
 
 const challenges = new Map<string, string>()
 const users = new Map<string, any>()
@@ -19,10 +24,11 @@ const deocdeBase64JSON = (base64: string): any => {
 /**
  * Decodes the Authenticator Data present in the Public Key Credential
  * https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse/authenticatorData
+ * https://www.w3.org/TR/webauthn-2/#typedefdef-cosealgorithmidentifier
  * @param {AuthenticatorAssertionResponse} credential - JSON form.
  * @returns
  */
-const decodeAuthenticatorData = ({ response }: PublicKeyCredentialJSON) => {
+const decodeAuthenticatorData = (response: PublicKeyCredentialJSON) => {
   const buffer = Buffer.from(response.authenticatorData, 'base64url')
   let offset = 0
 
@@ -78,10 +84,7 @@ export function getRandomChallenge(): PublicKeyCredentialRequestOptionsJSON {
 
 export function checkRandomChallenge({ response }: PublicKeyCredentialJSON) {
   console.log('[WebAuthN] checkRandomChallenge:', response)
-  const clientData = JSON.parse(
-    Buffer.from(response.clientDataJSON, 'base64url').toString('utf-8')
-  )
-
+  const clientData = JSON.parse(Buffer.from(response.clientDataJSON, 'base64url').toString('utf-8'))
   // decode authenticator data
   const authenticatorData = decodeAuthenticatorData(response)
 
@@ -92,40 +95,33 @@ export function checkRandomChallenge({ response }: PublicKeyCredentialJSON) {
 
   const isSignedIn = unpaired.has(clientData.challenge)
 
-  console.log('[WebAuthN] clientData:', { clientData, isSignedIn })
-  return isSignedIn
+  if (!isSignedIn) throw new Error('User must be signed in with authenticator!')
+
+  const user = passkeys.getUserByPasskey({ passkey: userHandle })
+
+  console.log('[WebAuthN] clientData:', { clientData, isSignedIn, user })
+  return user
 }
 
 /**
  * Start the login process.
  */
-export function loginStart({
-  username,
-}: {
-  username: string
-}): PublicKeyCredentialRequestOptionsJSON {
+export function loginStart({ username }: { username: string }): PublicKeyCredentialRequestOptionsJSON {
   const challenge = randomBytes(32).toString('base64url')
   challenges.set(username, challenge)
 
-  const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptionsJSON =
-    {
-      challenge,
-      timeout: 60000,
-      rpId: RP_ID, // Change to your domain
-      userVerification: USER_VERIFICATION,
-      allowCredentials: [],
-    }
+  const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptionsJSON = {
+    challenge,
+    timeout: 60000,
+    rpId: RP_ID, // Change to your domain
+    userVerification: USER_VERIFICATION,
+    allowCredentials: [],
+  }
 
   return publicKeyCredentialRequestOptions
 }
 
-export function loginComplete({
-  username,
-  credential,
-}: {
-  username: string
-  credential: PublicKeyCredential
-}) {
+export function loginComplete({ username, credential }: { username: string; credential: PublicKeyCredential }) {
   const expectedChallenge = challenges.get(username)
   const user = users.get(username)
 
@@ -152,97 +148,84 @@ export function loginComplete({
 /**
  * Start the registration process by assigning a new challenge for a given
  * username.
- * @param param0
- * @returns
  */
-export function registerStart({
-  username,
-}: {
-  username: string
-}): PublicKeyCredentialCreationOptionsJSON {
+export function registerStart({ user }: { user: User }): PublicKeyCredentialCreationOptionsJSON {
   const challenge = randomBytes(32).toBase64({
     alphabet: 'base64url',
     omitPadding: true,
   })
-  challenges.set(username, challenge)
 
-  const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptionsJSON =
-    {
-      challenge,
-      rp: {
-        name: 'Asleepace',
-        id: RP_ID, // Change to your domain
-      },
-      user: {
-        id: randomBytes(16).toBase64({
-          alphabet: 'base64url',
-          omitPadding: true,
-        }),
-        name: username,
-        displayName: username,
-      },
-      pubKeyCredParams: [
-        { alg: -7, type: 'public-key' },
-        { alg: -257, type: 'public-key' },
-      ],
-      excludeCredentials: [],
-      authenticatorSelection: {
-        authenticatorAttachment: 'platform',
-        requireResidentKey: false,
-        userVerification: USER_VERIFICATION,
-      },
-      attestation: 'none',
-      timeout: 60000,
-    }
+  registrationChallenges.set(user.id, challenge)
+
+  const passkey = randomBytes(16).toBase64({
+    alphabet: 'base64url',
+    omitPadding: true,
+  })
+
+  // NOTE: this is what will be saved to the database
+  passkeyForChallenge.set(challenge, passkey)
+
+  const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptionsJSON = {
+    challenge,
+    rp: {
+      name: 'Asleepace',
+      id: RP_ID, // Change to your domain
+    },
+    user: {
+      id: passkey,
+      name: user.username,
+      displayName: user.username,
+    },
+    pubKeyCredParams: [
+      { alg: -7, type: 'public-key' },
+      { alg: -257, type: 'public-key' },
+    ],
+    excludeCredentials: [],
+    authenticatorSelection: {
+      authenticatorAttachment: 'platform',
+      requireResidentKey: false,
+      userVerification: USER_VERIFICATION,
+    },
+    attestation: 'none',
+    timeout: 60000,
+  }
 
   return publicKeyCredentialCreationOptions
 }
 
 /**
  * Call this method to finish the registration process.
- * @param props
  */
-export function registerComplete({
-  username,
-  credential,
-}: {
-  username: string
-  credential: PublicKeyCredentialJSON
-}) {
-  const challengeForUser = challenges.get(username)
-
-  console.log('[WebAuthN] registration complete:', username)
-
+export function registerComplete({ user, credential }: { user: User; credential: PublicKeyCredentialJSON }) {
+  const challengeForUser = registrationChallenges.get(user.id)
+  console.log('[WebAuthN] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +')
+  console.log('[WebAuthN] registration complete:', user.email)
   if (!challengeForUser) throw new Error('Missing challenge for user')
-
   console.log('[WebAuthN] challengeForUser', challengeForUser)
 
-  const { response } = credential
+  const passkey = passkeyForChallenge.get(challengeForUser)
 
+  const { response } = credential
   const clientDataJSON = deocdeBase64JSON(response.clientDataJSON)
   // const attestionObject = deocdeBase64JSON(response.attestationObject)
-  // const authenticatorData = deocdeBase64JSON(response.authenticatorData)
+  const authenticatorData = decodeAuthenticatorData(response)
   const publicKey = response.publicKey
+  console.log('[WebAuthN] registration public key:', publicKey)
+  console.log('[WebAuthN] registration authenticator data:', authenticatorData)
+  console.log('[WebAuthN] registration client data:', clientDataJSON)
+  console.log('[WebAuthN] passkey:', passkey)
 
-  const hasChallenge =
-    'challenge' in clientDataJSON &&
-    typeof clientDataJSON.challenge === 'string'
+  const hasChallenge = 'challenge' in clientDataJSON && typeof clientDataJSON.challenge === 'string'
 
   if (!hasChallenge) throw new Error('Missing challenge in client data')
-
   if (clientDataJSON.challenge !== challengeForUser) {
     throw new Error('Challenge mismatch!')
   }
 
-  console.log('[success] credential:', credential.id)
+  if (!passkey) throw new Error('Missing passkey for challenge!')
 
-  users.set(username, {
-    credentialId: credential.id,
-    publicKey,
-    counter: 0,
-  })
-
-  challenges.delete(username)
-
+  console.log('[success] credential:', credential, passkey)
+  passkeys.addPasskey({ userId: user.id, passkey })
+  registrationChallenges.delete(user.id)
   return true
 }

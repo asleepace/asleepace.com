@@ -8,21 +8,6 @@ import { LockKeyholeIcon } from 'lucide-react'
 export const prerender = false
 export const route = '/admin/login'
 
-// const sessionCookie = Astro.cookies?.get('session')
-// const hasSessionCookie = Boolean(sessionCookie)
-// const isLoggedIn = Boolean(Astro.locals.isLoggedIn && Astro.locals.user)
-
-// if (hasSessionCookie && isLoggedIn) {
-//   console.log(`GET ${route} redirecting to ADMIN_HOME ...`, Astro.request)
-//   return Astro.redirect(PATH.ADMIN_HOME, 302)
-// }
-
-// if (hasSessionCookie && !isLoggedIn) {
-//   Astro.cookies.delete('session', { path: '/' })
-// }
-
-// NOTE: Astro.redirect() is not working here for logged in users.
-
 const error = Astro.url.searchParams.get('error')
 
 const ERROR_CASES = {
@@ -53,23 +38,14 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
         class="flex flex-col items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-all duration-300 rounded-2xl p-4"
       >
         <div class="flex flex-col items-center justify-center py-4">
-          <LockKeyholeIcon
-            className="text-neutral-300 text-shadow my-2 mb-3"
-            size={34}
-          />
-          <p
-            class="text-4xl font-semibold tracking-wider text-neutral-900/90 text-center"
-          >
-            Admin
-          </p>
+          <LockKeyholeIcon className="text-neutral-300 text-shadow my-2 mb-3" size={34} />
+          <p class="text-4xl font-semibold tracking-wider text-neutral-900/90 text-center">Admin</p>
           <p class="text-lg tracking-wide text-center">
             {
               message ? (
                 <span class="text-red-500">{message}</span>
               ) : (
-                <span class="text-neutral-400/90">
-                  {'Please login to continue'}
-                </span>
+                <span class="text-neutral-400/90">{'Please login to continue'}</span>
               )
             }
           </p>
@@ -113,41 +89,15 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
       <Footer />
     </div>
     <script>
-      import { WebAuthnClient } from '@/lib/webauthn/client'
-
-      const client = new WebAuthnClient()
-
-      const usernameInput = document.getElementById(
-        'username'
-      ) as HTMLInputElement
-      const passwordInput = document.getElementById(
-        'password'
-      ) as HTMLInputElement
-      const registerButton = document.getElementById(
-        'register'
-      ) as HTMLButtonElement
-
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          // const success = await client.register("colin_teahan@yahoo.com")
-          // console.log('[client] registered:', success)
-
-          // const success = await client.login(usernameInput.value)
-          await client.signIn()
-
-        } catch (e) {
-          console.warn('[client] register error:', e)
-        }
-      })
+      import { webAuthnClient } from '@/lib/webauthn/client'
 
       // https://web.dev/articles/passkey-form-autofill
-      registerButton.addEventListener('click', async () => {
+      document.addEventListener('DOMContentLoaded', async () => {
         try {
-          const username = usernameInput.value
-          const success = await client.login(username)
-          console.log({ success })
+          const result = await webAuthnClient.signIn()
+          console.log('[client] webauthn result:', result)
         } catch (e) {
-          console.warn('[client] error:', e)
+          console.warn('[client] webauthn error:', e)
         }
       })
     </script>

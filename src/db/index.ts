@@ -6,7 +6,9 @@ import {
   type UserSession,
   UserFlags,
   ANALYTICS_INIT,
+  PASSKEYS_INIT,
 } from './types'
+import { attachPasskeysTable } from './passkeys'
 
 // --- initialize the database ---
 
@@ -15,6 +17,7 @@ const db = new Database('db.sqlite')
 db.run(USERS_INIT)
 db.run(SESSIONS_INIT)
 db.run(ANALYTICS_INIT)
+db.run(PASSKEYS_INIT)
 
 // --- helper functions ---
 
@@ -351,3 +354,8 @@ export namespace Analytics {
     return result
   }
 }
+
+/**
+ * Attach passkeys table and methods and export.
+ */
+export const passkeys = attachPasskeysTable(db)
