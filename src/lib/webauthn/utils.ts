@@ -21,18 +21,25 @@ export interface WebAuthNAuthenticatorData {
   readonly buffer: Buffer
 }
 
+export interface ClientDataJSON {
+  challenge: string
+  origin: string
+  type: 'webauthn.create' | 'webauthn.get'
+  crossOrigin?: boolean
+}
+
 /**
  *  Deocde a base64 encoded string as a UTF-8 string.
  */
-export const deocdeBase64 = (base64: string): string => {
+export const decodeBase64 = (base64: string): string => {
   return Buffer.from(base64, 'base64url').toString('utf-8')
 }
 
 /**
  *  Decode a base64 encoded string as JSON.
  */
-export const deocdeBase64JSON = (base64: string): any => {
-  return JSON.parse(deocdeBase64(base64))
+export const decodeBase64JSON = <T = any>(base64: string): T => {
+  return JSON.parse(decodeBase64(base64)) as T
 }
 
 /**
