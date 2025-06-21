@@ -1,5 +1,5 @@
 ---
-import { passkeys } from '@/db'
+import { Credentials } from '@/db'
 import AdminPanel from '@/layouts/AdminPanel.astro'
 import { Trash2Icon } from 'lucide-react'
 
@@ -11,16 +11,19 @@ if (!Astro.locals.user) {
 
 const { user } = Astro.locals
 
-const userPasskeys = passkeys.getPasskeysForUser(user) ?? []
+const userPasskeys = Credentials.getCredentialsForUser(user) ?? []
 
-const sanitized = userPasskeys.map((pk, index) => {
-  return {
-    index,
-    preview: pk.passkey.slice(0, 4) + '...' + pk.passkey.slice(-4),
-    createdAt: new Date(pk.createdAt),
-    updatedAt: new Date(pk.updatedAt),
-  }
-})
+const sanitized = userPasskeys
+  .map((pk, index) => {
+    if (!pk.userHandle) return undefined
+    return {
+      index,
+      preview: pk.userHandle.slice(0, 4) + '...' + pk.userHandle.slice(-4),
+      createdAt: new Date(pk.createdAt),
+      updatedAt: new Date(pk.updatedAt),
+    }
+  })
+  .filter((pk) => pk !== undefined)
 ---
 
 <AdminPanel>
@@ -60,20 +63,20 @@ const sanitized = userPasskeys.map((pk, index) => {
             ) : null
           }
           {
-            sanitized.map((pk) => (
+            sanitized.map((pk, index) => (
               <div
-                data-id={String(pk.index)}
+                data-id={String(index)}
                 class="passkey-row flex flex-row items-center justify-between font-mono gap-x-4 text-sm bg-neutral-800 rounded-xl p-2 pl-4"
               >
-                <p class="text-neutral-600">{pk.index}</p>
+                <p class="text-neutral-600">{index}</p>
                 <p>
                   <span class="text-xs uppercase">Identifier</span>{' '}
-                  <span class="text-blue-500 tracking-widest font-bold">{pk.preview}</span>
+                  <span class="text-blue-500 tracking-widest font-bold">{pk!.preview}</span>
                 </p>
                 <p>
                   <span class="text-xs uppercase">LAST USED</span>{' '}
                   <span class="text-neutral-500">
-                    {pk.updatedAt.toLocaleDateString('en-US', {
+                    {pk!.updatedAt.toLocaleDateString('en-US', {
                       dateStyle: 'full',
                     })}
                   </span>
@@ -81,13 +84,13 @@ const sanitized = userPasskeys.map((pk, index) => {
                 <p>
                   <span class="text-xs uppercase">Created</span>{' '}
                   <span class="text-neutral-500">
-                    {pk.updatedAt.toLocaleDateString('en-US', {
+                    {pk!.updatedAt.toLocaleDateString('en-US', {
                       dateStyle: 'short',
                     })}
                   </span>
                 </p>
                 <button
-                  data-trash={pk.preview.slice(0, 4)}
+                  data-trash={pk!.preview.slice(0, 4)}
                   class="bg-neutral-700 hover:bg-red-500 transition-all duration-300 w-7 aspect-square rounded-lg p-2"
                 >
                   <Trash2Icon size={12} client:only="react" />

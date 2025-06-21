@@ -1,14 +1,6 @@
 import Database from 'bun:sqlite'
-import {
-  USERS_INIT,
-  SESSIONS_INIT,
-  type User,
-  type UserSession,
-  UserFlags,
-  ANALYTICS_INIT,
-  PASSKEYS_INIT,
-} from './types'
-import { attachPasskeysTable } from './passkeys'
+import { USERS_INIT, SESSIONS_INIT, type User, type UserSession, UserFlags, ANALYTICS_INIT } from './types'
+import { attachCredentialsTable } from '@/lib/webauthn/credentials'
 
 // --- initialize the database ---
 
@@ -17,7 +9,10 @@ const db = new Database('db.sqlite')
 db.run(USERS_INIT)
 db.run(SESSIONS_INIT)
 db.run(ANALYTICS_INIT)
-db.run(PASSKEYS_INIT)
+
+// --- attach plugins ---
+
+export const Credentials = attachCredentialsTable(db)
 
 // --- helper functions ---
 
@@ -25,8 +20,7 @@ export namespace Users {
   /**
    * Check if the user has all of the given flags.
    */
-  export const hasFlags = (user: User, ...flags: UserFlags[]) =>
-    flags.every((flag) => (user.flags & flag) === flag)
+  export const hasFlags = (user: User, ...flags: UserFlags[]) => flags.every((flag) => (user.flags & flag) === flag)
 
   /**
    * Set the user's flags.
@@ -52,22 +46,17 @@ export namespace Users {
   /**
    * Check if the user is an admin (or super admin).
    */
-  export const isAdmin = (user: User) =>
-    hasFlags(user, UserFlags.Admin) || hasFlags(user, UserFlags.SuperAdmin)
+  export const isAdmin = (user: User) => hasFlags(user, UserFlags.Admin) || hasFlags(user, UserFlags.SuperAdmin)
 
   /**
    * Check if the user is a super admin (highest permission).
    */
-  export const isSuperAdmin = (user: User) =>
-    user.username === 'asleepace' || hasFlags(user, UserFlags.SuperAdmin)
+  export const isSuperAdmin = (user: User) => user.username === 'asleepace' || hasFlags(user, UserFlags.SuperAdmin)
 
   /**
    * Verify a password against a hashed password.
    */
-  export async function verifyPassword(
-    hashedPassword: string,
-    rawPassword: string
-  ): Promise<boolean> {
+  export async function verifyPassword(hashedPassword: string, rawPassword: string): Promise<boolean> {
     return Bun.password.verify(rawPassword, hashedPassword)
   }
 
@@ -84,11 +73,7 @@ export namespace Users {
     return db.query('SELECT * FROM users').all()
   }
 
-  export async function createUser({
-    email,
-    username,
-    password,
-  }: Pick<User, 'email' | 'username' | 'password'>) {
+  export async function createUser({ email, username, password }: Pick<User, 'email' | 'username' | 'password'>) {
     const query = db.prepare(`
       INSERT INTO users (email, username, password)
       VALUES ($email, $username, $password)
@@ -128,18 +113,12 @@ export namespace Users {
     }) as User | undefined
   }
 
-  export function findUser(
-    user: Partial<Pick<User, 'id' | 'email' | 'username'>>
-  ) {
-    return db
-      .query(
-        'SELECT * FROM users WHERE id = $id OR email = $email OR username = $username LIMIT 1;'
-      )
-      .get({
-        $id: user.id ?? null,
-        $email: user.email ?? null,
-        $username: user.username ?? null,
-      }) as User | undefined
+  export function findUser(user: Partial<Pick<User, 'id' | 'email' | 'username'>>) {
+    return db.query('SELECT * FROM users WHERE id = $id OR email = $email OR username = $username LIMIT 1;').get({
+      $id: user.id ?? null,
+      $email: user.email ?? null,
+      $username: user.username ?? null,
+    }) as User | undefined
   }
 
   // --- initialize the database ---
@@ -190,9 +169,7 @@ export namespace Sessions {
    *
    * @returns the user for the given session cookie
    */
-  export async function getUser(
-    sessionCookie: string | undefined
-  ): Promise<User | undefined> {
+  export async function getUser(sessionCookie: string | undefined): Promise<User | undefined> {
     if (!sessionCookie) return undefined
     const session = findByToken(sessionCookie)
     if (!session) return undefined
@@ -247,11 +224,9 @@ export namespace Sessions {
   }
 
   export function findByToken(token: string): UserSession | undefined {
-    const session = db
-      .query('SELECT * FROM sessions WHERE token = $token')
-      .get({
-        $token: token,
-      }) as UserSession | undefined
+    const session = db.query('SELECT * FROM sessions WHERE token = $token').get({
+      $token: token,
+    }) as UserSession | undefined
 
     if (!session) {
       // console.warn('[findByToken] session not found:', token)
@@ -354,8 +329,3 @@ export namespace Analytics {
     return result
   }
 }
-
-/**
- * Attach passkeys table and methods and export.
- */
-export const passkeys = attachPasskeysTable(db)

@@ -8,7 +8,21 @@ export type Passkey = {
   updatedAt: Date
 }
 
+const PASSKEYS_INIT = `
+  CREATE TABLE IF NOT EXISTS passkeys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL,
+      passkey TEXT NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+`
+
 export function attachPasskeysTable(db: Database) {
+  // initialize database if it doesn't exist
+  db.run(PASSKEYS_INIT)
+
   return {
     /**
      *  Register a passkey for a specific user.
@@ -29,47 +43,30 @@ export function attachPasskeysTable(db: Database) {
     /**
      * Find a user based on a provided passkey.
      */
-    getUserByPasskey({ passkey }: { passkey: string }): User | undefined {
-      try {
-        // Single query with JOIN for efficiency
-        const result = db
-          .query(
-            `
-          SELECT u.* 
-          FROM users u 
-          INNER JOIN passkeys p ON u.id = p.userId 
-          WHERE p.passkey = $passkey`
-          )
-          .get({ $passkey: passkey }) as User | undefined
-
-        if (!result) {
-          console.warn('[passkey] no user found for provided passkey')
-        }
-
-        return result
-      } catch (error) {
-        console.error('[passkey] failed to get user by passkey:', error)
-        return undefined
-      }
+    getUserByHandle({ userHandle }: { userHandle: string }): User | undefined {
+      return db
+        .query(
+          `
+            SELECT u.* 
+            FROM users u 
+            INNER JOIN passkeys p ON u.id = p.userId 
+            WHERE p.passkey = $userHandle`
+        )
+        .get({ $userHandle: userHandle }) as User | undefined
     },
     /**
      *  Get all passkeys for a specific user.
      */
-    getPasskeysForUser({ id }: User) {
+    getPasskeysForUser({ id }: User): Passkey[] {
       return db.query(`SELECT * FROM passkeys WHERE userId = $id`).all({ $id: id }) as Passkey[]
     },
     /**
      *  Delete a specific passkey.
      */
-    deletePasskey({ passkey }: Passkey) {
-      try {
-        const query = db.prepare(`DELETE FROM passkeys WHERE passkey = $passkey`)
-        const result = query.run({ $passkey: passkey })
-        return result.changes > 0
-      } catch (error) {
-        console.error('[passkey] failed to delete passkey:', error)
-        return false
-      }
+    deletePasskey({ passkey }: Passkey): boolean {
+      const query = db.prepare(`DELETE FROM passkeys WHERE passkey = $passkey`)
+      const result = query.run({ $passkey: passkey })
+      return result.changes > 0
     },
   }
 }

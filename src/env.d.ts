@@ -33,6 +33,7 @@ interface Env {
   PROTOCOL: string
   ENVIRONMENT: 'development' | 'production'
   COOKIE_DOMAIN: string
+  WEBAUTHN_RP_ID: string
 }
 
 declare global {

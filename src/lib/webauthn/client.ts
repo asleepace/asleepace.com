@@ -1,5 +1,3 @@
-import type { User } from '@/db/types'
-
 const WebAuthnApi = {
   signInChallenge: '/api/webauthn/challenge',
   singInComplete: '/api/webauthn/complete',
@@ -57,6 +55,10 @@ const fetchThenRedirect = async (body: string) => {
  */
 export const webAuthnClient = {
   async signIn(options: { mediation: CredentialRequestOptions['mediation'] }) {
+    const isAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+    if (!isAvailable) {
+      return
+    }
     const requestOptionsJSON = await fetchWebAuthN({ route: WebAuthnApi.signInChallenge })
     const challenge = PublicKeyCredential.parseRequestOptionsFromJSON(requestOptionsJSON)
     const credential = await navigator.credentials.get({
