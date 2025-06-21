@@ -94,7 +94,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
       // https://web.dev/articles/passkey-form-autofill
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          const result = await webAuthnClient.signIn()
+          const result = await webAuthnClient.signIn({ mediation: 'silent' })
           console.log('[client] webauthn result:', result)
         } catch (e) {
           console.warn('[client] webauthn error:', e)

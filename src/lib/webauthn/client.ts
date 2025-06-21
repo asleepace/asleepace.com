@@ -56,11 +56,11 @@ const fetchThenRedirect = async (body: string) => {
  *
  */
 export const webAuthnClient = {
-  async signIn() {
+  async signIn(options: { mediation: CredentialRequestOptions['mediation'] }) {
     const requestOptionsJSON = await fetchWebAuthN({ route: WebAuthnApi.signInChallenge })
     const challenge = PublicKeyCredential.parseRequestOptionsFromJSON(requestOptionsJSON)
     const credential = await navigator.credentials.get({
-      mediation: 'conditional',
+      mediation: options.mediation ?? 'conditional',
       publicKey: challenge,
     })
     return fetchThenRedirect(JSON.stringify({ credential }))
