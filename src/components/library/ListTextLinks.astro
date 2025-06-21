@@ -5,15 +5,15 @@ export type ListItemData = [title: string, href: string]
 
 interface Props {
   className?: string
-  title: string
+  title?: string
   data: ListItemData[]
 }
 
-const { data, className } = Astro.props
+const { data, title = 'Admin', className } = Astro.props
 ---
 
 <div class={cn('px-4 flex flex-col flex-1 w-full h-full', className)}>
-  <p class="text-neutral-400 text-base font-thin mb-4 ml-3">History</p>
+  <p class="text-neutral-400 text-base font-thin mb-4 ml-3">{title}</p>
   <div class="flex-1 overflow-y-auto gap-y-2">
     <ul class="flex flex-col gap-y-2">
       {

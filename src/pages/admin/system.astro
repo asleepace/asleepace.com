@@ -5,6 +5,7 @@ import { ProcessInfoWidget } from '@/components/core/ProcessInfoWidget.tsx'
 import '@/styles/data-table.css'
 import clsx from 'clsx'
 import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
+import AdminPanel from '@/layouts/AdminPanel.astro'
 
 export const prerender = false
 
@@ -18,38 +19,21 @@ if (!isLoggedIn || !user) {
 const hideScrollBars = true
 ---
 
-<!doctype html>
-<html lang="en" class="h-full">
-  <head>
-    <BaseHead title={siteData.title} description={siteData.description} />
-  </head>
-  <body
-    class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden"
-  >
-    <main class="flex flex-row h-full flex-1 bg-zinc-950">
-      <!-- side bar -->
-      <AdminPanelSidebar activeTab={1} />
+<AdminPanel>
+  <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16">
+    <!-- welcome message & search bar -->
+    <div class="flex gap-y-4 flex-col flex-1 self-stretch max-w-screen-xl">
+      <p class="text-6xl font-bold">⚙️ System</p>
+      <p class="tracking-wide text-zinc-400 p-2">Detailed information on current system processess...</p>
+      <!-- memory usage statistics -->
       <div
-        class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16"
+        class={clsx(
+          'flex flex-col flex-1 self-stretch min-h-[400px] mb-16 bg-zinc-900 overflow-auto rounded-xl',
+          hideScrollBars && '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+        )}
       >
-        <!-- welcome message & search bar -->
-        <div class="flex gap-y-4 flex-col flex-1 self-stretch max-w-screen-xl">
-          <p class="text-6xl font-bold">⚙️ System</p>
-          <p class="tracking-wide text-zinc-400 p-2">
-            Detailed information on current system processess...
-          </p>
-          <!-- memory usage statistics -->
-          <div
-            class={clsx(
-              'flex flex-col flex-1 self-stretch min-h-[400px] mb-16 bg-zinc-900 overflow-auto rounded-xl',
-              hideScrollBars &&
-                '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
-            )}
-          >
-            <ProcessInfoWidget client:only="react" />
-          </div>
-        </div>
+        <ProcessInfoWidget client:only="react" />
       </div>
-    </main>
-  </body>
-</html>
+    </div>
+  </div>
+</AdminPanel>

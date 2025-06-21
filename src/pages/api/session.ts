@@ -12,16 +12,25 @@ export type SessionResponse = {
 /**
  *  GET /api/session
  *
- *  This route returns the current user for the session and a flag indicating
- *  whether the user is logged in.
- *
- *  @response {{ user: User, isLoggedIn: boolean }}
- *
- *  @note always returns a 200
+ *  This route returns the current user for the session or a 403,
+ *  will remove sensitive data like password.
  *
  */
-export const GET: APIRoute = async ({
-  locals: { user = undefined, isLoggedIn = false },
-}) => {
-  return WebResponse.OK({ user, isLoggedIn })
+export const GET: APIRoute = async (ctx) => {
+  const { user } = ctx.locals
+  console.log('[api/session] user:', user)
+
+  if (!user)
+    return Response.json(
+      {
+        error: 'NOT_AUTHORIZED',
+      },
+      {
+        status: 403,
+        statusText: 'Not Authorized',
+      }
+    )
+
+  const { password, ...sanitizedUserData } = user
+  return Response.json(sanitizedUserData)
 }
