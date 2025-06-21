@@ -9,7 +9,9 @@ if (!Astro.locals.user) {
   return Astro.redirect('/admin/login', 302)
 }
 
-const userPasskeys = passkeys.getPasskeysForUser(Astro.locals.user) ?? []
+const { user } = Astro.locals
+
+const userPasskeys = passkeys.getPasskeysForUser(user) ?? []
 
 const sanitized = userPasskeys.map((pk, index) => {
   return {
@@ -19,13 +21,21 @@ const sanitized = userPasskeys.map((pk, index) => {
     updatedAt: new Date(pk.updatedAt),
   }
 })
-
-console.log({ userPasskeys })
 ---
 
 <AdminPanel>
   <main class="p-16 flex flex-col gap-y-4 text-neutral-200">
     <ul class="flex flex-col gap-y-8 *:flex *:flex-col *:gap-y-2">
+      <li>
+        <p>Account</p>
+        <p class="text-sm text-neutral-400">These are the options for the currently logged in account.</p>
+        <div class="text-sm flex flex-col gap-y-2 font-mono rounded-xl max-w-lg p-2">
+          <p class="text-neutral-500">Username: <span class="text-blue-500">{user.username}</span></p>
+          <p class="text-neutral-500">Email: <span class="text-blue-500">{user.email}</span></p>
+          <p class="text-neutral-500">Updated: <span class="text-blue-500">{user.updatedAt}</span></p>
+          <p class="text-neutral-500">Created: <span class="text-blue-500">{user.createdAt}</span></p>
+        </div>
+      </li>
       <li>
         <p>Register Passkey</p>
         <p class="text-sm text-neutral-400">
@@ -87,6 +97,17 @@ console.log({ userPasskeys })
           }
         </div>
       </li>
+      <li>
+        <p>Session Logout</p>
+        <p class="text-sm text-neutral-400">Click the button below to sign out of your current session.</p>
+        <a href="/admin/logout">
+          <button
+            id="logout"
+            class="bg-red-500 my-4 shadow-sm hover:bg-red-400 transition-all duration-300 text-sm py-2 px-4 max-w-lg rounded-xl"
+            >Clear session & logout</button
+          ></a
+        >
+      </li>
     </ul>
   </main>
 </AdminPanel>
@@ -118,9 +139,10 @@ console.log({ userPasskeys })
     try {
       const result = await webAuthnClient.register()
       console.log('[admin][webauthn] result:', result)
-      window.alert('Success')
+      window.location.reload()
     } catch (e) {
       console.warn('[admin][webauthn] error:', e)
+      window.alert(e?.message || 'Failed to register passkey!')
     }
   })
 </script>

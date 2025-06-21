@@ -60,17 +60,5 @@ const adminPageInfo = {
         </ContainerLabeled>
       </div>
     </main>
-    <script>
-      import { webAuthnClient } from '@/lib/webauthn/client'
-
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          const result = await webAuthnClient.register()
-          console.log('[admin][webauthn] result:', result)
-        } catch (e) {
-          console.warn('[admin][webauthn] error:', e)
-        }
-      })
-    </script>
   </body>
 </html>
