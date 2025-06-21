@@ -38,8 +38,7 @@ export function attachPasskeysTable(db: Database) {
           SELECT u.* 
           FROM users u 
           INNER JOIN passkeys p ON u.id = p.userId 
-          WHERE p.passkey = $passkey
-        `
+          WHERE p.passkey = $passkey`
           )
           .get({ $passkey: passkey }) as User | undefined
 
@@ -58,6 +57,19 @@ export function attachPasskeysTable(db: Database) {
      */
     getPasskeysForUser({ id }: User) {
       return db.query(`SELECT * FROM passkeys WHERE userId = $id`).all({ $id: id }) as Passkey[]
+    },
+    /**
+     *  Delete a specific passkey.
+     */
+    deletePasskey({ passkey }: Passkey) {
+      try {
+        const query = db.prepare(`DELETE FROM passkeys WHERE passkey = $passkey`)
+        const result = query.run({ $passkey: passkey })
+        return result.changes > 0
+      } catch (error) {
+        console.error('[passkey] failed to delete passkey:', error)
+        return false
+      }
     },
   }
 }
