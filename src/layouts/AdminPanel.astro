@@ -12,7 +12,7 @@ const chatHistoryLinks = [
   ['Command Line', '/admin/cli'],
   ['Control Panel', '/admin/control-panel'],
   ['System Info', '/admin/system'],
-  ['Logs', '/admin/logs'],
+  ['Logs', '/admin/log'],
 ] as [string, string][]
 ---
 
@@ -41,7 +41,7 @@ const chatHistoryLinks = [
       </Sidebar>
 
       <!-- Main content area -->
-      <div class="flex-1 bg-neutral-900 overflow-auto">
+      <div class="flex-1 bg-neutral-900 text-white overflow-auto">
         <slot />
       </div>
     </div>
