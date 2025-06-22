@@ -2,6 +2,7 @@
 /// <reference types="astro/client" />
 
 import { type CollectionEntry } from 'astro:content'
+import type { User } from './db/types'
 
 export type PageMetrics = {
   views: number
@@ -32,6 +33,8 @@ interface Env {
   PROTOCOL: string
   ENVIRONMENT: 'development' | 'production'
   COOKIE_DOMAIN: string
+  WEBAUTHN_RP_ID: string
+  WEBAUTHN_RP_ORIGIN: string
 }
 
 declare global {
@@ -40,7 +43,7 @@ declare global {
   namespace App {
     export interface Locals {
       isLoggedIn: boolean
-      user: Record<string, any> | undefined
+      user: User | undefined
       requestId: number
     }
   }

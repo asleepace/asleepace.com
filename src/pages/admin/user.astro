@@ -1,0 +1,151 @@
+---
+import { Credentials } from '@/db'
+import AdminPanel from '@/layouts/AdminPanel.astro'
+import { Trash2Icon } from 'lucide-react'
+
+export const prerender = false
+
+if (!Astro.locals.user) {
+  return Astro.redirect('/admin/login', 302)
+}
+
+const { user } = Astro.locals
+
+const userPasskeys = Credentials.getCredentialsForUser(user) ?? []
+
+const sanitized = userPasskeys
+  .map((pk, index) => {
+    if (!pk.userHandle) return undefined
+    return {
+      index,
+      preview: pk.publicKey.slice(0, 4) + '...' + pk.publicKey.slice(-4),
+      createdAt: new Date(pk.createdAt),
+      updatedAt: new Date(pk.updatedAt),
+    }
+  })
+  .filter((pk) => pk !== undefined)
+---
+
+<AdminPanel>
+  <main class="p-16 flex flex-col gap-y-4 text-neutral-200">
+    <ul class="flex flex-col gap-y-8 *:flex *:flex-col *:gap-y-2">
+      <li>
+        <p>Account</p>
+        <p class="text-sm text-neutral-400">These are the options for the currently logged in account.</p>
+        <div class="text-sm flex flex-col gap-y-2 font-mono rounded-xl max-w-lg p-2">
+          <p class="text-neutral-500">Username: <span class="text-blue-500">{user.username}</span></p>
+          <p class="text-neutral-500">Email: <span class="text-blue-500">{user.email}</span></p>
+          <p class="text-neutral-500">Updated: <span class="text-blue-500">{user.updatedAt}</span></p>
+          <p class="text-neutral-500">Created: <span class="text-blue-500">{user.createdAt}</span></p>
+        </div>
+      </li>
+      <li>
+        <p>Register Passkey</p>
+        <p class="text-sm text-neutral-400">
+          Click the button below to register a new WebAuthN passkey for this account. <br />
+          You account can have multiple passkeys.
+        </p>
+        <button
+          id="register-passkey"
+          class="bg-blue-500 my-4 shadow-sm hover:bg-blue-400 transition-all duration-300 text-sm p-2 max-w-lg rounded-xl"
+          >Register new passkey</button
+        >
+      </li>
+      <li>
+        <p>Account Passkeys</p>
+        <p class="text-sm text-neutral-400">Below are the currently registered passkeys for this account.</p>
+        <div class="flex flex-col gap-y-2 max-w-3xl text-neutral-400 my-4">
+          {
+            sanitized.length === 0 ? (
+              <div class="p-4 bg-neutral-800 rounded-xl max-w-lg">
+                <p class="text-sm text-center">No passkeys registered.</p>
+              </div>
+            ) : null
+          }
+          {
+            sanitized.map((pk, index) => (
+              <div
+                data-id={String(index)}
+                class="passkey-row flex flex-row items-center justify-between font-mono gap-x-4 text-sm bg-neutral-800 rounded-xl p-2 pl-4"
+              >
+                <p class="text-neutral-600">{index}</p>
+                <p>
+                  <span class="text-xs uppercase">Identifier</span>{' '}
+                  <span class="text-blue-500 tracking-widest font-bold">{pk!.preview}</span>
+                </p>
+                <p>
+                  <span class="text-xs uppercase">LAST USED</span>{' '}
+                  <span class="text-neutral-500">
+                    {pk!.updatedAt.toLocaleDateString('en-US', {
+                      dateStyle: 'full',
+                    })}
+                  </span>
+                </p>
+                <p>
+                  <span class="text-xs uppercase">Created</span>{' '}
+                  <span class="text-neutral-500">
+                    {pk!.updatedAt.toLocaleDateString('en-US', {
+                      dateStyle: 'short',
+                    })}
+                  </span>
+                </p>
+                <button
+                  data-trash={pk!.preview.slice(0, 4)}
+                  class="bg-neutral-700 hover:bg-red-500 transition-all duration-300 w-7 aspect-square rounded-lg p-2"
+                >
+                  <Trash2Icon size={12} client:only="react" />
+                </button>
+              </div>
+            ))
+          }
+        </div>
+      </li>
+      <li>
+        <p>Session Logout</p>
+        <p class="text-sm text-neutral-400">Click the button below to sign out of your current session.</p>
+        <a href="/admin/logout">
+          <button
+            id="logout"
+            class="bg-red-500 my-4 shadow-sm hover:bg-red-400 transition-all duration-300 text-sm py-2 px-4 max-w-lg rounded-xl"
+            >Clear session & logout</button
+          ></a
+        >
+      </li>
+    </ul>
+  </main>
+</AdminPanel>
+
+<script>
+  import { webAuthnClient } from '@/lib/webauthn/client'
+
+  async function deletePasskey(id: string) {
+    if (!window.confirm('Permanently delete this passkey?')) return
+    const result = await fetch(`/api/webauthn/delete-key?id=${id}`, { method: 'DELETE' })
+    console.log('[admin][webauthn] result:', result)
+    window.location.reload()
+  }
+
+  const registerPasskey = document.getElementById('register-passkey') as HTMLButtonElement
+  const passkeyRows = [...document.getElementsByClassName('passkey-row')]
+
+  passkeyRows.forEach((pkRow) => {
+    const trashButton = pkRow.querySelector('[data-trash]') as HTMLButtonElement
+    const passkeyId = trashButton.getAttribute('data-trash')
+    if (!passkeyId) {
+      console.warn('Missing data attribute "data-trash" on button')
+      return
+    }
+    trashButton.addEventListener('click', () => deletePasskey(passkeyId))
+  })
+
+  registerPasskey.addEventListener('click', async () => {
+    try {
+      const result = await webAuthnClient.register()
+      console.log('[admin][webauthn] result:', result)
+      window.location.reload()
+    } catch (e) {
+      console.warn('[admin][webauthn] error:', e)
+      window.alert(e?.message || 'Failed to register passkey!')
+    }
+  })
+</script>

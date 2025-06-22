@@ -36,30 +36,26 @@ console.log(
  *
  * This endpoint can be used to either login or register a user.
  */
-export const POST: APIRoute = async ({
-  request,
-  locals,
-  cookies,
-  redirect,
-}) => {
+export const POST: APIRoute = async ({ request, locals, cookies, redirect }) => {
   try {
-    console.log(`\nPOST ${route}`)
+    console.log('[api/auth] login:', request)
 
     // --- parse the request body ---
 
+    const CONTENT_TYPE_MULTIPART = 'multipart/form-data'
     const CONTENT_TYPE_FORM = 'application/x-www-form-urlencoded'
     const CONTENT_TYPE_JSON = 'application/json'
 
-    const contentType =
-      request.headers.get('content-type') || request.headers.get('Content-Type')
+    const contentType = request.headers.get('content-type') || request.headers.get('Content-Type')
 
+    const isMultiPartEncoded = contentType?.includes(CONTENT_TYPE_MULTIPART)
     const isFormEncoded = contentType?.includes(CONTENT_TYPE_FORM)
     const isJsonEncoded = contentType?.includes(CONTENT_TYPE_JSON)
 
     let username: string | undefined
     let password: string | undefined
 
-    if (isFormEncoded) {
+    if (isFormEncoded || isMultiPartEncoded) {
       const formData = await request.formData()
       username = formData.get('username')?.toString()
       password = formData.get('password')?.toString()
@@ -68,7 +64,7 @@ export const POST: APIRoute = async ({
       username = body.username
       password = body.password
     } else {
-      throw new Error('bad_content')
+      throw new Error('Invalid body content.')
     }
 
     if (!username) throw new Error('invalid_username')

@@ -8,21 +8,6 @@ import { LockKeyholeIcon } from 'lucide-react'
 export const prerender = false
 export const route = '/admin/login'
 
-// const sessionCookie = Astro.cookies?.get('session')
-// const hasSessionCookie = Boolean(sessionCookie)
-// const isLoggedIn = Boolean(Astro.locals.isLoggedIn && Astro.locals.user)
-
-// if (hasSessionCookie && isLoggedIn) {
-//   console.log(`GET ${route} redirecting to ADMIN_HOME ...`, Astro.request)
-//   return Astro.redirect(PATH.ADMIN_HOME, 302)
-// }
-
-// if (hasSessionCookie && !isLoggedIn) {
-//   Astro.cookies.delete('session', { path: '/' })
-// }
-
-// NOTE: Astro.redirect() is not working here for logged in users.
-
 const error = Astro.url.searchParams.get('error')
 
 const ERROR_CASES = {
@@ -46,36 +31,28 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
   >
     <Header title="" class:list="before:bg-glass overflow-hidden" />
     <main
-      class="flex flex-col inset-shadow-2xs grow self-stretch w-full justify-center items-center mx-auto p-4 from-neutral-200 via-white/40 to-neutral-200 bg-gradient-to-r"
+      class="flex flex-col inset-shadow-2xs grow self-stretch w-full justify-center items-center mx-auto p-4 from-neutral-200/30 via-white/0 to-neutral-200/30 bg-gradient-to-r"
     >
       <div class="absolute bg-glass inset-shadow -z-10 inset-0"></div>
       <div
-        class="flex flex-col focus-within:-translate-y-16 items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-all duration-300 rounded-2xl p-4"
+        class="flex flex-col items-center gap-2 py-4 bg-white/85 focus-within:bg-white/95 transition-all duration-300 rounded-2xl p-4"
       >
         <div class="flex flex-col items-center justify-center py-4">
-          <LockKeyholeIcon
-            className="text-neutral-300 text-shadow my-2 mb-3"
-            size={34}
-          />
-          <p
-            class="text-4xl font-semibold tracking-wider text-neutral-900/90 text-center"
-          >
-            Admin
-          </p>
+          <LockKeyholeIcon className="text-neutral-300 text-shadow my-2 mb-3" size={34} />
+          <p class="text-4xl font-semibold tracking-wider text-neutral-900/90 text-center">Admin</p>
           <p class="text-lg tracking-wide text-center">
             {
               message ? (
                 <span class="text-red-500">{message}</span>
               ) : (
-                <span class="text-neutral-400/90">
-                  {'Please login to continue'}
-                </span>
+                <span class="text-neutral-400/90">{'Please login to continue'}</span>
               )
             }
           </p>
         </div>
         <!-- Login Form -->
         <form
+          id="login-form"
           action="/api/auth"
           class="flex flex-col mt-4 gap-2 w-[300px] *:transition-colors *:duration-100"
           method="post"
@@ -85,7 +62,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
           <input
             autofocus
             class="border border-gray-300 bg-transparent mix-blend-multiply text-center focus:ring-0 outline-none focus:border-blue-400 focus:placeholder:opacity-0 rounded-md p-2 text-sm"
-            autocomplete="email"
+            autocomplete="username webauthn"
             id="username"
             type="text"
             name="username"
@@ -93,7 +70,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
           />
           <input
             class="border border-gray-300 bg-transparent mix-blend-multiply focus:backdrop-blur-2xl text-center focus:ring-0 outline-none focus:border-blue-400 rounded-md focus:placeholder:opacity-0 p-2 text-sm"
-            autocomplete="current-password"
+            autocomplete="current-password webauthn"
             id="password"
             type="password"
             name="password"
@@ -101,6 +78,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
           />
           <div class="h-thin w-full bg-neutral-200/90"></div>
           <button
+            id="register"
             class="bg-blue-500 hover:bg-blue-400 transition-all duration-300 text-white text-sm tracking-wide rounded-xl p-3"
             type="submit">Submit</button
           >
@@ -110,5 +88,18 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
     <div class="backdrop-blur-lg">
       <Footer />
     </div>
+    <script>
+      import { webAuthnClient } from '@/lib/webauthn/client'
+
+      // https://web.dev/articles/passkey-form-autofill
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const result = await webAuthnClient.signIn({ mediation: 'silent' })
+          console.log('[client] webauthn result:', result)
+        } catch (e) {
+          console.warn('[client] webauthn error:', e)
+        }
+      })
+    </script>
   </body>
 </html>

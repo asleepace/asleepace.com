@@ -1,33 +1,20 @@
 ---
-import BaseHead from '@/components/astro/BaseHead.astro'
-import { siteData, siteConfig } from '@/consts'
 import '@/styles/data-table.css'
-import AdminPanelSidebar from '@/components/admin/AdminPanelSidebar.astro'
 import AdminPageInfo from '@/components/admin/AdminPageInfo.astro'
 import AdminCommandLine from '@/components/admin/AdminCommandLine'
 import ContainerLabeled from '@/components/astro/ContainerLabeled.astro'
-import chalk from 'chalk'
+import AdminPanel from '@/layouts/AdminPanel.astro'
 
 export const prerender = false
-
-const TAG =
-  chalk.white('[@] ' + Astro.request.method + ' ') +
-  chalk.gray(Astro.url.pathname) +
-  '\t'
-
-const redirectTo = siteConfig.path.adminLogin({
-  trackUser: '1', // does nothing lol
-})
 
 // =====================================
 // Admin Page
 // =====================================
 
-const { user, isLoggedIn } = Astro.locals
+const { user } = Astro.locals
 
-if (!isLoggedIn || !user) {
-  console.warn(TAG, chalk.yellow('NOT_LOGGED_IN'), chalk.gray('redirecting...'))
-  return Astro.redirect(redirectTo, 302)
+if (!user) {
+  return Astro.redirect('/admin/login', 302)
 }
 
 const adminPageInfo = {
@@ -35,40 +22,18 @@ const adminPageInfo = {
 }
 ---
 
-<!doctype html>
-<html lang="en" class="h-full">
-  <head>
-    <BaseHead title={siteData.title} description={siteData.description} />
-  </head>
-  <body
-    class="flex flex-col flex-1 min-h-full w-full bg-black text-white overflow-x-hidden"
-  >
-    <main class="flex flex-row h-full flex-1 bg-zinc-950">
-      <!-- side bar -->
-      <AdminPanelSidebar
-        activeTab={0}
-        username={user.username}
-        environment={siteConfig.environment}
-        version={siteConfig.version}
-      />
-      <div
-        class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16"
-      >
-        <!-- welcome message & search bar -->
-        <div class="flex flex-col gap-y-4 flex-1 self-stretch max-w-screen-xl">
-          <p class="text-white text-6xl font-bold">Admin Panel</p>
-          <p class="tracking-wide text-neutral-200 py-2">
-            Welcome to the admin page <strong>{user.username}!</strong>
-          </p>
-          <AdminCommandLine client:only="react" />
-        </div>
-        <ContainerLabeled
-          label="Environment"
-          className="basis-1/4 max-w-screen-xs max-h-[600px]"
-        >
-          <AdminPageInfo data={adminPageInfo} />
-        </ContainerLabeled>
-      </div>
-    </main>
-  </body>
-</html>
+<AdminPanel>
+  <div class="flex h-full flex-row flex-1 overflow-hidden max-h-screen justify-center items-start gap-16 p-16">
+    <!-- welcome message & search bar -->
+    <div class="flex flex-col gap-y-4 flex-1 self-stretch max-w-screen-xl">
+      <p class="text-white text-3xl font-bold">Admin Panel</p>
+      <p class="tracking-wide text-sm text-neutral-400 py-2">
+        Welcome to the admin page <a class="text-blue-500" href="/admin/user">{user.username}</a>!
+      </p>
+      <AdminCommandLine client:only="react" />
+    </div>
+    <ContainerLabeled label="Environment" className="basis-1/4 max-w-screen-xs max-h-[600px]">
+      <AdminPageInfo data={adminPageInfo} />
+    </ContainerLabeled>
+  </div>
+</AdminPanel>
