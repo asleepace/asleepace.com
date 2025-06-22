@@ -75,7 +75,10 @@ export const startSignInChallenge = (): PublicKeyCredentialRequestOptionsJSON =>
 })
 
 /**
- *  Verify cryptographic signature by comparing the
+ *  Verify cryptographic signature by comparing the SHA-256 of the client data to the
+ *  provided signature using the public key.
+ *
+ *  @note this is where the magic happens...
  */
 function verifySignature(props: {
   authenticatorDataBuffer: Buffer
@@ -83,27 +86,19 @@ function verifySignature(props: {
   signature: string
   publicKey: string
 }) {
-  console.log('[DEBUG] Starting signature verification...')
+  console.log('[webauthn][signin] verifying signature...')
 
-  // Use your existing utility to decode base64url to UTF-8
-  const clientDataJSONString = decodeBase64(props.clientDataJSON)
-  console.log('[DEBUG] Decoded clientDataJSON:', clientDataJSONString)
-
-  // Hash the decoded UTF-8 string (not the base64url version)
-  const clientDataHash = hashSha256(clientDataJSONString)
+  const clientDataJSONString = decodeBase64(props.clientDataJSON) // keep as UTF-8
+  const clientDataHash = hashSha256(clientDataJSONString) // sha256 of client data
 
   const authDataLength = props.authenticatorDataBuffer.length
   const totalLength = authDataLength + clientDataHash.length
-  const signedData = Buffer.alloc(totalLength)
+  const signedData = new Uint8Array(totalLength)
 
   props.authenticatorDataBuffer.copy(signedData, 0)
   clientDataHash.copy(signedData, authDataLength)
 
-  console.log('[DEBUG] AuthData hex:', props.authenticatorDataBuffer.toString('hex'))
-  console.log('[DEBUG] ClientDataHash hex (corrected):', clientDataHash.toString('hex'))
-  console.log('[DEBUG] Signed data hex (corrected):', signedData.toString('hex'))
-
-  const signatureBytes = Buffer.from(props.signature, 'base64url')
+  const signatureBytes = new Uint8Array(Buffer.from(props.signature, 'base64url'))
   const publicKeyBuffer = Buffer.from(props.publicKey, 'base64')
 
   const publicKeyObject = createPublicKey({
@@ -116,7 +111,6 @@ function verifySignature(props: {
   verifier.update(signedData)
 
   const isVerified = verifier.verify(publicKeyObject, signatureBytes)
-  console.log('[DEBUG] Verification result (corrected):', isVerified)
 
   if (!isVerified) {
     throw new Error('Signature verification failed')
@@ -162,7 +156,6 @@ const verifyClientData = (clientData?: ClientDataJSON): true | never => {
  */
 const verifyAuthenticatorData = (response: SignInResponse) => {
   const authenticatorData = decodeAuthenticatorData(response)
-
   if (!authenticatorData || typeof authenticatorData !== 'object') {
     throw new Error('Authenticator data invalid.')
   }
@@ -175,7 +168,6 @@ const verifyAuthenticatorData = (response: SignInResponse) => {
   if (!authenticatorData.rpIdHash.equals(RP_ID_HASH)) {
     throw new Error('Authenticator relaying party mismatch.')
   }
-
   return authenticatorData
 }
 
@@ -186,15 +178,12 @@ const findCredentialsById = ({ credentialId }: { credentialId: string }) => {
   if (!credentialId || typeof credentialId !== 'string') {
     throw new Error('Authenticator invalid credential id.')
   }
-
   const credential = Credentials.getCredentialById({
     credentialId,
   })
-
   if (!credential) {
     throw new Error('Authenticator credentials not found.')
   }
-
   return { credential }
 }
 
@@ -223,11 +212,11 @@ export async function completeSignInChallenge(signInCredential: SignInCredential
   // Step #4: find saved user and credential
   const { credential } = findCredentialsById({ credentialId })
 
-  console.log('[webauthn][signin] found saved credential:', credential)
-
-  // Step #5: check if the counter is out-of-sync
-  if (authenticatorData.signCount !== credential.counter) {
-    throw new Error('Authenticator potential replay attack detected.')
+  // Step #5: check if the counter is out-of-sync (if supported)
+  if (authenticatorData.signCount !== 0 || credential.counter !== 0) {
+    if (authenticatorData.signCount <= credential.counter) {
+      throw new Error('Authenticator potential replay attack detected.')
+    }
   }
 
   // Step #6: verify the signed credentials match
