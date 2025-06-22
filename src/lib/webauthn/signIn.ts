@@ -1,11 +1,17 @@
 import type { User } from '@/db/types'
-import { randomBytes, createHash, createVerify } from 'node:crypto'
-import { decodeAuthenticatorData, decodeBase64JSON, type ClientDataJSON, type WebAuthNAuthenticatorData } from './utils'
+import { randomBytes, createHash, createVerify, createPublicKey } from 'node:crypto'
+import {
+  decodeAuthenticatorData,
+  decodeBase64,
+  decodeBase64JSON,
+  type ClientDataJSON,
+  type WebAuthNAuthenticatorData,
+} from './utils'
 import { Credentials } from '@/db'
 
 const RP_ID: string = process.env.WEBAUTHN_RP_ID!
 const FIVE_MINUTES = 5 * 60 * 1000
-const WEBAUTHN_ORIGIN = 'localhost'
+const WEBAUTHN_ORIGIN = 'http://localhost:4321'
 
 const hashSha256 = (data: string) => {
   return createHash('sha256').update(data, 'utf-8').digest()
@@ -73,45 +79,63 @@ export const startSignInChallenge = (): PublicKeyCredentialRequestOptionsJSON =>
  */
 function verifySignature(props: {
   authenticatorDataBuffer: Buffer
-  clientDataJSON: string
+  clientDataJSON: string // This is base64url encoded
   signature: string
-  publicKey: Buffer // Assuming DER format
+  publicKey: string
 }) {
-  const verifier = createVerify('sha256')
-  const clientDataHash = hashSha256(props.clientDataJSON)
+  console.log('[DEBUG] Starting signature verification...')
+
+  // Use your existing utility to decode base64url to UTF-8
+  const clientDataJSONString = decodeBase64(props.clientDataJSON)
+  console.log('[DEBUG] Decoded clientDataJSON:', clientDataJSONString)
+
+  // Hash the decoded UTF-8 string (not the base64url version)
+  const clientDataHash = hashSha256(clientDataJSONString)
+
   const authDataLength = props.authenticatorDataBuffer.length
   const totalLength = authDataLength + clientDataHash.length
-  const signedData = new Uint8Array(totalLength)
+  const signedData = Buffer.alloc(totalLength)
 
-  signedData.set(props.authenticatorDataBuffer, 0)
-  signedData.set(clientDataHash, authDataLength)
+  props.authenticatorDataBuffer.copy(signedData, 0)
+  clientDataHash.copy(signedData, authDataLength)
+
+  console.log('[DEBUG] AuthData hex:', props.authenticatorDataBuffer.toString('hex'))
+  console.log('[DEBUG] ClientDataHash hex (corrected):', clientDataHash.toString('hex'))
+  console.log('[DEBUG] Signed data hex (corrected):', signedData.toString('hex'))
+
+  const signatureBytes = Buffer.from(props.signature, 'base64url')
+  const publicKeyBuffer = Buffer.from(props.publicKey, 'base64')
+
+  const publicKeyObject = createPublicKey({
+    key: publicKeyBuffer,
+    format: 'der',
+    type: 'spki',
+  })
+
+  const verifier = createVerify('sha256')
   verifier.update(signedData)
 
-  const signatureBytes = new Uint8Array(Buffer.from(props.signature, 'base64url'))
-
-  const isVerified = verifier.verify(
-    {
-      key: props.publicKey,
-      format: 'der',
-      type: 'spki',
-    },
-    signatureBytes
-  )
+  const isVerified = verifier.verify(publicKeyObject, signatureBytes)
+  console.log('[DEBUG] Verification result (corrected):', isVerified)
 
   if (!isVerified) {
-    throw new Error('Authenticator verification failed')
+    throw new Error('Signature verification failed')
   }
 }
 
-interface WebAuthNResponse {
+interface SignInResponse {
   id: string
   userHandle: string
   clientDataJSON: string
   signature: string
 }
 
-interface WebAuthNSignIn {
-  response: WebAuthNResponse
+interface SignInCredential {
+  authenticatorAttachment: string | 'platform'
+  clientExtensionResults: object
+  id: string
+  rawId: string
+  response: SignInResponse
 }
 
 /**
@@ -136,7 +160,7 @@ const verifyClientData = (clientData?: ClientDataJSON): true | never => {
 /**
  *  Verify the authenticator data matches the expected data.
  */
-const verifyAuthenticatorData = (response: WebAuthNResponse) => {
+const verifyAuthenticatorData = (response: SignInResponse) => {
   const authenticatorData = decodeAuthenticatorData(response)
 
   if (!authenticatorData || typeof authenticatorData !== 'object') {
@@ -158,22 +182,12 @@ const verifyAuthenticatorData = (response: WebAuthNResponse) => {
 /**
  *  Find saved user and credential from databased.
  */
-const findUserWithCredentialsByHandle = ({ userHandle, id: credentialId }: WebAuthNResponse) => {
-  if (!userHandle || typeof userHandle !== 'string') {
-    throw new Error('Authenticator invalid user handle.')
-  }
+const findCredentialsById = ({ credentialId }: { credentialId: string }) => {
   if (!credentialId || typeof credentialId !== 'string') {
     throw new Error('Authenticator invalid credential id.')
   }
 
-  const user = Credentials.getUserByHandle({ userHandle })
-
-  if (!user || !user.id) {
-    throw new Error('Authenticator user not found.')
-  }
-
   const credential = Credentials.getCredentialById({
-    userId: user.id,
     credentialId,
   })
 
@@ -181,7 +195,7 @@ const findUserWithCredentialsByHandle = ({ userHandle, id: credentialId }: WebAu
     throw new Error('Authenticator credentials not found.')
   }
 
-  return { user, credential }
+  return { credential }
 }
 
 /**
@@ -189,9 +203,9 @@ const findUserWithCredentialsByHandle = ({ userHandle, id: credentialId }: WebAu
  *  and then extracts the `userHandle` property from the public key credential json. This
  *  is then used to find a user in the backend.
  */
-export async function completeSignInChallenge(signInCredential: WebAuthNSignIn): Promise<User> {
+export async function completeSignInChallenge(signInCredential: SignInCredential): Promise<User> {
   if (!RP_ID || typeof RP_ID !== 'string') throw new Error('Missing RP_ID environment variable.')
-  const { response } = signInCredential
+  const { response, id: credentialId } = signInCredential
 
   console.log('[webauthn][signin] credential:', signInCredential)
 
@@ -204,12 +218,15 @@ export async function completeSignInChallenge(signInCredential: WebAuthNSignIn):
 
   // Step #3: verify authenticator data
   const authenticatorData = verifyAuthenticatorData(response)
+  console.log('[webauthn][signin] authenticator data:', authenticatorData)
 
   // Step #4: find saved user and credential
-  const { user, credential } = findUserWithCredentialsByHandle(response)
+  const { credential } = findCredentialsById({ credentialId })
+
+  console.log('[webauthn][signin] found saved credential:', credential)
 
   // Step #5: check if the counter is out-of-sync
-  if (authenticatorData.signCount <= credential.counter) {
+  if (authenticatorData.signCount !== credential.counter) {
     throw new Error('Authenticator potential replay attack detected.')
   }
 
@@ -217,15 +234,22 @@ export async function completeSignInChallenge(signInCredential: WebAuthNSignIn):
   verifySignature({
     clientDataJSON: response.clientDataJSON,
     authenticatorDataBuffer: authenticatorData.buffer,
-    publicKey: Buffer.from(credential.publicKey),
+    publicKey: credential.publicKey,
     signature: response.signature,
   })
 
-  // Step #13: update the signed counter
+  // Step #7: update the signed counter
   Credentials.updateCredentialCounter({
     credentialId: credential.id,
     counter: authenticatorData.signCount,
   })
+
+  // Step #8: fetch user from handle
+  const user = Credentials.getUserByHandle({
+    userHandle: credential.userHandle,
+  })
+
+  if (!user) throw new Error('Authenticator failed to load user!')
 
   return user
 }

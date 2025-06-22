@@ -1,47 +1,119 @@
 import type { User } from '@/db/types'
 import { randomBytes } from 'node:crypto'
-import { decodeAuthenticatorData, deocdeBase64JSON } from './utils'
-import { Crendentials } from '@/db'
+import { decodeAuthenticatorData, decodeBase64JSON, hashSha256, type ClientDataJSON } from './utils'
+import { Credentials } from '@/db'
 
-const registrationChallenges = new Map<number, string>()
-const passkeyForChallenge = new Map<string, string>()
+const FIVE_MINUTES = 5 * 60 * 1000
+
+/**
+ *  Create a unique random non-PII userHandle for the user.
+ */
+const createUserHandle = () =>
+  randomBytes(16).toBase64({
+    alphabet: 'base64url',
+    omitPadding: true,
+  })
+
+/**
+ *  Create a store which manages creating the registration challenges and
+ *  generating unique non-PII user handles.
+ */
+function createRegistrationChallengeStore() {
+  const store = new Map<string, { expires: number; userHandle: string }>()
+  return {
+    validate(clientChallenge: string): string | never {
+      if (!clientChallenge) throw new Error('Invalid client challenge!')
+      const found = store.get(clientChallenge)
+      if (!found || found.expires < Date.now()) {
+        throw new Error('Invalid or expired credential.')
+      }
+      store.delete(clientChallenge)
+      return found.userHandle
+    },
+    generate(): string {
+      const challenge = randomBytes(16).toBase64({
+        alphabet: 'base64url',
+        omitPadding: true,
+      })
+      store.set(challenge, {
+        expires: Date.now() + FIVE_MINUTES,
+        userHandle: createUserHandle(),
+      })
+      this.cleanup()
+      return challenge
+    },
+    cleanup(): void {
+      const now = Date.now()
+      for (const [challenge, data] of store) {
+        if (data.expires < now) {
+          store.delete(challenge)
+        }
+      }
+    },
+  }
+}
+
+/**
+ *  Registration challenge store which will hold challenges.
+ */
+const challenges = createRegistrationChallengeStore()
 
 /**
  *  RP_ID: needs to be "localhost" in development and set to the domain in production,
  *  will not work in development if site is behind a proxy.
  */
-const RP_ID = process.env.WEBAUTHN_RP_ID
+const RP_ID: string = process.env.WEBAUTHN_RP_ID!
+const RP_ID_HASH = hashSha256(RP_ID)
+const WEBAUTHN_ORIGIN = 'http://localhost:4321'
+
+interface WebAuthNResponse {
+  id: string
+  userHandle: string
+  clientDataJSON: string
+  signature: string
+}
+
+interface RegistrationResponse {
+  attestationObject: string
+  authenticatorData: string
+  clientDataJSON: string
+  publicKey: string
+  publicKeyAlgorithm: -7
+  transports: ['hybrid', 'internal']
+}
+
+interface RegistrationCredential {
+  authenticatorAttachment: string | 'platform'
+  clientExtensionResults: {}
+  id: string
+  rawId: string
+  response: RegistrationResponse
+  type: 'public-key'
+}
 
 /**
  * Start the registration process by assigning a new challenge for a given
  * username.
  */
-export function registerStart({ user }: { user: User }): PublicKeyCredentialCreationOptionsJSON {
-  const challenge = randomBytes(32).toBase64({
-    alphabet: 'base64url',
-    omitPadding: true,
+export const registerStart = (props: { user: User }): PublicKeyCredentialCreationOptionsJSON => {
+  const challenge = challenges.generate()
+  const userHandle = createUserHandle()
+
+  console.log('[webauthn][register] started:', {
+    challenge,
+    userHandle,
   })
 
-  registrationChallenges.set(user.id, challenge)
-
-  const passkey = randomBytes(16).toBase64({
-    alphabet: 'base64url',
-    omitPadding: true,
-  })
-
-  // NOTE: this is what will be saved to the database
-  passkeyForChallenge.set(challenge, passkey)
-
-  const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptionsJSON = {
+  return {
     challenge,
     rp: {
       name: 'Asleepace',
       id: RP_ID, // Change to your domain
     },
     user: {
-      id: passkey,
-      name: user.username,
-      displayName: user.username,
+      id: userHandle,
+      name: props.user.email,
+      displayName: props.user.username,
     },
     pubKeyCredParams: [
       { alg: -7, type: 'public-key' },
@@ -56,50 +128,50 @@ export function registerStart({ user }: { user: User }): PublicKeyCredentialCrea
     attestation: 'none',
     timeout: 60000,
   }
-
-  return publicKeyCredentialCreationOptions
 }
 
 /**
  * Call this method to finish the registration process.
  */
-export function registerComplete({ user, credential }: { user: User; credential: PublicKeyCredentialJSON }) {
-  const challengeForUser = registrationChallenges.get(user.id)
+export function registerComplete({ user, credential }: { user: User; credential: RegistrationCredential }) {
   console.log('[WebAuthN] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +')
-  console.log('[WebAuthN] registration complete:', user.email)
-
-  if (!challengeForUser) throw new Error('Missing challenge for user')
-  console.log('[WebAuthN] challengeForUser', challengeForUser)
-
-  const passkey = passkeyForChallenge.get(challengeForUser)
+  console.log('[WebAuthN] registration complete:', credential)
 
   const { response } = credential
-  const clientData = deocdeBase64JSON(response.clientDataJSON)
+  const clientData = decodeBase64JSON<ClientDataJSON>(response.clientDataJSON)
   const authenticatorData = decodeAuthenticatorData(response)
-  const publicKey = response.publicKey
-  console.log('[WebAuthN] registration public key:', publicKey)
+
   console.log('[WebAuthN] registration authenticator data:', authenticatorData)
   console.log('[WebAuthN] registration client data:', clientData)
-  console.log('[WebAuthN] passkey:', passkey)
 
-  const hasChallenge = Boolean('challenge' in clientData && typeof clientData.challenge === 'string')
-  if (!hasChallenge) throw new Error('Missing challenge in client data')
+  const userHandle = challenges.validate(clientData.challenge)
 
-  if (clientData.challenge !== challengeForUser) {
-    throw new Error('Challenge mismatch!')
+  if (!userHandle) {
+    throw new Error('Authenticator missing user handle!')
   }
 
-  if (!passkey) throw new Error('Missing passkey for challenge!')
+  if (clientData.origin !== WEBAUTHN_ORIGIN) {
+    throw new Error('Authenticator origin mismatch!')
+  }
 
-  console.log('[success] credential:', credential, passkey)
+  if (clientData.type !== 'webauthn.create') {
+    throw new Error('Authenticator type mismatch!')
+  }
 
-  Crendentials.addCredential({
-    credentialId: response.id,
+  if (!authenticatorData.flags.userPresent) {
+    throw new Error('Authenticator user not present!')
+  }
+
+  if (!authenticatorData.flags.userVerified) {
+    throw new Error('Authenticator user not verified!')
+  }
+
+  Credentials.addCredential({
+    credentialId: credential.id,
     userId: user.id,
-    userHandle: passkey,
-    publicKey,
+    userHandle: userHandle,
+    publicKey: response.publicKey,
   })
 
-  registrationChallenges.delete(user.id)
   return true
 }

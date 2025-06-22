@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer'
+import { createHash } from 'node:crypto'
 
 /**
  *  WebAuthN: Utils
@@ -40,6 +41,13 @@ export const decodeBase64 = (base64: string): string => {
  */
 export const decodeBase64JSON = <T = any>(base64: string): T => {
   return JSON.parse(decodeBase64(base64)) as T
+}
+
+/**
+ *  Hash the data as a 256 digest buffer.
+ */
+export const hashSha256 = (data: string): Buffer => {
+  return createHash('sha256').update(data, 'utf-8').digest()
 }
 
 /**
