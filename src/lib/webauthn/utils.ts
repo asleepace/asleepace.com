@@ -30,6 +30,28 @@ export interface ClientDataJSON {
 }
 
 /**
+ *  Hash the data as a 256 digest buffer.
+ */
+export const hashSha256 = (data: string): Buffer => {
+  return createHash('sha256').update(data, 'utf-8').digest()
+}
+
+/**
+ *  Shared configuration.
+ */
+export namespace WebAuthN {
+  export const RP_ID: string = process.env.WEBAUTHN_RP_ID!
+  export const RP_ORIGIN: string = process.env.WEBAUTHN_RP_ORIGIN!
+  export const RP_ID_HASH = new Uint8Array(hashSha256(RP_ID))
+  export const RP_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+  console.assert(RP_ID.length !== 0, 'Missing (.env) RP_ID=example')
+  console.assert(RP_ORIGIN.length !== 0, 'Missing (.env) RP_ORIGIN=https://example.com')
+
+  export const GetType = 'webauthn.get'
+  export const CreateType = 'webauthn.create'
+}
+
+/**
  *  Deocde a base64 encoded string as a UTF-8 string.
  */
 export const decodeBase64 = (base64: string): string => {
@@ -41,13 +63,6 @@ export const decodeBase64 = (base64: string): string => {
  */
 export const decodeBase64JSON = <T = any>(base64: string): T => {
   return JSON.parse(decodeBase64(base64)) as T
-}
-
-/**
- *  Hash the data as a 256 digest buffer.
- */
-export const hashSha256 = (data: string): Buffer => {
-  return createHash('sha256').update(data, 'utf-8').digest()
 }
 
 /**

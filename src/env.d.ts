@@ -34,6 +34,7 @@ interface Env {
   ENVIRONMENT: 'development' | 'production'
   COOKIE_DOMAIN: string
   WEBAUTHN_RP_ID: string
+  WEBAUTHN_RP_ORIGIN: string
 }
 
 declare global {

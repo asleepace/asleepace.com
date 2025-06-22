@@ -1,9 +1,7 @@
 import type { User } from '@/db/types'
 import { randomBytes } from 'node:crypto'
-import { decodeAuthenticatorData, decodeBase64JSON, hashSha256, type ClientDataJSON } from './utils'
+import { decodeAuthenticatorData, decodeBase64JSON, hashSha256, WebAuthN, type ClientDataJSON } from './utils'
 import { Credentials } from '@/db'
-
-const FIVE_MINUTES = 5 * 60 * 1000
 
 /**
  *  Create a unique random non-PII userHandle for the user.
@@ -36,7 +34,7 @@ function createRegistrationChallengeStore() {
         omitPadding: true,
       })
       store.set(challenge, {
-        expires: Date.now() + FIVE_MINUTES,
+        expires: Date.now() + WebAuthN.RP_TIMEOUT,
         userHandle: createUserHandle(),
       })
       this.cleanup()
@@ -57,14 +55,6 @@ function createRegistrationChallengeStore() {
  *  Registration challenge store which will hold challenges.
  */
 const challenges = createRegistrationChallengeStore()
-
-/**
- *  RP_ID: needs to be "localhost" in development and set to the domain in production,
- *  will not work in development if site is behind a proxy.
- */
-const RP_ID: string = process.env.WEBAUTHN_RP_ID!
-const RP_ID_HASH = hashSha256(RP_ID)
-const WEBAUTHN_ORIGIN = 'http://localhost:4321'
 
 interface WebAuthNResponse {
   id: string
@@ -108,7 +98,7 @@ export const registerStart = (props: { user: User }): PublicKeyCredentialCreatio
     challenge,
     rp: {
       name: 'Asleepace',
-      id: RP_ID, // Change to your domain
+      id: WebAuthN.RP_ID,
     },
     user: {
       id: userHandle,
@@ -134,15 +124,9 @@ export const registerStart = (props: { user: User }): PublicKeyCredentialCreatio
  * Call this method to finish the registration process.
  */
 export function registerComplete({ user, credential }: { user: User; credential: RegistrationCredential }) {
-  console.log('[WebAuthN] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +')
-  console.log('[WebAuthN] registration complete:', credential)
-
   const { response } = credential
   const clientData = decodeBase64JSON<ClientDataJSON>(response.clientDataJSON)
   const authenticatorData = decodeAuthenticatorData(response)
-
-  console.log('[WebAuthN] registration authenticator data:', authenticatorData)
-  console.log('[WebAuthN] registration client data:', clientData)
 
   const userHandle = challenges.validate(clientData.challenge)
 
@@ -150,11 +134,11 @@ export function registerComplete({ user, credential }: { user: User; credential:
     throw new Error('Authenticator missing user handle!')
   }
 
-  if (clientData.origin !== WEBAUTHN_ORIGIN) {
+  if (clientData.origin !== WebAuthN.RP_ORIGIN) {
     throw new Error('Authenticator origin mismatch!')
   }
 
-  if (clientData.type !== 'webauthn.create') {
+  if (clientData.type !== WebAuthN.CreateType) {
     throw new Error('Authenticator type mismatch!')
   }
 
