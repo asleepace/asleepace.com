@@ -30,7 +30,7 @@ export const POST: APIRoute = async (ctx) => {
   if (!user) throw new MissingWebAuthNUser()
   if (!credential) throw new MissingWebAuthNCredentials()
 
-  console.log('[WebAuthN] registration complete:', { user, credential })
+  console.log('[api][webauthn] registration complete!')
 
   const success = registerComplete({
     user,
