@@ -1,4 +1,4 @@
-import { passkeys } from '@/db'
+import { Credentials } from '@/db'
 import type { APIRoute } from 'astro'
 
 export const prerender = false
@@ -15,20 +15,20 @@ export const DELETE: APIRoute = (ctx) => {
   if (!user) throw new Error('Not authorized!')
 
   //  Step #1: fetch all passkeys for current user
-  const userPasskeys = passkeys.getPasskeysForUser(user)
-  if (!userPasskeys) throw new Error('No passkeys for user')
+  const credentials = Credentials.getCredentialsForUser(user)
+  if (!credentials) throw new Error('No credentials found for user.')
 
   //  Step #2: extract id search param
   const id = ctx.url.searchParams.get('id')
   if (!id) throw new Error('Missing id param for passkeys!')
 
   //  Step #3: match passkey for id param
-  const passkey = userPasskeys.find((pk) => pk.passkey.startsWith(id))
-  if (!passkey) throw new Error('No passkey found for id: ' + id)
+  const credential = credentials.find((cred) => cred.publicKey.startsWith(id))
+  if (!credential) throw new Error('No credential found for id: ' + id)
 
-  console.log('[webauthn] deleting passkey:', passkey)
+  console.log('[webauthn] deleting credential:', credential)
 
   //  Step #4: delete passkey and return status
-  const success = passkeys.deletePasskey(passkey)
+  const success = Credentials.deleteCredential({ credentialId: credential.id })
   return Response.json({ success })
 }

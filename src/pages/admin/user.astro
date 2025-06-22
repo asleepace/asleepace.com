@@ -18,7 +18,7 @@ const sanitized = userPasskeys
     if (!pk.userHandle) return undefined
     return {
       index,
-      preview: pk.userHandle.slice(0, 4) + '...' + pk.userHandle.slice(-4),
+      preview: pk.publicKey.slice(0, 4) + '...' + pk.publicKey.slice(-4),
       createdAt: new Date(pk.createdAt),
       updatedAt: new Date(pk.updatedAt),
     }
