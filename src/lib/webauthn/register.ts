@@ -4,15 +4,6 @@ import { decodeAuthenticatorData, decodeBase64JSON, hashSha256, WebAuthN, type C
 import { Credentials } from '@/db'
 
 /**
- *  Create a unique random non-PII userHandle for the user.
- */
-const createUserHandle = () =>
-  randomBytes(16).toBase64({
-    alphabet: 'base64url',
-    omitPadding: true,
-  })
-
-/**
  *  Create a store which manages creating the registration challenges and
  *  generating unique non-PII user handles.
  */
@@ -28,17 +19,21 @@ function createRegistrationChallengeStore() {
       store.delete(clientChallenge)
       return found.userHandle
     },
-    generate(): string {
+    generate() {
+      const userHandle = randomBytes(16).toBase64({
+        alphabet: 'base64url',
+        omitPadding: true,
+      })
       const challenge = randomBytes(16).toBase64({
         alphabet: 'base64url',
         omitPadding: true,
       })
       store.set(challenge, {
         expires: Date.now() + WebAuthN.RP_TIMEOUT,
-        userHandle: createUserHandle(),
+        userHandle,
       })
       this.cleanup()
-      return challenge
+      return { challenge, userHandle }
     },
     cleanup(): void {
       const now = Date.now()
@@ -55,13 +50,6 @@ function createRegistrationChallengeStore() {
  *  Registration challenge store which will hold challenges.
  */
 const challenges = createRegistrationChallengeStore()
-
-interface WebAuthNResponse {
-  id: string
-  userHandle: string
-  clientDataJSON: string
-  signature: string
-}
 
 interface RegistrationResponse {
   attestationObject: string
@@ -82,18 +70,12 @@ interface RegistrationCredential {
 }
 
 /**
- * Start the registration process by assigning a new challenge for a given
- * username.
+ *  Start the registration process by assigning a new challenge and user handle for the currently
+ *  logged in user, this will then be passed back to the client authenticator and then submitted
+ *  via the `registerComplete` method below.
  */
 export const registerStart = (props: { user: User }): PublicKeyCredentialCreationOptionsJSON => {
-  const challenge = challenges.generate()
-  const userHandle = createUserHandle()
-
-  console.log('[webauthn][register] started:', {
-    challenge,
-    userHandle,
-  })
-
+  const { challenge, userHandle } = challenges.generate()
   return {
     challenge,
     rp: {
@@ -121,7 +103,9 @@ export const registerStart = (props: { user: User }): PublicKeyCredentialCreatio
 }
 
 /**
- * Call this method to finish the registration process.
+ *  Call this method to finish the registration process and save the credential and public key data for
+ *  the currently logged in user. Verify the structure of the data is valid, the challenge matches the
+ *  one provided and the domain is equal.
  */
 export function registerComplete({ user, credential }: { user: User; credential: RegistrationCredential }) {
   const { response } = credential
@@ -148,6 +132,18 @@ export function registerComplete({ user, credential }: { user: User; credential:
 
   if (!authenticatorData.flags.userVerified) {
     throw new Error('Authenticator user not verified!')
+  }
+
+  if (!authenticatorData.rpIdHash.equals(WebAuthN.RP_ID_HASH)) {
+    throw new Error('Authenticator RP ID hash mismatch!')
+  }
+
+  if (!response.publicKey) {
+    throw new Error('Authenticator missing public key!')
+  }
+
+  if (!credential.id) {
+    throw new Error('Authenticator missing credential id!')
   }
 
   Credentials.addCredential({
