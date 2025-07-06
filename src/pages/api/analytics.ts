@@ -42,6 +42,6 @@ export const GET: APIRoute = endpoint(async ({ request, locals }) => {
   const { searchParams } = await http.parse(request)
   const limit = parseInt(searchParams['limit']) ?? 100
   const offset = parseInt(searchParams['offset']) ?? 0
-  const data = Analytics.fetchAnalytics(limit, offset)
+  const data = Analytics.fetchAnalytics({ limit, offset })
   return http.success({ data, limit, offset })
 })
