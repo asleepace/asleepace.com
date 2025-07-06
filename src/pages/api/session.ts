@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro'
-import { WebResponse } from '@/lib/web'
-import type { User } from '@/db/types'
+import type { User } from '@/db/'
 
 export const prerender = false
 
@@ -31,6 +30,9 @@ export const GET: APIRoute = async (ctx) => {
       }
     )
 
+  // remove password from the response
   const { password, ...sanitizedUserData } = user
+
+  // return the sanitized user data
   return Response.json(sanitizedUserData)
 }

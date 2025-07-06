@@ -1,4 +1,4 @@
-import type { User } from '@/db/types'
+import type { User } from '@/db/'
 import { randomBytes, createVerify, createPublicKey } from 'node:crypto'
 import {
   decodeAuthenticatorData,

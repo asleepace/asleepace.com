@@ -1,4 +1,4 @@
-import type { User } from '@/db/types'
+import type { User } from '@/db/'
 import { randomBytes } from 'node:crypto'
 import { decodeAuthenticatorData, decodeBase64JSON, hashSha256, WebAuthN, type ClientDataJSON } from './utils'
 import { Credentials } from '@/db'
