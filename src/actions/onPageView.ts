@@ -1,4 +1,4 @@
-import type { Metric } from '@/db'
+import type { Metric } from '@/db/index.server'
 import { defineAction } from 'astro:actions'
 import { z } from 'astro:content'
 
@@ -11,12 +11,22 @@ export const onPageLike = defineAction({
     unliked: z.boolean().default(false),
   }),
   async handler(input, context) {
-    const response = await fetch('/api/metrics', { method: input.unliked ? 'DELETE' : 'PUT' })
-    if (!response.ok) {
-      throw new Error('Failed to register page like!')
+    try {
+      console.log(context.originPathname)
+      console.log(context.request.referrer)
+
+      const url = new URL('/api/metrics', context.url.origin)
+      console.log(url)
+      return
+      const response = await fetch(url, { method: input.unliked ? 'DELETE' : 'PUT' })
+      if (!response.ok) {
+        throw new Error('Failed to register page like!')
+      }
+      const pageMetrics: Metric = await response.json()
+      return pageMetrics
+    } catch (e) {
+      console.error(e)
     }
-    const pageMetrics: Metric = await response.json()
-    return pageMetrics
   },
 })
 
@@ -28,11 +38,26 @@ export const onPageView = defineAction({
     referer: z.string().optional(),
   }),
   async handler(input, context) {
-    const response = await fetch('/api/metrics', { method: 'GET' })
+    const referer = input.referer ?? context.request.headers.get('referer')
+
+    if (!referer) {
+      throw new Error('No referer provided!')
+    }
+
+    const url = new URL('/api/metrics', context.url.origin)
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        referer,
+      },
+    })
+    if (response.redirected) {
+      throw new Error('Redirected to a different page!')
+    }
     if (!response.ok) {
       throw new Error('Failed to register page view!')
     }
-    const pageMetrics: Metric = await response.json()
-    return pageMetrics
+    const metrics: Metric = await response.json()
+    return metrics
   },
 })

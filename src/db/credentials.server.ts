@@ -1,5 +1,5 @@
 import Database from 'bun:sqlite'
-import type { User } from '@/db/'
+import type { User } from '@/db/index.server'
 
 /**
  * @note this is just a string alias.

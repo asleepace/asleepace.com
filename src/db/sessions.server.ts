@@ -1,5 +1,5 @@
 import Database from 'bun:sqlite'
-import { Users, type User } from '@/db/'
+import { Users, type User } from '@/db/index.server'
 
 export type UserId = number
 

@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro'
 
-import { Metrics } from '@/db'
+import { Metrics } from '@/db/index.server'
 
 // --- helpers ---
 
-function isValidPath(path: string) {
-  return path && typeof path === 'string' && path.startsWith('/')
+function isValidPath(path?: string | null): path is string {
+  return Boolean(path && typeof path === 'string' && path.startsWith('/'))
 }
 
 function MetricResponse(path: string) {
@@ -23,7 +23,9 @@ function ErrorResponse(message: string) {
  *  Returns the metrics for a given path as a JSON object.
  */
 export const GET: APIRoute = async (ctx) => {
-  const path = ctx.request.referrer ?? ctx.originPathname
+  const referer = ctx.request.headers.get('referer')
+  if (!referer) return ErrorResponse('No referer provided!')
+  const path = new URL(referer).pathname
   if (!isValidPath(path)) return ErrorResponse('Invalid path')
   Metrics.incrementPageViews(path)
   return MetricResponse(path)
@@ -33,7 +35,9 @@ export const GET: APIRoute = async (ctx) => {
  *  Increments the likes for a given path.
  */
 export const PUT: APIRoute = async (ctx) => {
-  const path = ctx.request.referrer ?? ctx.originPathname
+  const referer = ctx.request.headers.get('referer')
+  if (!referer) return ErrorResponse('No referer provided!')
+  const path = new URL(referer).pathname
   if (!isValidPath(path)) return ErrorResponse('Invalid path')
   Metrics.incrementPageLikes(path)
   return MetricResponse(path)
@@ -43,7 +47,9 @@ export const PUT: APIRoute = async (ctx) => {
  *  Decrements the likes for a given path.
  */
 export const DELETE: APIRoute = async (ctx) => {
-  const path = ctx.request.referrer ?? ctx.originPathname
+  const referer = ctx.request.headers.get('referer')
+  if (!referer) return ErrorResponse('No referer provided!')
+  const path = new URL(referer).pathname
   if (!isValidPath(path)) return ErrorResponse('Invalid path')
   Metrics.decrementPageLikes(path)
   return MetricResponse(path)

@@ -13,7 +13,8 @@ const whitelist = [
   '/api/webauthn/login-complete',
   '/api/webauthn/register-start',
   '/api/webauthn/register-complete',
-  '/api/webauthn/challenge'
+  '/api/webauthn/challenge',
+  '/api/metrics',
 ]
 const blacklist = ['/api', '/admin']
 
@@ -38,12 +39,17 @@ export const securityMiddleware = defineMiddleware(async (context, next) => {
   const isWhitelisted = whitelist.some((p) => path.startsWith(p))
   const isBlacklisted = blacklist.some((p) => path.startsWith(p))
 
-  // skip checks for whitelisted paths
-  if (isWhitelisted) {
+  console.log({
+    isWhitelisted,
+    isBlacklisted,
+    path,
+  })
+
+  if (isWhitelisted /** skip checks for whitelisted paths */) {
     return next()
-    // authorized users only
-  } else if (isBlacklisted) {
+  } else if (isBlacklisted /** authorized users only */) {
     handleLog('unauthorized access to blacklisted path:', path)
+    console.warn('[middleware][securityMiddleware] unauthorized access to blacklisted path:', path)
     return context.redirect(PATH.ADMIN_LOGIN(), 302)
   } else {
     return next()

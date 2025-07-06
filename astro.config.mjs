@@ -43,10 +43,13 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ['bun:sqlite']
     },
+    ssr: {
+      external: ['bun:sqlite']
+    },
     build: {
       rollupOptions: {
         // ignore these files when bundling...
-        external: [/highlight\.js\/styles\/.+\.css$/, /typescript\.js/],
+        external: [/highlight\.js\/styles\/.+\.css$/, /typescript\.js/, /@\/db\/.*/],
       },
     },
   },

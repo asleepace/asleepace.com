@@ -2,7 +2,7 @@
 /// <reference types="astro/client" />
 
 import { type CollectionEntry } from 'astro:content'
-import type { User, Metric } from './db/'
+import type { User, Metric } from './db/index.server'
 
 export type PageMetrics = Metric
 
