@@ -38,17 +38,16 @@ export namespace Users {
    * @note this must be called first before any other functions are called.
    */
   export function attachUsersTable(sharedDatabaseInstance: Database) {
-    console.log('[db] attaching users table...')
-    db = sharedDatabaseInstance
-    db.run(USERS_INIT)
-
     try {
+      console.log('[db][users] attaching table...')
+      db = sharedDatabaseInstance
+      db.run(USERS_INIT)
       const allUsers = fetchUsers()
       const numberOfUsers = allUsers.length
-      console.log('[db] total users:', allUsers.length)
+      console.log('[db][users] total users:', allUsers.length)
       console.assert(numberOfUsers > 0, 'ASSERT_USERS_EXISTS')
     } catch (e) {
-      console.error('[db] users error:', e)
+      console.error('[db][users] error:', e)
     }
   }
 

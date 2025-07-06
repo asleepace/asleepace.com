@@ -1,6 +1,6 @@
 import Database from 'bun:sqlite'
 
-type Metrics = {
+export type Metric = {
   path: string
   views: number
   likes: number
@@ -22,7 +22,7 @@ export namespace Metrics {
 
   CREATE INDEX IF NOT EXISTS idx_metrics_views ON metrics(views);
   CREATE INDEX IF NOT EXISTS idx_metrics_updated ON metrics(updatedAt);
-`
+  `
 
   let db: Database
 
@@ -32,7 +32,7 @@ export namespace Metrics {
     db.exec(INIT_METRICS)
   }
 
-  export function getPageMetrics(path: string): Metrics {
+  export function getPageMetrics(path: string): Metric {
     const selectQuery = db.prepare(`SELECT * FROM metrics WHERE path = $path`)
     let row = selectQuery.get({ $path: path }) as any
 
@@ -103,7 +103,6 @@ export namespace Metrics {
   }
 
   export function addPageComment(path: string, comment: any): void {
-    // Use SQLite's json_insert directly - much cleaner
     const query = db.prepare(`
       INSERT INTO metrics (path, comments, updatedAt)
       VALUES ($path, json_array(json($comment)), CURRENT_TIMESTAMP)

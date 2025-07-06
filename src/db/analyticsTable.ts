@@ -26,7 +26,7 @@ export namespace Analytics {
   `
 
   export function attachAnalyticsTable(sharedDatabaseInstance: Database) {
-    console.log('[db] attaching analytics table...')
+    console.log('[db][analytics] attaching table...')
     db = sharedDatabaseInstance
     db.run(ANALYTICS_INIT)
   }

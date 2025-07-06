@@ -74,7 +74,6 @@ export namespace Credentials {
   }
 
   export function getUserByHandle({ userHandle }: { userHandle: string }): User | undefined {
-    console.log('[db][credentials] getUserByHandle:', userHandle)
     const query = db.query(`
       SELECT u.* FROM users u INNER JOIN credentials c ON u.id = c.userId 
       WHERE c.userHandle = $userHandle

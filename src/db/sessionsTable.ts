@@ -40,7 +40,7 @@ export namespace Sessions {
    * @note this must be called first before any other functions are called.
    */
   export function attachSessionsTable(sharedDatabaseInstance: Database) {
-    console.log('[db] attaching sessions table...')
+    console.log('[db][sessions] attaching table...')
     db = sharedDatabaseInstance
     db.run(SESSIONS_INIT)
   }
@@ -99,8 +99,7 @@ export namespace Sessions {
   export function isValid(sessionCookie: string | undefined): boolean {
     if (!sessionCookie) return false
     const session = findByToken(sessionCookie)
-    console.log('[Sessions] session:', session)
-    return true
+    return Boolean(session && session.expiresAt > new Date())
   }
 
   export function getExpiry(): Date {
