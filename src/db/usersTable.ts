@@ -1,7 +1,26 @@
-import { UserFlags, type User } from './types'
 import Database from 'bun:sqlite'
 
+export type User = {
+  id: number
+  email: string
+  flags: Users.Flags
+  username: string
+  password: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export namespace Users {
+  export enum Flags {
+    None = 0,
+    Admin = 1 << 1,
+    SuperAdmin = 1 << 2,
+    Banned = 1 << 3,
+    Deleted = 1 << 4,
+    Suspended = 1 << 5,
+    EmailVerified = 1 << 6,
+  }
+
   let db: Database
 
   const USERS_INIT = `
@@ -33,7 +52,7 @@ export namespace Users {
     }
   }
 
-  export const hasFlags = (user: User, ...flags: UserFlags[]): boolean => {
+  export const hasFlags = (user: User, ...flags: Flags[]): boolean => {
     return flags.every((flag) => (user.flags & flag) === flag)
   }
 
@@ -42,7 +61,7 @@ export namespace Users {
    *
    * TODO: ensure this can only be done by admins/super admins.
    */
-  export const setFlags = (user: User, ...flags: UserFlags[]) => {
+  export const setFlags = (user: User, ...flags: Flags[]) => {
     const flagAsNumber = flags.reduce((acc, flag) => acc | flag, 0)
     const query = db.prepare(`
       UPDATE users SET flags = $flags WHERE id = $id;
@@ -53,11 +72,11 @@ export namespace Users {
     }).lastInsertRowid
   }
 
-  export const isBanned = (user: User) => hasFlags(user, UserFlags.Banned)
+  export const isBanned = (user: User) => hasFlags(user, Flags.Banned)
 
-  export const isAdmin = (user: User) => hasFlags(user, UserFlags.Admin) || hasFlags(user, UserFlags.SuperAdmin)
+  export const isAdmin = (user: User) => hasFlags(user, Flags.Admin) || hasFlags(user, Flags.SuperAdmin)
 
-  export const isSuperAdmin = (user: User) => user.username === 'asleepace' || hasFlags(user, UserFlags.SuperAdmin)
+  export const isSuperAdmin = (user: User) => user.username === 'asleepace' || hasFlags(user, Flags.SuperAdmin)
 
   // --- password functions ---
 

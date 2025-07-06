@@ -1,6 +1,16 @@
 import Database from 'bun:sqlite'
-import { Users } from '@/db/'
-import type { User, UserSession } from './types'
+import { Users, type User } from '@/db/'
+
+export type UserId = number
+
+export type Session = {
+  id: UserId
+  userId: number
+  token: string
+  expiresAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
 
 export namespace Sessions {
   const TOKEN_BYTES = 32
@@ -119,14 +129,14 @@ export namespace Sessions {
     return user
   }
 
-  export function findByToken(token: string): UserSession | undefined {
+  export function findByToken(token: string): Session | undefined {
     const session = db.query('SELECT * FROM sessions WHERE token = $token').get({
       $token: token,
-    }) as UserSession | undefined
+    }) as Session | undefined
     return session ?? undefined
   }
 
-  export function create(userId: number): UserSession | never {
+  export function create(userId: number): Session | never {
     const token = generateToken()
     const expiresAt = getExpiry()
     const query = db.prepare(`
@@ -139,7 +149,7 @@ export namespace Sessions {
       $userId: userId,
       $token: token,
       $expiresAt: expiresAt.toISOString(),
-    }) as UserSession | undefined
+    }) as Session | undefined
 
     if (!session) {
       console.error('Failed to create session:', session)
