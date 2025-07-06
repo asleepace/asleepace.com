@@ -1,9 +1,9 @@
+import type { Metric } from '@/db'
 import { defineAction } from 'astro:actions'
 import { z } from 'astro:content'
-import { Metrics } from '@/db/'
 
 /**
- *  Register a page like.
+ *  Update the page's likes metric by 1 or -1.
  */
 export const onPageLike = defineAction({
   input: z.object({
@@ -11,16 +11,12 @@ export const onPageLike = defineAction({
     unliked: z.boolean().default(false),
   }),
   async handler(input, context) {
-    const referer = input.referer ?? context.request.headers.get('referer')
-    if (!referer) throw new Error('Missing referer!')
-    const route = new URL(referer).pathname
-    if (!route) throw new Error('Missing route or referer!')
-    if (input.unliked) {
-      Metrics.decrementPageLikes(route)
-    } else {
-      Metrics.incrementPageLikes(route)
+    const response = await fetch('/api/metrics', { method: input.unliked ? 'DELETE' : 'PUT' })
+    if (!response.ok) {
+      throw new Error('Failed to register page like!')
     }
-    return Metrics.getPageMetrics(route)
+    const pageMetrics: Metric = await response.json()
+    return pageMetrics
   },
 })
 
@@ -32,11 +28,11 @@ export const onPageView = defineAction({
     referer: z.string().optional(),
   }),
   async handler(input, context) {
-    const referer = input.referer ?? context.request.headers.get('referer')
-    if (!referer) throw new Error('Missing referer!')
-    const route = new URL(referer).pathname
-    if (!route) throw new Error('Missing route or referer!')
-    Metrics.incrementPageViews(route)
-    return Metrics.getPageMetrics(route)
+    const response = await fetch('/api/metrics', { method: 'GET' })
+    if (!response.ok) {
+      throw new Error('Failed to register page view!')
+    }
+    const pageMetrics: Metric = await response.json()
+    return pageMetrics
   },
 })
