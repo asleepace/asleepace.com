@@ -1,29 +1,39 @@
 import Database from 'bun:sqlite'
-import { USERS_INIT, SESSIONS_INIT, type User, type UserSession, UserFlags, ANALYTICS_INIT } from './types'
-import { attachCredentialsTable } from '@/lib/webauthn/credentials'
-import { Users } from './usersTable'
-
-// --- initialize the database ---
-
-const db = new Database('db.sqlite')
-
-// db.run(USERS_INIT)
-db.run(SESSIONS_INIT)
-db.run(ANALYTICS_INIT)
-
-Users.attachUsersTable(db)
-
-// --- attach plugins ---
-
-export const Credentials = attachCredentialsTable(db)
-
-export { Users }
-
-// --- session functions ---
+import { Users } from '@/db/'
+import type { User, UserSession } from './types'
 
 export namespace Sessions {
   const TOKEN_BYTES = 32
   const TOKEN_EXPIRATION_DAYS = 30
+
+  let db: Database
+
+  export const SESSIONS_INIT = `
+    CREATE TABLE IF NOT EXISTS sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL,
+      token TEXT UNIQUE NOT NULL,        -- Add UNIQUE constraint
+      expiresAt DATETIME NOT NULL,       -- Add expiration timestamp
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Add index for faster token lookups
+    CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+    
+    -- Add index for user sessions
+    CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(userId);
+  `
+
+  /**
+   * @note this must be called first before any other functions are called.
+   */
+  export function attachSessionsTable(sharedDatabaseInstance: Database) {
+    console.log('[db] attaching sessions table...')
+    db = sharedDatabaseInstance
+    db.run(SESSIONS_INIT)
+  }
 
   /**
    * ## adminOnly(sessionCookie)
@@ -113,13 +123,7 @@ export namespace Sessions {
     const session = db.query('SELECT * FROM sessions WHERE token = $token').get({
       $token: token,
     }) as UserSession | undefined
-
-    if (!session) {
-      // console.warn('[findByToken] session not found:', token)
-      return
-    }
-
-    return session
+    return session ?? undefined
   }
 
   export function create(userId: number): UserSession | never {
@@ -143,75 +147,5 @@ export namespace Sessions {
     }
 
     return session
-  }
-}
-
-// --- analytics functions ---
-
-export namespace Analytics {
-  export type AnalyticsDataInit = {
-    path: string
-    userAgent?: string | null
-    ipAddress?: string | null
-    sessionId?: string | null
-    referrer?: string | null
-  }
-
-  /**
-   * ## Analytics.track(data)
-   *
-   * Track analytics data for a specific page.
-   *
-   */
-  export function track(data: AnalyticsDataInit) {
-    const query = db.prepare(`
-      INSERT INTO analytics (path, userAgent, ipAddress, sessionId, referrer)
-      VALUES ($path, $userAgent, $ipAddress, $sessionId, $referrer)
-      RETURNING *;
-    `)
-
-    const result = query.run({
-      $path: data.path ?? '/',
-      $userAgent: data.userAgent ?? null,
-      $ipAddress: data.ipAddress ?? null,
-      $sessionId: data.sessionId ?? null,
-      $referrer: data.referrer ?? null,
-    })
-
-    return result.lastInsertRowid
-  }
-
-  /**
-   * ## fetchAnalytics(limit=100, offset=0)
-   *
-   * fetches analytics data from the database.
-   *
-   * @param limit - the number of records to fetch
-   * @param offset - the number of records to skip
-   * @returns the analytics data
-   *
-   */
-  export function fetchAnalytics(limit: number = 100, offset: number = 0) {
-    if (limit < 0 || offset < 0) {
-      throw new Error('Limit and offset must be non-negative')
-    }
-
-    const query = db.prepare(
-      `
-      SELECT 
-        *,
-        COUNT(*) OVER() as totalCount 
-      FROM analytics 
-      ORDER BY createdAt DESC
-      LIMIT $limit OFFSET $offset;
-  `.trim()
-    )
-
-    const result = query.run({
-      $limit: limit,
-      $offset: offset,
-    })
-
-    return result
   }
 }
