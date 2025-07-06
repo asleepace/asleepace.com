@@ -7,8 +7,6 @@ import mdx from '@astrojs/mdx'
 
 import tailwindcss from '@tailwindcss/vite'
 
-import db from '@astrojs/db'
-
 /**
  *  ## AstroConfiguration
  *
@@ -39,7 +37,6 @@ export default defineConfig({
     }),
     sitemap(),
     react(),
-    db(),
   ],
   vite: {
     plugins: [tailwindcss()],

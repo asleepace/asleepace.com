@@ -1,9 +1,9 @@
 import Database from 'bun:sqlite'
-import { Users, type User } from './usersTable'
-import { Sessions, type Session } from './sessionsTable'
-import { Analytics, type Analytic } from './analyticsTable'
-import { Credentials, type Credential } from './credentialsTable'
-import { Metrics, type Metric } from './metricsTable'
+import { Users, type User } from './users.server'
+import { Sessions, type Session } from './sessions.server'
+import { Analytics, type Analytic } from './analytics.server'
+import { Credentials, type Credential } from './credentials.server'
+import { Metrics, type Metric } from './metrics.server'
 
 // --- initialize the database ---
 
