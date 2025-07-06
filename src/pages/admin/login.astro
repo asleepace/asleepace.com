@@ -25,10 +25,7 @@ const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
   <head>
     <BaseHead title={siteData.title} description={siteData.description} />
   </head>
-  <body
-    class="min-h-screen flex flex-col bg-white bg-cover bg-fixed"
-    style="background: url(/images/bg-login.jpeg); background-position: center; background-attachment: fixed;"
-  >
+  <body class="min-h-screen flex flex-col bg-white bg-cover bg-fixed">
     <Header title="" class:list="before:bg-glass overflow-hidden" />
     <main
       class="flex flex-col inset-shadow-2xs grow self-stretch w-full justify-center items-center mx-auto p-4 from-neutral-200/30 via-white/0 to-neutral-200/30 bg-gradient-to-r"
