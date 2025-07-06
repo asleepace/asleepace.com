@@ -1,6 +1,7 @@
-import { act, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { actions } from 'astro:actions'
 import { cn } from '@/utils/cn'
+import { type Metric } from '@/db'
 
 const MetricButton = (props: {
   onClick?: () => void
@@ -26,19 +27,11 @@ const MetricButton = (props: {
   )
 }
 
-type PageMetrics = {
-  likes: number
-  views: number
-  route: string
-  comments: unknown
-  createdAt: Date
-  updatedAt: Date
-}
 
 export function PageMetrics(props: { className?: string }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
-  const [data, setData] = useState<Partial<PageMetrics>>({
+  const [data, setData] = useState<Partial<Metric>>({
     likes: 0,
     views: 0,
   })

@@ -102,6 +102,17 @@ export namespace Metrics {
     query.run({ $path: path })
   }
 
+  export function decrementPageLikes(path: string): void {
+    const query = db.prepare(`
+      INSERT INTO metrics (path, likes, updatedAt)
+      VALUES ($path, 0, CURRENT_TIMESTAMP)
+      ON CONFLICT(path) DO UPDATE SET
+        likes = MAX(0, likes - 1),
+        updatedAt = CURRENT_TIMESTAMP
+    `)
+    query.run({ $path: path })
+  }
+
   export function addPageComment(path: string, comment: any): void {
     const query = db.prepare(`
       INSERT INTO metrics (path, comments, updatedAt)
