@@ -7,7 +7,6 @@ import type { User, Metric } from './db/index.server'
 export type PageMetrics = Metric
 
 interface Env {
-  DATABASE_URL: string
   SMTP_HOST: string
   SMTP_PORT: number
   SMTP_USER: string

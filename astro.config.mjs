@@ -30,7 +30,6 @@ export default defineConfig({
       WEBAUTHN_RP_ORIGIN: envField.string({ context: 'server', access: 'secret' }),
       WEBAUTHN_RP_ID: envField.string({ context: 'server', access: 'secret' }),
       MONGODB_URI: envField.string({ context: 'server', access: 'secret' }),
-      DATABASE_URL: envField.string({ context: 'server', access: 'secret', optional: true }), 
       SMTP_HOST: envField.string({ context: 'server', access: 'secret' }),
       SMTP_PORT: envField.number({ context: 'server', access: 'secret' }),
       SMTP_USER: envField.string({ context: 'server', access: 'secret' }),
