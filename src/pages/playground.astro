@@ -12,20 +12,14 @@ function CustomElement() {
   <!-- custom html string element -->
   <Fragment set:html={CustomElement()} />
   <h1 class="text-5xl font-black">Astro + Web Components</h1>
-  <p class="mb-8 mt-4 text-zinc-600">
-    The following is an example of a custom web component rendered in Astro!
-  </p>
+  <p class="mb-8 mt-4 text-zinc-600">The following is an example of a custom web component rendered in Astro!</p>
   <!-- example web component -->
-  <page-metrics
-    class="flex gap-x-4 pb-1 pt-2 px-4 min-w-64 justify-between border-1 rounded-2xl border-black/10"
-  >
+  <page-metrics class="flex gap-x-4 pb-1 pt-2 px-4 min-w-64 justify-between border-1 rounded-2xl border-black/10">
     <slot />
   </page-metrics>
   <typed-text text="Hello world this is a test!"></typed-text>
 </SiteLayout>
 <script>
-  import { PageMetrics } from '@/components/web/PageMetrics'
   import { TypedText } from '@/components/web/TypedText'
-  PageMetrics.register()
   TypedText.register()
 </script>

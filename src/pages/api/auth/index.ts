@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { Users, Sessions } from '@/db/index'
+import { Users, Sessions } from '@/db/index.server'
 import { PATH, siteConfig } from '@/consts'
 
 export const prerender = false

@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { Sessions } from '@/db/index'
+import { Sessions } from '@/db/index.server'
 import { consoleTag } from '@/utils/tagTime'
 
 const handleLog = consoleTag('session')

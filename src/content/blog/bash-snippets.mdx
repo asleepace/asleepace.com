@@ -1,0 +1,150 @@
+---
+title: 'Bash Snippets'
+description: 'Assorted bash snippets for everyday use.'
+pubDate: 'July 6 2025'
+heroImage: '/images/bash-logo.jpg'
+hashTags: 'Technical, Snippets, Bash'
+slug: 'bash-snippets'
+---
+
+This is an evolving collection of bash snippets I have found useful over the years. Note that some may work only on macOS and/or Linux.
+
+## Process Management
+
+```bash
+# Process info
+ps aux | grep node
+pgrep -f "node server"
+pkill -f "node server"
+jobs                      # Background jobs
+nohup command &           # Run in background
+
+# System monitoring
+top -o cpu
+htop                      # If installed
+lsof -i :3000             # What's using port 3000
+netstat -tulpn            # Open ports
+```
+
+## Files
+
+```bash
+# Find files
+find . -name "*.js" -type f
+find . -name "node_modules" -type d -exec rm -rf {} +
+
+# File info
+ls -la                    # Detailed list
+du -sh *                  # Directory sizes
+df -h                     # Disk usage
+stat filename             # File metadata
+
+# Copy/move with progress
+rsync -av --progress src/ dest/
+```
+
+## Text Processing
+
+```bash
+# Search in files
+grep -r "TODO" .
+grep -r "console.log" --include="*.js" .
+
+# Text manipulation
+cat file.txt | head -20   # First 20 lines
+cat file.txt | tail -20   # Last 20 lines
+cut -d',' -f1,3 file.csv  # Extract CSV columns
+sort file.txt | uniq      # Remove duplicates
+wc -l file.txt            # Line count
+
+# Replace text
+sed 's/old/new/g' file.txt
+sed -i '' 's/old/new/g' file.txt  # In-place (macOS)
+```
+
+## Networking
+
+Make a simple network request with JSON:
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John", "email": "john@example.com"}' \
+  https://api.example.com/users
+```
+
+If you want to quickly kill the process running at a specific port (`8080`)
+
+```bash
+lsof -ti :8080 | xargs kill -9
+```
+
+## Git
+
+```bash
+# restore a file from a remote branch (e.g. master)
+git checkout origin/master -- ./src/dir/file-to-restore.txt
+
+# rollback a commit
+git reset --hard HEAD~1
+
+# rollback a commit and keep changes
+git reset --soft HEAD~1
+
+# rollback a commit and keep changes (e.g. if you forgot to add a file)
+git reset --soft HEAD~1
+git add .
+git commit -m "Add forgotten file"
+git push
+```
+
+## FFMPEG
+
+Convert a `.wmv` to `.mp4` with FFMPEG:
+
+```bash
+ffmpeg -i input.wmv output.mp4
+```
+
+Download a streamed video (`.m3u8`) to `output.mp4`
+
+```bash
+ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "https://example.com/video720p.h264.mp4.m3u8" -c copy output.mp4
+```
+
+## Archives & Downloads
+
+```bash
+# Compress/extract
+tar -czf archive.tar.gz folder/
+tar -xzf archive.tar.gz
+unzip file.zip
+zip -r archive.zip folder/
+
+# Download
+wget https://example.com/file
+curl -O https://example.com/file
+```
+
+## Alias
+
+```bash
+alias ll='ls -la'
+alias la='ls -A'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias grep='grep --color=auto'
+alias ports='lsof -i -P | grep LISTEN'
+alias myip='curl -s ipinfo.io/ip'
+```
+
+## System Info
+
+```bash
+uname -a                  # System info
+whoami                    # Current user
+uptime                    # System uptime
+free -h                   # Memory usage (Linux)
+which node                # Find command location
+type node                 # Command type info
+```

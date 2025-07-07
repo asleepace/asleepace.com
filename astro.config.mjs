@@ -7,8 +7,6 @@ import mdx from '@astrojs/mdx'
 
 import tailwindcss from '@tailwindcss/vite'
 
-import db from '@astrojs/db'
-
 /**
  *  ## AstroConfiguration
  *
@@ -39,14 +37,19 @@ export default defineConfig({
     }),
     sitemap(),
     react(),
-    db(),
   ],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      exclude: ['bun:sqlite']
+    },
+    ssr: {
+      external: ['bun:sqlite']
+    },
     build: {
       rollupOptions: {
         // ignore these files when bundling...
-        external: [/highlight\.js\/styles\/.+\.css$/, /typescript\.js/],
+        external: [/highlight\.js\/styles\/.+\.css$/, /typescript\.js/, /@\/db\/.*/],
       },
     },
   },

@@ -1,5 +1,5 @@
 import { siteConfig } from '@/consts'
-import { Sessions } from '@/db'
+import { Sessions } from '@/db/index.server'
 import { completeSignInChallenge } from '@/lib/webauthn/signIn'
 import type { APIRoute } from 'astro'
 

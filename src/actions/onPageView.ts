@@ -1,9 +1,36 @@
-import { defineAction } from 'astro:actions'
+import type { Metric } from '@/db/index.server'
+import { defineAction, type ActionAPIContext } from 'astro:actions'
 import { z } from 'astro:content'
-import { db, PageMetrics, sql } from 'astro:db'
+
+function getReferer(context: ActionAPIContext) {
+  const referer = context.request.headers.get('referer')
+  if (!referer) throw new Error('No referer provided!')
+  return referer
+}
+
+async function fetchMetrics({
+  context,
+  referer,
+  method,
+}: {
+  context: ActionAPIContext
+  referer: string
+  method: 'GET' | 'PUT' | 'DELETE'
+}): Promise<Metric> {
+  const url = new URL('/api/metrics', context.url.origin)
+  const response = await fetch(url, { method, headers: { referer } })
+  if (response.redirected) {
+    throw new Error('Not authorized!')
+  }
+  if (!response.ok) {
+    console.error('[onPageView] failed to fetch metrics', response)
+    throw new Error('Invalid metric referer!')
+  }
+  return response.json()
+}
 
 /**
- *  Register a page like.
+ *  Update the page's likes metric by 1 or -1.
  */
 export const onPageLike = defineAction({
   input: z.object({
@@ -11,65 +38,21 @@ export const onPageLike = defineAction({
     unliked: z.boolean().default(false),
   }),
   async handler(input, context) {
-    const referer = input.referer ?? context.request.headers.get('referer')
-    if (!referer) throw new Error('Missing referer!')
-    const route = new URL(referer).pathname
-    if (!route) throw new Error('Missing route or referer!')
-
-    const pageMetrics = await db
-      .insert(PageMetrics)
-      .values({
-        route,
-        views: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: PageMetrics.route,
-        set: {
-          likes: input.unliked ? sql`likes - 1` : sql`likes + 1`,
-          updatedAt: new Date(),
-        },
-      })
-      .returning()
-      .get()
-
-    return pageMetrics
+    const referer = input.referer ?? getReferer(context)
+    const method = input.unliked ? 'DELETE' : 'PUT'
+    return fetchMetrics({ context, referer, method })
   },
 })
 
 /**
- *  Register a page view.
+ *  Increment the page's views and return the updated metrics.
  */
 export const onPageView = defineAction({
   input: z.object({
     referer: z.string().optional(),
   }),
   async handler(input, context) {
-    const referer = input.referer ?? context.request.headers.get('referer')
-    if (!referer) throw new Error('Missing referer!')
-    const route = new URL(referer).pathname
-    if (!route) throw new Error('Missing route or referer!')
-
-    // insert or update page metrics and incrament
-    const pageMetrics = await db
-      .insert(PageMetrics)
-      .values({
-        route,
-        views: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: PageMetrics.route,
-        set: {
-          views: sql`views + 1`,
-          updatedAt: new Date(),
-        },
-      })
-      .returning()
-      .get()
-
-    return pageMetrics
+    const referer = input.referer ?? getReferer(context)
+    return fetchMetrics({ context, referer, method: 'GET' })
   },
 })

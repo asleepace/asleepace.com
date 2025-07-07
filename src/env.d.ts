@@ -2,20 +2,9 @@
 /// <reference types="astro/client" />
 
 import { type CollectionEntry } from 'astro:content'
-import type { User } from './db/types'
+import type { User, Metric } from './db/index.server'
 
-export type PageMetrics = {
-  views: number
-  likes: number
-  comments: unknown
-  createdAt: Date
-  updatedAt: Date
-}
-
-// declare global {
-//   type ToString = { toString(): string }
-//   type Blog = CollectionEntry<'blog'>
-// }
+export type PageMetrics = Metric
 
 interface Env {
   DATABASE_URL: string
