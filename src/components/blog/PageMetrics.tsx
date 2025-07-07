@@ -44,8 +44,10 @@ export function PageMetrics(props: { className?: string }) {
     const hasLiked = window.localStorage.getItem(likedKey)
     setStorageKey(likedKey)
     setIsLiked(hasLiked === 'true')
-    actions.onPageView({ referer }).then((metrics) => {
+    actions.onPageView({}).then((metrics) => {
       if (metrics.data) setData(metrics.data)
+    }).catch((err) => {
+      console.error('[PageMetrics] failed to fetch metrics', err)
     })
   }, [])
 
