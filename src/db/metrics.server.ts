@@ -1,4 +1,8 @@
 import Database from 'bun:sqlite'
+import { consoleTag } from '@/utils/tagTime'
+import chalk from 'chalk'
+
+const print = consoleTag('db:metrics', chalk.magentaBright)
 
 export type Metric = {
   path: string
@@ -27,7 +31,7 @@ export namespace Metrics {
   let db: Database
 
   export function attachMetricsTable(sharedDatabaseInstance: Database) {
-    console.log('[db][metrics] attaching table...')
+    print('attaching table...')
     db = sharedDatabaseInstance
     db.exec(INIT_METRICS)
   }

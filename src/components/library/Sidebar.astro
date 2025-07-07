@@ -21,7 +21,7 @@ const { className } = Astro.props
   <slot name="sidebar-footer" />
 </app-side-bar>
 <script>
-  import { defineComponent, $define } from './defineComponent'
+  import { $define } from './defineComponent'
 
   $define('app-side-bar', {
     $state: { open: true },
@@ -29,19 +29,4 @@ const { className } = Astro.props
       console.log('[Sidebar] clicked:', this)
     },
   })
-
-  // defineComponent({
-  //   tagName: 'app-side-bar',
-  //   state: {
-  //     open: true,
-  //   },
-  //   attach({ open }) {
-  //     console.log('[Sidebar] attached!')
-  //     this.onclick = () => {
-  //       const nextOpen = !this.state.open
-  //       console.log('[SideBar] onclicked called:', nextOpen)
-  //       this.setState({ open: nextOpen })
-  //     }
-  //   },
-  // })
 </script>

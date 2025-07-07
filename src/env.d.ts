@@ -2,25 +2,20 @@
 /// <reference types="astro/client" />
 
 import { type CollectionEntry } from 'astro:content'
-import type { User, Metric } from './db/index.server'
+import type { User, Metric } from './db'
 
 export type PageMetrics = Metric
 
 interface Env {
-  DATABASE_URL: string
-  SECRET: string
   SMTP_HOST: string
   SMTP_PORT: number
   SMTP_USER: string
   SMTP_PASSWORD: string
   SMTP_FROM: string
-  GITHUB_CLIENT_SECRET: string
-  GITHUB_CLIENT_ID: string
   MONGODB_URI: string
   HOST: string
   PORT: number
   PROTOCOL: string
-  ENVIRONMENT: 'development' | 'production'
   COOKIE_DOMAIN: string
   WEBAUTHN_RP_ID: string
   WEBAUTHN_RP_ORIGIN: string

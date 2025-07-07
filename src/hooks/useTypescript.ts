@@ -1,10 +1,7 @@
 // src/hooks/useTypescript.ts
 
 import { useEffect, useState, useCallback } from 'react'
-import {
-  loadTypeScript,
-  DEFAULT_COMPILER_OPTIONS,
-} from '@/utils/typescript-loader'
+import { loadTypeScript, DEFAULT_COMPILER_OPTIONS } from '@/utils/typescript-loader'
 
 export type TypeScriptCompilerOptions = {
   target?: number
@@ -26,6 +23,17 @@ export type UseTypeScriptResult = {
   isLoading: boolean
   isReady: boolean
   compile: () => Promise<string | null>
+}
+
+export type UseTypeScriptDiagnostics = {
+  messageText: string
+  start: number
+  file: {
+    getLineAndCharacterOfPosition: (position: number) => {
+      line: number
+      character: number
+    }
+  }
 }
 
 export function useTypescript({
@@ -93,28 +101,23 @@ export function useTypescript({
 
       const diagnostics = typescript.getPreEmitDiagnostics(
         typescript.createProgram(['temp.ts'], compilerOptions, {
-          getSourceFile: (fileName) =>
-            fileName === 'temp.ts' ? sourceFile : undefined,
+          getSourceFile: (fileName: string) => (fileName === 'temp.ts' ? sourceFile : undefined),
           writeFile: () => {},
           getCurrentDirectory: () => '',
           getDirectories: () => [],
           fileExists: () => true,
           readFile: () => '',
-          getCanonicalFileName: (fileName) => fileName,
+          getCanonicalFileName: (fileName: string) => fileName,
           useCaseSensitiveFileNames: () => true,
           getNewLine: () => '\n',
         })
       )
 
       if (diagnostics.length > 0) {
-        const errorMessages = diagnostics.map((diagnostic) => {
-          const message = typescript.flattenDiagnosticMessageText(
-            diagnostic.messageText,
-            '\n'
-          )
+        const errorMessages = diagnostics.map((diagnostic: UseTypeScriptDiagnostics) => {
+          const message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
           if (diagnostic.file && diagnostic.start) {
-            const { line, character } =
-              diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
+            const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
             return `Line ${line + 1}, Column ${character + 1}: ${message}`
           }
           return message
@@ -125,8 +128,7 @@ export function useTypescript({
       setJavascript(result)
       return result
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Compilation failed'
+      const errorMessage = error instanceof Error ? error.message : 'Compilation failed'
       setErrors([errorMessage])
       return null
     } finally {
@@ -150,8 +152,7 @@ export function useTypescript({
 
           setJavascript(result)
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Compilation failed'
+          const errorMessage = error instanceof Error ? error.message : 'Compilation failed'
           setErrors([errorMessage])
         } finally {
           setIsLoading(false)

@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro'
 import { endpoint } from '@/pages/api'
-import { Analytics } from '@/db/index.server'
+import { Analytics, Users } from '@/db'
 import { http } from '@/lib/web'
-import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
+import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
 
 export const prerender = false
 
@@ -12,20 +12,15 @@ export const prerender = false
  * This endpoint is used to track analytics for the website.
  *
  */
-export const POST: APIRoute = endpoint(async ({ request }) => {
+export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
   const { headers } = request
 
   const ipAddress = getIpAddressFromHeaders(headers)
-  const userAgent = headers.get('user-agent')
-  const sessionId = headers.get('session')
-  const referrer = headers.get('referer')
 
-  Analytics.track({
-    path: request.url,
-    ipAddress,
-    userAgent,
-    sessionId,
-    referrer,
+  Analytics.trackEvent({
+    request,
+    cookies,
+    message: 'analytics',
   })
 
   return http.success({ ipAddress })
@@ -39,9 +34,10 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
  */
 export const GET: APIRoute = endpoint(async ({ request, locals }) => {
   if (!locals.isLoggedIn) return http.failure(401, 'Unauthorized')
+  if (!locals.user || !Users.isAdmin(locals.user)) return http.failure(403, 'Forbidden')
   const { searchParams } = await http.parse(request)
-  const limit = parseInt(searchParams['limit']) ?? 100
-  const offset = parseInt(searchParams['offset']) ?? 0
-  const data = Analytics.fetchAnalytics({ limit, offset })
-  return http.success({ data, limit, offset })
+  const daysParam = searchParams['days'] ? parseInt(searchParams['days']) : 30
+  const days = isNaN(daysParam) ? 30 : daysParam
+  const analytics = Analytics.getAnalytics({ days })
+  return http.success(analytics)
 })

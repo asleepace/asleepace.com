@@ -1,7 +1,7 @@
 import Database from 'bun:sqlite'
 import { Users, type User } from './users.server'
 import { Sessions, type Session } from './sessions.server'
-import { Analytics, type Analytic } from './analytics.server'
+import { Analytics, type AnalyticsData } from './analytics.server'
 import { Credentials, type Credential } from './credentials.server'
 import { Metrics, type Metric } from './metrics.server'
 
@@ -25,7 +25,7 @@ export {
   Metrics,
   type User,
   type Session,
-  type Analytic,
+  type AnalyticsData,
   type Credential,
   type Metric,
 }

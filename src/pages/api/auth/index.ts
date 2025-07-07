@@ -1,35 +1,10 @@
 import type { APIRoute } from 'astro'
-import { Users, Sessions } from '@/db/index.server'
-import { PATH, siteConfig } from '@/consts'
+import { Users, Sessions } from '@/db'
+import { siteConfig } from '@/consts'
+import { Cookies } from '@/lib/backend/cookies'
 
 export const prerender = false
 export const route = '/api/auth'
-
-const environment = process.env.ENVIRONMENT
-const isDevelopment = Boolean(environment === 'development')
-const isProduction = !isDevelopment
-const cookieDomain = isDevelopment ? 'localhost' : process.env.COOKIE_DOMAIN
-
-const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
-
-console.assert(cookieDomain, 'COOKIE_DOMAIN env variable is not set!')
-console.assert(
-  environment === 'development' || environment === 'production',
-  'ENVIRONMENT env variable is not set to development or production!'
-)
-
-console.log(
-  '[auth] config:',
-  JSON.stringify(
-    {
-      isDevelopment,
-      isProduction,
-      cookieDomain,
-    },
-    null,
-    2
-  )
-)
 
 /**
  * POST /api/auth
@@ -85,33 +60,16 @@ export const POST: APIRoute = async ({ request, locals, cookies, redirect }) => 
     // --- on success, create a session ---
 
     const session = Sessions.create(user.id)
-    const sessionToken = session.token
 
-    const cookieOptions = {
-      /** where the cookie is valid (must match to delete) */
-      path: siteConfig.cookiePath,
-      /** the domain that the cookie is valid for */
-      domain: cookieDomain,
-      /** javascript cannot access the cookie */
-      httpOnly: true,
-      /** if the cookie is only accessible via https */
-      secure: isProduction,
-      /** if the cookie is only accessible via the same site */
-      sameSite: 'lax',
-      /** the expiration date of the cookie */
-      expires: new Date(Date.now() + THIRTY_DAYS), // 30 days
-    } as const
+    Cookies.setSessionCookie(cookies, session.token)
 
-    cookies.set('session', sessionToken, cookieOptions) // set the cookie
     locals.isLoggedIn = true
     locals.user = user
 
-    console.log('[auth] setting cookie:', cookieOptions)
-
-    return redirect(PATH.ADMIN_HOME, 302)
+    return redirect(siteConfig.path.adminHome, 302)
   } catch (e) {
     console.error('[auth] error:', e)
     const error = (e as Error)?.message ?? 'unknown'
-    return redirect(PATH.ADMIN_LOGIN({ error }), 302)
+    return redirect(siteConfig.path.adminLogin({ error }), 302)
   }
 }

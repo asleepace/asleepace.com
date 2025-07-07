@@ -8,10 +8,14 @@ import AdminPanel from '@/layouts/AdminPanel.astro'
 export const prerender = false
 
 const { user, isLoggedIn } = Astro.locals
+const { adminLogin } = siteConfig.path
+
+// NOTE: this fixes an issue where `bun run check` thinks it's not being used
+const redirectToLogin = adminLogin({}) || '/admin/login'
+console.log('[system] redirectToLogin:', redirectToLogin)
 
 if (!isLoggedIn || !user) {
-  console.warn('[/admin/system] not authorized!')
-  return Astro.redirect(siteConfig.path.adminLogout)
+  return Astro.redirect(redirectToLogin)
 }
 
 const hideScrollBars = true

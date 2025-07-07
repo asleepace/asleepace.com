@@ -16,10 +16,7 @@ const getRxAttrs = (elem: HTMLElement): Attr[] => {
 
 // iterate all child elements which have rx-* attributes and update
 // accordingly, if none are found early return.
-function collectBoundChildren(
-  child: HTMLElement | undefined,
-  found: Map<string, HTMLElement[]> = new Map()
-) {
+function collectBoundChildren(child: HTMLElement | undefined, found: Map<string, HTMLElement[]> = new Map()) {
   if (!child) return found
   child.childNodes.forEach((next) => {
     if (next.nodeType === Node.ELEMENT_NODE) {
@@ -34,25 +31,21 @@ function collectBoundChildren(
   return found
 }
 
-const attachProxy = <T extends {}>(state: T, didUpdate: (state: T) => void) =>
-  new Proxy(state, {
-    set(target, key, value, recv) {
-      const output = Reflect.set(target, key, value, recv)
-      didUpdate({ ...target, [key]: value })
-      return output
-    },
-  })
+// const attachProxy = <T extends {}>(state: T, didUpdate: (state: T) => void) =>
+//   new Proxy(state, {
+//     set(target, key, value, recv) {
+//       const output = Reflect.set(target, key, value, recv)
+//       didUpdate({ ...target, [key]: value })
+//       return output
+//     },
+//   })
 
-function attributeCoder<T extends {}, K extends keyof T>(
-  this: HTMLElement,
-  initialState: T
-) {
+function attributeCoder<T extends {}, K extends keyof T>(this: HTMLElement, initialState: T) {
   const keys = Object.keys(initialState) as K[]
   const toDataKey = (key: string) => `data-${key}`
-  const dataKeys = keys.filter((key) => typeof key === 'string').map(toDataKey)
+  // const dataKeys = keys.filter((key) => typeof key === 'string').map(toDataKey)
   const safeParse = (obj: string) => Try.catch(() => JSON.parse(obj))[0]
-  const safeStringify = <T extends {}>(obj: T) =>
-    Try.catch(() => JSON.stringify(obj))[0]
+  const safeStringify = <T extends {}>(obj: T) => Try.catch(() => JSON.stringify(obj))[0]
 
   const parseBoolean = (str: string) => {
     switch (str) {
@@ -64,10 +57,7 @@ function attributeCoder<T extends {}, K extends keyof T>(
     }
   }
 
-  const decodeAttribute = (
-    dataKey: string,
-    value: string | null
-  ): [key: K, value: any] => {
+  const decodeAttribute = (dataKey: string, value: string | null): [key: K, value: any] => {
     const key = dataKey.slice(5) as K // slice off "data-"
     if (!value) return [key, undefined] as const
     if (value === 'undefined') return [key, undefined] as const
@@ -239,11 +229,7 @@ export function defineComponent<T extends {}>({
     public disconnectedCallback() {
       shared.instances.delete(this)
     }
-    public attributeChangedCallback(
-      name: string,
-      oldValue: string | null,
-      newValue: string | null
-    ) {
+    public attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
       console.log('[component] attribute changed:', {
         name,
         oldValue,

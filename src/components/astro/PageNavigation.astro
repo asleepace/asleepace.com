@@ -2,20 +2,20 @@
 import HeaderLink from '@/components/astro/HeaderLink.astro'
 import SocialLinkGithub from './SocialLinkGithub.astro'
 import SocialLinkTwitter from './SocialLinkTwitter.astro'
-import { SITE_TITLE } from '@/consts'
+import { siteConfig } from '@/consts'
+
+const { title } = siteConfig
 ---
 
 <header class="min-w-full sticky" transition:animate="none">
-  <nav
-    class="flex flex-row justify-between items-center h-[78px] px-4 bg-white"
-  >
+  <nav class="flex flex-row justify-between items-center h-[78px] px-4 bg-white">
     <!-- logo and site title -->
     <div class="basis-1/4 flex flex-row items-center">
       <a class="hover:scale-105 transition-all duration-300" href="/"
         ><img src="/images/logo.png" width="44" height="44" /></a
       >
       <h2 class="hidden xs:block">
-        <a class="font-black text-lg" href="/">{SITE_TITLE}</a>
+        <a class="font-black text-lg" href="/">{title}</a>
       </h2>
     </div>
     <!-- navigation buttons -->
@@ -25,9 +25,7 @@ import { SITE_TITLE } from '@/consts'
       <HeaderLink href="/about">About</HeaderLink>
     </div>
     <!-- social media links -->
-    <div
-      class="hidden gap-x-3 sm:flex flex-row basis-1/4 items-center justify-end"
-    >
+    <div class="hidden gap-x-3 sm:flex flex-row basis-1/4 items-center justify-end">
       <SocialLinkTwitter />
       <SocialLinkGithub />
     </div>

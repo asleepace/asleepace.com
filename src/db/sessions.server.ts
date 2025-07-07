@@ -1,5 +1,9 @@
 import Database from 'bun:sqlite'
-import { Users, type User } from '@/db/index.server'
+import { Users, type User } from '@/db'
+import { consoleTag } from '@/utils/tagTime'
+import chalk from 'chalk'
+
+const print = consoleTag('db:sessions', chalk.magentaBright)
 
 export type UserId = number
 
@@ -40,7 +44,7 @@ export namespace Sessions {
    * @note this must be called first before any other functions are called.
    */
   export function attachSessionsTable(sharedDatabaseInstance: Database) {
-    console.log('[db][sessions] attaching table...')
+    print('attaching table...')
     db = sharedDatabaseInstance
     db.run(SESSIONS_INIT)
   }
@@ -122,7 +126,7 @@ export namespace Sessions {
     if (!session) return
     const user = Users.getUserById(session.userId)
     if (!user) {
-      console.warn('User not found for session!')
+      print('User not found for session!')
       throw new Error('User not found for session!')
     }
     return user
@@ -151,7 +155,7 @@ export namespace Sessions {
     }) as Session | undefined
 
     if (!session) {
-      console.error('Failed to create session:', session)
+      print('Failed to create session:', session)
       throw new Error('Failed to create session')
     }
 

@@ -1,5 +1,9 @@
 import Database from 'bun:sqlite'
-import type { User } from '@/db/index.server'
+import type { User } from '@/db'
+import { consoleTag } from '@/utils/tagTime'
+import chalk from 'chalk'
+
+const print = consoleTag('db:credentials', chalk.magentaBright)
 
 /**
  * @note this is just a string alias.
@@ -38,13 +42,13 @@ export namespace Credentials {
   `
 
   export function attachCredentialsTable(sharedDatabaseInstance: Database) {
-    console.log('[db][credentials] attaching table...')
+    print('attaching table...')
     db = sharedDatabaseInstance
     db.run(CREDENTIALS_INIT)
   }
 
   export function dropTable() {
-    console.log('[db][credentials] dropping table...')
+    print('dropping table...')
     db.run(CREDENTIALS_DROP)
   }
 
@@ -57,7 +61,7 @@ export namespace Credentials {
     publicKey: string
     userHandle: string
   }): boolean {
-    console.log('[db][credentials] adding credential:', props)
+    print('adding credential:', props)
     const query = db.prepare(`
       INSERT INTO credentials (id, userId, publicKey, userHandle)
       VALUES ($id, $userId, $publicKey, $userHandle);

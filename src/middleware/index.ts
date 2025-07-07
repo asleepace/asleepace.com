@@ -1,6 +1,5 @@
 import { sequence } from 'astro:middleware'
 import { sessionMiddleware } from './sessionMiddleware'
-import { analyticsMiddleware } from './analyticsMiddleware'
 import { securityMiddleware } from './securityMiddleware'
 import { rootMiddleware } from './rootMiddleware'
 
@@ -16,14 +15,8 @@ import { rootMiddleware } from './rootMiddleware'
  *  @see `env.d.ts` for types.
  *
  *    0. Root handler
- *    1. Analytics
- *    2. User session
- *    3. Security checks
+ *    1. User session
+ *    2. Security checks
  *
  */
-export const onRequest = sequence(
-  rootMiddleware,
-  analyticsMiddleware,
-  sessionMiddleware,
-  securityMiddleware
-)
+export const onRequest = sequence(rootMiddleware, sessionMiddleware, securityMiddleware)

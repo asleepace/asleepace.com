@@ -1,4 +1,8 @@
 import Database from 'bun:sqlite'
+import { consoleTag } from '@/utils/tagTime'
+import chalk from 'chalk'
+
+const print = consoleTag('db:users', chalk.magentaBright)
 
 export type User = {
   id: number
@@ -39,15 +43,15 @@ export namespace Users {
    */
   export function attachUsersTable(sharedDatabaseInstance: Database) {
     try {
-      console.log('[db][users] attaching table...')
+      print('attaching table...')
       db = sharedDatabaseInstance
       db.run(USERS_INIT)
       const allUsers = fetchUsers()
       const numberOfUsers = allUsers.length
-      console.log('[db][users] total users:', allUsers.length)
+      print('total users:', allUsers.length)
       console.assert(numberOfUsers > 0, 'ASSERT_USERS_EXISTS')
     } catch (e) {
-      console.error('[db][users] error:', e)
+      print('error:', e)
     }
   }
 

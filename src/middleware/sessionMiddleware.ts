@@ -1,8 +1,9 @@
 import { defineMiddleware } from 'astro:middleware'
-import { Sessions } from '@/db/index.server'
+import { Sessions } from '@/db'
 import { consoleTag } from '@/utils/tagTime'
+import { Cookies } from '@/lib/backend/cookies'
 
-const handleLog = consoleTag('session')
+const print = consoleTag('session')
 
 /**
  *  ## sessionMiddleware
@@ -16,11 +17,11 @@ const handleLog = consoleTag('session')
 export const sessionMiddleware = defineMiddleware(async (context, next) => {
   if (context.isPrerendered) return next() // skip pre-renders
 
-  const sessionCookie = context.cookies.get('session')
-  const cookieString = sessionCookie?.value
+  const sessionToken = Cookies.getSessionCookie(context.cookies)
 
-  const user = await Sessions.getUser(cookieString).catch((e) => {
-    handleLog('bad cookie:', e)
+  const user = await Sessions.getUser(sessionToken).catch((e) => {
+    Cookies.deleteSessionCookie(context.cookies)
+    print('bad cookie:', e)
     return undefined
   })
 

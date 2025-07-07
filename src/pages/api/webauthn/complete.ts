@@ -1,21 +1,15 @@
-import { siteConfig } from '@/consts'
-import { Sessions } from '@/db/index.server'
+import { Sessions } from '@/db'
+import { Cookies } from '@/lib/backend/cookies'
 import { completeSignInChallenge } from '@/lib/webauthn/signIn'
+import { consoleTag } from '@/utils/tagTime'
 import type { APIRoute } from 'astro'
+
+const print = consoleTag('webauthn')
 
 export const prerender = false
 
-const environment = process.env.ENVIRONMENT
-const isDevelopment = Boolean(environment === 'development')
-const isProduction = !isDevelopment
-const cookieDomain = isDevelopment ? 'localhost' : process.env.COOKIE_DOMAIN
-
-const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
-
 export const POST: APIRoute = async ({ request, cookies, locals, redirect }) => {
   try {
-    console.log('[api][webauthn] completing sign-in...')
-
     const { credential } = await request.json()
 
     const user = await completeSignInChallenge(credential)
@@ -23,31 +17,17 @@ export const POST: APIRoute = async ({ request, cookies, locals, redirect }) => 
     if (!user || !user.id) throw new Error('Failed to load user for challenge')
 
     const session = Sessions.create(user.id)
-    const sessionToken = session.token
 
-    const cookieOptions = {
-      /** where the cookie is valid (must match to delete) */
-      path: siteConfig.cookiePath,
-      /** the domain that the cookie is valid for */
-      domain: cookieDomain,
-      /** javascript cannot access the cookie */
-      httpOnly: true,
-      /** if the cookie is only accessible via https */
-      secure: isProduction,
-      /** if the cookie is only accessible via the same site */
-      sameSite: 'lax',
-      /** the expiration date of the cookie */
-      expires: new Date(Date.now() + THIRTY_DAYS), // 30 days
-    } as const
+    Cookies.setSessionCookie(cookies, session.token)
 
-    cookies.set('session', sessionToken, cookieOptions) // set the cookie
     locals.isLoggedIn = true
     locals.user = user
 
-    console.log('[auth][webauthn] success, setting cookie:', cookieOptions)
+    print('completed sign-in, redirecting to admin home')
+
     return redirect('/admin/', 302)
   } catch (e) {
-    console.warn('[api][webauthn] error completing sign-in:', e)
+    print('error completing sign-in:', e)
     return Response.json(e, { status: 500 })
   }
 }

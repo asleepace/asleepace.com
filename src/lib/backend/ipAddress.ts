@@ -18,9 +18,7 @@ export function getIpAddressFromHeaders(headers: Headers) {
 /**
  * Attempts to get the first ip address from the x-forwarded-for header.
  */
-export function getFirstForwardedIpAddress(
-  xForwardedFor: string | null | undefined
-) {
+export function getFirstForwardedIpAddress(xForwardedFor: string | null | undefined) {
   if (!xForwardedFor) return undefined
   const ips = xForwardedFor.split(',')
   if (ips.length === 0) return undefined
@@ -28,9 +26,7 @@ export function getFirstForwardedIpAddress(
 }
 
 export function isValidIpAddressV4(ipAddress: string): boolean {
-  return /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-    ipAddress
-  )
+  return /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipAddress)
 }
 
 export function isValidIpAddressV6(ipAddress: string): boolean {
