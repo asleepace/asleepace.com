@@ -10,7 +10,7 @@ export const route = '/api/auth/clearSession'
  *  ## POST /api/auth/clearSession
  *
  *  This endpoint is used to clear the session cookie
- *  @note when cleaing the cookie, the path must match the path that was set in the cookie.
+ *  @note when clearing the cookie, the path must match the path that was set in the cookie.
  */
 
 export const POST: APIRoute = async ({ cookies, redirect }) => {

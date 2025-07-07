@@ -55,7 +55,7 @@ const { clearSession } = siteConfig.path
 
   <Spacer direction="vertical" />
 
-  <form method="post" target={clearSession}>
+  <form method="post" action={clearSession}>
     <AdminPanelSidebarButton href={clearSession} title="Logout" icon="LogOut" variant="destructive" isFormSubmit />
   </form>
 </aside>
