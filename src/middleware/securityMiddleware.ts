@@ -40,10 +40,14 @@ export const securityMiddleware = defineMiddleware(async (context, next) => {
   const isBlacklisted = blacklist.some((p) => path.startsWith(p))
 
   // skip checks for whitelisted paths
-  if (isWhitelisted || !isBlacklisted) return next()
+  if (isWhitelisted) return next()
 
-  console.warn('[middleware][security] unauthorized access:', path)
+  // if not whitelisted, but on the blacklist, log the unauthorized access
+  if (isBlacklisted) {
+    console.warn('[middleware][security] unauthorized access:', path, context.request.headers)
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-  // redirect to login page for blacklisted paths
-  return context.redirect(PATH.ADMIN_LOGIN(), 302)
+  // otherwise continue as normal
+  return next()
 })
