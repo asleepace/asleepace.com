@@ -18,15 +18,14 @@ async function fetchMetrics({
   method: 'GET' | 'PUT' | 'DELETE'
 }): Promise<Metric> {
   const url = new URL('/api/metrics', context.url.origin)
+  console.log('[onPageView] url:', url, method, referer)
   const response = await fetch(url, { method, headers: { referer } })
-  if (response.redirected) {
-    throw new Error('Not authorized!')
-  }
   if (!response.ok) {
     console.error('[onPageView] failed to fetch metrics', response)
     throw new Error('Invalid metric referer!')
   }
-  return response.json()
+  const data = await response.json()
+  return data
 }
 
 /**
@@ -38,10 +37,15 @@ export const onPageLike = defineAction({
     unliked: z.boolean().default(false),
   }),
   async handler(input, context) {
-    const referer = input.referer ?? getReferer(context)
-    const method = input.unliked ? 'DELETE' : 'PUT'
-    const metrics = await fetchMetrics({ context, referer, method })
-    return metrics
+    try {
+      const referer = input.referer ?? getReferer(context)
+      const metrics = await fetchMetrics({ context, referer, method: input.unliked ? 'DELETE' : 'PUT' })
+      console.log('[onPageLike] referer:', referer, metrics)
+      return metrics
+    } catch (e) {
+      console.error('[onPageLike] failed to fetch metrics', e)
+      throw e
+    }
   },
 })
 
@@ -55,8 +59,9 @@ export const onPageView = defineAction({
   async handler(input, context) {
     try {
       const referer = input.referer ?? getReferer(context)
+      console.log('[onPageView] referer:', referer)
       const metrics = await fetchMetrics({ context, referer, method: 'GET' })
-      console.log('[onPageView] referer:', referer, metrics)
+      console.log('[onPageView] metrics:', metrics)
       return metrics
     } catch (e) {
       console.error('[onPageView] failed to fetch metrics', e)
