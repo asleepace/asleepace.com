@@ -1,12 +1,10 @@
 import type { APIRoute } from 'astro'
 import { Users, Sessions } from '@/db/index.server'
 import { siteConfig } from '@/consts'
+import { Cookies } from '@/lib/backend/cookies'
 
 export const prerender = false
 export const route = '/api/auth'
-
-const cookieDomain = import.meta.env.DEV ? 'localhost' : process.env.COOKIE_DOMAIN
-const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
 
 /**
  * POST /api/auth
@@ -62,28 +60,11 @@ export const POST: APIRoute = async ({ request, locals, cookies, redirect }) => 
     // --- on success, create a session ---
 
     const session = Sessions.create(user.id)
-    const sessionToken = session.token
 
-    const cookieOptions = {
-      /** where the cookie is valid (must match to delete) */
-      path: siteConfig.cookiePath,
-      /** the domain that the cookie is valid for */
-      domain: cookieDomain,
-      /** javascript cannot access the cookie */
-      httpOnly: true,
-      /** if the cookie is only accessible via https */
-      secure: import.meta.env.PROD,
-      /** if the cookie is only accessible via the same site */
-      sameSite: 'lax',
-      /** the expiration date of the cookie */
-      expires: new Date(Date.now() + THIRTY_DAYS), // 30 days
-    } as const
+    Cookies.setSessionCookie(cookies, session.token)
 
-    cookies.set('session', sessionToken, cookieOptions) // set the cookie
     locals.isLoggedIn = true
     locals.user = user
-
-    console.log('[auth] setting cookie:', cookieOptions)
 
     return redirect(siteConfig.path.adminHome, 302)
   } catch (e) {

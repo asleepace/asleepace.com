@@ -3,6 +3,7 @@ import BaseHead from '@/components/astro/BaseHead.astro'
 import Header from '@/components/astro/Header.astro'
 import Footer from '@/components/astro/Footer.astro'
 import { siteConfig } from '@/consts'
+import { Cookies } from '@/lib/backend/cookies'
 
 export const prerender = false
 
@@ -16,11 +17,7 @@ export const prerender = false
  *  @note the path needs to match the path that was set in the cookie.
  *
  */
-console.warn('[/admin/logout] clearing session...')
-
-Astro.cookies.delete('session', {
-  path: siteConfig.cookiePath, // IMPORTANT: must match the path that was set in the cookie.
-})
+Cookies.deleteSessionCookie(Astro.cookies)
 
 Astro.redirect(siteConfig.path.adminLogin({}))
 
