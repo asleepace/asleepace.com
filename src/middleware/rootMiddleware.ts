@@ -1,8 +1,9 @@
+import { Analytics } from '@/db/analytics.server'
 import { consoleTag } from '@/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 
-const handleLog = consoleTag('middleware')
+const print = consoleTag('middleware')
 
 /**
  *  ## Root Middleware
@@ -16,39 +17,34 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
   try {
     const isSSR = context.isPrerendered
     const isAction = context.url.pathname.startsWith('/_actions/')
-    handleLog(
-      isSSR
-        ? chalk.magenta('[ssr]')
-        : isAction
-        ? chalk.magenta('[action]')
-        : '',
-      context.url.pathname
-    )
+    print(isSSR ? chalk.magenta('[ssr]') : isAction ? chalk.magenta('[action]') : '', context.url.pathname)
     if (context.isPrerendered) return next()
-
-    // const method = context.request.method
-    // const path = context.url.pathname
 
     // --- pre-processing ---
 
     const response = await next()
 
-    // TODO: too strict, disabling for now, plus there's nothing to hack anyways XD
-    // Object.entries(HEADERS.SECURITY).forEach(([header, value]) => {
-    //   response.headers.set(header, value)
-    // })
+    Analytics.trackEvent({
+      request: context.request,
+      response,
+      message: 'default',
+    })
 
     // --- post-processing ---
 
     return response
   } catch (e) {
-    console.error('', chalk.red(e))
+    const message = e instanceof Error ? e.message : 'error'
 
-    // TODO: write error to database
+    print(chalk.redBright('error:'), e?.message ?? e)
+
+    Analytics.trackEvent({
+      request: context.request,
+      message,
+    })
 
     return new Response(e?.message, { status: 500 })
   } finally {
     // TODO: handle any cleanup
-    // console.log(chalk.gray(`[m][closed] REQ #${requestId}`))
   }
 })
