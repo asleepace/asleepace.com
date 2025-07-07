@@ -1,5 +1,5 @@
 import Database from 'bun:sqlite'
-import type { User } from '@/db/index.server'
+import type { User } from '@/db'
 import { consoleTag } from '@/utils/tagTime'
 import chalk from 'chalk'
 

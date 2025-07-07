@@ -1,7 +1,7 @@
-import type { User } from '@/db/index.server'
+import type { User } from '@/db'
 import { randomBytes } from 'node:crypto'
 import { decodeAuthenticatorData, decodeBase64JSON, WebAuthN, type ClientDataJSON } from './utils'
-import { Credentials } from '@/db/index.server'
+import { Credentials } from '@/db'
 
 /**
  *  Create a store which manages creating the registration challenges and

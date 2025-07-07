@@ -15,9 +15,6 @@ const print = consoleTag('middleware')
  */
 export const rootMiddleware = defineMiddleware(async (context, next) => {
   try {
-    const isSSR = context.isPrerendered
-    const isAction = context.url.pathname.startsWith('/_actions/')
-    print(isSSR ? chalk.magenta('[ssr]') : isAction ? chalk.magenta('[action]') : '', context.url.pathname)
     if (context.isPrerendered) return next()
 
     // --- pre-processing ---
@@ -43,8 +40,6 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
       message,
     })
 
-    return new Response(e?.message, { status: 500 })
-  } finally {
-    // TODO: handle any cleanup
+    return new Response(message, { status: 500 })
   }
 })

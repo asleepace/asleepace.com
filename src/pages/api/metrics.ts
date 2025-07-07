@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { Metrics } from '@/db/index.server'
+import { Metrics } from '@/db'
 
 // --- helpers ---
 

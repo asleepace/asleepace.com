@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { Users, Sessions } from '@/db/index.server'
+import { Users, Sessions } from '@/db'
 import { siteConfig } from '@/consts'
 import { Cookies } from '@/lib/backend/cookies'
 

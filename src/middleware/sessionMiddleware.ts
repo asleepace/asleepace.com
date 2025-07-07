@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { Sessions } from '@/db/index.server'
+import { Sessions } from '@/db'
 import { consoleTag } from '@/utils/tagTime'
 import { Cookies } from '@/lib/backend/cookies'
 

@@ -51,6 +51,8 @@ export namespace Analytics {
   export function attachAnalyticsTable(sharedDatabaseInstance: Database) {
     print('attaching table...')
     db = sharedDatabaseInstance
+    // TODO: remove this in next release
+    dropAnalyticsTable(db)
     db.run(ANALYTICS_INIT)
   }
 

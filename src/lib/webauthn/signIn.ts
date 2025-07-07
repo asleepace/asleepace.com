@@ -1,4 +1,4 @@
-import type { User } from '@/db/index.server'
+import type { User } from '@/db'
 import { randomBytes, createVerify, createPublicKey } from 'node:crypto'
 import {
   decodeAuthenticatorData,
@@ -8,7 +8,7 @@ import {
   WebAuthN,
   type ClientDataJSON,
 } from './utils'
-import { Credentials } from '@/db/index.server'
+import { Credentials } from '@/db'
 
 /**
  *  Creates a new in-memory store for sign-in challenges.

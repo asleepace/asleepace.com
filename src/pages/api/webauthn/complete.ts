@@ -1,4 +1,4 @@
-import { Sessions } from '@/db/index.server'
+import { Sessions } from '@/db'
 import { Cookies } from '@/lib/backend/cookies'
 import { completeSignInChallenge } from '@/lib/webauthn/signIn'
 import { consoleTag } from '@/utils/tagTime'

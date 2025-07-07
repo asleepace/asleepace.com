@@ -1,4 +1,4 @@
-import type { Metric } from '@/db/index.server'
+import type { Metric } from '@/db'
 import { defineAction, type ActionAPIContext } from 'astro:actions'
 import { z } from 'astro:content'
 

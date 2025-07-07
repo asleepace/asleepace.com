@@ -1,4 +1,4 @@
-import { Credentials } from '@/db/index.server'
+import { Credentials } from '@/db'
 import type { APIRoute } from 'astro'
 
 export const prerender = false
