@@ -8,7 +8,6 @@ export type PageMetrics = Metric
 
 interface Env {
   DATABASE_URL: string
-  SECRET: string
   SMTP_HOST: string
   SMTP_PORT: number
   SMTP_USER: string
