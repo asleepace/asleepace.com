@@ -31,12 +31,13 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     return response
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'error'
+    const message = e instanceof Error ? e.message : 'Internal Server Error'
 
     print(chalk.redBright('error:'), e?.message ?? e)
 
     Analytics.trackEvent({
       request: context.request,
+      status: 500,
       message,
     })
 
