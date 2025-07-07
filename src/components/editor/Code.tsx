@@ -45,7 +45,7 @@ async function loadHighlightJS() {
 async function loadLanguage(lang: string) {
   if (languageCache.has(lang)) return languageCache.get(lang)
 
-  let module
+  let module: any
   switch (lang) {
     case 'javascript':
       module = await import('highlight.js/lib/languages/javascript')
