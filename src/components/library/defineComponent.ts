@@ -31,14 +31,14 @@ function collectBoundChildren(child: HTMLElement | undefined, found: Map<string,
   return found
 }
 
-const attachProxy = <T extends {}>(state: T, didUpdate: (state: T) => void) =>
-  new Proxy(state, {
-    set(target, key, value, recv) {
-      const output = Reflect.set(target, key, value, recv)
-      didUpdate({ ...target, [key]: value })
-      return output
-    },
-  })
+// const attachProxy = <T extends {}>(state: T, didUpdate: (state: T) => void) =>
+//   new Proxy(state, {
+//     set(target, key, value, recv) {
+//       const output = Reflect.set(target, key, value, recv)
+//       didUpdate({ ...target, [key]: value })
+//       return output
+//     },
+//   })
 
 function attributeCoder<T extends {}, K extends keyof T>(this: HTMLElement, initialState: T) {
   const keys = Object.keys(initialState) as K[]
