@@ -25,6 +25,17 @@ export type UseTypeScriptResult = {
   compile: () => Promise<string | null>
 }
 
+export type UseTypeScriptDiagnostics = {
+  messageText: string
+  start: number
+  file: {
+    getLineAndCharacterOfPosition: (position: number) => {
+      line: number
+      character: number
+    }
+  }
+}
+
 export function useTypescript({
   code,
   compilerOptions = DEFAULT_COMPILER_OPTIONS,
@@ -103,7 +114,7 @@ export function useTypescript({
       )
 
       if (diagnostics.length > 0) {
-        const errorMessages = diagnostics.map((diagnostic) => {
+        const errorMessages = diagnostics.map((diagnostic: UseTypeScriptDiagnostics) => {
           const message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
           if (diagnostic.file && diagnostic.start) {
             const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
