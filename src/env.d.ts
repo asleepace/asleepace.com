@@ -13,8 +13,6 @@ interface Env {
   SMTP_USER: string
   SMTP_PASSWORD: string
   SMTP_FROM: string
-  GITHUB_CLIENT_SECRET: string
-  GITHUB_CLIENT_ID: string
   MONGODB_URI: string
   HOST: string
   PORT: number

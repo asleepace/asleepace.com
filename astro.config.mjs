@@ -36,8 +36,6 @@ export default defineConfig({
       SMTP_USER: envField.string({ context: 'server', access: 'secret' }),
       SMTP_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
       SMTP_FROM: envField.string({ context: 'server', access: 'secret' }),
-      GITHUB_CLIENT_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
-      GITHUB_CLIENT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
     }
   },
   integrations: [
