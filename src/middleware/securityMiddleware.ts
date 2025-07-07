@@ -1,4 +1,3 @@
-import { PATH } from '@/consts'
 import { defineMiddleware } from 'astro:middleware'
 
 const whitelist = [

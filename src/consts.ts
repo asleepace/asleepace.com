@@ -53,6 +53,9 @@ const DEFAULT_CONFIGURATIONS = {
 
 const baseUrl = ENVIRONMENT === 'production' ? new URL('https://asleepace.com') : new URL('http://localhost:4321')
 
+console.log('[consts] baseUrl:', baseUrl)
+console.log('[consts] environment:', ENVIRONMENT)
+
 // --- create config ---
 
 export const siteConfig: SiteConfig = {
