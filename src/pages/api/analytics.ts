@@ -34,7 +34,8 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
 export const GET: APIRoute = endpoint(async ({ request, locals }) => {
   if (!locals.isLoggedIn) return http.failure(401, 'Unauthorized')
   const { searchParams } = await http.parse(request)
-  const days = parseInt(searchParams['days']) ?? 30
+  const daysParam = searchParams['days'] ? parseInt(searchParams['days']) : 30
+  const days = isNaN(daysParam) ? 30 : daysParam
   const analytics = Analytics.getAnalytics({ days })
   return http.success(analytics)
 })

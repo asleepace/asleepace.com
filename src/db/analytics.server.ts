@@ -52,7 +52,7 @@ export namespace Analytics {
     print('attaching table...')
     db = sharedDatabaseInstance
     // TODO: remove this in next release
-    dropAnalyticsTable(db)
+    // dropAnalyticsTable(db)
     db.run(ANALYTICS_INIT)
   }
 
@@ -78,12 +78,18 @@ export namespace Analytics {
   // --- operations ---
 
   export function getAnalytics({ path, days = 30 }: { path?: string; days?: number }) {
+    const safeDays = Math.max(1, Math.floor(Math.abs(days || 30)))
     const query = path
-      ? `SELECT * FROM analytics WHERE path = ? AND timestamp > datetime('now', '-${days} days')`
-      : `SELECT * FROM analytics WHERE timestamp > datetime('now', '-${days} days')`
-
+      ? `SELECT * FROM analytics WHERE path = $path AND timestamp > datetime('now', '-${safeDays} days')`
+      : `SELECT * FROM analytics WHERE timestamp > datetime('now', '-${safeDays} days')`
     const stmt = db.prepare(query)
-    return path ? stmt.all(path) : stmt.all()
+    const rows = path ? stmt.all({ $path: path }) : stmt.all()
+    return rows.map(transformResult)
+  }
+
+  export function getAllAnalytics(): AnalyticsData[] {
+    const stmt = db.prepare(`SELECT * FROM analytics`)
+    return stmt.all().map(transformResult)
   }
 
   function safeEncodeJSON(data: any) {
@@ -91,6 +97,21 @@ export namespace Analytics {
       return JSON.stringify(data)
     } catch (e) {
       return null
+    }
+  }
+
+  function safeDecodeJSON(data: string) {
+    try {
+      return JSON.parse(data)
+    } catch (e) {
+      return null
+    }
+  }
+
+  function transformResult(result: any): AnalyticsData {
+    return {
+      ...result,
+      headers: safeDecodeJSON(result.headers),
     }
   }
 
