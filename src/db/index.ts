@@ -9,11 +9,15 @@ import { Metrics, type Metric } from './metrics.server'
 
 const db = new Database('db.sqlite')
 
-Users.attachUsersTable(db)
-Sessions.attachSessionsTable(db)
-Analytics.attachAnalyticsTable(db)
-Credentials.attachCredentialsTable(db)
-Metrics.attachMetricsTable(db)
+try {
+  Users.attachUsersTable(db)
+  Sessions.attachSessionsTable(db)
+  Analytics.attachAnalyticsTable(db)
+  Credentials.attachCredentialsTable(db)
+  Metrics.attachMetricsTable(db)
+} catch (error) {
+  console.error('Error attaching tables:', error)
+}
 
 // --- attach plugins ---
 

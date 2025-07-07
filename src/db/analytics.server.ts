@@ -55,7 +55,7 @@ export namespace Analytics {
   export function attachAnalyticsTable(sharedDatabaseInstance: Database) {
     print('attaching table...')
     db = sharedDatabaseInstance
-    migrateAnalyticsTable() // TODO: remove after next release
+    dropAnalyticsTable()
     db.run(ANALYTICS_INIT)
   }
 
