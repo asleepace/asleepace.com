@@ -18,6 +18,7 @@ const print = consoleTag('cookies')
 export namespace Cookies {
   export const SESSION_COOKIE_NAME = 'session'
   export const SESSION_COOKIE_EXPIRATION = THIRTY_DAYS
+  export const TRACKING_ID_COOKIE_NAME = 'tracking-id'
 
   export function getCookieOptions() {
     const cookieOptions = {
@@ -50,7 +51,26 @@ export namespace Cookies {
     print('deleted session cookie')
   }
 
+  function generateTrackingId(): string {
+    return Math.random().toString(36).substring(2, 10)
+  }
+
   export function getSessionCookie(cookies: AstroCookies): string | undefined {
     return cookies.get(SESSION_COOKIE_NAME)?.value
+  }
+
+  export function getTrackingId(cookies: AstroCookies): string {
+    const existingTrackingId = cookies.get(TRACKING_ID_COOKIE_NAME)?.value
+    return existingTrackingId ?? setTrackingId(cookies)
+  }
+
+  export function setTrackingId(cookies: AstroCookies): string {
+    const trackingId = generateTrackingId()
+    cookies.set(TRACKING_ID_COOKIE_NAME, trackingId, getCookieOptions())
+    return trackingId
+  }
+
+  export function deleteTrackingId(cookies: AstroCookies) {
+    cookies.delete(TRACKING_ID_COOKIE_NAME, getCookieOptions())
   }
 }

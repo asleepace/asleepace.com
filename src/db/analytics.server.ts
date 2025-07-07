@@ -2,6 +2,8 @@ import { consoleTag } from '@/utils/tagTime'
 import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
 import Database from 'bun:sqlite'
 import chalk from 'chalk'
+import type { AstroCookies } from 'astro'
+import { Cookies } from '@/lib/backend'
 
 const print = consoleTag('db:analytics', chalk.magentaBright)
 
@@ -9,16 +11,18 @@ export type AnalyticsDeviceType = 'mobile' | 'desktop' | 'tablet'
 
 export type AnalyticsData = {
   path: string
+  params?: Record<string, string>
   method?: string
+  status?: number
   userAgent?: string
   ipAddress?: string
-  sessionId?: string
-  country?: string
+  trackingId?: string
   deviceType?: AnalyticsDeviceType
+  country?: string
   isBot?: boolean
+  isExternal?: boolean
   message?: string
   headers?: Record<string, string>
-  status?: number
 }
 
 export namespace Analytics {
@@ -28,17 +32,19 @@ export namespace Analytics {
     CREATE TABLE IF NOT EXISTS analytics (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       path TEXT NOT NULL,
+      params TEXT, -- JSON string
       method TEXT NOT NULL DEFAULT 'GET',
+      status INTEGER NOT NULL DEFAULT 200,
       user_agent TEXT,
       ip_address TEXT,
-      session_id TEXT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-      country TEXT,
+      tracking_id TEXT,
       device_type TEXT,
+      country TEXT,
       is_bot BOOLEAN DEFAULT FALSE,
+      is_external BOOLEAN DEFAULT FALSE,
       message TEXT,
       headers TEXT, -- JSON string
-      status INTEGER NOT NULL DEFAULT 200
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `
 
@@ -58,7 +64,7 @@ export namespace Analytics {
    *  the referrer column exists.
    */
   export function migrateAnalyticsTable() {
-    const tableInfo = db.prepare("SELECT name FROM pragma_table_info('analytics') WHERE name = 'referrer'").get()
+    const tableInfo = db.prepare("SELECT name FROM pragma_table_info('analytics') WHERE name = 'session_id'").get()
 
     if (tableInfo) {
       print('migrating analytics table...')
@@ -123,8 +129,33 @@ export namespace Analytics {
   function transformResult(result: any): AnalyticsData {
     return {
       ...result,
+      params: safeDecodeJSON(result.params),
       headers: safeDecodeJSON(result.headers),
     }
+  }
+
+  function isExternalRequest(headers: Headers): boolean {
+    // Check if request came from external site
+    const referer = headers.get('referer') || headers.get('referrer')
+    const origin = headers.get('origin')
+    const host = headers.get('host')
+    if (!referer && !origin) return false
+    try {
+      const refererHost = referer ? new URL(referer).host : null
+      const originHost = origin ? new URL(origin).host : null
+      return Boolean((refererHost && refererHost !== host) || (originHost && originHost !== host))
+    } catch {
+      return false
+    }
+  }
+
+  function getCountryFromHeaders(headers: Headers): string | undefined {
+    const countryHeaders = ['country', 'x-country', 'x-cf-ipcountry', 'x-real-country', 'x-forwarded-country']
+    for (const header of countryHeaders) {
+      const country = headers.get(header)
+      if (country) return country
+    }
+    return undefined
   }
 
   // --- track request ---
@@ -132,44 +163,69 @@ export namespace Analytics {
   export async function insert(data: AnalyticsData) {
     const stmt = db.prepare(`
       INSERT INTO analytics (
-        path, method, user_agent, ip_address, 
-        session_id, country, device_type, is_bot,
-        message, headers, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        path, params, method, status, user_agent, ip_address, 
+        tracking_id, device_type, country, is_bot, is_external,
+        message, headers
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
 
     return stmt.run(
       data.path,
+      data.params ? safeEncodeJSON(data.params) : null,
       data.method || 'GET',
+      data.status || 200,
       data.userAgent || null,
       data.ipAddress || null,
-      data.sessionId || null,
-      data.country || null,
+      data.trackingId || null,
       data.deviceType || null,
+      data.country || null,
       data.isBot || false,
+      data.isExternal || false,
       data.message || null,
-      data.headers ? safeEncodeJSON(data.headers) : null,
-      data.status || 200
+      data.headers ? safeEncodeJSON(data.headers) : null
     )
   }
 
-  export function trackEvent(event: { request: Request; response?: Response; message?: string; status?: number }) {
+  export function trackEvent(event: {
+    request: Request
+    cookies: AstroCookies
+    response?: Response
+    message?: string
+    status?: number
+  }) {
     try {
       const { request, response } = event
-      const { headers } = request
       const url = new URL(request.url)
+
+      const ipAddress = getIpAddressFromHeaders(request.headers) ?? ''
+      const headers = Object.fromEntries(request.headers.entries())
+      const country = getCountryFromHeaders(request.headers)
+      const userAgent = headers['user-agent'] ?? ''
+      const deviceType = getDeviceType(userAgent)
+
+      // convert search params to an object
+      const params = Object.fromEntries(url.searchParams.entries())
+
+      // get tracking id from cookies (will generate a new one if not present)
+      const trackingId = Cookies.getTrackingId(event.cookies)
+
+      // remove headers which are redudant
+      delete headers['user-agent']
+
       return insert({
         path: url.pathname,
+        params,
         method: request.method,
-        userAgent: headers.get('user-agent') ?? '',
-        ipAddress: getIpAddressFromHeaders(headers) ?? '',
-        sessionId: headers.get('x-session-id') ?? '',
-        country: headers.get('x-country') ?? '',
-        deviceType: getDeviceType(headers.get('user-agent') || ''),
-        isBot: isBot(headers.get('user-agent') || ''),
-        headers: Object.fromEntries(headers.entries()),
-        status: event.status ?? response?.status,
+        status: event.status ?? response?.status ?? 200,
+        userAgent,
+        ipAddress,
+        trackingId,
+        country,
+        deviceType,
+        isBot: isBot(userAgent),
+        isExternal: isExternalRequest(request.headers),
         message: event.message,
+        headers,
       })
     } catch (e) {
       print('error:', e)
