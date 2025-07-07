@@ -164,11 +164,11 @@ export namespace Analytics {
     try {
       if (!db) throw new Error('Analytics database not initialized')
       const stmt = db.prepare(`
-      INSERT INTO analytics (
-        path, params, method, status, user_agent, ip_address, 
-        tracking_id, device_type, country, is_bot, is_external,
-        message, headers
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO analytics (
+          path, params, method, status, user_agent, ip_address, 
+          tracking_id, device_type, country, is_bot, is_external,
+          message, headers
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
 
       return stmt.run(
