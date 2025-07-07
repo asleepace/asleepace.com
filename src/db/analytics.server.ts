@@ -1,4 +1,5 @@
 import { consoleTag } from '@/utils/tagTime'
+import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
 import Database from 'bun:sqlite'
 
 const print = consoleTag('db:analytics')
@@ -128,7 +129,7 @@ export namespace Analytics {
         method: request.method,
         referrer: headers.get('referer') ?? '',
         userAgent: headers.get('user-agent') ?? '',
-        ipAddress: headers.get('x-forwarded-for') ?? '',
+        ipAddress: getIpAddressFromHeaders(headers) ?? '',
         sessionId: headers.get('x-session-id') ?? '',
         country: headers.get('x-country') ?? '',
         deviceType: getDeviceType(headers.get('user-agent') || ''),

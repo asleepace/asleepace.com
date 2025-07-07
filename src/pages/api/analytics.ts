@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro'
 import { endpoint } from '@/pages/api'
 import { Analytics } from '@/db/index.server'
 import { http } from '@/lib/web'
-import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
+import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
 
 export const prerender = false
 
