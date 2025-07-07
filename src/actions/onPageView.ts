@@ -8,12 +8,23 @@ function getReferer(context: ActionAPIContext) {
   return referer
 }
 
-async function fetchMetrics(context: ActionAPIContext, referer: string, method: 'GET' | 'PUT' | 'DELETE') {
+async function fetchMetrics({
+  context,
+  referer,
+  method,
+}: {
+  context: ActionAPIContext
+  referer: string
+  method: 'GET' | 'PUT' | 'DELETE'
+}): Promise<Metric> {
   const url = new URL('/api/metrics', context.url.origin)
   const response = await fetch(url, { method, headers: { referer } })
+  if (response.redirected) {
+    throw new Error('Not authorized!')
+  }
   if (!response.ok) {
     console.error('[onPageView] failed to fetch metrics', response)
-    throw new Error('Failed to register page like!')
+    throw new Error('Invalid metric referer!')
   }
   return response.json()
 }
@@ -28,21 +39,15 @@ export const onPageLike = defineAction({
   }),
   async handler(input, context) {
     const referer = input.referer ?? getReferer(context)
-    const url = new URL('/api/metrics', context.url.origin)
-    const response = await fetch(url, { method: input.unliked ? 'DELETE' : 'PUT', headers: { referer } })
-    if (response.redirected) {
-      throw new Error('Not authorized!')
-    }
-    if (!response.ok) {
-      throw new Error('Failed to register page like!')
-    }
-    const pageMetrics: Metric = await response.json()
-    return pageMetrics
+    const method = input.unliked ? 'DELETE' : 'PUT'
+
+    const metrics = await fetchMetrics({ context, referer, method })
+    return metrics
   },
 })
 
 /**
- *  Register a page view.
+ *  Increment the page's views and return the updated metrics.
  */
 export const onPageView = defineAction({
   input: z.object({
@@ -50,20 +55,7 @@ export const onPageView = defineAction({
   }),
   async handler(input, context) {
     const referer = input.referer ?? getReferer(context)
-    const url = new URL('/api/metrics', context.url.origin)
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        referer,
-      },
-    })
-    if (response.redirected) {
-      throw new Error('Redirected to a different page!')
-    }
-    if (!response.ok) {
-      throw new Error('Failed to register page view!')
-    }
-    const metrics: Metric = await response.json()
+    const metrics = await fetchMetrics({ context, referer, method: 'GET' })
     return metrics
   },
 })
