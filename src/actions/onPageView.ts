@@ -52,7 +52,13 @@ export const onPageView = defineAction({
     referer: z.string().optional(),
   }),
   async handler(input, context) {
-    const referer = input.referer ?? getReferer(context)
-    return fetchMetrics({ context, referer, method: 'GET' })
+    try {
+      const referer = input.referer ?? getReferer(context)
+      console.log('[onPageView] referer:', referer)
+      return fetchMetrics({ context, referer, method: 'GET' })
+    } catch (e) {
+      console.error('[onPageView] failed to fetch metrics', e)
+      throw e
+    }
   },
 })
