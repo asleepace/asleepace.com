@@ -35,7 +35,6 @@ export const securityMiddleware = defineMiddleware(async (context, next) => {
   if (context.locals.isLoggedIn) return next()
 
   const path = context.url.pathname
-  console.log('[middleware][security] checkpoint:', path)
 
   // check if path is whitelisted or blacklisted
   const isWhitelisted = whitelist.some((p) => path.startsWith(p))
