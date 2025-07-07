@@ -77,6 +77,25 @@ If you want to quickly kill the process running at a specific port (`8080`)
 lsof -ti :8080 | xargs kill -9
 ```
 
+## Git
+
+```bash
+# restore a file from a remote branch (e.g. master)
+git checkout origin/master -- ./src/dir/file-to-restore.txt
+
+# rollback a commit
+git reset --hard HEAD~1
+
+# rollback a commit and keep changes
+git reset --soft HEAD~1
+
+# rollback a commit and keep changes (e.g. if you forgot to add a file)
+git reset --soft HEAD~1
+git add .
+git commit -m "Add forgotten file"
+git push
+```
+
 ## FFMPEG
 
 Convert a `.wmv` to `.mp4` with FFMPEG:
