@@ -10,11 +10,10 @@ export const prerender = false
 // =====================================
 
 const blog = await getCollection('blog')
-const posts = blog.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-)
+const posts = blog.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 
-const featured = posts.at(0)!
+const randomIndexOfLastFour = Math.floor(Math.random() * posts.length) % 4
+const featured = posts.at(randomIndexOfLastFour)!
 
 const feed = posts.slice(1).map(({ data, id }) => ({
   name: data.title,
@@ -23,11 +22,6 @@ const feed = posts.slice(1).map(({ data, id }) => ({
 }))
 ---
 
-<SiteLayout
-  title="Home"
-  className="justify-center grow"
-  transition:animate="none"
-  htmx
->
+<SiteLayout title="Home" className="justify-center grow" transition:animate="none" htmx>
   <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
 </SiteLayout>
