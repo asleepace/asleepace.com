@@ -2,7 +2,7 @@
 import BaseHead from '@/components/astro/BaseHead.astro'
 import Header from '@/components/astro/Header.astro'
 import Footer from '@/components/astro/Footer.astro'
-import { siteData } from '@/consts'
+import { siteConfig } from '@/consts'
 import { LockKeyholeIcon } from 'lucide-react'
 
 export const prerender = false
@@ -18,12 +18,14 @@ const ERROR_CASES = {
 }
 
 const message = error && error in ERROR_CASES ? ERROR_CASES[error] : error
+
+const { title, description } = siteConfig
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={siteData.title} description={siteData.description} />
+    <BaseHead title={title} description={description} />
   </head>
   <body class="min-h-screen flex flex-col bg-white bg-cover bg-fixed">
     <Header title="" class:list="before:bg-glass overflow-hidden" />

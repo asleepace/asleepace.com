@@ -9,6 +9,9 @@ export type SiteCookiePath = `/${string}` // example: "/"
 export type SiteEnvironment = 'production' | 'development'
 
 export type SiteConfig = {
+  title: string
+  description: string
+  url: string
   baseUrl: URL
   environment: SiteEnvironment
   isDebug: boolean
@@ -42,6 +45,9 @@ const baseUrl = import.meta.env.PROD ? new URL('https://asleepace.com') : new UR
 // --- create config ---
 
 export const siteConfig: SiteConfig = {
+  title: 'Asleepace',
+  description: 'a random collection of internet treasures',
+  url: 'https://asleepace.com',
   environment: import.meta.env.DEV ? 'development' : 'production',
   isDebug: import.meta.env.DEV,
   mongodbUri: MONGODB_URI,
@@ -92,25 +98,11 @@ Object.entries(siteConfig).forEach(([key, value]) => {
     print(chalk.gray(`${key}:`), chalk.cyan(value.toString()))
   } else if (typeof value === 'string') {
     print(chalk.gray(`${key}:`), chalk.green(`"${value}"`))
+  } else if (typeof value === 'number') {
+    print(chalk.gray(`${key}:`), chalk.yellow(value))
+  } else if (typeof value === 'boolean') {
+    print(chalk.gray(`${key}:`), chalk.yellow(value))
   } else {
     print(chalk.gray(`${key}:`), value)
   }
 })
-
-export const SITE_TITLE = 'Asleepace'
-export const SITE_DESCRIPTION = 'a random collection of internet treasures'
-export const SITE_URL = 'https://asleepace.com'
-
-export const siteData = {
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  url: SITE_URL,
-  showcaseLinks: [
-    'https://soladex.co',
-    'https://consoledump.io',
-    'https://polyblog.net',
-    'https://patrick-teahan.com',
-    'https://lams-kitchen.com',
-    'https://stockindx.com',
-  ],
-}

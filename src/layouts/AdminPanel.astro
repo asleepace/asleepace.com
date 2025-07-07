@@ -1,7 +1,7 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
 import { ButtonRoundIcon, ButtonIconWithText, ListTextLinks } from '@/components/library/'
-import { siteData } from '@/consts'
+import { siteConfig } from '@/consts'
 import Sidebar from '@/components/library/Sidebar.astro'
 
 export const prerender = false
@@ -14,12 +14,14 @@ const chatHistoryLinks = [
   ['System Info', '/admin/system'],
   ['Logs', '/admin/log'],
 ] as [string, string][]
+
+const { description, title } = siteConfig
 ---
 
 <!doctype html>
 <html lang="en" class="h-full">
   <head>
-    <BaseHead title={siteData.title} description={siteData.description} />
+    <BaseHead title={title} description={description} />
   </head>
   <body class="h-full bg-black text-white overflow-hidden">
     <div class="flex flex-1 h-full">

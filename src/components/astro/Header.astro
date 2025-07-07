@@ -1,22 +1,17 @@
 ---
 import HeaderLink from '@/components/astro/HeaderLink.astro'
-import { siteData } from '@/consts'
+import { siteConfig } from '@/consts'
 import { cn } from '@/utils/cn'
 interface Props {
   title?: string
   class?: string
 }
 
-const { class: className, title = siteData.title } = Astro.props
+const { class: className, title = siteConfig.title } = Astro.props
 ---
 
 <header>
-  <nav
-    class={cn(
-      'flex flex-row justify-between items-center min-w-full h-20 overflow-y-hidden',
-      className
-    )}
-  >
+  <nav class={cn('flex flex-row justify-between items-center min-w-full h-20 overflow-y-hidden', className)}>
     <div class="title-and-logo">
       <a href="/"><img src="/images/logo.png" width="44" height="44" /></a>
       <h2 class="min-w-sm:hidden">
