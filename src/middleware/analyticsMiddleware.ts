@@ -15,9 +15,12 @@ const IGNORED_PATHS = [
 ]
 
 /**
- *  ## analyticsMiddleware
+ *  ## Analytics Middleware
  *
- *  This middleware tracks request data and stores it in the database.
+ *  This middleware tracks request data and stores it in the database, mainly we just want to track
+ *  requests to the site, not the API.
+ *
+ *  @note this middleware is only run on GET requests.
  *
  */
 export const analyticsMiddleware = defineMiddleware(({ request, url, cookies, isPrerendered }, next) => {
