@@ -80,15 +80,15 @@ export namespace Analytics {
   export function getAnalytics({ path, days = 30 }: { path?: string; days?: number }) {
     const safeDays = Math.max(1, Math.floor(Math.abs(days || 30)))
     const query = path
-      ? `SELECT * FROM analytics WHERE path = $path AND timestamp > datetime('now', '-${safeDays} days')`
-      : `SELECT * FROM analytics WHERE timestamp > datetime('now', '-${safeDays} days')`
+      ? `SELECT * FROM analytics WHERE path = $path AND timestamp > datetime('now', '-${safeDays} days') ORDER BY timestamp DESC`
+      : `SELECT * FROM analytics WHERE timestamp > datetime('now', '-${safeDays} days') ORDER BY timestamp DESC`
     const stmt = db.prepare(query)
     const rows = path ? stmt.all({ $path: path }) : stmt.all()
     return rows.map(transformResult)
   }
 
   export function getAllAnalytics(): AnalyticsData[] {
-    const stmt = db.prepare(`SELECT * FROM analytics`)
+    const stmt = db.prepare(`SELECT * FROM analytics ORDER BY timestamp DESC`)
     return stmt.all().map(transformResult)
   }
 

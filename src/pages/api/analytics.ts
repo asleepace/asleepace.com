@@ -33,6 +33,7 @@ export const POST: APIRoute = endpoint(async ({ request }) => {
  */
 export const GET: APIRoute = endpoint(async ({ request, locals }) => {
   if (!locals.isLoggedIn) return http.failure(401, 'Unauthorized')
+  if (!locals.user) return http.failure(403, 'Forbidden')
   const { searchParams } = await http.parse(request)
   const daysParam = searchParams['days'] ? parseInt(searchParams['days']) : 30
   const days = isNaN(daysParam) ? 30 : daysParam
