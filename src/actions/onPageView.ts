@@ -8,6 +8,16 @@ function getReferer(context: ActionAPIContext) {
   return referer
 }
 
+async function fetchMetrics(context: ActionAPIContext, referer: string, method: 'GET' | 'PUT' | 'DELETE') {
+  const url = new URL('/api/metrics', context.url.origin)
+  const response = await fetch(url, { method, headers: { referer } })
+  if (!response.ok) {
+    console.error('[onPageView] failed to fetch metrics', response)
+    throw new Error('Failed to register page like!')
+  }
+  return response.json()
+}
+
 /**
  *  Update the page's likes metric by 1 or -1.
  */
@@ -20,6 +30,9 @@ export const onPageLike = defineAction({
     const referer = input.referer ?? getReferer(context)
     const url = new URL('/api/metrics', context.url.origin)
     const response = await fetch(url, { method: input.unliked ? 'DELETE' : 'PUT', headers: { referer } })
+    if (response.redirected) {
+      throw new Error('Not authorized!')
+    }
     if (!response.ok) {
       throw new Error('Failed to register page like!')
     }

@@ -1,0 +1,47 @@
+---
+title: 'Bash Snippets'
+description: 'Common bash snippets for everyday use.'
+pubDate: 'July 6 2025'
+heroImage: '/images/css.png'
+hashTags: 'Technical, Snippets, Bash'
+slug: 'bash-snippets'
+---
+
+## General
+
+To check which applications are taking up the most memory:
+
+```bash
+top
+```
+
+## Networking
+
+Make a simple network request with JSON:
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John", "email": "john@example.com"}' \
+  https://api.example.com/users
+```
+
+If you want to quickly kill the process running at a specific port (`8080`)
+
+```bash
+lsof -ti :8080 | xargs kill -9
+```
+
+## FFMPEG
+
+Convert a `.wmv` to `.mp4` with FFMPEG:
+
+```bash
+ffmpeg -i input.wmv output.mp4
+```
+
+Download a streamed video (`.m3u8`) to `output.mp4`
+
+```bash
+ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "https://example.com/video720p.h264.mp4.m3u8" -c copy output.mp4
+```
