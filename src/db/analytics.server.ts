@@ -1,8 +1,9 @@
 import { consoleTag } from '@/utils/tagTime'
 import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
 import Database from 'bun:sqlite'
+import chalk from 'chalk'
 
-const print = consoleTag('db:analytics')
+const print = consoleTag('db:analytics', chalk.magentaBright)
 
 export type AnalyticsDeviceType = 'mobile' | 'desktop' | 'tablet'
 
@@ -50,7 +51,6 @@ export namespace Analytics {
   export function attachAnalyticsTable(sharedDatabaseInstance: Database) {
     print('attaching table...')
     db = sharedDatabaseInstance
-    dropAnalyticsTable(db)
     db.run(ANALYTICS_INIT)
   }
 
