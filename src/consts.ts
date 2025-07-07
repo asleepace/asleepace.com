@@ -23,7 +23,7 @@ export type SiteConfig = {
   themeColor: string
   coverImage: string
   readonly path: {
-    adminLogin(searchParams: Record<string, string>): string
+    adminLogin(searchParams?: Record<string, string>): string
     adminLogout: '/admin/logout'
     adminHome: '/admin'
     adminSystem: '/admin/system'
