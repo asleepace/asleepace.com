@@ -1,4 +1,9 @@
+import { Responses } from '@/lib/backend'
+import { consoleTag } from '@/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
+import chalk from 'chalk'
+
+const print = consoleTag('security', chalk.redBright)
 
 const whitelist = [
   '/admin/logout',
@@ -30,8 +35,8 @@ const blacklist = ['/api', '/admin']
  */
 export const securityMiddleware = defineMiddleware(async (context, next) => {
   if (context.isPrerendered) return next()
-  if (context.request.method !== 'GET') return next()
   if (context.locals.isLoggedIn) return next()
+  if (context.request.method !== 'GET') return next()
 
   const path = context.url.pathname
 
@@ -44,8 +49,8 @@ export const securityMiddleware = defineMiddleware(async (context, next) => {
 
   // if not whitelisted, but on the blacklist, log the unauthorized access
   if (isBlacklisted) {
-    console.warn('[middleware][security] unauthorized access:', path, context.request.headers)
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    print('unauthorized:', chalk.cyanBright(path), context.request.headers)
+    return Responses.NOT_AUTHORIZED()
   }
 
   // otherwise continue as normal
