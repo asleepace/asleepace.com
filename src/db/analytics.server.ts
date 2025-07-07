@@ -161,7 +161,9 @@ export namespace Analytics {
   // --- track request ---
 
   export async function insert(data: AnalyticsData) {
-    const stmt = db.prepare(`
+    try {
+      if (!db) throw new Error('Analytics database not initialized')
+      const stmt = db.prepare(`
       INSERT INTO analytics (
         path, params, method, status, user_agent, ip_address, 
         tracking_id, device_type, country, is_bot, is_external,
@@ -169,21 +171,24 @@ export namespace Analytics {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
 
-    return stmt.run(
-      data.path,
-      data.params ? safeEncodeJSON(data.params) : null,
-      data.method || 'GET',
-      data.status || 200,
-      data.userAgent || null,
-      data.ipAddress || null,
-      data.trackingId || null,
-      data.deviceType || null,
-      data.country || null,
-      data.isBot || false,
-      data.isExternal || false,
-      data.message || null,
-      data.headers ? safeEncodeJSON(data.headers) : null
-    )
+      return stmt.run(
+        data.path,
+        data.params ? safeEncodeJSON(data.params) : null,
+        data.method || 'GET',
+        data.status || 200,
+        data.userAgent || null,
+        data.ipAddress || null,
+        data.trackingId || null,
+        data.deviceType || null,
+        data.country || null,
+        data.isBot || false,
+        data.isExternal || false,
+        data.message || null,
+        data.headers ? safeEncodeJSON(data.headers) : null
+      )
+    } catch (error) {
+      print('error inserting analytics data:', error)
+    }
   }
 
   export function trackEvent(event: {
