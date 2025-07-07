@@ -40,9 +40,7 @@ export const onPageLike = defineAction({
   async handler(input, context) {
     const referer = input.referer ?? getReferer(context)
     const method = input.unliked ? 'DELETE' : 'PUT'
-
-    const metrics = await fetchMetrics({ context, referer, method })
-    return metrics
+    return fetchMetrics({ context, referer, method })
   },
 })
 
@@ -55,7 +53,6 @@ export const onPageView = defineAction({
   }),
   async handler(input, context) {
     const referer = input.referer ?? getReferer(context)
-    const metrics = await fetchMetrics({ context, referer, method: 'GET' })
-    return metrics
+    return fetchMetrics({ context, referer, method: 'GET' })
   },
 })
