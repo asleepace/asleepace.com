@@ -10,8 +10,12 @@ export const prerender = false
 const { user, isLoggedIn } = Astro.locals
 const { adminLogin } = siteConfig.path
 
+// NOTE: this fixes an issue where `bun run check` thinks it's not being used
+const redirectToLogin = adminLogin({}) || '/admin/login'
+console.log('[system] redirectToLogin:', redirectToLogin)
+
 if (!isLoggedIn || !user) {
-  return Astro.redirect(adminLogin({}))
+  return Astro.redirect(redirectToLogin)
 }
 
 const hideScrollBars = true
