@@ -60,6 +60,6 @@ export default defineConfig({
     checkOrigin: false, // CORS
   },
   server: {
-
+    allowedHosts: ['asleepace.com']
   },
 })
