@@ -1,9 +1,18 @@
 import { Analytics } from '@/db/index.server'
 import { getIpAddressFromHeaders } from '@/lib/utils/ipAddress'
 import { defineMiddleware } from 'astro:middleware'
-import chalk from 'chalk'
 
-const TAG = chalk.gray('[m] analytics\t')
+const IGNORED_PATHS = [
+  '/api/analytics',
+  '/_actions/',
+  '/fonts/',
+  '/images/',
+  '/scripts/',
+  '/styles/',
+  '/favicon.ico',
+  '/sitemap.xml',
+  '/robots.txt',
+]
 
 /**
  *  ## analyticsMiddleware
@@ -13,10 +22,8 @@ const TAG = chalk.gray('[m] analytics\t')
  */
 export const analyticsMiddleware = defineMiddleware(({ request, url, cookies, isPrerendered }, next) => {
   if (isPrerendered) return next()
-  if (url.pathname.startsWith('/api/analytics')) return next()
-  if (request.method === 'POST') return next()
-
-  console.log(TAG, chalk.gray(url.pathname))
+  if (request.method !== 'GET') return next()
+  if (IGNORED_PATHS.some((path) => url.pathname.startsWith(path))) return next()
 
   const { headers } = request
   const referrer = headers.get('referer')
