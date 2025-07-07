@@ -10,7 +10,6 @@ export type AnalyticsDeviceType = 'mobile' | 'desktop' | 'tablet'
 export type AnalyticsData = {
   path: string
   method?: string
-  referrer?: string
   userAgent?: string
   ipAddress?: string
   sessionId?: string
@@ -30,7 +29,6 @@ export namespace Analytics {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       path TEXT NOT NULL,
       method TEXT NOT NULL DEFAULT 'GET',
-      referrer TEXT,
       user_agent TEXT,
       ip_address TEXT,
       session_id TEXT,
@@ -51,8 +49,24 @@ export namespace Analytics {
   export function attachAnalyticsTable(sharedDatabaseInstance: Database) {
     print('attaching table...')
     db = sharedDatabaseInstance
-    // TODO: remove this in next release
-    // dropAnalyticsTable(db)
+    migrateAnalyticsTable(db) // TODO: remove after next release
+    db.run(ANALYTICS_INIT)
+  }
+
+  /**
+   *  Use this to migrate the analytics table to the new schema, currently it will drop the table if
+   *  the referrer column exists.
+   */
+  export function migrateAnalyticsTable(sharedDatabaseInstance: Database) {
+    db = sharedDatabaseInstance
+    const tableInfo = db.prepare("SELECT name FROM pragma_table_info('analytics') WHERE name = 'referrer'").get()
+
+    if (tableInfo) {
+      print('migrating analytics table...')
+      db.run(DROP_TABLE)
+    }
+
+    // Create/recreate table with new schema
     db.run(ANALYTICS_INIT)
   }
 
@@ -120,16 +134,15 @@ export namespace Analytics {
   export async function insert(data: AnalyticsData) {
     const stmt = db.prepare(`
       INSERT INTO analytics (
-        path, method, referrer, user_agent, ip_address, 
+        path, method, user_agent, ip_address, 
         session_id, country, device_type, is_bot,
         message, headers, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
 
     return stmt.run(
       data.path,
       data.method || 'GET',
-      data.referrer || null,
       data.userAgent || null,
       data.ipAddress || null,
       data.sessionId || null,
@@ -150,7 +163,6 @@ export namespace Analytics {
       return insert({
         path: url.pathname,
         method: request.method,
-        referrer: headers.get('referer') ?? '',
         userAgent: headers.get('user-agent') ?? '',
         ipAddress: getIpAddressFromHeaders(headers) ?? '',
         sessionId: headers.get('x-session-id') ?? '',
