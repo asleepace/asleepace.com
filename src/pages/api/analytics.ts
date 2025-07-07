@@ -12,13 +12,14 @@ export const prerender = false
  * This endpoint is used to track analytics for the website.
  *
  */
-export const POST: APIRoute = endpoint(async ({ request }) => {
+export const POST: APIRoute = endpoint(async ({ request, cookies }) => {
   const { headers } = request
 
   const ipAddress = getIpAddressFromHeaders(headers)
 
   Analytics.trackEvent({
     request,
+    cookies,
     message: 'analytics',
   })
 

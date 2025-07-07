@@ -23,6 +23,7 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     Analytics.trackEvent({
       request: context.request,
+      cookies: context.cookies,
       response,
       message: 'default',
     })
@@ -37,6 +38,7 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     Analytics.trackEvent({
       request: context.request,
+      cookies: context.cookies,
       status: 500,
       message,
     })
