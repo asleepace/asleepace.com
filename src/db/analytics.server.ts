@@ -64,7 +64,7 @@ export namespace Analytics {
    *  the referrer column exists.
    */
   export function migrateAnalyticsTable() {
-    const tableInfo = db.prepare("SELECT name FROM pragma_table_info('analytics') WHERE name = 'session_id'").get()
+    const tableInfo = db.prepare("SELECT name FROM pragma_table_info('analytics') WHERE name = 'referrer'").get()
 
     if (tableInfo) {
       print('migrating analytics table...')
