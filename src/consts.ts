@@ -33,32 +33,17 @@ export type SiteConfig = {
 
 // --- check environment variables ---
 
-const ENVIRONMENT = (process.env.NODE_ENV ?? 'development') as SiteEnvironment
 const MONGODB_URI = process.env.MONGODB_URI as string
 
 console.assert(MONGODB_URI, 'warning: MONGODB_URI (.env) is not set!')
 
-const DEFAULT_CONFIGURATIONS = {
-  production: {
-    host: 'asleepace.com',
-    http: 'https',
-    port: 4321,
-  },
-  development: {
-    host: 'localhost',
-    http: 'http',
-    port: 4321,
-  },
-} as const
-
-const baseUrl = ENVIRONMENT === 'production' ? new URL('https://asleepace.com') : new URL('http://localhost:4321')
+const baseUrl = import.meta.env.PROD ? new URL('https://asleepace.com') : new URL('http://localhost:4321')
 
 // --- create config ---
 
 export const siteConfig: SiteConfig = {
-  ...DEFAULT_CONFIGURATIONS[ENVIRONMENT],
-  environment: ENVIRONMENT,
-  isDebug: ENVIRONMENT === 'development',
+  environment: import.meta.env.DEV ? 'development' : 'production',
+  isDebug: import.meta.env.DEV,
   mongodbUri: MONGODB_URI,
   sqliteUri: 'db.sqlite',
   version: packageJson.version,

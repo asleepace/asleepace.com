@@ -5,31 +5,8 @@ import { siteConfig } from '@/consts'
 export const prerender = false
 export const route = '/api/auth'
 
-const environment = process.env.ENVIRONMENT
-const isDevelopment = Boolean(environment === 'development')
-const isProduction = !isDevelopment
-const cookieDomain = isDevelopment ? 'localhost' : process.env.COOKIE_DOMAIN
-
+const cookieDomain = import.meta.env.DEV ? 'localhost' : process.env.COOKIE_DOMAIN
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
-
-console.assert(cookieDomain, 'COOKIE_DOMAIN env variable is not set!')
-console.assert(
-  environment === 'development' || environment === 'production',
-  'ENVIRONMENT env variable is not set to development or production!'
-)
-
-console.log(
-  '[auth] config:',
-  JSON.stringify(
-    {
-      isDevelopment,
-      isProduction,
-      cookieDomain,
-    },
-    null,
-    2
-  )
-)
 
 /**
  * POST /api/auth
@@ -95,7 +72,7 @@ export const POST: APIRoute = async ({ request, locals, cookies, redirect }) => 
       /** javascript cannot access the cookie */
       httpOnly: true,
       /** if the cookie is only accessible via https */
-      secure: isProduction,
+      secure: import.meta.env.PROD,
       /** if the cookie is only accessible via the same site */
       sameSite: 'lax',
       /** the expiration date of the cookie */

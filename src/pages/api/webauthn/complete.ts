@@ -5,10 +5,7 @@ import type { APIRoute } from 'astro'
 
 export const prerender = false
 
-const environment = process.env.ENVIRONMENT
-const isDevelopment = Boolean(environment === 'development')
-const isProduction = !isDevelopment
-const cookieDomain = isDevelopment ? 'localhost' : process.env.COOKIE_DOMAIN
+const cookieDomain = import.meta.env.DEV ? 'localhost' : process.env.COOKIE_DOMAIN
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
 
@@ -33,7 +30,7 @@ export const POST: APIRoute = async ({ request, cookies, locals, redirect }) => 
       /** javascript cannot access the cookie */
       httpOnly: true,
       /** if the cookie is only accessible via https */
-      secure: isProduction,
+      secure: import.meta.env.PROD,
       /** if the cookie is only accessible via the same site */
       sameSite: 'lax',
       /** the expiration date of the cookie */

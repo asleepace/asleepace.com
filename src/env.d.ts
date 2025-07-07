@@ -20,7 +20,6 @@ interface Env {
   HOST: string
   PORT: number
   PROTOCOL: string
-  ENVIRONMENT: 'development' | 'production'
   COOKIE_DOMAIN: string
   WEBAUTHN_RP_ID: string
   WEBAUTHN_RP_ORIGIN: string

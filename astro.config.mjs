@@ -24,8 +24,9 @@ export default defineConfig({
   site: 'https://asleepace.com',
   env: {
     schema: {
-      ENVIRONMENT: envField.enum({ context: 'server', access: 'secret', values: ['development', 'production'], default: 'development' }),
+      HOST: envField.enum({ context: 'server', access: 'public', values: ['localhost', 'asleepace.com'], default: 'localhost' }),
       PORT: envField.number({ context: 'server', access: 'public', default: 4321 }),
+      PROTOCOL: envField.enum({ context: 'server', access: 'public', values: ['http', 'https'], default: 'http' }),
       WEBAUTHN_RP_ORIGIN: envField.string({ context: 'server', access: 'secret' }),
       WEBAUTHN_RP_ID: envField.string({ context: 'server', access: 'secret' }),
       MONGODB_URI: envField.string({ context: 'server', access: 'secret' }),
@@ -35,8 +36,8 @@ export default defineConfig({
       SMTP_USER: envField.string({ context: 'server', access: 'secret' }),
       SMTP_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
       SMTP_FROM: envField.string({ context: 'server', access: 'secret' }),
-      GITHUB_CLIENT_SECRET: envField.string({ context: 'server', access: 'secret' }),
-      GITHUB_CLIENT_ID: envField.string({ context: 'server', access: 'secret' }),
+      GITHUB_CLIENT_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
+      GITHUB_CLIENT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
     }
   },
   integrations: [
