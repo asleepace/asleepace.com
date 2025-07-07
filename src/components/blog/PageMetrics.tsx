@@ -38,7 +38,7 @@ export function PageMetrics(props: { className?: string }) {
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (typeof window.localStorage === 'undefined') return
-    const referer = window.location.href
+    // const referer = window.location.href
     const path = window.location.pathname
     const likedKey = `liked:${path}`
     const hasLiked = window.localStorage.getItem(likedKey)

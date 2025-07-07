@@ -51,10 +51,7 @@ const DEFAULT_CONFIGURATIONS = {
   },
 } as const
 
-const baseUrl =
-  ENVIRONMENT === 'production'
-    ? new URL('https://asleepace.com')
-    : new URL('http://localhost:4321')
+const baseUrl = ENVIRONMENT === 'production' ? new URL('https://asleepace.com') : new URL('http://localhost:4321')
 
 // --- create config ---
 
@@ -103,7 +100,7 @@ export const siteConfig: SiteConfig = {
   },
 }
 
-Object.entries(siteConfig).forEach(([key, value]) => {
+Object.entries(siteConfig).forEach(([_key, value]) => {
   const tag = () => tagTime(chalk.magenta('[config]'))
   if (value instanceof URL) {
     console.log(tag(), chalk.cyan(value.toString()))
