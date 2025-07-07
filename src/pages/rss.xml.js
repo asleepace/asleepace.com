@@ -1,11 +1,14 @@
 import rss from '@astrojs/rss'
 import { getCollection } from 'astro:content'
 import { siteConfig } from '@/consts'
+import { consoleTag } from '@/utils/tagTime'
+
+const print = consoleTag('rss')
 
 const { title, description, url } = siteConfig
 
 export const GET = async (context) => {
-  console.log('[rss.xml] Generating RSS feed')
+  print('generating RSS feed')
   const posts = await getCollection('blog')
   return rss({
     title,
