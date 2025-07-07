@@ -1,5 +1,5 @@
 ---
-import { PATH } from '@/consts'
+import { siteConfig } from '@/consts'
 import Spacer from '../astro/Spacer.astro'
 import AdminPanelSidebarButton from './AdminPanelSidebarButton.astro'
 import AdminPanelProfile from './AdminPanelProfile.astro'
@@ -14,27 +14,25 @@ interface Props {
 
 const {
   activeTab = 0,
-  version = '1.0.0',
-  environment = 'production',
+  version = siteConfig.version,
+  environment = siteConfig.environment,
   username = 'Admin',
 } = Astro.props
 
 const sideBarButtons = [
-  { href: PATH.ADMIN_HOME, title: 'Home', icon: 'LayoutGrid' },
-  { href: PATH.ADMIN_SYSTEM, title: 'System', icon: 'Settings' },
-  { href: PATH.ADMIN_ANALYTICS, title: 'Analytics', icon: 'BarChart' },
-  { href: PATH.CODE_EDITOR, title: 'Code', icon: 'Code' },
+  { href: siteConfig.path.adminHome, title: 'Home', icon: 'LayoutGrid' },
+  { href: siteConfig.path.adminSystem, title: 'System', icon: 'Settings' },
+  { href: siteConfig.path.adminAnalytics, title: 'Analytics', icon: 'BarChart' },
+  { href: siteConfig.path.codeEditor, title: 'Code', icon: 'Code' },
 ]
 
 console.log('[AdminPanelSidebar] version:', version)
+
+const { clearSession } = siteConfig.path
 ---
 
 <aside class="w-52 bg-black pl-2 pr-4 py-8 gap-y-2 flex flex-col text-zinc-300">
-  <AdminPanelProfile
-    environment={environment}
-    username={username}
-    className="ml-1"
-  />
+  <AdminPanelProfile environment={environment} username={username} className="ml-1" />
 
   <Line className="my-2" />
 
@@ -57,13 +55,7 @@ console.log('[AdminPanelSidebar] version:', version)
 
   <Spacer direction="vertical" />
 
-  <form method="post" action={PATH.CLEAR_SESSION}>
-    <AdminPanelSidebarButton
-      href={PATH.CLEAR_SESSION}
-      title="Logout"
-      icon="LogOut"
-      variant="destructive"
-      isFormSubmit
-    />
+  <form method="post" target={clearSession}>
+    <AdminPanelSidebarButton href={clearSession} title="Logout" icon="LogOut" variant="destructive" isFormSubmit />
   </form>
 </aside>

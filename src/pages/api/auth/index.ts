@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { Users, Sessions } from '@/db/index.server'
-import { PATH, siteConfig } from '@/consts'
+import { siteConfig } from '@/consts'
 
 export const prerender = false
 export const route = '/api/auth'
@@ -108,10 +108,10 @@ export const POST: APIRoute = async ({ request, locals, cookies, redirect }) => 
 
     console.log('[auth] setting cookie:', cookieOptions)
 
-    return redirect(PATH.ADMIN_HOME, 302)
+    return redirect(siteConfig.path.adminHome, 302)
   } catch (e) {
     console.error('[auth] error:', e)
     const error = (e as Error)?.message ?? 'unknown'
-    return redirect(PATH.ADMIN_LOGIN({ error }), 302)
+    return redirect(siteConfig.path.adminLogin({ error }), 302)
   }
 }

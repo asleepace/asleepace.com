@@ -1,8 +1,8 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
 import chalk from 'chalk'
 import packageJson from '../package.json'
-import { tagTime } from './utils/tagTime'
+import { consoleTag } from './utils/tagTime'
+
+const print = consoleTag('config', chalk.magenta)
 
 export type SiteCookieDomain = `.${string}` // example: ".asleepace.com"
 export type SiteCookiePath = `/${string}` // example: "/"
@@ -33,7 +33,7 @@ export type SiteConfig = {
 
 // --- check environment variables ---
 
-const ENVIRONMENT = process.env.ENVIRONMENT as SiteEnvironment
+const ENVIRONMENT = (process.env.NODE_ENV ?? 'development') as SiteEnvironment
 const MONGODB_URI = process.env.MONGODB_URI as string
 
 console.assert(MONGODB_URI, 'warning: MONGODB_URI (.env) is not set!')
@@ -52,9 +52,6 @@ const DEFAULT_CONFIGURATIONS = {
 } as const
 
 const baseUrl = ENVIRONMENT === 'production' ? new URL('https://asleepace.com') : new URL('http://localhost:4321')
-
-console.log('[consts] baseUrl:', baseUrl)
-console.log('[consts] environment:', ENVIRONMENT)
 
 // --- create config ---
 
@@ -103,14 +100,15 @@ export const siteConfig: SiteConfig = {
   },
 }
 
-Object.entries(siteConfig).forEach(([_key, value]) => {
-  const tag = () => tagTime(chalk.magenta('[config]'))
+Object.entries(siteConfig).forEach(([key, value]) => {
+  if (key === 'hashTagColors') return
+  if (key === 'path') return
   if (value instanceof URL) {
-    console.log(tag(), chalk.cyan(value.toString()))
+    print(chalk.gray(`${key}:`), chalk.cyan(value.toString()))
   } else if (typeof value === 'string') {
-    console.log(tag(), chalk.white(value))
+    print(chalk.gray(`${key}:`), chalk.green(`"${value}"`))
   } else {
-    console.log(tag(), value)
+    print(chalk.gray(`${key}:`), value)
   }
 })
 
@@ -130,22 +128,4 @@ export const siteData = {
     'https://lams-kitchen.com',
     'https://stockindx.com',
   ],
-}
-
-/**
- * Routes for common site paths.
- */
-export const PATH = {
-  ADMIN_LOGIN(searchParams: Record<string, string> = {}) {
-    const query = new URLSearchParams(searchParams)
-    const hasParams = Object.keys(searchParams).length > 0
-    const queryString = hasParams ? `?${query.toString()}` : ''
-    return '/admin/login' + queryString
-  },
-  ADMIN_LOGOUT: '/admin/logout',
-  ADMIN_HOME: '/admin',
-  ADMIN_SYSTEM: '/admin/system',
-  ADMIN_ANALYTICS: '/admin/analytics',
-  CODE_EDITOR: '/code',
-  CLEAR_SESSION: '/api/auth/clearSession',
 }
