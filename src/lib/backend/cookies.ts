@@ -52,7 +52,7 @@ export namespace Cookies {
   }
 
   function generateTrackingId(): string {
-    return Math.random().toString(36).substring(2, 10)
+    return Math.random().toString(36).substring(2, 12)
   }
 
   export function getSessionCookie(cookies: AstroCookies): string | undefined {
@@ -65,6 +65,8 @@ export namespace Cookies {
   }
 
   export function setTrackingId(cookies: AstroCookies): string {
+    const existingTrackingId = cookies.get(TRACKING_ID_COOKIE_NAME)?.value
+    if (existingTrackingId) return existingTrackingId
     const trackingId = generateTrackingId()
     cookies.set(TRACKING_ID_COOKIE_NAME, trackingId, getCookieOptions())
     return trackingId
