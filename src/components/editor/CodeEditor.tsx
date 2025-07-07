@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useEffect } from 'react'
 import { Code } from './Code'
 
 import { useTypescript } from '@/hooks/useTypescript'
@@ -58,6 +58,10 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
   })
 
   const [output, execute] = useJSRuntime(ts.javascript || undefined)
+
+  useEffect(() => {
+    console.log(output)
+  }, [output])
 
   const onSave = useCallback(() => {
     console.log('save code')
