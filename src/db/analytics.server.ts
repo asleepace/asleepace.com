@@ -49,7 +49,7 @@ export namespace Analytics {
   export function attachAnalyticsTable(sharedDatabaseInstance: Database) {
     print('attaching table...')
     db = sharedDatabaseInstance
-    migrateAnalyticsTable(db) // TODO: remove after next release
+    migrateAnalyticsTable() // TODO: remove after next release
     db.run(ANALYTICS_INIT)
   }
 
@@ -57,22 +57,20 @@ export namespace Analytics {
    *  Use this to migrate the analytics table to the new schema, currently it will drop the table if
    *  the referrer column exists.
    */
-  export function migrateAnalyticsTable(sharedDatabaseInstance: Database) {
-    db = sharedDatabaseInstance
+  export function migrateAnalyticsTable() {
     const tableInfo = db.prepare("SELECT name FROM pragma_table_info('analytics') WHERE name = 'referrer'").get()
 
     if (tableInfo) {
       print('migrating analytics table...')
-      db.run(DROP_TABLE)
+      dropAnalyticsTable()
     }
 
     // Create/recreate table with new schema
     db.run(ANALYTICS_INIT)
   }
 
-  export function dropAnalyticsTable(sharedDatabaseInstance: Database) {
+  export function dropAnalyticsTable() {
     print('dropping table...')
-    db = sharedDatabaseInstance
     db.run(DROP_TABLE)
   }
 
