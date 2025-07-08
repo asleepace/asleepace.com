@@ -114,7 +114,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     header: 'Region',
     cell: ({ row }) => {
       const headers: AnalyticsData['headers'] = row.getValue('headers') ?? {}
-      const region = headers['X-Region'] ?? 'N/A'
+      const region = headers['X-Region'] ?? headers['x-region'] ?? 'N/A'
       const isPresent = region !== 'N/A'
       return (
         <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
@@ -128,7 +128,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     header: 'City',
     cell: ({ row }) => {
       const headers: AnalyticsData['headers'] = row.getValue('headers') ?? {}
-      const city = headers['X-City'] ?? 'N/A'
+      const city = headers['X-City'] ?? headers['x-city'] ?? 'N/A'
       const isPresent = city !== 'N/A'
       return (
         <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
