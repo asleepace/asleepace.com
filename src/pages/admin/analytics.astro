@@ -1,0 +1,25 @@
+---
+import { siteConfig } from '@/consts'
+import '@/styles/data-table.css'
+import AdminPanel from '@/layouts/AdminPanel.astro'
+import { AnalyticsTable } from '@/components/react/AnalyticsTable'
+
+export const prerender = false
+
+const { user, isLoggedIn } = Astro.locals
+const { adminLogin } = siteConfig.path
+
+// NOTE: this fixes an issue where `bun run check` thinks it's not being used
+const redirectToLogin = adminLogin({}) || '/admin/login'
+console.log('[system] redirectToLogin:', redirectToLogin)
+
+if (!isLoggedIn || !user) {
+  return Astro.redirect(redirectToLogin)
+}
+---
+
+<AdminPanel>
+  <div class="container mx-auto overflow-y-auto scrollbar-none">
+    <AnalyticsTable client:only="react" />
+  </div>
+</AdminPanel>
