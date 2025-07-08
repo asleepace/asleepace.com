@@ -50,8 +50,21 @@ const columns: ColumnDef<AnalyticsData>[] = [
       const statusText: string = row.getValue('status') ?? '-1'
       const status = Number(statusText)
       const isOk = status >= 200 && status < 300
+      const isRedirected = status >= 300 && status < 400
+      const isClientError = status >= 400 && status < 500
       return (
-        <div className={cn('ps-2 text-center shrink flex', isOk ? 'text-green-500' : 'text-red-500')}>
+        <div
+          className={cn(
+            'ps-2 text-center shrink flex',
+            isOk
+              ? 'text-green-500'
+              : isRedirected
+              ? 'text-yellow-500'
+              : isClientError
+              ? 'text-orange-500'
+              : 'text-red-500'
+          )}
+        >
           <span>{statusText}</span>
         </div>
       )
