@@ -56,7 +56,6 @@
     --color-neutral-700: oklch(37.1% 0 0);
     --color-neutral-800: oklch(26.9% 0 0);
     --color-neutral-900: oklch(20.5% 0 0);
-    --color-neutral-950: oklch(14.5% 0 0);
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -553,12 +552,6 @@
   .max-w-4\/5 {
     max-width: calc(4/5 * 100%);
   }
-  .max-w-24 {
-    max-width: calc(var(--spacing) * 24);
-  }
-  .max-w-36 {
-    max-width: calc(var(--spacing) * 36);
-  }
   .max-w-44 {
     max-width: calc(var(--spacing) * 44);
   }
@@ -979,9 +972,6 @@
       background-color: color-mix(in oklab, var(--color-neutral-200) 90%, transparent);
     }
   }
-  .bg-neutral-400 {
-    background-color: var(--color-neutral-400);
-  }
   .bg-neutral-700 {
     background-color: var(--color-neutral-700);
   }
@@ -990,9 +980,6 @@
   }
   .bg-neutral-900 {
     background-color: var(--color-neutral-900);
-  }
-  .bg-neutral-950 {
-    background-color: var(--color-neutral-950);
   }
   .bg-orange-400 {
     background-color: var(--color-orange-400);
@@ -1034,12 +1021,6 @@
     background-color: color-mix(in srgb, #fff 0%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-white) 0%, transparent);
-    }
-  }
-  .bg-white\/10 {
-    background-color: color-mix(in srgb, #fff 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
     }
   }
   .bg-white\/50 {
@@ -1731,20 +1712,6 @@
       }
     }
   }
-  .selection\:bg-white\/10 {
-    & *::selection {
-      background-color: color-mix(in srgb, #fff 10%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-      }
-    }
-    &::selection {
-      background-color: color-mix(in srgb, #fff 10%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-      }
-    }
-  }
   .after\:blur-\[20px\] {
     &::after {
       content: var(--tw-content);
@@ -2005,14 +1972,6 @@
   .data-\[state\=selected\]\:bg-muted {
     &[data-state="selected"] {
       background-color: var(--muted);
-    }
-  }
-  .data-\[state\=selected\]\:bg-white\/10 {
-    &[data-state="selected"] {
-      background-color: color-mix(in srgb, #fff 10%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-      }
     }
   }
   .data-\[state\=selected\]\:bg-white\/20 {
