@@ -1,6 +1,13 @@
 import type { AnalyticsData } from '@/db'
 import { useEffect, useState } from 'react'
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  type Row,
+  type RowData,
+  useReactTable,
+} from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/utils/cn'
@@ -34,16 +41,26 @@ function useAnalytics() {
 
 const columns: ColumnDef<AnalyticsData>[] = [
   {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const statusText: string = row.getValue('status') ?? '-1'
+      const status = Number(statusText)
+      const isOk = status >= 200 && status < 300
+      return (
+        <div className={cn(isOk ? 'text-green-500' : 'text-red-500')}>
+          <span>{statusText}</span>
+        </div>
+      )
+    },
+  },
+  {
     accessorKey: 'method',
     header: 'Method',
   },
   {
     accessorKey: 'path',
     header: 'Path',
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
   },
   {
     accessorKey: 'ipAddress',
@@ -56,10 +73,26 @@ const columns: ColumnDef<AnalyticsData>[] = [
   {
     accessorKey: 'isBot',
     header: 'Bot',
+    cell: ({ row }) => {
+      const isBot = !!row.getValue('isBot')
+      return (
+        <div className={cn('font-mono', isBot ? 'text-orange-400' : 'text-neutral-400')}>
+          <span>{isBot ? 'true' : 'false'}</span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'isExternal',
     header: 'External',
+    cell: ({ row }) => {
+      const isExternal = !!row.getValue('isExternal')
+      return (
+        <div className={cn('font-mono', isExternal ? 'text-orange-400' : 'text-neutral-400')}>
+          <span>{isExternal ? 'true' : 'false'}</span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'trackingId',
@@ -70,6 +103,24 @@ const columns: ColumnDef<AnalyticsData>[] = [
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+}
+
+function AnalyticsRow({ row, index }: { row: Row<any>; index: number }) {
+  const isEvenRow = index % 2 === 0
+  return (
+    <TableRow
+      className={cn(
+        'px-4 border-none hover:bg-white/10 data-[state=selected]:bg-white/20',
+        isEvenRow ? 'bg-black/10' : 'bg-transparent'
+      )}
+      key={row.id}
+      data-state={row.getIsSelected() && 'selected'}
+    >
+      {row.getVisibleCells().map((cell) => (
+        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+      ))}
+    </TableRow>
+  )
 }
 
 export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
@@ -96,17 +147,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       </TableHeader>
       <TableBody>
         {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row, i) => (
-            <TableRow
-              className={cn('px-4 border-none', i % 2 === 0 ? 'bg-black/10' : 'bg-transparent')}
-              key={row.id}
-              data-state={row.getIsSelected() && 'selected'}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-              ))}
-            </TableRow>
-          ))
+          table.getRowModel().rows.map((row, index) => <AnalyticsRow row={row} index={index} />)
         ) : (
           <TableRow>
             <TableCell colSpan={columns.length} className="h-24 text-center">
