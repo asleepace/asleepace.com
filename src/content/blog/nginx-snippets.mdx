@@ -1,0 +1,209 @@
+---
+title: 'NGINX Snippets'
+description: 'Useful snippets and configurations for customizing your NGINX server.'
+pubDate: 'July 8 2025'
+heroImage: '/images/nginx.png'
+hashTags: 'Technical, Snippets, NGINX'
+slug: 'nginx-snippets'
+---
+
+The following is an ever evolving doc on how to setup and configure [nginx](https://nginx.org/).
+
+## Installation
+
+To install NGINX on a Linux box run the following:
+
+```bash
+# Update package index
+sudo apt update
+
+# Install nginx
+sudo apt install nginx
+
+# Start, enable and check nginx status
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+```
+
+You can quickly verify it is working by
+
+- Open browser to http://localhost or http://your-server-ip
+- Should see nginx welcome page
+
+### Configuration
+
+Here are where the various nginx configuration files live:
+
+- Main config: `/etc/nginx/nginx.conf`
+- Site configs: `/etc/nginx/sites-available/`
+- Enabled sites: `/etc/nginx/sites-enabled/`
+
+Each time you make changes to any of these files you should run the following to verify the changes and reload nginx for them to take effect:
+
+```bash
+# Check nginx configuration & reload
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Generally it's best practice to add individual site-specific configurations in the `/etc/nginx/sites-enabled` directory. 
+
+Let's create a new file for our site `asleepace.com` by creating the following `.conf`
+
+```bash
+cd /etc/nginx/site-enabled/
+
+touch asleepace.com.conf  # create a new empty file
+nano asleepace.com.conf   # open in editor of your choice (nano gang)
+```
+
+A basic configuration might look something like this:
+
+```conf
+server {
+    listen 80;
+    server_name www.asleepace.com asleepace.com;  # Replace with your domain or use _ for default
+
+    location / {
+        proxy_pass http://localhost:4321; # Replace with location of your web app
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Now once you have saved the file, enable it the file with following:
+
+```bash
+# Create symlink to enable
+sudo ln -s /etc/nginx/sites-available/asleepace.com.conf /etc/nginx/sites-enabled/
+
+# Test & reload configuration
+sudo nginx -t  
+sudo systemctl reload nginx
+```
+
+## SSL with Certbot
+
+In order to use SSL for your site (`https://`) let's generate the certificates with [Certbot](https://certbot.eff.org/)
+
+```bash
+# Install certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Get SSL certificate
+sudo certbot --nginx -d your-domain.com
+```
+
+## Logging 
+
+```bash
+# View logs
+sudo journalctl -u nginx
+```
+
+## Caching
+
+```bash
+# Add inside server block for better performance
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+    proxy_pass http://localhost:4321;
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
+```
+
+## Geolocation
+
+To add geolocation to your nginx configuration, you can use the following snippet:
+
+https://github.com/P3TERX/GeoLite.mmdb?tab=readme-ov-file
+
+NOTE: The GeoIP2 City database is quite large (~70MB) and is optional. 
+If you don't need it, you can just download the GeoLite2-Country.mmdb file.  
+
+```bash
+# download the GeoLite2-Country.mmdb and GeoLite2-City.mmdb (optional)
+sudo wget -O /var/lib/GeoIP/GeoLite2-Country.mmdb "https://git.io/GeoLite2-Country.mmdb"
+sudo wget -O /var/lib/GeoIP/GeoLite2-City.mmdb "https://git.io/GeoLite2-City.mmdb"
+
+# set permissions
+sudo chmod 644 /var/lib/GeoIP/GeoLite2-Country.mmdb
+sudo chmod 644 /var/lib/GeoIP/GeoLite2-City.mmdb
+sudo chown root:root /var/lib/GeoIP/GeoLite2-Country.mmdb
+sudo chown root:root /var/lib/GeoIP/GeoLite2-City.mmdb
+
+# verify both databases
+ls -la /var/lib/GeoIP/
+```
+
+then once these have been downloaded add the following to your `etc/nginx/nginx.conf` file:
+
+```bash
+##
+# GeoIP2 Settings
+##
+
+geoip2 /var/lib/GeoIP/GeoLite2-City.mmdb {
+    auto_reload 5m;
+    $geoip2_data_country_code default=XX source=$remote_addr country iso_code;
+    $geoip2_data_country_name default=Unknown source=$remote_addr country names en;
+    $geoip2_data_city_name default=Unknown source=$remote_addr city names en;
+    $geoip2_data_subdivision_name default=Unknown source=$remote_addr subdivisions 0 names en;
+    $geoip2_data_subdivision_code default=XX source=$remote_addr subdivisions 0 iso_code;
+}
+```
+
+and then in your `etc/nginx/sites-enabled/<your-site>.conf` file server block add the following:
+
+```bash
+server {
+  # ...
+
+  location / {
+      # ...
+
+      # add geolocation headers specific stuff here...
+      proxy_set_header X-Country $geoip2_data_country_code;
+      proxy_set_header X-City $geoip2_data_city_name;
+      proxy_set_header X-Region $geoip2_data_subdivision_name;
+      proxy_set_header X-Region-Code $geoip2_data_subdivision_code;
+  }
+}
+```
+
+Finally let's check our configuration to verify it's working:
+
+```bash
+# check the configuration
+sudo nginx -t
+
+# restart nginx process
+sudo systemctl restart nginx
+
+# verify the changes
+sudo systemctl status nginx
+```
+
+Now you should see the following headers included on incoming requests:
+
+```json
+{
+  "accept": "*/*",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "connection": "upgrade",
+  "host": "asleepace.com",
+  "referer": "https://asleepace.com/about",
+  "x-forwarded-host": "asleepace.com",
+  "x-forwarded-proto": "https",
+  "x-region": "California",
+  "x-city": "San Francisco",
+  "x-country": "US"
+}
