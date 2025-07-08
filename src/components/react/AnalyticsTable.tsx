@@ -17,10 +17,13 @@ async function fetchAnalytics() {
     credentials: 'include',
     method: 'GET',
     headers: {
-      'Content-Type': 'aplication/json',
+      'Content-Type': 'application/json',
     },
   })
-  console.log('[fetchAnalytics] fetchAnalytics:', response)
+  if (!response.ok) {
+    console.warn(`[AnalyticsTable] failed to fetch analytics data:`, response.status, response.statusText)
+    throw new Error('Failed to fetch analytics data')
+  }
   const data = await response.json()
   return data as AnalyticsData[]
 }
@@ -192,7 +195,7 @@ function AnalyticsRow({ row, index }: { row: Row<any>; index: number }) {
         isEvenRow ? 'bg-black/10' : 'bg-transparent'
       )}
       key={row.id}
-      data-state={row.getIsSelected() && 'selected'}
+      data-state={row.getIsSelected() ? 'selected' : undefined}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
