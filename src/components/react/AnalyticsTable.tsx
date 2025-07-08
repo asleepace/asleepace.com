@@ -48,7 +48,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
       const status = Number(statusText)
       const isOk = status >= 200 && status < 300
       return (
-        <div className={cn(isOk ? 'text-green-500' : 'text-red-500')}>
+        <div className={cn('ps-2 text-center shrink flex', isOk ? 'text-green-500' : 'text-red-500')}>
           <span>{statusText}</span>
         </div>
       )
@@ -57,18 +57,79 @@ const columns: ColumnDef<AnalyticsData>[] = [
   {
     accessorKey: 'method',
     header: 'Method',
+    cell: ({ row }) => {
+      const method: string = row.getValue('method') ?? '---'
+      const isPresent = method !== '---'
+      return <div className="font-mon font-medium tracking-wide text-neutral-200">{method}</div>
+    },
   },
   {
     accessorKey: 'path',
     header: 'Path',
+    cell: ({ row }) => {
+      const path: string = row.getValue('path')
+      return (
+        <div>
+          <a className="text-blue-300 font-mono" href={path}>
+            {path}
+          </a>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'ipAddress',
     header: 'IP',
+    cell: ({ row }) => {
+      const ipAddress: string = row.getValue('ipAddress') ?? '---'
+      const isPresent = ipAddress !== '---'
+      return (
+        <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
+          <span>{ipAddress}</span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'country',
     header: 'Country',
+    cell: ({ row }) => {
+      const country: string = row.getValue('country') ?? 'N/A'
+      const isPresent = country !== 'N/A'
+      return (
+        <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
+          <span>{country}</span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: 'region',
+    header: 'Region',
+    cell: ({ row }) => {
+      const headers: AnalyticsData['headers'] = row.getValue('headers') ?? {}
+      const region = headers['X-Region'] ?? 'N/A'
+      const isPresent = region !== 'N/A'
+      return (
+        <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
+          <span>{region}</span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: 'city',
+    header: 'City',
+    cell: ({ row }) => {
+      const headers: AnalyticsData['headers'] = row.getValue('headers') ?? {}
+      const city = headers['X-City'] ?? 'N/A'
+      const isPresent = city !== 'N/A'
+      return (
+        <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
+          <span>{city}</span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'isBot',
@@ -97,6 +158,20 @@ const columns: ColumnDef<AnalyticsData>[] = [
   {
     accessorKey: 'trackingId',
     header: 'Tracking',
+    cell: ({ row }) => {
+      const trackingId: string = row.getValue('trackingId') ?? '---'
+      const isPresent = trackingId !== '---'
+      return <div className="font-mono text-neutral-400">{trackingId ?? '---'}</div>
+    },
+  },
+  {
+    accessorKey: 'headers',
+    header: 'Headers',
+    cell: ({ row }) => {
+      const headers = JSON.stringify(row.getValue('headers') ?? {})
+      const headerLength = headers.length
+      return <div className="text-ellipsis overflow-hidden text-neutral-400">{headerLength} bytes</div>
+    },
   },
 ]
 
