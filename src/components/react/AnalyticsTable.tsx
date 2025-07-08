@@ -58,9 +58,12 @@ const columns: ColumnDef<AnalyticsData>[] = [
     accessorKey: 'method',
     header: 'Method',
     cell: ({ row }) => {
-      const method: string = row.getValue('method') ?? '---'
-      const isPresent = method !== '---'
-      return <div className="font-mon font-medium tracking-wide text-neutral-200">{method}</div>
+      const method: string = row.getValue('method') ?? 'GET'
+      return (
+        <div className="font-semibold tracking-wider text-neutral-500">
+          <span>{method}</span>
+        </div>
+      )
     },
   },
   {
