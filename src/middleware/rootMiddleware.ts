@@ -1,5 +1,5 @@
 import { Analytics } from '@/db/'
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
 

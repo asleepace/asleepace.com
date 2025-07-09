@@ -5,7 +5,7 @@ import { useTypescript } from '@/hooks/useTypescript'
 import { useJSRuntime } from '@/hooks/useJSRuntime'
 import { useStore } from '@/hooks/useStore'
 import { CodeToolbar } from './CodeToolbar'
-import { DEFAULT_COMPILER_OPTIONS } from '@/utils/typescript-loader'
+import { DEFAULT_COMPILER_OPTIONS } from '@/lib/utils/typescript-loader'
 
 export type CodeEditorProps = {
   persist?: boolean
@@ -66,10 +66,7 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
   const onSave = useCallback(() => {
     console.log('save code')
     setCode({ code: data.code, lang: 'typescript' })
-    const saveFileName = window.prompt(
-      'Save file as:',
-      `code_snippet_${Date.now()}.ts`
-    )
+    const saveFileName = window.prompt('Save file as:', `code_snippet_${Date.now()}.ts`)
     if (!saveFileName) return
     const blob = new Blob([data.code ?? ''], {
       type: 'text/plain',

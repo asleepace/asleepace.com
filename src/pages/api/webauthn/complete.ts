@@ -1,7 +1,7 @@
 import { Sessions } from '@/db'
 import { Cookies } from '@/lib/backend/cookies'
 import { completeSignInChallenge } from '@/lib/webauthn/signIn'
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 import type { APIRoute } from 'astro'
 
 const print = consoleTag('webauthn')

@@ -1,5 +1,5 @@
 import { siteConfig } from '@/consts'
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 import type { AstroCookies } from 'astro'
 
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30

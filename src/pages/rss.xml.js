@@ -1,7 +1,7 @@
 import rss from '@astrojs/rss'
 import { getCollection } from 'astro:content'
 import { siteConfig } from '@/consts'
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 
 const print = consoleTag('rss')
 
