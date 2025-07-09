@@ -154,7 +154,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     accessorKey: 'isBot',
     header: 'Bot',
     cell: ({ row }) => {
-      const isBot = !!row.getValue('isBot')
+      const isBot = Boolean(row.getValue('isBot'))
       return (
         <div className={cn('font-mono', isBot ? 'text-orange-400' : 'text-neutral-400')}>
           <span>{isBot ? 'true' : 'false'}</span>
@@ -175,12 +175,12 @@ const columns: ColumnDef<AnalyticsData>[] = [
     },
   },
   {
-    accessorKey: 'trackingId',
+    accessorKey: 'tracking_id',
     header: 'Tracking',
     cell: ({ row }) => {
       const trackingId: string = row.getValue('trackingId') ?? '---'
       const isPresent = trackingId !== '---'
-      return <div className="font-mono text-neutral-400">{trackingId ?? '---'}</div>
+      return <div className="font-mono text-neutral-600">{trackingId ?? '---'}</div>
     },
   },
   {
