@@ -100,7 +100,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     accessorKey: 'ip_address',
     header: 'IP',
     cell: ({ row }) => {
-      const ipAddress: string = row.getValue('ipAddress') ?? '---'
+      const ipAddress: string = row.getValue('ip_address') ?? '---'
       const isPresent = ipAddress !== '---'
       return (
         <div className={cn('font-mono', isPresent ? 'text-indigo-400' : 'text-neutral-600')}>
@@ -163,10 +163,10 @@ const columns: ColumnDef<AnalyticsData>[] = [
     },
   },
   {
-    accessorKey: 'isExternal',
+    accessorKey: 'is_external',
     header: 'External',
     cell: ({ row }) => {
-      const isExternal = !!row.getValue('isExternal')
+      const isExternal = !!row.getValue('is_external')
       return (
         <div className={cn('font-mono', isExternal ? 'text-orange-400' : 'text-neutral-400')}>
           <span>{isExternal ? 'true' : 'false'}</span>
@@ -178,7 +178,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     accessorKey: 'tracking_id',
     header: 'Tracking',
     cell: ({ row }) => {
-      const trackingId: string = row.getValue('trackingId') ?? '---'
+      const trackingId: string = row.getValue('tracking_id') ?? '---'
       const isPresent = trackingId !== '---'
       return <div className="font-mono text-neutral-600">{trackingId ?? '---'}</div>
     },
