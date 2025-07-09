@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 /*---break--- */
 @custom-variant dark (&:is(.dark *));
 
@@ -51,23 +51,13 @@
     transition-duration: 300ms;
     background: linear-gradient(var(--gray-gradient)) no-repeat;
     color: color-mix(in srgb, var(--gray), 1%, transparent);
-    mask: radial-gradient(
-      ellipse at center,
-      var(--glass-edge),
-      var(--glass-center),
-      var(--glass-edge)
-    );
+    mask: radial-gradient(ellipse at center, var(--glass-edge), var(--glass-center), var(--glass-edge));
   }
 
   .bg-glass::after {
     @apply bottom-0 backdrop-blur-xs;
     background-color: color-mix(in srgb, var(--glass-edge), 1%, transparent);
-    mask: radial-gradient(
-      ellipse at center,
-      var(--glass-edge),
-      var(--glass-center),
-      var(--glass-edge)
-    );
+    mask: radial-gradient(ellipse at center, var(--glass-edge), var(--glass-center), var(--glass-edge));
   }
 
   .bg-glass-light {
@@ -95,6 +85,30 @@
   }
 }
 
+@layer base {
+  :root {
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+  }
+
+  .dark {
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.439 0 0);
+  }
+}
+
 :root {
   --accent: oklch(0.97 0 0);
   --accent-dark: var(--color-accent-dark);
@@ -103,11 +117,10 @@
   --gray-light: 229, 233, 240;
   --gray-dark: 34, 41, 57;
   --gray-gradient: rgba(var(--gray-light), 50%), #fff;
-  --box-shadow: 0 2px 6px rgba(var(--gray), 25%),
-    0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
+  --box-shadow: 0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
 
-  --box-shadow-sm: 0 1px 3px rgba(var(--gray), 25%),
-    0 4px 12px rgba(var(--gray), 33%), 0 8px 16px rgba(var(--gray), 33%);
+  --box-shadow-sm: 0 1px 3px rgba(var(--gray), 25%), 0 4px 12px rgba(var(--gray), 33%),
+    0 8px 16px rgba(var(--gray), 33%);
 
   --theme-bg-gradient-top: #2a233e;
   --theme-bg-gradient-bottom: #171424;
