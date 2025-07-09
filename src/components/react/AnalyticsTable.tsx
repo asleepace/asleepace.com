@@ -14,10 +14,12 @@ import { cn } from '@/utils/cn'
 
 async function fetchAnalytics() {
   const response = await fetch('/api/analytics', {
+    cache: 'no-store',
     credentials: 'include',
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache',
     },
   })
   if (!response.ok) {
