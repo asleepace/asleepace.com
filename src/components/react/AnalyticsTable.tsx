@@ -1,13 +1,6 @@
 import type { AnalyticsData } from '@/db'
 import { useEffect, useState } from 'react'
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  type Row,
-  type RowData,
-  useReactTable,
-} from '@tanstack/react-table'
+import { type ColumnDef, flexRender, getCoreRowModel, type Row, useReactTable } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils/cn'
@@ -181,8 +174,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     header: 'Tracking',
     cell: ({ row }) => {
       const trackingId: string = row.getValue('tracking_id') ?? '---'
-      const isPresent = trackingId !== '---'
-      return <div className="font-mono text-neutral-600">{trackingId ?? '---'}</div>
+      return <div className="font-mono text-neutral-600">{trackingId}</div>
     },
   },
   {
