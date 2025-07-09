@@ -97,13 +97,13 @@ const columns: ColumnDef<AnalyticsData>[] = [
     },
   },
   {
-    accessorKey: 'ipAddress',
+    accessorKey: 'ip_address',
     header: 'IP',
     cell: ({ row }) => {
       const ipAddress: string = row.getValue('ipAddress') ?? '---'
       const isPresent = ipAddress !== '---'
       return (
-        <div className={cn('font-mono', isPresent ? 'text-orange-400' : 'text-neutral-400')}>
+        <div className={cn('font-mono', isPresent ? 'text-indigo-400' : 'text-neutral-600')}>
           <span>{ipAddress}</span>
         </div>
       )
