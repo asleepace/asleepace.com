@@ -1,32 +1,100 @@
 ---
-import { cn } from '@/lib/utils/cn'
+import { cn } from '@/lib/utils'
+import SidebarButton from './SidebarButton.astro'
+import { ButtonRoundIcon } from '.'
+import type { LucideIconName } from './types'
+import { PanelRightOpen } from 'lucide-react'
+
+export interface SidebarButton {
+  text: string
+  icon: LucideIconName
+  href: string
+}
 
 interface Props {
+  open: boolean
+  buttons: SidebarButton[]
   className?: string
 }
 
-const { className } = Astro.props
+const { open, className, buttons } = Astro.props
 ---
 
-<app-side-bar
-  className={cn(
-    'bg-neutral-800 drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-1 flex-col max-w-64',
+<div
+  id="sidebar"
+  class={cn(
+    'bg-neutral-800 text-neutral-200 font-sans drop-shadow-md transition-all duration-300 ease-in-out h-full flex flex-1 flex-col',
+    'max-w-50 ps-2 pe-3 pt-4 pb-2',
     className
   )}
 >
-  <div class="sticky top-0 p-4 flex justify-between items-center">
-    <slot name="sidebar-header" />
+  <!-- Sidebar Header -->
+  <div class="flex justify-start gap-x-2 ps-2 items-center">
+    <button id="toggle-button">
+      <PanelRightOpen size={16} />
+    </button>
+    <p
+      data-open={open}
+      class={cn('text-lg text-shadow-2xs font-medium font-serif text-white', '[data-open="false"]:hidden')}
+    >
+      Admin Panel
+    </p>
   </div>
-  <slot />
-  <slot name="sidebar-footer" />
-</app-side-bar>
-<script>
-  import { $define } from './defineComponent'
 
-  $define('app-side-bar', {
-    $state: { open: true },
-    onclick(this: HTMLElement) {
-      console.log('[Sidebar] clicked:', this)
-    },
+  <!-- Sidebar Buttons -->
+  <label data-open={open} class="text-xs text-neutral-400 pt-8 pb-2">Quick Links</label>
+  <ul class="list-none flex flex-col">
+    {
+      buttons.map(({ text, icon, href }) => {
+        return (
+          <li>
+            <SidebarButton open={open} text={text} icon={icon} href={href} />
+          </li>
+        )
+      })
+    }
+  </ul>
+
+  <!-- Flexible spacer -->
+  <div class="flex grow"></div>
+
+  <!-- Sidebar Footer -->
+  <div class="border-t-0.5 border-t-neutral-400"></div>
+</div>
+
+<script>
+  const state = {
+    isOpen: true,
+  }
+
+  const toggleButton = document.getElementById('toggle-button') as HTMLButtonElement
+  const sidebar = document.getElementById('sidebar') as HTMLDivElement
+
+  function iterateChildren(elem: Element, callback: (el: Element) => void) {
+    if (!elem) return
+    callback(elem)
+    for (const child of elem.children) {
+      iterateChildren(child, callback)
+    }
+  }
+
+  function onStateChangeRender() {
+    iterateChildren(sidebar, (elem) => {
+      if (elem.hasAttribute('data-open')) {
+        elem.setAttribute('data-open', state.isOpen ? 'true' : 'false')
+      }
+    })
+  }
+
+  toggleButton.addEventListener('click', () => {
+    state.isOpen = !state.isOpen
+    onStateChangeRender()
   })
 </script>
+
+<style>
+  [data-open='false'],
+  [data-open=''] {
+    display: none;
+  }
+</style>
