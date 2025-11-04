@@ -1,30 +1,79 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { CodeEditorLazy } from '@/components/editor/CodeEditorLazy'
 
-export const prerender = false;
-
-// =====================================
-// Cope Page
-// =====================================
-
+export const prerender = false
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-800">
   <head>
-    <BaseHead title={"Code"} description={"a simple online code playground."} />
-    <link type="text/css" rel="stylesheet" href="/styles/material-palenight.css">
+    <BaseHead title={'Code'} description={'a simple online code playground.'} />
+    <style>
+      html,
+      head {
+        background-color: oklch(27.8% 0.033 256.848) !important;
+      }
+    </style>
   </head>
-  <body class="h-screen w-screen overflow-y-auto overflow-x-hidden flex flex-1 flex-col bg-editor-100 overscroll-none">
-    <div class="flex flex-1 grow flex-col w-full min-h-screen bg-editor-200">
-      <CodeEditorLazy code={''} client:only="react" />
+  <body class="bg-gray-900 text-gray-100 h-full m-0 flex flex-col">
+    <!-- Toolbar -->
+    <div class="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center gap-3">
+      <span class="text-sm font-mono text-gray-400">TypeScript Editor</span>
+      <button id="run-btn" class="ml-auto px-3 py-1 text-sm bg-green-600 hover:bg-green-700 rounded"> Run </button>
     </div>
+
+    <!-- Editor -->
+    <div id="editor" class="flex-1"></div>
+
+    <!-- Output -->
+    <div id="output" class="bg-gray-800 border-t border-gray-700 p-3 hidden">
+      <div class="text-xs text-gray-400 mb-1">Output:</div>
+      <pre id="output-text" class="text-sm font-mono text-green-400"></pre>
+    </div>
+
+    <script is:inline src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+    <script is:inline>
+      require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
+
+      require(['vs/editor/editor.main'], function () {
+        const editor = monaco.editor.create(document.getElementById('editor'), {
+          value: `\n\nconst greeting: string = "Hello, TypeScript!"\nconsole.log(greeting)\n\nfunction add(a: number, b: number): number {\n  return a + b\n}\n\nconsole.log(add(2, 3))`,
+          language: 'typescript',
+          theme: 'vs-dark',
+          automaticLayout: true,
+        })
+
+        document.getElementById('run-btn').addEventListener('click', () => {
+          const code = editor.getValue()
+          const output = document.getElementById('output')
+          const outputText = document.getElementById('output-text')
+
+          const logs = []
+          const originalLog = console.log
+          console.log = (...args) => {
+            logs.push(args.join(' '))
+            originalLog(...args)
+          }
+
+          try {
+            eval(code)
+            outputText.textContent = logs.join('\n') || '(no output)'
+          } catch (err) {
+            outputText.textContent = 'Error: ' + err.message
+          }
+
+          console.log = originalLog
+          output.classList.remove('hidden')
+        })
+      })
+    </script>
   </body>
 </html>
+
 <style>
+  html,
   body {
-    background-color: #1e1e1e;
-    color: #e2e8f0;
+    height: 100%;
+    margin: 0;
   }
 </style>
