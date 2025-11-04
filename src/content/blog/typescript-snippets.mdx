@@ -9,6 +9,55 @@ slug: 'typescript-snippets'
 
 This document contains a collection of useful, interesting and sometimes quirky snippets of TypeScript I've gathered over the years. Some of these patterns are not unique to TypeScript, but in these examples they should be also type-safe (hopefully).
 
+### SQL Template String w/ Types
+
+```ts
+
+
+
+// Extract parameter name between {{ and }}
+type ExtractParam<S extends string> = 
+  S extends `${infer Param}}${infer _}` ? Param : never
+
+// Recursively find all {{paramName}} patterns
+type SQLParamsFromString<S extends string> = 
+  S extends `${infer _}{{${infer Rest}`
+    ? ExtractParam<Rest> | SQLParamsFromString<Rest>
+    : never
+
+function sqlQueryTemplate<SQLString extends string>(statement: SQLString) {
+  return {
+    prepare(queryParams: Record<SQLParamsFromString<SQLString>, string | number>) {
+      let template = statement as string
+      let params: string[] = []
+      let paramIndex = 0
+      
+      // Replace {{paramName}} with actual values
+      for (const [key, value] of Object.entries(queryParams)) {
+        if (value === null || value === undefined || Number.isNaN(value)) continue
+        template = template.replace(`{{${key}}}`, String(++paramIndex))
+        params.push(String(value))
+      }
+      
+      return {
+        template,
+        params
+      }
+    }
+  }
+}
+
+
+const userQuery = sqlQueryTemplate('SELECT * FROM past_prompts WHERE user_id = {{userId}}')
+
+const { template, params } = userQuery.prepare({
+    userId: 123 // inferred!
+})
+```
+
+[Try it on the Typescript Playground!](https://www.typescriptlang.org/play/?target=99#code/FAj0oAgUQDwFwE4EMDGcIAcnILYFM48EIA7JfCAIwIHc88SIBvJiJEgEwgF9vg4AnhjzR4yNAAVs5ADwBlCHngMOAZwirEASxIBzAHwQAvBGAQICpYU7qABgBImOgGZEIU3L0cu3AfW62EAD87tI4EABcpHgAbkRgkABKeCgArgiqWnEANgIQzjpcSNnZzExYuABy5Hi8mEhwhAgkqvxCInIAigAyHuSqAGIIAPY4ctp68orKNhoTBsam5pYzahAOTiSuxP4s3ltuyZoBZubBooiocH04MkdwhgA+Fj03gyNj83d4mvqn5lESLF4sBnKkSGgtMNGKoAI7ZTqpIgCAAqeBwGGyDTw8h64wQOl002sa00BL0+gAFJpsfgSHAol1uvjCQBKZinBAEdKMJj-TBcip4SmwpEIARvKLJFDDBAcXG9MLvUYsyZM1UGAA0c3JROeJFSOGoCH07L5ZzO2QIEEIGKxhEWNNtDHQSHUZMJ-PMVvQFX6UQ9egA2gBdRahr0QH31XAASU4SkWAAZI5HwBBkpjUCIWH6cNV8HUaFo4AALNhoVLFCAxYpI1oW8zOWUQSkylroIMAazwAm1teySLDw2cEAA8pQAFYpOAAOhdBJ+IrFEqVrLNkfMWlHlIHSOMRhMBpKEEezz3IkPJnBHDwBSBXDPEEqhuNs60qmqlV3dbw64g7ZwDoSKbja6JZg6Ji2hBeCzoKWIoMKth7EwPYCLwATahqlIANQ4Xm8a3jA66gXmqizhgqSqKWlLYReJGNjwqaMVycA8hyjHmNB9p4JqpFKpGfAWkJTF8CA7aaBAVFEIiyKOvCsnimidrYpSADkchQN0UAAMIohAABUEADIkY4ALL1JovgYB8GBwOoADqAASUCJFAUmqEQvhaFwJgsNJCCxhwvBqay4nQpJrDcdi2pkTwiwBYpAgUYK2DCuaZwBUFUQAIwAEwAMzANwrJAA)
+
+
 ### Builder Pattern
 
 The following snippet creates a typed object by progressively adding properties, this can be useful for defining different errors in an application.
@@ -381,3 +430,426 @@ setTimeout(() => {
 
 [Try it on the Typescript Playground!](https://www.typescriptlang.org/play/?target=99&module=7&ssl=2&ssc=1&pln=77&pc=10&jsx=0#code/MYewdgziA2CmB0w4EMBOAKAlAKGwSzABdZUAzZYWAAgGVQAHWAYUIA8qBvbKnq1WAOZ4IhVAE8AXFQBiBZNDwAvZITzgASoOGixAHhGoCAgHzYAvrgLEyFanRCNO3XsIDi0EACN5UzyBiwyGDOPNDInrDQUgZGIVT0KgAW0aKxvFTAiXjQACb8YFIA6oEA1pqkuvaMxgDaALoANHHA-Cqw6GERUVQxYAKYUlWwcTU0YgC2ftDweNYqIKh1WFIAknOecGsk86iVDLCm6aMTU-A5wvQgELBLA1QAbiB4Oea4pACuYMCq4BmtxO4vPIhlgnOlQJBCFQBB5vNBylQALx-QLEIaIeTQdAcKhxdL8IQGSRUMCwADuMjkCmUPzAmkJOn0qT6xnQ6Ag+wACklMEjjGD0oKeBCoHB4B4BOgAORIQJgd70DKY2A5CRSho9Lk8vG8Mw4dJ6uL8QjvVBgaGw+TlV7YD5fWkotogwhZCCDfYsVh3IYC0KwKHfdjIl3CI3+03mrhC0LhSJSKUwoHQdU6ngJF3xgD0KejGSyuXyUnqTVzAn9VDclqxvKjud4xojVBDEHg6cSSMRyKl2dTVDMJejLVR7U6cZ6zP6vrrIoD+ZySMdaP2GOgWMD+rrwrnraSC+bO5dVAA1FRR9Bj1Ru1Le+Dt2eF2eb7wZ3nsjkEcjSRTisgyrBSOgmRvhum77kBBawGArbvBAiSAXO5QgdObDwAS2jiKhWgiCQ8FvuUGrgTkB6JEhuYNmar65L2-a9gAVMckwwDMcyEAstxTrmYh4JE87Nk+PCkAsVCAeAIiUfOICkE2rqIHO+Q1vxgovoRH7iWcJD-lginpHgUnoAAhCp-68hCqjysMm5ClxPG0eJ1qWX21EDkKDGnOcECXNc7G1puIoBOKICSgABu5nkqhIQUavuZ6kbqcQWBYuDYC+iZwj6yJDm0gJpfsWkvhyDiwAAgguqXAsumXENKyBSjg+X7AAQqVVbopV7RSp4tXJaJUIFYwTDNUmrX-O1wBdfVhUACILn1sANYgI3SjktULcO0qwCtbXSqQ409ZqhWuINOWFatbTSgIXXYD5VAwUYVChVcKrpftjCTadVVSqQAD6ABMK1ldAw1rZ9X0AMybYtIMACxdYlgmoMJE2OJJFpDfsCngqJ-kSuyy4xTa1yEAAKng4ywCA7yEGyvKIvy11+WKONSvQqCBagyDjPd4AbTg-ZUAArF9AAMIuYEAA)
 
+## Streams
+
+```ts
+
+declare const StreamBrand: unique symbol
+
+type Ints = Uint8Array<ArrayBufferLike>
+type StreamableStatus = 'init' | 'open' | 'closed'
+type StreamId = string & {
+    [StreamBrand]: 'v1'
+}
+
+function createId() {
+    const random = crypto.getRandomValues(new Uint8Array(8))
+    const idString = Array.from(random).map((item) => item.toString(36)).join('')
+    return idString as StreamId
+}
+
+function id(idString: string | StreamId): StreamId {
+    return idString as StreamId
+}
+
+
+class ChildStream extends ReadableStream<Ints> {
+    public controller?: ReadableStreamDefaultController
+
+    get connected() {
+        return Boolean(this.controller)
+    }
+
+    constructor(public cleanup: () => void) {
+        super({
+            start: (controller) => {
+                this.controller = controller
+            },
+            cancel: () => {
+                this.controller = undefined
+                this.cleanup()
+            }
+        })
+    }
+
+    public enqueue(chunk: Ints) {
+        this.controller?.enqueue(chunk)
+    }
+
+    public close() {
+        this.controller?.close()
+    }
+}
+
+
+class Streamable {
+    private writable: WritableStream<Ints>
+    private children: (ChildStream|null)[] = []
+    private writeQueue = Promise.resolve()
+
+    private state = {
+        status: 'init' as StreamableStatus
+    }
+
+    get status() {
+        return this.state.status
+    }
+
+    get count() {
+        return this.children.length
+    }
+
+
+    constructor(
+        public readonly id: StreamId
+    ) {
+        this.writable = new WritableStream({
+            start: () => {
+                this.state.status = 'open'
+            },
+            write: (chunk) => {
+                for (const childStream of this.children) {
+                    if (!childStream) continue
+                    childStream.enqueue(chunk)
+                }
+            },
+            close: () => {
+                this.state.status = 'closed'
+            }
+        })
+    }
+
+    public subscribe(): ChildStream {
+        const child = new ChildStream(() => {
+            const idx = this.children.findIndex((stream) => Object.is(stream, child))
+            if (idx !== -1) {
+                this.children[idx] = null
+            }
+        })
+        this.children.push(child)
+        return child
+    }
+
+    public close(): void {
+        try {
+            if (this.status !== 'open') return console.warn('stream already closed!')
+            this.state.status = 'closed'
+            this.children.forEach((child) => child?.close())
+            this.writable.abort('closed')
+        } catch (e) {
+            console.warn(e)
+        } finally {
+            this.children.length = 0
+        }
+    }
+
+    async transaction(operation: (
+        writer: WritableStreamDefaultWriter<Ints>
+    ) => Promise<void>) {
+        await this.writeQueue
+        const writer = this.writable.getWriter()
+        try {
+            await operation(writer)
+        } finally {
+            writer.releaseLock()
+        }
+    }
+
+    async bytes(chunk: Ints) {
+        const promise = await this.transaction((writer) => writer.write(chunk))
+        this.writeQueue = this.writeQueue.then(() => promise).catch((e) => console.warn(e))
+    }
+}
+
+
+
+
+class Streams {
+    public readonly items = new Map<StreamId, WeakRef<Streamable>>()
+
+    public readonly defer = new FinalizationRegistry((streamIdRef: StreamId) => {
+        if (!this.items.has(streamIdRef)) return console.warn('[cleanup] key not found:', streamIdRef)
+        const streamRef = this.get(streamIdRef)
+        streamRef?.close()
+        this.items.delete(streamIdRef)
+    })
+
+    get size() {
+        return this.items.size
+    }
+
+    public has(id: StreamId): boolean;
+    public has(stream: Streamable): boolean;
+    public has(key: StreamId | Streamable): boolean {
+        if (typeof key === 'string') return Boolean(this.get(key))
+        if (typeof key === 'object' && 'id' in key) {
+            return Boolean(this.get(key.id))
+        }
+        return false
+    }
+
+    public get(streamId: StreamId): Streamable | undefined {
+        return this.items.get(streamId)?.deref?.()
+    }
+
+    public ref(stream: Streamable): WeakRef<Streamable> {
+        const weakRef = new WeakRef(stream)
+        this.defer.register(stream, stream.id, weakRef)
+        return weakRef
+    }
+
+    public add(stream: Streamable): void {
+        const streamRef = this.ref(stream)
+        this.items.set(stream.id, streamRef)
+    }
+
+    public delete(streamId: string | StreamId) {
+        return this.items.delete(streamId as StreamId)
+    }
+
+    *[Symbol.iterator](): Generator<Streamable> {
+        for (const [_id, streamRef] of this.items) {
+            const stream = streamRef.deref?.()
+            if (!stream) continue
+            yield stream
+        }
+    }
+}
+
+
+function resp(stream: Streamable) {
+    return new Response(stream.subscribe(), {
+        status: 200,
+        headers: {
+            'Content-Type': 'text/event-stream'
+        } 
+    })
+}
+
+
+async function GET(ctx: { url: URL; streams: Streams }): Promise<Response> {
+    const id = ctx.url.pathname.slice(1) as StreamId
+
+    // if stream exists, clone and send response
+    if (ctx.streams.has(id)) {
+        const stream = ctx.streams.get(id)!
+        return resp(stream)
+    }
+
+    // otherwise, create a new instance
+    const stream = new Streamable(id)
+    ctx.streams.add(stream)
+    return resp(stream)
+}
+declare const StreamBrand: unique symbol
+
+type Ints = Uint8Array<ArrayBufferLike>
+type StreamableStatus = 'init' | 'open' | 'closed'
+type StreamId = string & {
+    [StreamBrand]: 'v1'
+}
+
+function createId() {
+    const random = crypto.getRandomValues(new Uint8Array(8))
+    const idString = Array.from(random).map((item) => item.toString(36)).join('')
+    return idString as StreamId
+}
+
+function id(idString: string | StreamId): StreamId {
+    return idString as StreamId
+}
+
+
+class ChildStream extends ReadableStream<Ints> {
+    public controller?: ReadableStreamDefaultController
+
+    get connected() {
+        return Boolean(this.controller)
+    }
+
+    constructor(public cleanup: () => void) {
+        super({
+            start: (controller) => {
+                this.controller = controller
+            },
+            cancel: () => {
+                this.controller = undefined
+                this.cleanup()
+            }
+        })
+    }
+
+    public enqueue(chunk: Ints) {
+        this.controller?.enqueue(chunk)
+    }
+
+    public close() {
+        this.controller?.close()
+    }
+}
+
+
+class Streamable {
+    private writable: WritableStream<Ints>
+    private children: (ChildStream|null)[] = []
+    private writeQueue = Promise.resolve()
+
+    private state = {
+        status: 'init' as StreamableStatus
+    }
+
+    get status() {
+        return this.state.status
+    }
+
+    get count() {
+        return this.children.length
+    }
+
+
+    constructor(
+        public readonly id: StreamId
+    ) {
+        this.writable = new WritableStream({
+            start: () => {
+                this.state.status = 'open'
+            },
+            write: (chunk) => {
+                for (const childStream of this.children) {
+                    if (!childStream) continue
+                    childStream.enqueue(chunk)
+                }
+            },
+            close: () => {
+                this.state.status = 'closed'
+            }
+        })
+    }
+
+    public subscribe(): ChildStream {
+        const child = new ChildStream(() => {
+            const idx = this.children.findIndex((stream) => Object.is(stream, child))
+            if (idx !== -1) {
+                this.children[idx] = null
+            }
+        })
+        this.children.push(child)
+        return child
+    }
+
+    public close(): void {
+        try {
+            if (this.status !== 'open') return console.warn('stream already closed!')
+            this.state.status = 'closed'
+            this.children.forEach((child) => child?.close())
+            this.writable.abort('closed')
+        } catch (e) {
+            console.warn(e)
+        } finally {
+            this.children.length = 0
+        }
+    }
+
+    async transaction(operation: (
+        writer: WritableStreamDefaultWriter<Ints>
+    ) => Promise<void>) {
+        await this.writeQueue
+        const writer = this.writable.getWriter()
+        try {
+            await operation(writer)
+        } finally {
+            writer.releaseLock()
+        }
+    }
+
+    async bytes(chunk: Ints) {
+        const promise = await this.transaction((writer) => writer.write(chunk))
+        this.writeQueue = this.writeQueue.then(() => promise).catch((e) => console.warn(e))
+    }
+}
+
+
+
+
+class Streams {
+    public readonly items = new Map<StreamId, WeakRef<Streamable>>()
+
+    public readonly defer = new FinalizationRegistry((streamIdRef: StreamId) => {
+        if (!this.items.has(streamIdRef)) return console.warn('[cleanup] key not found:', streamIdRef)
+        const streamRef = this.get(streamIdRef)
+        streamRef?.close()
+        this.items.delete(streamIdRef)
+    })
+
+    get size() {
+        return this.items.size
+    }
+
+    public has(id: StreamId): boolean;
+    public has(stream: Streamable): boolean;
+    public has(key: StreamId | Streamable): boolean {
+        if (typeof key === 'string') return Boolean(this.get(key))
+        if (typeof key === 'object' && 'id' in key) {
+            return Boolean(this.get(key.id))
+        }
+        return false
+    }
+
+    public get(streamId: StreamId): Streamable | undefined {
+        return this.items.get(streamId)?.deref?.()
+    }
+
+    public ref(stream: Streamable): WeakRef<Streamable> {
+        const weakRef = new WeakRef(stream)
+        this.defer.register(stream, stream.id, weakRef)
+        return weakRef
+    }
+
+    public add(stream: Streamable): void {
+        const streamRef = this.ref(stream)
+        this.items.set(stream.id, streamRef)
+    }
+
+    public delete(streamId: string | StreamId) {
+        return this.items.delete(streamId as StreamId)
+    }
+
+    *[Symbol.iterator](): Generator<Streamable> {
+        for (const [_id, streamRef] of this.items) {
+            const stream = streamRef.deref?.()
+            if (!stream) continue
+            yield stream
+        }
+    }
+}
+
+
+function resp(stream: Streamable) {
+    return new Response(stream.subscribe(), {
+        status: 200,
+        headers: {
+            'Content-Type': 'text/event-stream'
+        } 
+    })
+}
+
+
+async function GET(ctx: { url: URL; streams: Streams }): Promise<Response> {
+    const id = ctx.url.pathname.slice(1) as StreamId
+
+    // if stream exists, clone and send response
+    if (ctx.streams.has(id)) {
+        const stream = ctx.streams.get(id)!
+        return resp(stream)
+    }
+
+    // otherwise, create a new instance
+    const stream = new Streamable(id)
+    ctx.streams.add(stream)
+    return resp(stream)
+}
+```
+
+[Try it on the TypeScript Playground!](https://www.typescriptlang.org/play/?target=99#code/FAEwpgxgNghgTmABBA9gOwM4BdEGUsIwC2AQnDGiAFyICuaAlgI61IYCeRARilMMFnYAHJAEk0WDIgC8iAKoMJADgCCccuwA8ajSVoAzfWDgAZBgGswAPgHCk+QkRhcoYfDCy0psgOSKGWD6IAD6IPigiaEGhPtAoGGAgPrYieARgxKIgMojYcIoA5ogAZIgA3sCIVYgA2g4ZpOSUALo0PgBuAIzJAL78+vQQWAzoyIRYYFkAFACU5ZXVqJg4TSAoRDkQcMJYKAB0BWBYAEoUa0QAajBQrBhTaGAA7vKKWKrqMOxTSjMzC1VLbCIBggByFHI6T57fRwdZTVbrGZ7JxCKZTAJgIhzaRWYETIh7XZgtAFKYAZgAbL89gArFCKKY+Hx-aqIBCeOBoYGggjgmBSeqZEDAPrAAZoIYjLkg9E8-Ikmh5cGhQVELIzGiqrLzVns2ic7nEor8tKOLIi-jAaD8qQAYQAFgwoHKGogwAAPCaUKTHDIgZyuVWacSSXEVVlCWguBgQZDoAi8VxwAD8NF9MH9Ljc6WIABEwPoYLQoFhbfHYVAk-xWYccEsHkNErMdazqnqDSQULwMmgplhHRg9ksE5XjCzqqLWYCCLQhig4FNI9HY9Ae7QhDRmzjEO16SA5uHW1UMOvjFND0fWdh4FhN8OK0nsWH-pej-2GIP74njJty9+4C+r49AANIBl4QBQEBgFAm5Pi2r5vgOQ5-qOcA5PQ4D6IoiRgQhiDvp+rgUOusy4a2fRAeOVSTtUS5QDGbpoCwYCsFMED2vQ5g0CGGAHmRBHIRID7GMmexgExrCsexnFUYgNFVHRDFxAkzYXq2AlfqhonKWApGsn0opWrAGACjmThZvBiBCPk7QeEgjz5FgAZgDQADqjnOUGPE2BGNl2cgjrOggaCbg6TousQwRoMWUAzDUzQ5PFL7WQwtkTIgDkYgAipJSCyAACrCRAfmAewIBgvDtLpfzJX56XXulshqVeTmeBgbT+IEiAmqqnmtV4L7yYgta5P1dx8a+7ZcgJDWlQ1A36dW1Qjag9BYKpZFTfhSHseFwV7K4JL9oNlpTugeSzrsC5kYpsaEGsaBQOw3KamZ5qshNl4CZlTkWbIDzPO5AR9Y455kS1N6wTIz54YhH57LNCNjTk4SRMksNyaBGM-S5iBsRxaDmHBzWw-o8549OAXhaqiAoPo23w7tQXiZ9GNHgw9NTAAhEzEVYnGEiKKw4Ow7zqpiRJLG6dJhOyRjFGwyBIsAlA8S41uMNs1UM2tXNyO+DpSTK3JZE9LJQ23bkUYYFsDBcNVNBhc6NMkwC511oF2T-U8iBO3zaLE8blMgu6OQaZ7+1YZQ4jgO6aJ5A0cEAPJcDSkBYHsH5TAnxDAVTzq-MbHN4yHiBc9IsgALSdKzbPh3t4k1CHCX-TFxsK0eZv8TtEfiXskYYPa+PhXLbZHPqXK8ydyVRvRK6qypGo7nulmsgQz2u62xd9kh81SOXvgROJzJsuPBqAt2eyPPAvY+DnGzXPdz2G1zzLGzrdlIx4Xgo4b6Ow-XZmaBoTzgAKIwHYmiXmcFebaQXtVUecNBw-WcnsZw851qxHgUkRBclkAeHYnjMAtdXwX1cFfG+UxiGm0QFHa4T1V5fR7g3YBh0Cj9hyAABlNtPVk-J2ASnwk0DAEDhjoCmEfcgYiQp4zIjjOAbkPJZlVPmQsxYsBAwmHAYMEgMA+WqHBQq6wSqaF3CCKwJDqgwGvgEBmyDHJgBylLMilN5FhyQigrMBwjiaLPLg9ejCjzWJgLYyRHgpRTHkbgnotDFD0I3sbeRZVoIZASCYFAEBzB6UvB3E2L5+GCK4OwCYdwZZcUQDxSxbtlhWSKiVHIwTbECQIBQERkpxGRIcXAOCSScb4xkv4jxDinGsHcfDHGIzSr9nEgHaGtTjEJCRBBLAkCqEwPOpfa+nI1nmwtJaIyNpTQNCkGpS2910AMIxEQbwiAAaIAALIwCEJoLUIA86uQyOYX0+gXlmWclYKwpEZ7LlPhmC5z1MI-m9s8AAYnE+iAAvcJ6BfQFA-OveOb0QDfNemafcczN7by5gJK5g57T8mzli75vxT4cknhs8hWzb41FXMRIQCVLDPTQCgHAZMMJUB8Hne+WRqUuPdqNRw3yxmDlrJSvForXz32+XAtW2SkGZ3xIOcArgJhyoaCKgs5sao1iOLkBgCLqqBNpRPOxGrMSDgwOasAvDaKzwYuSu4IJcX6v3DQHg3YKAAG5gVz0QB6vVxBvXEGckvf1RE0DBojG62M4bOVRrVNkFUfysyxq7PGq129BAiDpogTlMgK5hCVCSE+W1OwBt7AJWVnLC6vkLXYEtZaK6H1TunIIxRSh+CSMCLkzarW6jPlyOt8ad7wybWAdgmd9zRM2hO2h1wEguoUsm4aRwI0ZvTeqdNzkQh0EoAWbC2RN5bRJZq7x61hX7lEuABA+hRJqryUmkFL691HpzW5T53zfmOH+Va1xAGCw5DuR8mAXyCx7sGfDSFcBklouwGee+QqzKLrzo8cD+hcFbVwzB75m6rLbozCAH9Rzo1-uXiCUD4qlUQdkAJb998EODlJQjXd99sMSoaAqicS0t0gu1UcXSD7FS8hJCe15VTrUGhvfavYYndUPu6qZPFuyXwACo6icB4FAO1Uj5zNFmDQAA4uJYwHh5xAYaCBzeZM0JsXFTUAA+iCTDkqCwJRLUp658mzo1PvjkJj+gVPGALG+3BrIiXsYFsMaKzqMbsAYNBbI98eGLUMuKdpXJyqonvr+1wtctp3N9BgIQ50JNYZPFwG2+R7azDzpvPeNAABMnDOFY0vPaP0xh2pjuqD4MsEhxJYErgAFTsD4NoExPQAHowBVQkJXe+-9O6IEGn8QyBTYx5ekYgCzoCptsSwO6GgZQ6BwBgvIY4JhA38eIEN1UUgzY0CMcVBImhKvVcwNYSywcvbIAu3sfURmhAeHtGgYgc0566Rrhp6jGbhOIEW4t4E9NQsenRRgPOcQHjdUoLkcS2RCs1ZfNvIY7okaODJRSkENLN6U1C7IGndPjl3tlDMLmK66Wnyq-B0jGPabTLgI8EqBPxhIBgLcn2ihrwShS4sRjZlIM+16lmHnL4Of30HBR4X46BeFeFz0IAA)
+
+## Others...
