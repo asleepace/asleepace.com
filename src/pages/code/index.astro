@@ -1,36 +1,81 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
+import { Play } from 'lucide-react'
 
 export const prerender = false
 ---
 
 <!doctype html>
-<html lang="en" class="h-full bg-gray-800">
+<html lang="en" class="h-full">
   <head>
     <BaseHead title={'Code'} description={'a simple online code playground.'} />
     <style>
-      html,
-      head {
-        background-color: oklch(27.8% 0.033 256.848) !important;
+      /* Custom scrollbar for output panel */
+      #output-content::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      #output-content::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      #output-content::-webkit-scrollbar-thumb {
+        background: #3e3e42;
+        border-radius: 5px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+      }
+
+      #output-content::-webkit-scrollbar-thumb:hover {
+        background: #4ec9b0;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+      }
+
+      #output-content::-webkit-scrollbar-corner {
+        background: transparent;
       }
     </style>
   </head>
-  <body class="text-gray-100 h-full max-h-screen overscroll-contain m-0 flex flex-col">
+  <body class="h-full m-0 flex flex-col overflow-hidden bg-[#1e1e1e]">
     <!-- Toolbar -->
-    <div class="bg-neutral-800 flex items-center gap-3 top-0 left-0 right-0">
-      <span class="text-sm font-mono text-neutral-400 px-4 py-3">TypeScript</span>
-      <span id="ts-version" class="text-xs font-mono text-neutral-600"></span>
-      <button id="run-btn" class="ml-auto px-6 py-3 text-sm bg-blue-500 text-white hover:bg-blue-600"> Run </button>
+    <div class="bg-[#252526] border-b border-[#3e3e42] flex items-center h-12 px-4 pr-0 gap-4 shrink-0">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-[#cccccc] tracking-wide">TypeScript</span>
+        <span id="ts-version" class="text-xs text-[#858585] font-mono"></span>
+      </div>
+      <button
+        id="run-btn"
+        class="ml-auto self-stretch flex items-center gap-2 px-4 pr-5 py-2 bg-indigo-500 text-white text-xs font-medium hover:bg-indigo-600 active:bg-indigo-700 transition-colors duration-150"
+      >
+        <Play size={16} strokeWidth={2} />
+        <span class="tracking-wider mt-0.5">Run</span>
+      </button>
     </div>
 
-      <!-- Editor -->
-      <div id="editor" class="flex-1"></div>
+    <!-- Editor -->
+    <div id="editor" class="flex-1 overflow-hidden"></div>
 
-      <!-- Output -->
-      <div id="output" class="bg-gray-800 border-t bottom-0 left-0 right-0 border-gray-700 p-3">
-        <div class="text-xs text-gray-400 mb-1">Output:</div>
-        <pre id="output-text" class="text-sm font-mono text-green-400"></pre>
+    <!-- Output Panel -->
+    <div id="output" class="hidden border-t border-[#3e3e42] bg-[#1e1e1e] shrink-0" style="height: 200px;">
+      <!-- Resize Handle -->
+      <div
+        id="resize-handle"
+        class="h-1 bg-[#3e3e42] hover:bg-[#00ff88] cursor-ns-resize transition-colors group relative"
+      >
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-5 flex items-center justify-center">
+          <div class="w-12 h-0.5 bg-[#858585] group-hover:bg-[#00ff88] transition-colors"></div>
+        </div>
       </div>
+      <div class="flex items-center justify-between px-4 py-2 bg-[#252526]">
+        <span class="text-xs font-medium text-[#cccccc] uppercase tracking-wider">Output</span>
+        <button id="clear-output" class="text-xs text-[#858585] hover:text-[#cccccc] transition-colors">Clear</button>
+      </div>
+      <div id="output-content" class="px-4 py-3 overflow-auto" style="height: calc(100% - 52px);">
+        <pre id="output-text" class="text-sm font-mono text-[#4ec9b0] leading-relaxed"></pre>
+      </div>
+    </div>
 
     <script is:inline src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
     <script is:inline src="https://unpkg.com/typescript@latest/lib/typescript.js"></script>
@@ -39,53 +84,130 @@ export const prerender = false
 
       require(['vs/editor/editor.main'], function () {
         const editor = monaco.editor.create(document.getElementById('editor'), {
-          value: `\n\nconst greeting: string = "Hello, TypeScript!"\nconsole.log(greeting)\n\nfunction add(a: number, b: number): number {\n  return a + b\n}\n\nconsole.log(add(2, 3))`,
+          value: `const greeting: string = "Hello, TypeScript!"
+console.log(greeting)
+
+function add(a: number, b: number): number {
+  return a + b
+}
+
+console.log(\`2 + 3 = \${add(2, 3)}\`)
+
+// Try editing and running your code!`,
           language: 'typescript',
           theme: 'vs-dark',
           automaticLayout: true,
+          fontSize: 14,
+          lineHeight: 22,
+          padding: { top: 16, bottom: 16 },
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+          fontLigatures: true,
+          renderLineHighlight: 'line',
+          scrollbar: {
+            verticalScrollbarSize: 8,
+            horizontalScrollbarSize: 8,
+          },
         })
 
-        document.getElementById('run-btn').addEventListener('click', () => {
+        const output = document.getElementById('output')
+        const outputText = document.getElementById('output-text')
+        const tsVersion = document.getElementById('ts-version')
+        const runBtn = document.getElementById('run-btn')
+        const clearBtn = document.getElementById('clear-output')
+        const resizeHandle = document.getElementById('resize-handle')
+
+        // Set TypeScript version
+        tsVersion.innerText = `v${ts.version}`
+
+        // Resizable output panel
+        let isResizing = false
+        let startY = 0
+        let startHeight = 0
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+          isResizing = true
+          startY = e.clientY
+          startHeight = output.offsetHeight
+          document.body.style.cursor = 'ns-resize'
+          document.body.style.userSelect = 'none'
+        })
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isResizing) return
+          const delta = startY - e.clientY
+          const newHeight = Math.max(100, Math.min(window.innerHeight - 100, startHeight + delta))
+          output.style.height = newHeight + 'px'
+        })
+
+        document.addEventListener('mouseup', () => {
+          if (isResizing) {
+            isResizing = false
+            document.body.style.cursor = ''
+            document.body.style.userSelect = ''
+          }
+        })
+
+        // Clear output handler
+        clearBtn.addEventListener('click', () => {
+          output.classList.add('hidden')
+          outputText.textContent = ''
+        })
+
+        // Run code handler
+        runBtn.addEventListener('click', () => {
           const code = editor.getValue()
-          const output = document.getElementById('output')
-          const outputText = document.getElementById('output-text')
 
           const logs = []
+          const errors = []
           const originalLog = console.log
+          const originalError = console.error
+
           console.log = (...args) => {
             logs.push(args.join(' '))
             originalLog(...args)
           }
 
+          console.error = (...args) => {
+            errors.push('Error: ' + args.join(' '))
+            originalError(...args)
+          }
+
           try {
-            document.getElementById('ts-version').innerText = 'ES2022'
             // Transpile TypeScript to JavaScript
             const result = ts.transpileModule(code, {
               compilerOptions: {
-                module: ts.ModuleKind.Module,
+                module: ts.ModuleKind.ES2015,
                 target: ts.ScriptTarget.ES2022,
               },
             })
 
             // Execute the transpiled JavaScript
             eval(result.outputText)
-            outputText.textContent = logs.join('\n') || '(no output)'
+
+            const allOutput = [...logs, ...errors]
+            outputText.textContent =
+              allOutput.length > 0 ? allOutput.join('\n') : '✓ Code executed successfully (no output)'
+            outputText.className =
+              errors.length > 0
+                ? 'text-sm font-mono text-[#f48771] leading-relaxed'
+                : 'text-sm font-mono text-[#4ec9b0] leading-relaxed'
           } catch (err) {
-            outputText.textContent = 'Error: ' + err.message
+            outputText.textContent = '✗ ' + err.message
+            outputText.className = 'text-sm font-mono text-[#f48771] leading-relaxed'
           }
 
           console.log = originalLog
+          console.error = originalError
           output.classList.remove('hidden')
+        })
+
+        // Run on Cmd/Ctrl + Enter
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+          runBtn.click()
         })
       })
     </script>
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    height: 100%;
-    margin: 0;
-  }
-</style>
