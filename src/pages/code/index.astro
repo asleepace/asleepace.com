@@ -159,18 +159,18 @@ export const prerender = false
       <div class="relative">
         <button
           id="version-btn"
-          class="flex items-center gap-1.5 px-3 py-1.5 text-xs leading-4 text-blue-400! border border-neutral-800 hover:bg-gh-tertiary rounded transition-colors"
+          class="flex items-center gap-1.5 px-3 pl-3.5 py-1.5 text-xs leading-4 text-indigo-400 *:hover:text-indigo-500 border border-neutral-800 hover:border-indigo-400 rounded transition-colors"
         >
-          <span id="selected-version tracking-wide">ES2022</span>
+          <span id="selected-version" class="tracking-wide">ES2022</span>
           <div class="h-4 w-[1px] bg-neutral-800 mx-0.5"></div>
-          <ChevronDown className='text-neutral-500' size={14} />
+          <ChevronDown className="text-neutral-500" size={14} />
         </button>
         <div
           id="version-dropdown"
           class="hidden absolute top-full mt-1 left-0 bg-gh-default border border-gh rounded shadow-lg z-50 min-w-[120px]"
         >
           {
-            ['ES5', 'ES2015', 'ES2020', 'ES2022', 'ESNEXT'].map((tsVersion) => {
+            ['ES5', 'ES2015', 'ES2020', 'ES2022', 'ESNext'].map((tsVersion) => {
               return (
                 <button
                   class="version-option w-full px-3 py-2 text-xs text-left text-gh-primary hover:bg-gh-secondary transition-colors"
@@ -195,7 +195,7 @@ export const prerender = false
 
         <button
           id="run-btn"
-          class="ml-auto self-stretch flex items-center gap-2 px-4 pr-5 py-1.5 bg-gh-success text-white text-xs font-medium hover:bg-gh-success-hover active:bg-gh-success-hover transition-colors duration-150"
+          class="self-stretch flex items-center gap-2 pl-3 pr-3.5 py-1.5 bg-indigo-500 text-white text-xs font-medium hover:bg-gh-success-hover active:bg-gh-success-hover transition-colors duration-150"
         >
           <Play size={16} strokeWidth={2} />
           <span class="tracking-wider mt-0.5">Run</span>
@@ -207,7 +207,7 @@ export const prerender = false
     <div id="loading-overlay" class="absolute inset-0 flex items-center justify-center bg-gh-canvas">
       <div class="flex flex-col items-center gap-4">
         <svg
-          class="loading-spinner w-12 h-12 text-gh-accent"
+          class="loading-spinner w-12 h-12 text-indigo-500"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -230,7 +230,7 @@ export const prerender = false
     <div id="editor" class="flex-1 overflow-hidden opacity-0"></div>
 
     <!-- Output Panel -->
-    <div id="output" class="hidden border-t border-gh bg-gh-canvas shrink-0" style="height: 200px;">
+    <div id="output" class="hidden border-t border-gh bg-gh-darker shrink-0" style="height: 200px;">
       <!-- Resize Handle -->
       <div
         id="resize-handle"
@@ -240,14 +240,14 @@ export const prerender = false
           <div class="w-12 h-0.5 bg-gh-secondary group-hover:bg-gh-accent transition-colors"></div>
         </div>
       </div>
-      <div class="flex items-center justify-between px-4 py-2 bg-gh-darker">
+      <div class="flex items-center justify-between px-4 py-2 bg-gh-canvas border-b border-gh">
         <span class="text-xs font-medium text-gh-primary uppercase tracking-wider">Output</span>
         <button id="clear-output" class="text-xs text-gh-secondary hover:text-gh-primary transition-colors"
           >Clear</button
         >
       </div>
-      <div id="output-content" class="px-4 py-3 overflow-auto bg-gh-darker" style="height: calc(100% - 52px);">
-        <pre id="output-text" class="text-sm font-mono text-green-500! leading-relaxed"></pre>
+      <div id="output-content" class="px-4 py-3 overflow-auto" style="height: calc(100% - 37px);">
+        <pre id="output-text" class="text-sm font-mono text-green-500 leading-relaxed"></pre>
       </div>
     </div>
 
@@ -545,13 +545,16 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
           })
 
           // Hide loading overlay and show editor
-          setTimeout(() => {
-            editorContainer.classList.remove('opacity-0')
-            editorContainer.classList.add('fade-in')
-            setTimeout(() => {
-              loadingOverlay.style.display = 'none'
-            }, 300)
-          }, didRetry ? 500 : 300)
+          setTimeout(
+            () => {
+              editorContainer.classList.remove('opacity-0')
+              editorContainer.classList.add('fade-in')
+              setTimeout(() => {
+                loadingOverlay.style.display = 'none'
+              }, 300)
+            },
+            didRetry ? 500 : 300
+          )
 
           const output = document.getElementById('output')
           const outputText = document.getElementById('output-text')
