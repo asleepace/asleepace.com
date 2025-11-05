@@ -15,24 +15,26 @@ export const prerender = false
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-gray-100 h-full m-0 flex flex-col">
+  <body class="text-gray-100 h-full max-h-screen overscroll-contain m-0 flex flex-col">
     <!-- Toolbar -->
-    <div class="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center gap-3">
-      <span class="text-sm font-mono text-gray-400">TypeScript Editor</span>
-      <button id="run-btn" class="ml-auto px-3 py-1 text-sm bg-green-600 hover:bg-green-700 rounded"> Run </button>
+    <div class="bg-neutral-800 flex items-center gap-3 top-0 left-0 right-0">
+      <span class="text-sm font-mono text-neutral-400 px-4 py-3">TypeScript</span>
+      <span id="ts-version" class="text-xs font-mono text-neutral-600"></span>
+      <button id="run-btn" class="ml-auto px-6 py-3 text-sm bg-blue-500 text-white hover:bg-blue-600"> Run </button>
     </div>
 
-    <!-- Editor -->
-    <div id="editor" class="flex-1"></div>
+      <!-- Editor -->
+      <div id="editor" class="flex-1"></div>
 
-    <!-- Output -->
-    <div id="output" class="bg-gray-800 border-t border-gray-700 p-3 hidden">
-      <div class="text-xs text-gray-400 mb-1">Output:</div>
-      <pre id="output-text" class="text-sm font-mono text-green-400"></pre>
-    </div>
+      <!-- Output -->
+      <div id="output" class="bg-gray-800 border-t bottom-0 left-0 right-0 border-gray-700 p-3">
+        <div class="text-xs text-gray-400 mb-1">Output:</div>
+        <pre id="output-text" class="text-sm font-mono text-green-400"></pre>
+      </div>
 
     <script is:inline src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
-    <script is:inline>
+    <script is:inline src="https://unpkg.com/typescript@latest/lib/typescript.js"></script>
+    <script is:inline defer>
       require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
 
       require(['vs/editor/editor.main'], function () {
@@ -56,7 +58,17 @@ export const prerender = false
           }
 
           try {
-            eval(code)
+            document.getElementById('ts-version').innerText = 'ES2022'
+            // Transpile TypeScript to JavaScript
+            const result = ts.transpileModule(code, {
+              compilerOptions: {
+                module: ts.ModuleKind.Module,
+                target: ts.ScriptTarget.ES2022,
+              },
+            })
+
+            // Execute the transpiled JavaScript
+            eval(result.outputText)
             outputText.textContent = logs.join('\n') || '(no output)'
           } catch (err) {
             outputText.textContent = 'Error: ' + err.message
