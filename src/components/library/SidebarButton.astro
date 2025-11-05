@@ -1,0 +1,32 @@
+---
+import { cn } from '@/lib/utils/cn'
+import { type LucideIconName, type AstroButtonProps } from '@/components/library/types'
+import { getDynamicIcon } from './getDynamicIcon'
+
+interface Props extends AstroButtonProps {
+  className?: string
+  size?: number
+  icon: LucideIconName
+  text: string
+  href: string
+  open: boolean
+}
+
+const { icon, open: isOpen, text, href, size = 16, className, ...buttonProps } = Astro.props
+
+const DisplayedIcon = await getDynamicIcon(icon)
+---
+
+<a class="flex" href={href}>
+  <button
+    class={cn(
+      'hover:bg-neutral-700 hover:*:text-neutral-200 transition-colors duration-300',
+      'flex flex-1 items-center justify-start gap-x-3 px-2 py-2 h-8 rounded-md text-xs',
+      className
+    )}
+    {...buttonProps}
+  >
+    <DisplayedIcon className={cn('text-neutral-400 align-text-bottom')} name={icon} size={size} />
+    <span class={cn('font-sans align-text-bottom', isOpen ? 'visible' : 'hidden')}>{text}</span>
+  </button>
+</a>

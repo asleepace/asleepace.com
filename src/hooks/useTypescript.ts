@@ -1,7 +1,7 @@
 // src/hooks/useTypescript.ts
 
 import { useEffect, useState, useCallback } from 'react'
-import { loadTypeScript, DEFAULT_COMPILER_OPTIONS } from '@/utils/typescript-loader'
+import { loadTypeScript, DEFAULT_COMPILER_OPTIONS } from '@/lib/utils/typescript-loader'
 
 export type TypeScriptCompilerOptions = {
   target?: number

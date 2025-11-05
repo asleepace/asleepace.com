@@ -1,5 +1,5 @@
 import Database from 'bun:sqlite'
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 import chalk from 'chalk'
 
 const print = consoleTag('db:users', chalk.magentaBright)

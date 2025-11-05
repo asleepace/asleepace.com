@@ -1,6 +1,6 @@
 import Database from 'bun:sqlite'
 import { Users, type User } from '@/db'
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 import chalk from 'chalk'
 
 const print = consoleTag('db:sessions', chalk.magentaBright)

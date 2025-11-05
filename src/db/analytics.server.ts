@@ -1,4 +1,4 @@
-import { consoleTag } from '@/utils/tagTime'
+import { consoleTag } from '@/lib/utils/tagTime'
 import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
 import Database from 'bun:sqlite'
 import chalk from 'chalk'

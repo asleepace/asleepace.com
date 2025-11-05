@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { actions } from 'astro:actions'
-import { cn } from '@/utils/cn'
+import { cn } from '@/lib/utils/cn'
 
-const MetricButton = (props: {
-  onClick?: () => void
-  icon: string
-  hoverIcon?: string
-  text: string
-}) => {
+const MetricButton = (props: { onClick?: () => void; icon: string; hoverIcon?: string; text: string }) => {
   const [isHovered, setIsHovered] = useState(false)
   const { hoverIcon = props.icon, icon } = props
   return (
@@ -26,7 +21,6 @@ const MetricButton = (props: {
   )
 }
 
-
 export function PageMetrics(props: { className?: string }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
@@ -44,11 +38,14 @@ export function PageMetrics(props: { className?: string }) {
     const hasLiked = window.localStorage.getItem(likedKey)
     setStorageKey(likedKey)
     setIsLiked(hasLiked === 'true')
-    actions.onPageView({}).then((metrics) => {
-      if (metrics.data) setData(metrics.data)
-    }).catch((err) => {
-      console.error('[PageMetrics] failed to fetch metrics', err)
-    })
+    actions
+      .onPageView({})
+      .then((metrics) => {
+        if (metrics.data) setData(metrics.data)
+      })
+      .catch((err) => {
+        console.error('[PageMetrics] failed to fetch metrics', err)
+      })
   }, [])
 
   useEffect(() => {
@@ -60,11 +57,9 @@ export function PageMetrics(props: { className?: string }) {
   const onClickLike = useCallback(() => {
     const unliked = isLiked
     setIsLiked(!unliked)
-    actions
-      .onPageLike({ referer: window.location.href, unliked })
-      .then((metrics) => {
-        if (metrics.data) setData(metrics.data)
-      })
+    actions.onPageLike({ referer: window.location.href, unliked }).then((metrics) => {
+      if (metrics.data) setData(metrics.data)
+    })
   }, [isLiked])
 
   return (
@@ -76,19 +71,9 @@ export function PageMetrics(props: { className?: string }) {
     >
       <MetricButton icon="👀" text={String(data.views)} />
       {isLiked ? (
-        <MetricButton
-          icon="❤️"
-          hoverIcon="💔"
-          onClick={onClickLike}
-          text={String(data.likes)}
-        />
+        <MetricButton icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(data.likes)} />
       ) : (
-        <MetricButton
-          icon="🤍"
-          hoverIcon="❤️"
-          onClick={onClickLike}
-          text={String(data.likes)}
-        />
+        <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(data.likes)} />
       )}
       <MetricButton icon="💬" text={'0'} />
     </div>

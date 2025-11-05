@@ -1,5 +1,5 @@
 ---
-import { cn } from '@/utils/cn'
+import { cn } from '@/lib/utils/cn'
 import { siteConfig } from '@/consts'
 
 interface Props {
@@ -33,12 +33,7 @@ const capitalize = (tag: string) => {
 <Fragment>
   {
     hasHashTags ? (
-      <div
-        class={cn(
-          'flex flex-row shrink items-center gap-4 justify-center',
-          className
-        )}
-      >
+      <div class={cn('flex flex-row shrink items-center gap-4 justify-center', className)}>
         {tags.map((tag) => {
           return (
             <a

@@ -109,26 +109,23 @@ function useSyntax({
    */
   const lastCursorPosRef = useRef<RangeArray>([0, defaultCode.length])
 
-  // Initialize highlighting for default code
   useEffect(() => {
-    let mounted = true
+    // Only initialize if code actually changed
+    if (rawCode === defaultCode) return
 
+    let mounted = true
     async function initHighlighting() {
       try {
         const highlighted = await highlightCode(defaultCode, language)
         if (mounted) {
           setHighlightedCode(highlighted)
+          setRawCode(defaultCode)
           setIsInitialized(true)
         }
       } catch (error) {
-        console.error('Failed to initialize syntax highlighting:', error)
-        if (mounted) {
-          setHighlightedCode(defaultCode)
-          setIsInitialized(true)
-        }
+        // ...
       }
     }
-
     initHighlighting()
     return () => {
       mounted = false
@@ -247,11 +244,11 @@ export function Code({
   return (
     <div
       className={clsx(
-        'flex flex-col flex-1 grow h-full bg-transparent',
+        'flex flex-col flex-1 min-h-screen h-full bg-transparent',
         className
       )}
     >
-      <pre className="w-full h-full bg-transparent relative">
+      <pre className="w-full h-full min-h-screen bg-transparent relative">
         <code
           dangerouslySetInnerHTML={{ __html: code }}
           className={clsx(

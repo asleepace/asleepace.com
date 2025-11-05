@@ -1,16 +1,9 @@
 import type { AnalyticsData } from '@/db'
 import { useEffect, useState } from 'react'
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  type Row,
-  type RowData,
-  useReactTable,
-} from '@tanstack/react-table'
+import { type ColumnDef, flexRender, getCoreRowModel, type Row, useReactTable } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { cn } from '@/utils/cn'
+import { cn } from '@/lib/utils/cn'
 
 async function fetchAnalytics() {
   const response = await fetch('/api/analytics', {
@@ -181,8 +174,7 @@ const columns: ColumnDef<AnalyticsData>[] = [
     header: 'Tracking',
     cell: ({ row }) => {
       const trackingId: string = row.getValue('tracking_id') ?? '---'
-      const isPresent = trackingId !== '---'
-      return <div className="font-mono text-neutral-600">{trackingId ?? '---'}</div>
+      return <div className="font-mono text-neutral-600">{trackingId}</div>
     },
   },
   {
@@ -195,11 +187,6 @@ const columns: ColumnDef<AnalyticsData>[] = [
     },
   },
 ]
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
 
 function AnalyticsRow({ row, index }: { row: Row<any>; index: number }) {
   const isEvenRow = index % 2 === 0
@@ -219,6 +206,11 @@ function AnalyticsRow({ row, index }: { row: Row<any>; index: number }) {
   )
 }
 
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+}
+
 export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -227,17 +219,15 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   })
 
   return (
-    <Table className="border-none px-8">
-      <TableHeader className="bg-blue-500 border-none shadow-lg sticky top-0">
+    <Table className="border-none">
+      <TableHeader className="bg-blue-500 border-none shadow-lg sticky! top-0 z-10">
         {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow className="sticky top-0 border-none" key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
-              return (
-                <TableHead className="font-semibold font-mono text-white text-shadow-2xs" key={header.id}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              )
-            })}
+          <TableRow className="border-none" key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead className="font-semibold font-mono text-white text-shadow-2xs" key={header.id}>
+                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+              </TableHead>
+            ))}
           </TableRow>
         ))}
       </TableHeader>
@@ -258,5 +248,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
 export function AnalyticsTable() {
   const data = useAnalytics()
-  return <DataTable columns={columns} data={data} />
+  return (
+    <div className="h-full overflow-auto">
+      <DataTable columns={columns} data={data} />
+    </div>
+  )
 }

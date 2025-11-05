@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import packageJson from '../package.json'
-import { consoleTag } from './utils/tagTime'
+import { consoleTag } from './lib/utils/tagTime'
 
 const print = consoleTag('config', chalk.magenta)
 
