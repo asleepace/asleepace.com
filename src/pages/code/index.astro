@@ -1,6 +1,6 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { Play } from 'lucide-react'
+import { Play, Settings, ChevronDown } from 'lucide-react'
 
 export const prerender = false
 ---
@@ -10,55 +10,107 @@ export const prerender = false
   <head>
     <BaseHead title={'Code'} description={'a simple online code playground.'} />
     <style>
-      /* Custom scrollbar for output panel */
-      #output-content::-webkit-scrollbar {
+      /* Custom scrollbar for output panel and settings modal */
+      #output-content::-webkit-scrollbar,
+      #settings-body::-webkit-scrollbar {
         width: 10px;
         height: 10px;
       }
 
-      #output-content::-webkit-scrollbar-track {
+      #output-content::-webkit-scrollbar-track,
+      #settings-body::-webkit-scrollbar-track {
         background: transparent;
       }
 
-      #output-content::-webkit-scrollbar-thumb {
+      #output-content::-webkit-scrollbar-thumb,
+      #settings-body::-webkit-scrollbar-thumb {
         background: #3e3e42;
         border-radius: 5px;
         border: 2px solid transparent;
         background-clip: padding-box;
       }
 
-      #output-content::-webkit-scrollbar-thumb:hover {
+      #output-content::-webkit-scrollbar-thumb:hover,
+      #settings-body::-webkit-scrollbar-thumb:hover {
         background: #4ec9b0;
         border: 2px solid transparent;
         background-clip: padding-box;
       }
 
-      #output-content::-webkit-scrollbar-corner {
+      #output-content::-webkit-scrollbar-corner,
+      #settings-body::-webkit-scrollbar-corner {
         background: transparent;
       }
     </style>
   </head>
   <body class="h-full m-0 flex flex-col overflow-hidden bg-[#1e1e1e]">
     <!-- Toolbar -->
-    <div class="bg-[#252526] border-b border-[#3e3e42] flex items-center h-12 px-4 pr-0 gap-4 shrink-0">
+    <div class="bg-[#252526] border-b border-[#3e3e42] flex items-center h-12 px-4 pr-2 gap-4 shrink-0">
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-[#cccccc] tracking-wide">TypeScript</span>
         <span id="ts-version" class="text-xs text-[#858585] font-mono"></span>
       </div>
-      <button
-        id="run-btn"
-        class="ml-auto self-stretch flex items-center gap-2 px-4 pr-5 py-2 bg-indigo-500 text-white text-xs font-medium hover:bg-indigo-600 active:bg-indigo-700 transition-colors duration-150"
-      >
-        <Play size={16} strokeWidth={2} />
-        <span class="tracking-wider mt-0.5">Run</span>
-      </button>
+
+      <!-- Version Dropdown -->
+      <div class="relative">
+        <button
+          id="version-btn"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#cccccc] bg-[#3e3e42] hover:bg-[#4e4e52] rounded transition-colors"
+        >
+          <span id="selected-version">ES2022</span>
+          <ChevronDown size={14} />
+        </button>
+        <div
+          id="version-dropdown"
+          class="hidden absolute top-full mt-1 left-0 bg-[#252526] border border-[#3e3e42] rounded shadow-lg z-50 min-w-[120px]"
+        >
+          <button
+            class="version-option w-full px-3 py-2 text-xs text-left text-[#cccccc] hover:bg-[#3e3e42] transition-colors"
+            data-version="ES5">ES5</button
+          >
+          <button
+            class="version-option w-full px-3 py-2 text-xs text-left text-[#cccccc] hover:bg-[#3e3e42] transition-colors"
+            data-version="ES2015">ES2015</button
+          >
+          <button
+            class="version-option w-full px-3 py-2 text-xs text-left text-[#cccccc] hover:bg-[#3e3e42] transition-colors"
+            data-version="ES2020">ES2020</button
+          >
+          <button
+            class="version-option w-full px-3 py-2 text-xs text-left text-[#cccccc] hover:bg-[#3e3e42] transition-colors"
+            data-version="ES2022">ES2022</button
+          >
+          <button
+            class="version-option w-full px-3 py-2 text-xs text-left text-[#cccccc] hover:bg-[#3e3e42] transition-colors"
+            data-version="ESNext">ESNext</button
+          >
+        </div>
+      </div>
+
+      <!-- Settings Button -->
+      <div class="flex flex-row ml-auto rounded overflow-clip">
+        <button
+          id="settings-btn"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#cccccc] bg-[#3e3e42] hover:bg-[#4e4e52] transition-colors"
+        >
+          <Settings size={14} />
+        </button>
+
+        <button
+          id="run-btn"
+          class="ml-auto self-stretch flex items-center gap-2 px-4 pr-5 py-2 bg-indigo-500 text-white text-xs font-medium hover:bg-indigo-600 active:bg-indigo-700 transition-colors duration-150"
+        >
+          <Play size={16} strokeWidth={2} />
+          <span class="tracking-wider mt-0.5">Run</span>
+        </button>
+      </div>
     </div>
 
     <!-- Editor -->
     <div id="editor" class="flex-1 overflow-hidden"></div>
 
     <!-- Output Panel -->
-    <div id="output" class="hidden border-t border-[#3e3e42] bg-[#1e1e1e] shrink-0" style="height: 200px;">
+    <div id="output" class="hidden border-t border-[#3e3e42] bg-neutral-900 shrink-0" style="height: 200px;">
       <!-- Resize Handle -->
       <div
         id="resize-handle"
@@ -73,7 +125,223 @@ export const prerender = false
         <button id="clear-output" class="text-xs text-[#858585] hover:text-[#cccccc] transition-colors">Clear</button>
       </div>
       <div id="output-content" class="px-4 py-3 overflow-auto" style="height: calc(100% - 52px);">
-        <pre id="output-text" class="text-sm font-mono text-[#4ec9b0] leading-relaxed"></pre>
+        <pre id="output-text" class="text-sm font-mono text-green-500! leading-relaxed"></pre>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center">
+      <div class="bg-[#252526] border border-[#3e3e42] rounded-lg w-full max-w-md mx-4 shadow-2xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[#3e3e42]">
+          <h2 class="text-base font-semibold text-[#cccccc]">Editor Settings</h2>
+          <button id="close-settings" class="text-[#858585] hover:text-[#cccccc] transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div id="settings-body" class="px-5 py-4 space-y-4 max-h-[60vh] overflow-y-auto">
+          <!-- Font Size -->
+          <div>
+            <label class="block text-xs font-medium text-[#cccccc] mb-2">Font Size</label>
+            <input
+              id="font-size"
+              type="range"
+              min="10"
+              max="24"
+              value="14"
+              class="w-full h-1.5 bg-[#3e3e42] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            />
+            <div class="flex justify-between text-xs text-[#858585] mt-1">
+              <span>10px</span>
+              <span id="font-size-value">14px</span>
+              <span>24px</span>
+            </div>
+          </div>
+
+          <!-- Line Height -->
+          <div>
+            <label class="block text-xs font-medium text-[#cccccc] mb-2">Line Height</label>
+            <input
+              id="line-height"
+              type="range"
+              min="16"
+              max="32"
+              value="22"
+              class="w-full h-1.5 bg-[#3e3e42] rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            />
+            <div class="flex justify-between text-xs text-[#858585] mt-1">
+              <span>16px</span>
+              <span id="line-height-value">22px</span>
+              <span>32px</span>
+            </div>
+          </div>
+
+          <!-- Minimap -->
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-medium text-[#cccccc]">Show Minimap</label>
+            <button
+              id="minimap-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-[#3e3e42]"
+              data-enabled="false"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+              ></span>
+            </button>
+          </div>
+
+          <!-- Font Ligatures -->
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-medium text-[#cccccc]">Font Ligatures</label>
+            <button
+              id="ligatures-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-indigo-500"
+              data-enabled="true"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"
+              ></span>
+            </button>
+          </div>
+
+          <!-- Line Numbers -->
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-medium text-[#cccccc]">Line Numbers</label>
+            <button
+              id="line-numbers-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-indigo-500"
+              data-enabled="true"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"
+              ></span>
+            </button>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-[#3e3e42] my-4"></div>
+
+          <!-- TypeScript Options Header -->
+          <div class="mb-3">
+            <h3 class="text-sm font-semibold text-[#cccccc]">TypeScript Compiler Options</h3>
+            <p class="text-xs text-[#858585] mt-0.5">Configure how TypeScript compiles your code</p>
+          </div>
+
+          <!-- Strict Mode -->
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="text-xs font-medium text-[#cccccc]">Strict Mode</label>
+              <p class="text-xs text-[#858585] mt-0.5">Enable all strict type checking options</p>
+            </div>
+            <button
+              id="strict-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-[#3e3e42]"
+              data-enabled="false"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+              ></span>
+            </button>
+          </div>
+
+          <!-- No Implicit Any -->
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="text-xs font-medium text-[#cccccc]">No Implicit Any</label>
+              <p class="text-xs text-[#858585] mt-0.5">Raise error on expressions with implied 'any' type</p>
+            </div>
+            <button
+              id="no-implicit-any-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-[#3e3e42]"
+              data-enabled="false"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+              ></span>
+            </button>
+          </div>
+
+          <!-- Strict Null Checks -->
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="text-xs font-medium text-[#cccccc]">Strict Null Checks</label>
+              <p class="text-xs text-[#858585] mt-0.5">Differentiate between null/undefined and other types</p>
+            </div>
+            <button
+              id="strict-null-checks-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-[#3e3e42]"
+              data-enabled="false"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+              ></span>
+            </button>
+          </div>
+
+          <!-- No Unused Locals -->
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="text-xs font-medium text-[#cccccc]">No Unused Locals</label>
+              <p class="text-xs text-[#858585] mt-0.5">Report errors on unused local variables</p>
+            </div>
+            <button
+              id="no-unused-locals-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-[#3e3e42]"
+              data-enabled="false"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+              ></span>
+            </button>
+          </div>
+
+          <!-- No Unused Parameters -->
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="text-xs font-medium text-[#cccccc]">No Unused Parameters</label>
+              <p class="text-xs text-[#858585] mt-0.5">Report errors on unused function parameters</p>
+            </div>
+            <button
+              id="no-unused-parameters-toggle"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-[#3e3e42]"
+              data-enabled="false"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"
+              ></span>
+            </button>
+          </div>
+
+          <!-- Module System -->
+          <div>
+            <label class="block text-xs font-medium text-[#cccccc] mb-2">Module System</label>
+            <select
+              id="module-select"
+              class="w-full px-3 py-2 text-xs bg-[#3e3e42] text-[#cccccc] rounded border border-[#3e3e42] hover:border-[#4e4e52] focus:outline-none focus:border-indigo-500 transition-colors"
+            >
+              <option value="None">None</option>
+              <option value="CommonJS">CommonJS</option>
+              <option value="AMD">AMD</option>
+              <option value="UMD">UMD</option>
+              <option value="System">System</option>
+              <option value="ES2015" selected>ES2015/ES6</option>
+              <option value="ES2020">ES2020</option>
+              <option value="ESNext">ESNext</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-[#3e3e42]">
+          <button
+            id="reset-settings"
+            class="px-4 py-2 text-xs font-medium text-[#cccccc] hover:text-white transition-colors"
+          >
+            Reset to Default
+          </button>
+          <button
+            id="apply-settings"
+            class="px-4 py-2 text-xs font-medium bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+          >
+            Apply
+          </button>
+        </div>
       </div>
     </div>
 
@@ -118,8 +386,50 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
         const clearBtn = document.getElementById('clear-output')
         const resizeHandle = document.getElementById('resize-handle')
 
+        // Version dropdown elements
+        const versionBtn = document.getElementById('version-btn')
+        const versionDropdown = document.getElementById('version-dropdown')
+        const selectedVersion = document.getElementById('selected-version')
+        const versionOptions = document.querySelectorAll('.version-option')
+
+        // Settings modal elements
+        const settingsBtn = document.getElementById('settings-btn')
+        const settingsModal = document.getElementById('settings-modal')
+        const closeSettings = document.getElementById('close-settings')
+        const applySettings = document.getElementById('apply-settings')
+        const resetSettings = document.getElementById('reset-settings')
+
+        // Settings controls
+        const fontSizeInput = document.getElementById('font-size')
+        const fontSizeValue = document.getElementById('font-size-value')
+        const lineHeightInput = document.getElementById('line-height')
+        const lineHeightValue = document.getElementById('line-height-value')
+        const minimapToggle = document.getElementById('minimap-toggle')
+        const ligaturesToggle = document.getElementById('ligatures-toggle')
+        const lineNumbersToggle = document.getElementById('line-numbers-toggle')
+
+        // TypeScript compiler options controls
+        const strictToggle = document.getElementById('strict-toggle')
+        const noImplicitAnyToggle = document.getElementById('no-implicit-any-toggle')
+        const strictNullChecksToggle = document.getElementById('strict-null-checks-toggle')
+        const noUnusedLocalsToggle = document.getElementById('no-unused-locals-toggle')
+        const noUnusedParametersToggle = document.getElementById('no-unused-parameters-toggle')
+        const moduleSelect = document.getElementById('module-select')
+
         // Set TypeScript version
         tsVersion.innerText = `v${ts.version}`
+
+        // Current compiler options
+        let currentTarget = ts.ScriptTarget.ES2022
+        let compilerOptions = {
+          module: ts.ModuleKind.ES2015,
+          target: ts.ScriptTarget.ES2022,
+          strict: false,
+          noImplicitAny: false,
+          strictNullChecks: false,
+          noUnusedLocals: false,
+          noUnusedParameters: false,
+        }
 
         // Resizable output panel
         let isResizing = false
@@ -146,6 +456,197 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
             isResizing = false
             document.body.style.cursor = ''
             document.body.style.userSelect = ''
+          }
+        })
+
+        // Version dropdown handlers
+        versionBtn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          versionDropdown.classList.toggle('hidden')
+        })
+
+        versionOptions.forEach((option) => {
+          option.addEventListener('click', () => {
+            const version = option.getAttribute('data-version')
+            selectedVersion.textContent = version
+            versionDropdown.classList.add('hidden')
+
+            // Update transpile target
+            const targetMap = {
+              ES5: ts.ScriptTarget.ES5,
+              ES2015: ts.ScriptTarget.ES2015,
+              ES2020: ts.ScriptTarget.ES2020,
+              ES2022: ts.ScriptTarget.ES2022,
+              ESNext: ts.ScriptTarget.ESNext,
+            }
+            currentTarget = targetMap[version] || ts.ScriptTarget.ES2022
+            compilerOptions.target = currentTarget
+          })
+        })
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          versionDropdown.classList.add('hidden')
+        })
+
+        // Settings modal handlers
+        settingsBtn.addEventListener('click', () => {
+          settingsModal.classList.remove('hidden')
+          settingsModal.classList.add('flex')
+        })
+
+        closeSettings.addEventListener('click', () => {
+          settingsModal.classList.add('hidden')
+          settingsModal.classList.remove('flex')
+        })
+
+        settingsModal.addEventListener('click', (e) => {
+          if (e.target === settingsModal) {
+            settingsModal.classList.add('hidden')
+            settingsModal.classList.remove('flex')
+          }
+        })
+
+        // Settings controls
+        fontSizeInput.addEventListener('input', (e) => {
+          fontSizeValue.textContent = e.target.value + 'px'
+        })
+
+        lineHeightInput.addEventListener('input', (e) => {
+          lineHeightValue.textContent = e.target.value + 'px'
+        })
+
+        // Toggle helpers
+        function toggleSwitch(button) {
+          const isEnabled = button.getAttribute('data-enabled') === 'true'
+          const newState = !isEnabled
+          button.setAttribute('data-enabled', newState)
+
+          const toggle = button.querySelector('span')
+          if (newState) {
+            button.classList.remove('bg-[#3e3e42]')
+            button.classList.add('bg-indigo-500')
+            toggle.classList.remove('translate-x-1')
+            toggle.classList.add('translate-x-6')
+          } else {
+            button.classList.remove('bg-indigo-500')
+            button.classList.add('bg-[#3e3e42]')
+            toggle.classList.remove('translate-x-6')
+            toggle.classList.add('translate-x-1')
+          }
+          return newState
+        }
+
+        minimapToggle.addEventListener('click', () => toggleSwitch(minimapToggle))
+        ligaturesToggle.addEventListener('click', () => toggleSwitch(ligaturesToggle))
+        lineNumbersToggle.addEventListener('click', () => toggleSwitch(lineNumbersToggle))
+
+        // TypeScript option toggles
+        strictToggle.addEventListener('click', () => toggleSwitch(strictToggle))
+        noImplicitAnyToggle.addEventListener('click', () => toggleSwitch(noImplicitAnyToggle))
+        strictNullChecksToggle.addEventListener('click', () => toggleSwitch(strictNullChecksToggle))
+        noUnusedLocalsToggle.addEventListener('click', () => toggleSwitch(noUnusedLocalsToggle))
+        noUnusedParametersToggle.addEventListener('click', () => toggleSwitch(noUnusedParametersToggle))
+
+        // Apply settings
+        applySettings.addEventListener('click', () => {
+          const fontSize = parseInt(fontSizeInput.value)
+          const lineHeight = parseInt(lineHeightInput.value)
+          const minimap = minimapToggle.getAttribute('data-enabled') === 'true'
+          const ligatures = ligaturesToggle.getAttribute('data-enabled') === 'true'
+          const lineNumbers = lineNumbersToggle.getAttribute('data-enabled') === 'true'
+
+          // Update editor options
+          editor.updateOptions({
+            fontSize: fontSize,
+            lineHeight: lineHeight,
+            minimap: { enabled: minimap },
+            fontLigatures: ligatures,
+            lineNumbers: lineNumbers ? 'on' : 'off',
+          })
+
+          // Update compiler options
+          const moduleMap = {
+            None: ts.ModuleKind.None,
+            CommonJS: ts.ModuleKind.CommonJS,
+            AMD: ts.ModuleKind.AMD,
+            UMD: ts.ModuleKind.UMD,
+            System: ts.ModuleKind.System,
+            ES2015: ts.ModuleKind.ES2015,
+            ES2020: ts.ModuleKind.ES2020,
+            ESNext: ts.ModuleKind.ESNext,
+          }
+
+          compilerOptions = {
+            module: moduleMap[moduleSelect.value] || ts.ModuleKind.ES2015,
+            target: currentTarget,
+            strict: strictToggle.getAttribute('data-enabled') === 'true',
+            noImplicitAny: noImplicitAnyToggle.getAttribute('data-enabled') === 'true',
+            strictNullChecks: strictNullChecksToggle.getAttribute('data-enabled') === 'true',
+            noUnusedLocals: noUnusedLocalsToggle.getAttribute('data-enabled') === 'true',
+            noUnusedParameters: noUnusedParametersToggle.getAttribute('data-enabled') === 'true',
+          }
+
+          settingsModal.classList.add('hidden')
+          settingsModal.classList.remove('flex')
+        })
+
+        // Reset settings
+        resetSettings.addEventListener('click', () => {
+          // Reset editor settings
+          fontSizeInput.value = 14
+          fontSizeValue.textContent = '14px'
+          lineHeightInput.value = 22
+          lineHeightValue.textContent = '22px'
+
+          // Helper to reset toggle to off
+          const resetToggleOff = (toggle) => {
+            toggle.setAttribute('data-enabled', 'false')
+            toggle.classList.remove('bg-indigo-500')
+            toggle.classList.add('bg-[#3e3e42]')
+            toggle.querySelector('span').classList.remove('translate-x-6')
+            toggle.querySelector('span').classList.add('translate-x-1')
+          }
+
+          // Helper to reset toggle to on
+          const resetToggleOn = (toggle) => {
+            toggle.setAttribute('data-enabled', 'true')
+            toggle.classList.remove('bg-[#3e3e42]')
+            toggle.classList.add('bg-indigo-500')
+            toggle.querySelector('span').classList.remove('translate-x-1')
+            toggle.querySelector('span').classList.add('translate-x-6')
+          }
+
+          resetToggleOff(minimapToggle)
+          resetToggleOn(ligaturesToggle)
+          resetToggleOn(lineNumbersToggle)
+
+          // Reset TypeScript options
+          resetToggleOff(strictToggle)
+          resetToggleOff(noImplicitAnyToggle)
+          resetToggleOff(strictNullChecksToggle)
+          resetToggleOff(noUnusedLocalsToggle)
+          resetToggleOff(noUnusedParametersToggle)
+
+          moduleSelect.value = 'ES2015'
+
+          // Apply defaults
+          editor.updateOptions({
+            fontSize: 14,
+            lineHeight: 22,
+            minimap: { enabled: false },
+            fontLigatures: true,
+            lineNumbers: 'on',
+          })
+
+          compilerOptions = {
+            module: ts.ModuleKind.ES2015,
+            target: currentTarget,
+            strict: false,
+            noImplicitAny: false,
+            strictNullChecks: false,
+            noUnusedLocals: false,
+            noUnusedParameters: false,
           }
         })
 
@@ -177,10 +678,7 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
           try {
             // Transpile TypeScript to JavaScript
             const result = ts.transpileModule(code, {
-              compilerOptions: {
-                module: ts.ModuleKind.ES2015,
-                target: ts.ScriptTarget.ES2022,
-              },
+              compilerOptions: compilerOptions,
             })
 
             // Execute the transpiled JavaScript
@@ -191,11 +689,11 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
               allOutput.length > 0 ? allOutput.join('\n') : '✓ Code executed successfully (no output)'
             outputText.className =
               errors.length > 0
-                ? 'text-sm font-mono text-[#f48771] leading-relaxed'
-                : 'text-sm font-mono text-[#4ec9b0] leading-relaxed'
+                ? 'text-sm font-mono text-red-500 leading-relaxed'
+                : 'text-sm font-mono text-green-500 leading-relaxed'
           } catch (err) {
             outputText.textContent = '✗ ' + err.message
-            outputText.className = 'text-sm font-mono text-[#f48771] leading-relaxed'
+            outputText.className = 'text-sm font-mono text-red-500 leading-relaxed'
           }
 
           console.log = originalLog
