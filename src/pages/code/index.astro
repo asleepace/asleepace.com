@@ -41,6 +41,31 @@ export const prerender = false
       #settings-body::-webkit-scrollbar-corner {
         background: transparent;
       }
+
+      /* Loading spinner animation */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      /* Fade in animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.3s ease-in;
+      }
     </style>
   </head>
   <body class="h-full m-0 flex flex-col overflow-hidden bg-[#1e1e1e]">
@@ -106,8 +131,31 @@ export const prerender = false
       </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="absolute inset-0 flex items-center justify-center bg-[#1e1e1e]">
+      <div class="flex flex-col items-center gap-4">
+        <svg
+          class="loading-spinner w-12 h-12 text-indigo-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <div class="text-center">
+          <p class="text-sm font-medium text-[#cccccc]">Loading Editor</p>
+          <p class="text-xs text-[#858585] mt-1">Initializing Monaco & TypeScript...</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Editor -->
-    <div id="editor" class="flex-1 overflow-hidden"></div>
+    <div id="editor" class="flex-1 overflow-hidden opacity-0"></div>
 
     <!-- Output Panel -->
     <div id="output" class="hidden border-t border-[#3e3e42] bg-neutral-900 shrink-0" style="height: 200px;">
@@ -347,12 +395,22 @@ export const prerender = false
 
     <script is:inline src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
     <script is:inline src="https://unpkg.com/typescript@latest/lib/typescript.js"></script>
-    <script is:inline defer>
-      require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
+    <script is:inline>
+      // Wait for dependencies to load
+      function initEditor() {
+        if (typeof require === 'undefined' || typeof ts === 'undefined') {
+          setTimeout(initEditor, 300)
+          return
+        }
 
-      require(['vs/editor/editor.main'], function () {
-        const editor = monaco.editor.create(document.getElementById('editor'), {
-          value: `const greeting: string = "Hello, TypeScript!"
+        require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
+
+        require(['vs/editor/editor.main'], function () {
+          const editorContainer = document.getElementById('editor')
+          const loadingOverlay = document.getElementById('loading-overlay')
+
+          const editor = monaco.editor.create(editorContainer, {
+            value: `const greeting: string = "Hello, TypeScript!"
 console.log(greeting)
 
 function add(a: number, b: number): number {
@@ -362,350 +420,363 @@ function add(a: number, b: number): number {
 console.log(\`2 + 3 = \${add(2, 3)}\`)
 
 // Try editing and running your code!`,
-          language: 'typescript',
-          theme: 'vs-dark',
-          automaticLayout: true,
-          fontSize: 14,
-          lineHeight: 22,
-          padding: { top: 16, bottom: 16 },
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
-          fontLigatures: true,
-          renderLineHighlight: 'line',
-          scrollbar: {
-            verticalScrollbarSize: 8,
-            horizontalScrollbarSize: 8,
-          },
-        })
-
-        const output = document.getElementById('output')
-        const outputText = document.getElementById('output-text')
-        const tsVersion = document.getElementById('ts-version')
-        const runBtn = document.getElementById('run-btn')
-        const clearBtn = document.getElementById('clear-output')
-        const resizeHandle = document.getElementById('resize-handle')
-
-        // Version dropdown elements
-        const versionBtn = document.getElementById('version-btn')
-        const versionDropdown = document.getElementById('version-dropdown')
-        const selectedVersion = document.getElementById('selected-version')
-        const versionOptions = document.querySelectorAll('.version-option')
-
-        // Settings modal elements
-        const settingsBtn = document.getElementById('settings-btn')
-        const settingsModal = document.getElementById('settings-modal')
-        const closeSettings = document.getElementById('close-settings')
-        const applySettings = document.getElementById('apply-settings')
-        const resetSettings = document.getElementById('reset-settings')
-
-        // Settings controls
-        const fontSizeInput = document.getElementById('font-size')
-        const fontSizeValue = document.getElementById('font-size-value')
-        const lineHeightInput = document.getElementById('line-height')
-        const lineHeightValue = document.getElementById('line-height-value')
-        const minimapToggle = document.getElementById('minimap-toggle')
-        const ligaturesToggle = document.getElementById('ligatures-toggle')
-        const lineNumbersToggle = document.getElementById('line-numbers-toggle')
-
-        // TypeScript compiler options controls
-        const strictToggle = document.getElementById('strict-toggle')
-        const noImplicitAnyToggle = document.getElementById('no-implicit-any-toggle')
-        const strictNullChecksToggle = document.getElementById('strict-null-checks-toggle')
-        const noUnusedLocalsToggle = document.getElementById('no-unused-locals-toggle')
-        const noUnusedParametersToggle = document.getElementById('no-unused-parameters-toggle')
-        const moduleSelect = document.getElementById('module-select')
-
-        // Set TypeScript version
-        tsVersion.innerText = `v${ts.version}`
-
-        // Current compiler options
-        let currentTarget = ts.ScriptTarget.ES2022
-        let compilerOptions = {
-          module: ts.ModuleKind.ES2015,
-          target: ts.ScriptTarget.ES2022,
-          strict: false,
-          noImplicitAny: false,
-          strictNullChecks: false,
-          noUnusedLocals: false,
-          noUnusedParameters: false,
-        }
-
-        // Resizable output panel
-        let isResizing = false
-        let startY = 0
-        let startHeight = 0
-
-        resizeHandle.addEventListener('mousedown', (e) => {
-          isResizing = true
-          startY = e.clientY
-          startHeight = output.offsetHeight
-          document.body.style.cursor = 'ns-resize'
-          document.body.style.userSelect = 'none'
-        })
-
-        document.addEventListener('mousemove', (e) => {
-          if (!isResizing) return
-          const delta = startY - e.clientY
-          const newHeight = Math.max(100, Math.min(window.innerHeight - 100, startHeight + delta))
-          output.style.height = newHeight + 'px'
-        })
-
-        document.addEventListener('mouseup', () => {
-          if (isResizing) {
-            isResizing = false
-            document.body.style.cursor = ''
-            document.body.style.userSelect = ''
-          }
-        })
-
-        // Version dropdown handlers
-        versionBtn.addEventListener('click', (e) => {
-          e.stopPropagation()
-          versionDropdown.classList.toggle('hidden')
-        })
-
-        versionOptions.forEach((option) => {
-          option.addEventListener('click', () => {
-            const version = option.getAttribute('data-version')
-            selectedVersion.textContent = version
-            versionDropdown.classList.add('hidden')
-
-            // Update transpile target
-            const targetMap = {
-              ES5: ts.ScriptTarget.ES5,
-              ES2015: ts.ScriptTarget.ES2015,
-              ES2020: ts.ScriptTarget.ES2020,
-              ES2022: ts.ScriptTarget.ES2022,
-              ESNext: ts.ScriptTarget.ESNext,
-            }
-            currentTarget = targetMap[version] || ts.ScriptTarget.ES2022
-            compilerOptions.target = currentTarget
-          })
-        })
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', () => {
-          versionDropdown.classList.add('hidden')
-        })
-
-        // Settings modal handlers
-        settingsBtn.addEventListener('click', () => {
-          settingsModal.classList.remove('hidden')
-          settingsModal.classList.add('flex')
-        })
-
-        closeSettings.addEventListener('click', () => {
-          settingsModal.classList.add('hidden')
-          settingsModal.classList.remove('flex')
-        })
-
-        settingsModal.addEventListener('click', (e) => {
-          if (e.target === settingsModal) {
-            settingsModal.classList.add('hidden')
-            settingsModal.classList.remove('flex')
-          }
-        })
-
-        // Settings controls
-        fontSizeInput.addEventListener('input', (e) => {
-          fontSizeValue.textContent = e.target.value + 'px'
-        })
-
-        lineHeightInput.addEventListener('input', (e) => {
-          lineHeightValue.textContent = e.target.value + 'px'
-        })
-
-        // Toggle helpers
-        function toggleSwitch(button) {
-          const isEnabled = button.getAttribute('data-enabled') === 'true'
-          const newState = !isEnabled
-          button.setAttribute('data-enabled', newState)
-
-          const toggle = button.querySelector('span')
-          if (newState) {
-            button.classList.remove('bg-[#3e3e42]')
-            button.classList.add('bg-indigo-500')
-            toggle.classList.remove('translate-x-1')
-            toggle.classList.add('translate-x-6')
-          } else {
-            button.classList.remove('bg-indigo-500')
-            button.classList.add('bg-[#3e3e42]')
-            toggle.classList.remove('translate-x-6')
-            toggle.classList.add('translate-x-1')
-          }
-          return newState
-        }
-
-        minimapToggle.addEventListener('click', () => toggleSwitch(minimapToggle))
-        ligaturesToggle.addEventListener('click', () => toggleSwitch(ligaturesToggle))
-        lineNumbersToggle.addEventListener('click', () => toggleSwitch(lineNumbersToggle))
-
-        // TypeScript option toggles
-        strictToggle.addEventListener('click', () => toggleSwitch(strictToggle))
-        noImplicitAnyToggle.addEventListener('click', () => toggleSwitch(noImplicitAnyToggle))
-        strictNullChecksToggle.addEventListener('click', () => toggleSwitch(strictNullChecksToggle))
-        noUnusedLocalsToggle.addEventListener('click', () => toggleSwitch(noUnusedLocalsToggle))
-        noUnusedParametersToggle.addEventListener('click', () => toggleSwitch(noUnusedParametersToggle))
-
-        // Apply settings
-        applySettings.addEventListener('click', () => {
-          const fontSize = parseInt(fontSizeInput.value)
-          const lineHeight = parseInt(lineHeightInput.value)
-          const minimap = minimapToggle.getAttribute('data-enabled') === 'true'
-          const ligatures = ligaturesToggle.getAttribute('data-enabled') === 'true'
-          const lineNumbers = lineNumbersToggle.getAttribute('data-enabled') === 'true'
-
-          // Update editor options
-          editor.updateOptions({
-            fontSize: fontSize,
-            lineHeight: lineHeight,
-            minimap: { enabled: minimap },
-            fontLigatures: ligatures,
-            lineNumbers: lineNumbers ? 'on' : 'off',
-          })
-
-          // Update compiler options
-          const moduleMap = {
-            None: ts.ModuleKind.None,
-            CommonJS: ts.ModuleKind.CommonJS,
-            AMD: ts.ModuleKind.AMD,
-            UMD: ts.ModuleKind.UMD,
-            System: ts.ModuleKind.System,
-            ES2015: ts.ModuleKind.ES2015,
-            ES2020: ts.ModuleKind.ES2020,
-            ESNext: ts.ModuleKind.ESNext,
-          }
-
-          compilerOptions = {
-            module: moduleMap[moduleSelect.value] || ts.ModuleKind.ES2015,
-            target: currentTarget,
-            strict: strictToggle.getAttribute('data-enabled') === 'true',
-            noImplicitAny: noImplicitAnyToggle.getAttribute('data-enabled') === 'true',
-            strictNullChecks: strictNullChecksToggle.getAttribute('data-enabled') === 'true',
-            noUnusedLocals: noUnusedLocalsToggle.getAttribute('data-enabled') === 'true',
-            noUnusedParameters: noUnusedParametersToggle.getAttribute('data-enabled') === 'true',
-          }
-
-          settingsModal.classList.add('hidden')
-          settingsModal.classList.remove('flex')
-        })
-
-        // Reset settings
-        resetSettings.addEventListener('click', () => {
-          // Reset editor settings
-          fontSizeInput.value = 14
-          fontSizeValue.textContent = '14px'
-          lineHeightInput.value = 22
-          lineHeightValue.textContent = '22px'
-
-          // Helper to reset toggle to off
-          const resetToggleOff = (toggle) => {
-            toggle.setAttribute('data-enabled', 'false')
-            toggle.classList.remove('bg-indigo-500')
-            toggle.classList.add('bg-[#3e3e42]')
-            toggle.querySelector('span').classList.remove('translate-x-6')
-            toggle.querySelector('span').classList.add('translate-x-1')
-          }
-
-          // Helper to reset toggle to on
-          const resetToggleOn = (toggle) => {
-            toggle.setAttribute('data-enabled', 'true')
-            toggle.classList.remove('bg-[#3e3e42]')
-            toggle.classList.add('bg-indigo-500')
-            toggle.querySelector('span').classList.remove('translate-x-1')
-            toggle.querySelector('span').classList.add('translate-x-6')
-          }
-
-          resetToggleOff(minimapToggle)
-          resetToggleOn(ligaturesToggle)
-          resetToggleOn(lineNumbersToggle)
-
-          // Reset TypeScript options
-          resetToggleOff(strictToggle)
-          resetToggleOff(noImplicitAnyToggle)
-          resetToggleOff(strictNullChecksToggle)
-          resetToggleOff(noUnusedLocalsToggle)
-          resetToggleOff(noUnusedParametersToggle)
-
-          moduleSelect.value = 'ES2015'
-
-          // Apply defaults
-          editor.updateOptions({
+            language: 'typescript',
+            theme: 'vs-dark',
+            automaticLayout: true,
             fontSize: 14,
             lineHeight: 22,
+            padding: { top: 16, bottom: 16 },
             minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
             fontLigatures: true,
-            lineNumbers: 'on',
+            renderLineHighlight: 'line',
+            scrollbar: {
+              verticalScrollbarSize: 8,
+              horizontalScrollbarSize: 8,
+            },
           })
 
-          compilerOptions = {
+          // Hide loading overlay and show editor
+          setTimeout(() => {
+            editorContainer.classList.remove('opacity-0')
+            editorContainer.classList.add('fade-in')
+            setTimeout(() => {
+              loadingOverlay.style.display = 'none'
+            }, 500)
+          }, 500)
+
+          const output = document.getElementById('output')
+          const outputText = document.getElementById('output-text')
+          const tsVersion = document.getElementById('ts-version')
+          const runBtn = document.getElementById('run-btn')
+          const clearBtn = document.getElementById('clear-output')
+          const resizeHandle = document.getElementById('resize-handle')
+
+          // Version dropdown elements
+          const versionBtn = document.getElementById('version-btn')
+          const versionDropdown = document.getElementById('version-dropdown')
+          const selectedVersion = document.getElementById('selected-version')
+          const versionOptions = document.querySelectorAll('.version-option')
+
+          // Settings modal elements
+          const settingsBtn = document.getElementById('settings-btn')
+          const settingsModal = document.getElementById('settings-modal')
+          const closeSettings = document.getElementById('close-settings')
+          const applySettings = document.getElementById('apply-settings')
+          const resetSettings = document.getElementById('reset-settings')
+
+          // Settings controls
+          const fontSizeInput = document.getElementById('font-size')
+          const fontSizeValue = document.getElementById('font-size-value')
+          const lineHeightInput = document.getElementById('line-height')
+          const lineHeightValue = document.getElementById('line-height-value')
+          const minimapToggle = document.getElementById('minimap-toggle')
+          const ligaturesToggle = document.getElementById('ligatures-toggle')
+          const lineNumbersToggle = document.getElementById('line-numbers-toggle')
+
+          // TypeScript compiler options controls
+          const strictToggle = document.getElementById('strict-toggle')
+          const noImplicitAnyToggle = document.getElementById('no-implicit-any-toggle')
+          const strictNullChecksToggle = document.getElementById('strict-null-checks-toggle')
+          const noUnusedLocalsToggle = document.getElementById('no-unused-locals-toggle')
+          const noUnusedParametersToggle = document.getElementById('no-unused-parameters-toggle')
+          const moduleSelect = document.getElementById('module-select')
+
+          // Set TypeScript version
+          tsVersion.innerText = `v${ts.version}`
+
+          // Current compiler options
+          let currentTarget = ts.ScriptTarget.ES2022
+          let compilerOptions = {
             module: ts.ModuleKind.ES2015,
-            target: currentTarget,
+            target: ts.ScriptTarget.ES2022,
             strict: false,
             noImplicitAny: false,
             strictNullChecks: false,
             noUnusedLocals: false,
             noUnusedParameters: false,
           }
-        })
 
-        // Clear output handler
-        clearBtn.addEventListener('click', () => {
-          output.classList.add('hidden')
-          outputText.textContent = ''
-        })
+          // Resizable output panel
+          let isResizing = false
+          let startY = 0
+          let startHeight = 0
 
-        // Run code handler
-        runBtn.addEventListener('click', () => {
-          const code = editor.getValue()
+          resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true
+            startY = e.clientY
+            startHeight = output.offsetHeight
+            document.body.style.cursor = 'ns-resize'
+            document.body.style.userSelect = 'none'
+          })
 
-          const logs = []
-          const errors = []
-          const originalLog = console.log
-          const originalError = console.error
+          document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return
+            const delta = startY - e.clientY
+            const newHeight = Math.max(100, Math.min(window.innerHeight - 100, startHeight + delta))
+            output.style.height = newHeight + 'px'
+          })
 
-          console.log = (...args) => {
-            logs.push(args.join(' '))
-            originalLog(...args)
+          document.addEventListener('mouseup', () => {
+            if (isResizing) {
+              isResizing = false
+              document.body.style.cursor = ''
+              document.body.style.userSelect = ''
+            }
+          })
+
+          // Version dropdown handlers
+          versionBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            versionDropdown.classList.toggle('hidden')
+          })
+
+          versionOptions.forEach((option) => {
+            option.addEventListener('click', () => {
+              const version = option.getAttribute('data-version')
+              selectedVersion.textContent = version
+              versionDropdown.classList.add('hidden')
+
+              // Update transpile target
+              const targetMap = {
+                ES5: ts.ScriptTarget.ES5,
+                ES2015: ts.ScriptTarget.ES2015,
+                ES2020: ts.ScriptTarget.ES2020,
+                ES2022: ts.ScriptTarget.ES2022,
+                ESNext: ts.ScriptTarget.ESNext,
+              }
+              currentTarget = targetMap[version] || ts.ScriptTarget.ES2022
+              compilerOptions.target = currentTarget
+            })
+          })
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            versionDropdown.classList.add('hidden')
+          })
+
+          // Settings modal handlers
+          settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('hidden')
+            settingsModal.classList.add('flex')
+          })
+
+          closeSettings.addEventListener('click', () => {
+            settingsModal.classList.add('hidden')
+            settingsModal.classList.remove('flex')
+          })
+
+          settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+              settingsModal.classList.add('hidden')
+              settingsModal.classList.remove('flex')
+            }
+          })
+
+          // Settings controls
+          fontSizeInput.addEventListener('input', (e) => {
+            fontSizeValue.textContent = e.target.value + 'px'
+          })
+
+          lineHeightInput.addEventListener('input', (e) => {
+            lineHeightValue.textContent = e.target.value + 'px'
+          })
+
+          // Toggle helpers
+          function toggleSwitch(button) {
+            const isEnabled = button.getAttribute('data-enabled') === 'true'
+            const newState = !isEnabled
+            button.setAttribute('data-enabled', newState)
+
+            const toggle = button.querySelector('span')
+            if (newState) {
+              button.classList.remove('bg-[#3e3e42]')
+              button.classList.add('bg-indigo-500')
+              toggle.classList.remove('translate-x-1')
+              toggle.classList.add('translate-x-6')
+            } else {
+              button.classList.remove('bg-indigo-500')
+              button.classList.add('bg-[#3e3e42]')
+              toggle.classList.remove('translate-x-6')
+              toggle.classList.add('translate-x-1')
+            }
+            return newState
           }
 
-          console.error = (...args) => {
-            errors.push('Error: ' + args.join(' '))
-            originalError(...args)
-          }
+          minimapToggle.addEventListener('click', () => toggleSwitch(minimapToggle))
+          ligaturesToggle.addEventListener('click', () => toggleSwitch(ligaturesToggle))
+          lineNumbersToggle.addEventListener('click', () => toggleSwitch(lineNumbersToggle))
 
-          try {
-            // Transpile TypeScript to JavaScript
-            const result = ts.transpileModule(code, {
-              compilerOptions: compilerOptions,
+          // TypeScript option toggles
+          strictToggle.addEventListener('click', () => toggleSwitch(strictToggle))
+          noImplicitAnyToggle.addEventListener('click', () => toggleSwitch(noImplicitAnyToggle))
+          strictNullChecksToggle.addEventListener('click', () => toggleSwitch(strictNullChecksToggle))
+          noUnusedLocalsToggle.addEventListener('click', () => toggleSwitch(noUnusedLocalsToggle))
+          noUnusedParametersToggle.addEventListener('click', () => toggleSwitch(noUnusedParametersToggle))
+
+          // Apply settings
+          applySettings.addEventListener('click', () => {
+            const fontSize = parseInt(fontSizeInput.value)
+            const lineHeight = parseInt(lineHeightInput.value)
+            const minimap = minimapToggle.getAttribute('data-enabled') === 'true'
+            const ligatures = ligaturesToggle.getAttribute('data-enabled') === 'true'
+            const lineNumbers = lineNumbersToggle.getAttribute('data-enabled') === 'true'
+
+            // Update editor options
+            editor.updateOptions({
+              fontSize: fontSize,
+              lineHeight: lineHeight,
+              minimap: { enabled: minimap },
+              fontLigatures: ligatures,
+              lineNumbers: lineNumbers ? 'on' : 'off',
             })
 
-            // Execute the transpiled JavaScript
-            eval(result.outputText)
+            // Update compiler options
+            const moduleMap = {
+              None: ts.ModuleKind.None,
+              CommonJS: ts.ModuleKind.CommonJS,
+              AMD: ts.ModuleKind.AMD,
+              UMD: ts.ModuleKind.UMD,
+              System: ts.ModuleKind.System,
+              ES2015: ts.ModuleKind.ES2015,
+              ES2020: ts.ModuleKind.ES2020,
+              ESNext: ts.ModuleKind.ESNext,
+            }
 
-            const allOutput = [...logs, ...errors]
-            outputText.textContent =
-              allOutput.length > 0 ? allOutput.join('\n') : '✓ Code executed successfully (no output)'
-            outputText.className =
-              errors.length > 0
-                ? 'text-sm font-mono text-red-500 leading-relaxed'
-                : 'text-sm font-mono text-green-500 leading-relaxed'
-          } catch (err) {
-            outputText.textContent = '✗ ' + err.message
-            outputText.className = 'text-sm font-mono text-red-500 leading-relaxed'
-          }
+            compilerOptions = {
+              module: moduleMap[moduleSelect.value] || ts.ModuleKind.ES2015,
+              target: currentTarget,
+              strict: strictToggle.getAttribute('data-enabled') === 'true',
+              noImplicitAny: noImplicitAnyToggle.getAttribute('data-enabled') === 'true',
+              strictNullChecks: strictNullChecksToggle.getAttribute('data-enabled') === 'true',
+              noUnusedLocals: noUnusedLocalsToggle.getAttribute('data-enabled') === 'true',
+              noUnusedParameters: noUnusedParametersToggle.getAttribute('data-enabled') === 'true',
+            }
 
-          console.log = originalLog
-          console.error = originalError
-          output.classList.remove('hidden')
+            settingsModal.classList.add('hidden')
+            settingsModal.classList.remove('flex')
+          })
+
+          // Reset settings
+          resetSettings.addEventListener('click', () => {
+            // Reset editor settings
+            fontSizeInput.value = 14
+            fontSizeValue.textContent = '14px'
+            lineHeightInput.value = 22
+            lineHeightValue.textContent = '22px'
+
+            // Helper to reset toggle to off
+            const resetToggleOff = (toggle) => {
+              toggle.setAttribute('data-enabled', 'false')
+              toggle.classList.remove('bg-indigo-500')
+              toggle.classList.add('bg-[#3e3e42]')
+              toggle.querySelector('span').classList.remove('translate-x-6')
+              toggle.querySelector('span').classList.add('translate-x-1')
+            }
+
+            // Helper to reset toggle to on
+            const resetToggleOn = (toggle) => {
+              toggle.setAttribute('data-enabled', 'true')
+              toggle.classList.remove('bg-[#3e3e42]')
+              toggle.classList.add('bg-indigo-500')
+              toggle.querySelector('span').classList.remove('translate-x-1')
+              toggle.querySelector('span').classList.add('translate-x-6')
+            }
+
+            resetToggleOff(minimapToggle)
+            resetToggleOn(ligaturesToggle)
+            resetToggleOn(lineNumbersToggle)
+
+            // Reset TypeScript options
+            resetToggleOff(strictToggle)
+            resetToggleOff(noImplicitAnyToggle)
+            resetToggleOff(strictNullChecksToggle)
+            resetToggleOff(noUnusedLocalsToggle)
+            resetToggleOff(noUnusedParametersToggle)
+
+            moduleSelect.value = 'ES2015'
+
+            // Apply defaults
+            editor.updateOptions({
+              fontSize: 14,
+              lineHeight: 22,
+              minimap: { enabled: false },
+              fontLigatures: true,
+              lineNumbers: 'on',
+            })
+
+            compilerOptions = {
+              module: ts.ModuleKind.ES2015,
+              target: currentTarget,
+              strict: false,
+              noImplicitAny: false,
+              strictNullChecks: false,
+              noUnusedLocals: false,
+              noUnusedParameters: false,
+            }
+          })
+
+          // Clear output handler
+          clearBtn.addEventListener('click', () => {
+            output.classList.add('hidden')
+            outputText.textContent = ''
+          })
+
+          // Run code handler
+          runBtn.addEventListener('click', () => {
+            const code = editor.getValue()
+
+            const logs = []
+            const errors = []
+            const originalLog = console.log
+            const originalError = console.error
+
+            console.log = (...args) => {
+              logs.push(args.join(' '))
+              originalLog(...args)
+            }
+
+            console.error = (...args) => {
+              errors.push('Error: ' + args.join(' '))
+              originalError(...args)
+            }
+
+            try {
+              // Transpile TypeScript to JavaScript
+              const result = ts.transpileModule(code, {
+                compilerOptions: compilerOptions,
+              })
+
+              // Execute the transpiled JavaScript
+              eval(result.outputText)
+
+              const allOutput = [...logs, ...errors]
+              outputText.textContent =
+                allOutput.length > 0 ? allOutput.join('\n') : '✓ Code executed successfully (no output)'
+              outputText.className =
+                errors.length > 0
+                  ? 'text-sm font-mono text-red-500 leading-relaxed'
+                  : 'text-sm font-mono text-green-500 leading-relaxed'
+            } catch (err) {
+              outputText.textContent = '✗ ' + err.message
+              outputText.className = 'text-sm font-mono text-red-500 leading-relaxed'
+            }
+
+            console.log = originalLog
+            console.error = originalError
+            output.classList.remove('hidden')
+          })
+
+          // Run on Cmd/Ctrl + Enter
+          editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+            runBtn.click()
+          })
         })
+      }
 
-        // Run on Cmd/Ctrl + Enter
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-          runBtn.click()
-        })
-      })
+      // Start initialization
+      initEditor()
     </script>
   </body>
 </html>
