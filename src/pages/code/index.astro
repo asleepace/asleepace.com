@@ -520,34 +520,39 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
     <script is:inline>
       function createDatabase() {
         const DB_NAME = 'CodeDB'
+        const STORE_NAME = ['code']
         return {
           name: DB_NAME,
           db: null,
           store: null,
           codeFiles: [],
+          lastEntry: null,
           get isInitialized() {
             return Boolean(this.db)
           },
-          initialize() {
-            const request = window.indexedDB.open('CodeDB', 1)
-            console.log(request)
-            request.onerror = (ev) => {
-              console.warn(`[IndexDB:${DB_NAME}] error: ${ev.message}`)
-              this.db = null
-            }
-            request.onsuccess = (ev) => {
-              console.log(`[IndexDB:${DB_NAME}] opened:`, ev.message)
-              this.db = ev.target.result
-              this.forEach((saveItem) => {
-                console.log(saveItem)
-                this.codeFiles.push(saveItem)
-              })
-            }
-            request.onupgradeneeded = (ev) => {
-              console.log(`[IndexDB:${DB_NAME}] onupgradeneeded:`)
-              this.db = ev.target.result
-              this.store = this.db.createObjectStore('code', { autoIncrement: true })
-            }
+          async initialize() {
+            return new Promise((resolve) => {
+              const request = window.indexedDB.open('CodeDB', 1)
+              console.log(request)
+              request.onerror = (ev) => {
+                console.warn(`[IndexDB:${DB_NAME}] error: ${ev.message}`)
+                this.db = null
+              }
+              request.onsuccess = (ev) => {
+                console.log(`[IndexDB:${DB_NAME}] opened:`, ev.message)
+                this.db = ev.target.result
+                this.forEach((saveItem) => {
+                  console.log(saveItem.slice(saveItem.indexOf('@file'), saveItem.indexOf('\n')))
+                  this.codeFiles.push(saveItem)
+                })
+                resolve(this)
+              }
+              request.onupgradeneeded = (ev) => {
+                console.log(`[IndexDB:${DB_NAME}] onupgradeneeded:`)
+                this.db = ev.target.result
+                this.store = this.db.createObjectStore('code', { autoIncrement: true })
+              }
+            })
           },
           transaction(callback) {
             if (!this.isInitialized) return void console.warn('DB: Not initialized!')
@@ -557,6 +562,12 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
           },
           save(code) {
             this.transaction((objectStore) => objectStore.add(code))
+          },
+          async getLastEntry() {
+            const tx = this.db.transaction(STORE_NAME, 'readonly')
+            const store = tx.objectStore(STORE_NAME)
+            const cursor = await store.openCursor(null, 'prev')
+            return cursor?.value || null
           },
           getAll(callback) {
             this.transaction((objectStore) => {
@@ -577,21 +588,28 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
       }
 
       // Wait for dependencies to load
-      function initEditor(didRetry = false) {
+      async function initEditor(didRetry = false) {
         if (typeof require === 'undefined' || typeof ts === 'undefined') {
           setTimeout(() => initEditor(true), 300)
           return
         }
 
         // initialize local indexdb
-        const database = createDatabase()
-        database.initialize()
+        const database = await createDatabase().initialize()
+        const initialEntry = await database.getLastEntry()
 
-        console.log('database:', database.isInitialized)
+        const fileName = new Date()
+          .toLocaleDateString('en-US', { dateStyle: 'medium' })
+          .replaceAll(' ', '_')
+          .replaceAll(',', '')
+          .toLowerCase()
+          .concat('.ts')
+
+        console.log('database:', { initialEntry })
 
         require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
 
-        require(['vs/editor/editor.main'], function () {
+        require(['vs/editor/editor.main'], async () => {
           const editorContainer = document.getElementById('editor')
           const loadingOverlay = document.getElementById('loading-overlay')
 
@@ -630,12 +648,16 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
 
           const searchParams = new URLSearchParams(window.location.search)
           const initialCode = searchParams.get('data')
-          const decodedCode = initialCode ? Buffer.from(initialCode, 'base64url') : null
+          const entry = database.codeFiles.at(-1)
 
           const editor = monaco.editor.create(editorContainer, {
             value:
-              decodedCode ??
-              `const greeting: string = "Hello, TypeScript!"
+              entry ??
+              `/**
+ * @file ${fileName}
+ */
+
+const greeting: string = "Hello, TypeScript!"
 console.log(greeting)
 
 function add(a: number, b: number): number {
@@ -675,10 +697,15 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
             didRetry ? 500 : 300
           )
 
+          // // initialize editor with saved code
+          // database.getLastEntry().then((savedCode) => {
+          //   editor.setValue(savedCode)
+          // })
+
           // auto-save current content when leaving page...
           window.addEventListener('beforeunload', () => {
-            const currentContent = document.getElementById('editor')?.innerText
-            database.save(currentContent)
+            console.log(editor.getValue())
+            database.save(editor.getValue())
           })
 
           const output = document.getElementById('output')
