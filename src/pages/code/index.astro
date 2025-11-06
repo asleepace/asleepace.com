@@ -9,6 +9,7 @@ export const prerender = false
 <html lang="en" class="h-full">
   <head>
     <BaseHead title={'Code'} description={'a simple online code playground.'} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <style>
       /* GitHub Dark Theme Colors */
       :root {
@@ -24,6 +25,12 @@ export const prerender = false
         --gh-accent-blue-hover: #1f6feb;
         --gh-success: #238636;
         --gh-success-hover: #2ea043;
+
+        /* iOS Safe Area */
+        --safe-area-inset-top: env(safe-area-inset-top, 0px);
+        --safe-area-inset-right: env(safe-area-inset-right, 0px);
+        --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-area-inset-left: env(safe-area-inset-left, 0px);
       }
 
       /* Custom scrollbar for output panel and settings modal */
@@ -145,11 +152,37 @@ export const prerender = false
       .active\:bg-gh-success-hover:active {
         background-color: var(--gh-success-hover);
       }
+
+      /* iOS Safe Area Support */
+      body {
+        padding-left: var(--safe-area-inset-left);
+        padding-right: var(--safe-area-inset-right);
+      }
+
+      /* Toolbar safe area */
+      #toolbar {
+        padding-top: var(--safe-area-inset-top);
+      }
+
+      /* Output panel safe area */
+      #output {
+        padding-bottom: var(--safe-area-inset-bottom);
+      }
+
+      #output-content {
+        padding-bottom: calc(0.75rem + var(--safe-area-inset-bottom));
+      }
+
+      /* Settings modal safe area */
+      #settings-modal {
+        padding-top: var(--safe-area-inset-top);
+        padding-bottom: var(--safe-area-inset-bottom);
+      }
     </style>
   </head>
   <body class="h-full m-0 flex flex-col overflow-hidden bg-gh-canvas">
     <!-- Toolbar -->
-    <div class="bg-gh-darker border-b border-gh flex items-center h-12 px-4 pr-2 gap-4 shrink-0">
+    <div id="toolbar" class="bg-gh-darker border-b border-gh flex items-center h-12 px-4 pr-2 gap-4 shrink-0">
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-gh-primary tracking-wide">TypeScript</span>
         <span id="ts-version" class="text-xs text-gh-secondary font-mono"></span>
