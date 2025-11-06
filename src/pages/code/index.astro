@@ -517,61 +517,167 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
 
     <script is:inline src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
     <script is:inline src="https://unpkg.com/typescript@latest/lib/typescript.js"></script>
-    <script is:inline>
-      function createDatabase() {
+    <script async>
+      /**
+       * ## Database
+       *
+       * A simple wrapper around our IndexDB for Code.
+       *
+       * @returns {{
+       *  name: string,
+       *  db: IndexDB,
+       *  files: any[],
+       *  lastEntry: readonly {name: string; code:string; createdAt: Date; updatedAt: Date; id: number} | null
+       *  isInitialized: readonly boolean
+       *  createFileName(): string
+       *  initialize: Promise<this>
+       *  save(code: string, fileName?: string): Promise<void>
+       *  getByKey(key: string): Promise<any | null>
+       *  getByName(name: string): Promise<any | null>
+       *  transaction(callbackFn: (store: any) => void): void
+       *  update(id: string, code: string): void
+       * }}
+       */
+      function CodeDB() {
         const DB_NAME = 'CodeDB'
-        const STORE_NAME = ['code']
+        const STORE_NAME = 'code'
+
+        const handleError = (ev) => {
+          console.warn(`[IndexDB:${DB_NAME}] error:`, ev)
+          this.db = null
+        }
+
+        const createFileName = () =>
+          new Date()
+            .toLocaleDateString('en-US', { dateStyle: 'medium' })
+            .replaceAll(' ', '_')
+            .replaceAll(',', '')
+            .toLowerCase()
+            .concat(crypto.randomUUID().slice(0, 4))
+            .concat('.ts')
+
         return {
           name: DB_NAME,
           db: null,
           store: null,
-          codeFiles: [],
-          lastEntry: null,
+          files: [],
+          createFileName,
+          get lastEntry() {
+            return this.files.at(-1)?.data
+          },
           get isInitialized() {
             return Boolean(this.db)
           },
           async initialize() {
             return new Promise((resolve) => {
-              const request = window.indexedDB.open('CodeDB', 1)
-              console.log(request)
-              request.onerror = (ev) => {
-                console.warn(`[IndexDB:${DB_NAME}] error: ${ev.message}`)
-                this.db = null
-              }
+              const request = window.indexedDB.open(DB_NAME, 2) // Increment version
+              request.onerror = handleError
               request.onsuccess = (ev) => {
-                console.log(`[IndexDB:${DB_NAME}] opened:`, ev.message)
+                console.log(`[IndexDB:${DB_NAME}] opened`)
                 this.db = ev.target.result
-                this.forEach((saveItem) => {
-                  console.log(saveItem.slice(saveItem.indexOf('@file'), saveItem.indexOf('\n')))
-                  this.codeFiles.push(saveItem)
+                this.forEach((file) => {
+                  if (!file) return
+                  this.files.push(file)
                 })
                 resolve(this)
               }
               request.onupgradeneeded = (ev) => {
-                console.log(`[IndexDB:${DB_NAME}] onupgradeneeded:`)
+                console.log(`[IndexDB:${DB_NAME}] onupgradeneeded`)
                 this.db = ev.target.result
-                this.store = this.db.createObjectStore('code', { autoIncrement: true })
+
+                // Create or get store
+                let store
+                if (!this.db.objectStoreNames.contains(STORE_NAME)) {
+                  store = this.db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true })
+                } else {
+                  store = ev.target.transaction.objectStore(STORE_NAME)
+                }
+
+                // Create indexes
+                if (!store.indexNames.contains('name')) {
+                  store.createIndex('name', 'name', { unique: false })
+                }
+                if (!store.indexNames.contains('createdAt')) {
+                  store.createIndex('createdAt', 'createdAt', { unique: false })
+                }
+                if (!store.indexNames.contains('updatedAt')) {
+                  store.createIndex('updatedAt', 'updatedAt', { unique: false })
+                }
+                if (!store.indexNames.contains('meta')) {
+                  store.createIndex('meta', 'meta', { unique: false })
+                }
               }
             })
           },
           transaction(callback) {
             if (!this.isInitialized) return void console.warn('DB: Not initialized!')
-            const transaction = this.db.transaction(['code'], 'readwrite')
-            const store = transaction.objectStore('code')
+            const transaction = this.db.transaction([STORE_NAME], 'readwrite')
+            const store = transaction.objectStore(STORE_NAME)
             return callback(store)
           },
           save(code) {
-            this.transaction((objectStore) => objectStore.add(code))
+            const FILE_NAME_REGEX = new RegExp(/@file (.*)\\*/gi)
+            const getFileName = (data) => data.matchAll(FILE_NAME_REGEX)?.[1]
+            const now = Date.now()
+            const entry = {
+              name: getFileName(code) ?? createFileName(),
+              code,
+              createdAt: now,
+              updatedAt: now,
+              meta: {
+                tsVersion: null,
+              },
+            }
+            this.transaction((objectStore) => objectStore.add(entry))
+          },
+          update(id, code) {
+            this.transaction(async (objectStore) => {
+              const existing = await objectStore.get(id)
+              if (existing) {
+                existing.code = code
+                existing.updatedAt = Date.now()
+                objectStore.put(existing)
+              }
+            })
+          },
+          async getByKey(key) {
+            const tx = this.db.transaction(STORE_NAME, 'readonly')
+            const store = tx.objectStore(STORE_NAME)
+            return new Promise((resolve) => {
+              const request = store.get(key)
+              request.onsuccess = () => resolve(request.result)
+            })
+          },
+          async getByName(name) {
+            const tx = this.db.transaction(STORE_NAME, 'readonly')
+            const store = tx.objectStore(STORE_NAME)
+            const index = store.index('name')
+            return new Promise((resolve) => {
+              const request = index.get(name)
+              request.onsuccess = () => resolve(request.result)
+            })
+          },
+          async getByDate(date) {
+            const tx = this.db.transaction(STORE_NAME, 'readonly')
+            const store = tx.objectStore(STORE_NAME)
+            const index = store.index('createdAt')
+            return new Promise((resolve) => {
+              const request = index.getAll(IDBKeyRange.only(date))
+              request.onsuccess = () => resolve(request.result)
+            })
           },
           async getLastEntry() {
             const tx = this.db.transaction(STORE_NAME, 'readonly')
             const store = tx.objectStore(STORE_NAME)
-            const cursor = await store.openCursor(null, 'prev')
-            return cursor?.value || null
+            return new Promise((resolve) => {
+              const request = store.openCursor(null, 'prev')
+              request.onsuccess = () => resolve(request.result?.value || null)
+            })
           },
           getAll(callback) {
             this.transaction((objectStore) => {
-              callback(objectStore.getAll())
+              const request = objectStore.getAll()
+              request.onsuccess = () => callback(request.result)
             })
           },
           forEach(callback) {
@@ -579,7 +685,7 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
               objectStore.openCursor().onsuccess = (event) => {
                 const cursor = event.target.result
                 if (!cursor) return
-                callback(cursor.value)
+                callback({ data: cursor.value, key: cursor.key })
                 cursor.continue()
               }
             })
@@ -587,31 +693,24 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
         }
       }
 
+      // initialize local indexdb
+      const codeDB = CodeDB()
+
       // Wait for dependencies to load
       async function initEditor(didRetry = false) {
+        await codeDB.initialize()
         if (typeof require === 'undefined' || typeof ts === 'undefined') {
           setTimeout(() => initEditor(true), 300)
           return
         }
-
-        // initialize local indexdb
-        const database = await createDatabase().initialize()
-        const initialEntry = await database.getLastEntry()
-
-        const fileName = new Date()
-          .toLocaleDateString('en-US', { dateStyle: 'medium' })
-          .replaceAll(' ', '_')
-          .replaceAll(',', '')
-          .toLowerCase()
-          .concat('.ts')
-
-        console.log('database:', { initialEntry })
 
         require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
 
         require(['vs/editor/editor.main'], async () => {
           const editorContainer = document.getElementById('editor')
           const loadingOverlay = document.getElementById('loading-overlay')
+
+          console.log({ codeDB })
 
           // Define custom GitHub Dark theme for Monaco
           monaco.editor.defineTheme('github-dark', {
@@ -646,27 +745,19 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
             },
           })
 
-          const searchParams = new URLSearchParams(window.location.search)
-          const initialCode = searchParams.get('data')
-          const entry = database.codeFiles.at(-1)
+          const lastEntry = codeDB.lastEntry
+          console.log({ lastEntry })
 
           const editor = monaco.editor.create(editorContainer, {
             value:
-              entry ??
+              codeDB.lastEntry?.code ??
               `/**
- * @file ${fileName}
+ * @file snippet.ts
+ * @date ${new Date().toLocaleDateString('en-US', { dateStyle: 'short' })}
  */
 
-const greeting: string = "Hello, TypeScript!"
-console.log(greeting)
-
-function add(a: number, b: number): number {
-  return a + b
-}
-
-console.log(\`2 + 3 = \${add(2, 3)}\`)
-
-// Try editing and running your code!`,
+console.log('Hello, world!')
+`,
             language: 'typescript',
             theme: 'github-dark',
             automaticLayout: true,
@@ -691,21 +782,14 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
               editorContainer.classList.add('fade-in')
               setTimeout(() => {
                 loadingOverlay.style.display = 'none'
-                console.log(editor)
               }, 300)
             },
             didRetry ? 500 : 300
           )
 
-          // // initialize editor with saved code
-          // database.getLastEntry().then((savedCode) => {
-          //   editor.setValue(savedCode)
-          // })
-
           // auto-save current content when leaving page...
           window.addEventListener('beforeunload', () => {
-            console.log(editor.getValue())
-            database.save(editor.getValue())
+            codeDB.save(editor.getValue())
           })
 
           const output = document.getElementById('output')
