@@ -3,6 +3,21 @@ import BaseHead from '@/components/astro/BaseHead.astro'
 import { Play, Settings, ChevronDown } from 'lucide-react'
 
 export const prerender = false
+
+const data = Astro.url.searchParams.get('data')
+
+const initialCodeData = data
+  ? Buffer.from(data, 'base64')
+  : `const greeting: string = "Hello, TypeScript!"
+console.log(greeting)
+
+function add(a: number, b: number): number {
+  return a + b
+}
+
+console.log(\`2 + 3 = \${add(2, 3)}\`)
+
+// Try editing and running your code!`
 ---
 
 <!doctype html>
@@ -503,12 +518,76 @@ export const prerender = false
     <script is:inline src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
     <script is:inline src="https://unpkg.com/typescript@latest/lib/typescript.js"></script>
     <script is:inline>
+      function createDatabase() {
+        const DB_NAME = 'CodeDB'
+        return {
+          name: DB_NAME,
+          db: null,
+          store: null,
+          codeFiles: [],
+          get isInitialized() {
+            return Boolean(this.db)
+          },
+          initialize() {
+            const request = window.indexedDB.open('CodeDB', 1)
+            console.log(request)
+            request.onerror = (ev) => {
+              console.warn(`[IndexDB:${DB_NAME}] error: ${ev.message}`)
+              this.db = null
+            }
+            request.onsuccess = (ev) => {
+              console.log(`[IndexDB:${DB_NAME}] opened:`, ev.message)
+              this.db = ev.target.result
+              this.forEach((saveItem) => {
+                console.log(saveItem)
+                this.codeFiles.push(saveItem)
+              })
+            }
+            request.onupgradeneeded = (ev) => {
+              console.log(`[IndexDB:${DB_NAME}] onupgradeneeded:`)
+              this.db = ev.target.result
+              this.store = this.db.createObjectStore('code', { autoIncrement: true })
+            }
+          },
+          transaction(callback) {
+            if (!this.isInitialized) return void console.warn('DB: Not initialized!')
+            const transaction = this.db.transaction(['code'], 'readwrite')
+            const store = transaction.objectStore('code')
+            return callback(store)
+          },
+          save(code) {
+            this.transaction((objectStore) => objectStore.add(code))
+          },
+          getAll(callback) {
+            this.transaction((objectStore) => {
+              callback(objectStore.getAll())
+            })
+          },
+          forEach(callback) {
+            this.transaction((objectStore) => {
+              objectStore.openCursor().onsuccess = (event) => {
+                const cursor = event.target.result
+                if (!cursor) return
+                callback(cursor.value)
+                cursor.continue()
+              }
+            })
+          },
+        }
+      }
+
       // Wait for dependencies to load
       function initEditor(didRetry = false) {
         if (typeof require === 'undefined' || typeof ts === 'undefined') {
           setTimeout(() => initEditor(true), 300)
           return
         }
+
+        // initialize local indexdb
+        const database = createDatabase()
+        database.initialize()
+
+        console.log('database:', database.isInitialized)
 
         require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } })
 
@@ -549,8 +628,14 @@ export const prerender = false
             },
           })
 
+          const searchParams = new URLSearchParams(window.location.search)
+          const initialCode = searchParams.get('data')
+          const decodedCode = initialCode ? Buffer.from(initialCode, 'base64url') : null
+
           const editor = monaco.editor.create(editorContainer, {
-            value: `const greeting: string = "Hello, TypeScript!"
+            value:
+              decodedCode ??
+              `const greeting: string = "Hello, TypeScript!"
 console.log(greeting)
 
 function add(a: number, b: number): number {
@@ -584,10 +669,17 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
               editorContainer.classList.add('fade-in')
               setTimeout(() => {
                 loadingOverlay.style.display = 'none'
+                console.log(editor)
               }, 300)
             },
             didRetry ? 500 : 300
           )
+
+          // auto-save current content when leaving page...
+          window.addEventListener('beforeunload', () => {
+            const currentContent = document.getElementById('editor')?.innerText
+            database.save(currentContent)
+          })
 
           const output = document.getElementById('output')
           const outputText = document.getElementById('output-text')
