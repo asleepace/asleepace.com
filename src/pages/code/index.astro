@@ -1,6 +1,6 @@
 ---
 import BaseHead from '@/components/astro/BaseHead.astro'
-import { Play, Settings, ChevronDown } from 'lucide-react'
+import { Play, Settings, ChevronDown, FileText, Plus, Save } from 'lucide-react'
 
 export const prerender = false
 
@@ -48,20 +48,23 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
         --safe-area-inset-left: env(safe-area-inset-left, 0px);
       }
 
-      /* Custom scrollbar for output panel and settings modal */
+      /* Custom scrollbar for output panel, settings modal, and files dropdown */
       #output-content::-webkit-scrollbar,
-      #settings-body::-webkit-scrollbar {
+      #settings-body::-webkit-scrollbar,
+      #files-dropdown::-webkit-scrollbar {
         width: 10px;
         height: 10px;
       }
 
       #output-content::-webkit-scrollbar-track,
-      #settings-body::-webkit-scrollbar-track {
+      #settings-body::-webkit-scrollbar-track,
+      #files-dropdown::-webkit-scrollbar-track {
         background: transparent;
       }
 
       #output-content::-webkit-scrollbar-thumb,
-      #settings-body::-webkit-scrollbar-thumb {
+      #settings-body::-webkit-scrollbar-thumb,
+      #files-dropdown::-webkit-scrollbar-thumb {
         background: var(--gh-border-default);
         border-radius: 5px;
         border: 2px solid transparent;
@@ -69,14 +72,16 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
       }
 
       #output-content::-webkit-scrollbar-thumb:hover,
-      #settings-body::-webkit-scrollbar-thumb:hover {
+      #settings-body::-webkit-scrollbar-thumb:hover,
+      #files-dropdown::-webkit-scrollbar-thumb:hover {
         background: var(--gh-accent-blue);
         border: 2px solid transparent;
         background-clip: padding-box;
       }
 
       #output-content::-webkit-scrollbar-corner,
-      #settings-body::-webkit-scrollbar-corner {
+      #settings-body::-webkit-scrollbar-corner,
+      #files-dropdown::-webkit-scrollbar-corner {
         background: transparent;
       }
 
@@ -203,6 +208,34 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
         <span id="ts-version" class="text-xs text-gh-secondary font-mono"></span>
       </div>
 
+      <!-- Files Dropdown -->
+      <div class="relative">
+        <button
+          id="files-btn"
+          class="flex items-center gap-1.5 px-3 pl-3.5 py-1.5 text-xs leading-4 text-gh-primary border border-neutral-800 hover:border-gh-accent rounded transition-colors"
+        >
+          <FileText size={14} className="text-gh-secondary" />
+          <span id="selected-file" class="tracking-wide max-w-[150px] truncate">New File</span>
+          <div class="h-4 w-[1px] bg-neutral-800 mx-0.5"></div>
+          <ChevronDown className="text-neutral-500" size={14} />
+        </button>
+        <div
+          id="files-dropdown"
+          class="hidden absolute top-full mt-1 left-0 bg-gh-default border border-gh rounded shadow-lg z-50 min-w-[200px] max-h-[300px] overflow-y-auto"
+        >
+          <!-- New File Button -->
+          <button
+            id="new-file-btn"
+            class="w-full px-3 py-2 text-xs text-left text-gh-accent hover:bg-gh-secondary transition-colors flex items-center gap-2 border-b border-gh"
+          >
+            <Plus size={14} />
+            <span>New File</span>
+          </button>
+          <!-- Files will be populated here dynamically -->
+          <div id="files-list"></div>
+        </div>
+      </div>
+
       <!-- Version Dropdown -->
       <div class="relative">
         <button
@@ -232,13 +265,22 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
         </div>
       </div>
 
-      <!-- Settings Button -->
+      <!-- Settings and Action Buttons -->
       <div class="flex flex-row ml-auto rounded overflow-clip">
         <button
           id="settings-btn"
           class="flex items-center gap-1.5 pr-3.5 pl-4 py-1.5 text-xs text-gh-primary bg-gh-secondary hover:bg-gh-tertiary transition-colors"
         >
           <Settings size={14} />
+        </button>
+
+        <button
+          id="save-btn"
+          class="flex items-center gap-1.5 pr-3.5 pl-3.5 py-1.5 text-xs text-gh-primary bg-gh-secondary hover:bg-gh-tertiary transition-colors border-l border-gh"
+          title="Save file (Ctrl/Cmd+S)"
+        >
+          <Save size={14} />
+          <span class="tracking-wide">Save</span>
         </button>
 
         <button
@@ -553,6 +595,7 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
             .replaceAll(' ', '_')
             .replaceAll(',', '')
             .toLowerCase()
+            .concat('_')
             .concat(crypto.randomUUID().slice(0, 4))
             .concat('.ts')
 
@@ -606,6 +649,8 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
                 if (!store.indexNames.contains('meta')) {
                   store.createIndex('meta', 'meta', { unique: false })
                 }
+
+                this.store = store
               }
             })
           },
@@ -615,12 +660,17 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
             const store = transaction.objectStore(STORE_NAME)
             return callback(store)
           },
-          save(code) {
-            const FILE_NAME_REGEX = new RegExp(/@file (.*)\\*/gi)
-            const getFileName = (data) => data.matchAll(FILE_NAME_REGEX)?.[1]
+          save(code, callback) {
+            // Extract filename from @file comment (e.g., @file myfile.ts)
+            const FILE_NAME_REGEX = /@file\s+([^\s*]+)/i
+            const match = code.match(FILE_NAME_REGEX)
+            const name = match ? match[1] : createFileName()
+
+            console.log('Saving file:', name)
+
             const now = Date.now()
             const entry = {
-              name: getFileName(code) ?? createFileName(),
+              name: name,
               code,
               createdAt: now,
               updatedAt: now,
@@ -628,15 +678,49 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
                 tsVersion: null,
               },
             }
-            this.transaction((objectStore) => objectStore.add(entry))
+            this.transaction((objectStore) => {
+              const request = objectStore.add(entry)
+              request.onsuccess = () => {
+                console.log('File saved successfully:', name, 'ID:', request.result)
+                if (callback) {
+                  callback({ id: request.result, name: name })
+                }
+              }
+              request.onerror = (e) => {
+                console.error('Error saving file:', e)
+              }
+            })
           },
-          update(id, code) {
-            this.transaction(async (objectStore) => {
-              const existing = await objectStore.get(id)
-              if (existing) {
-                existing.code = code
-                existing.updatedAt = Date.now()
-                objectStore.put(existing)
+          update(id, code, callback) {
+            // Extract filename from @file comment
+            const FILE_NAME_REGEX = /@file\s+([^\s*]+)/i
+            const match = code.match(FILE_NAME_REGEX)
+
+            this.transaction((objectStore) => {
+              const getRequest = objectStore.get(id)
+              getRequest.onsuccess = () => {
+                const existing = getRequest.result
+                if (existing) {
+                  existing.code = code
+                  existing.updatedAt = Date.now()
+                  // Update name if @file comment changed
+                  if (match) {
+                    existing.name = match[1]
+                  }
+                  const putRequest = objectStore.put(existing)
+                  putRequest.onsuccess = () => {
+                    console.log('File updated successfully:', existing.name)
+                    if (callback) {
+                      callback({ id: existing.id, name: existing.name })
+                    }
+                  }
+                  putRequest.onerror = (e) => {
+                    console.error('Error updating file:', e)
+                  }
+                }
+              }
+              getRequest.onerror = (e) => {
+                console.error('Error getting file for update:', e)
               }
             })
           },
@@ -789,13 +873,23 @@ console.log('Hello, world!')
 
           // auto-save current content when leaving page...
           window.addEventListener('beforeunload', () => {
-            codeDB.save(editor.getValue())
+            if (currentFileId) {
+              codeDB.update(currentFileId, editor.getValue())
+            } else {
+              const code = editor.getValue()
+              if (code.trim()) {
+                codeDB.save(code, (result) => {
+                  console.log('File auto-saved on page unload:', result)
+                })
+              }
+            }
           })
 
           const output = document.getElementById('output')
           const outputText = document.getElementById('output-text')
           const tsVersion = document.getElementById('ts-version')
           const runBtn = document.getElementById('run-btn')
+          const saveBtn = document.getElementById('save-btn')
           const clearBtn = document.getElementById('clear-output')
           const resizeHandle = document.getElementById('resize-handle')
 
@@ -804,6 +898,44 @@ console.log('Hello, world!')
           const versionDropdown = document.getElementById('version-dropdown')
           const selectedVersion = document.getElementById('selected-version')
           const versionOptions = document.querySelectorAll('.version-option')
+
+          // Files dropdown elements
+          const filesBtn = document.getElementById('files-btn')
+          const filesDropdown = document.getElementById('files-dropdown')
+          const selectedFile = document.getElementById('selected-file')
+          const filesList = document.getElementById('files-list')
+          const newFileBtn = document.getElementById('new-file-btn')
+
+          // Current file tracking
+          let currentFileId = codeDB.lastEntry?.id || null
+          let currentFileName = codeDB.lastEntry?.name || 'New File'
+          selectedFile.textContent = currentFileName
+
+          // Function to extract filename from code
+          function extractFileName(code) {
+            const FILE_NAME_REGEX = /@file\s+([^\s*]+)/i
+            const match = code.match(FILE_NAME_REGEX)
+            return match ? match[1] : null
+          }
+
+          // Function to update displayed filename
+          function updateDisplayedFileName() {
+            const code = editor.getValue()
+            const extractedName = extractFileName(code)
+
+            if (extractedName) {
+              currentFileName = extractedName
+              selectedFile.textContent = extractedName
+            } else if (!currentFileId) {
+              // Only show "New File" if we don't have a saved file
+              selectedFile.textContent = 'New File'
+            }
+          }
+
+          // Update filename when code changes
+          editor.onDidChangeModelContent(() => {
+            updateDisplayedFileName()
+          })
 
           // Settings modal elements
           const settingsBtn = document.getElementById('settings-btn')
@@ -900,6 +1032,145 @@ console.log('Hello, world!')
           // Close dropdown when clicking outside
           document.addEventListener('click', () => {
             versionDropdown.classList.add('hidden')
+            filesDropdown.classList.add('hidden')
+          })
+
+          // Files dropdown handlers
+          async function loadFiles() {
+            codeDB.getAll((files) => {
+              filesList.innerHTML = ''
+              if (files.length === 0) {
+                filesList.innerHTML = '<div class="px-3 py-2 text-xs text-gh-secondary italic">No saved files</div>'
+                return
+              }
+
+              files
+                .sort((a, b) => b.updatedAt - a.updatedAt)
+                .forEach((file) => {
+                  const fileButton = document.createElement('button')
+                  fileButton.className =
+                    'file-option w-full px-3 py-2 text-xs text-left text-gh-primary hover:bg-gh-secondary transition-colors truncate'
+                  fileButton.setAttribute('data-file-id', file.id)
+                  fileButton.textContent = file.name
+                  fileButton.title = file.name
+
+                  if (file.id === currentFileId) {
+                    fileButton.classList.add('bg-gh-tertiary')
+                  }
+
+                  fileButton.addEventListener('click', () => switchToFile(file.id))
+                  filesList.appendChild(fileButton)
+                })
+            })
+          }
+
+          async function switchToFile(fileId) {
+            // Save current file before switching
+            if (currentFileId) {
+              codeDB.update(currentFileId, editor.getValue())
+            } else {
+              // Save new file if it has content
+              const currentCode = editor.getValue()
+              if (currentCode.trim()) {
+                codeDB.save(currentCode, (result) => {
+                  console.log('New file auto-saved before switch:', result)
+                })
+              }
+            }
+
+            // Load the new file
+            const file = await codeDB.getByKey(fileId)
+            if (file) {
+              currentFileId = file.id
+              currentFileName = file.name
+              selectedFile.textContent = currentFileName
+              editor.setValue(file.code)
+              filesDropdown.classList.add('hidden')
+              loadFiles() // Refresh list to update active state
+            }
+          }
+
+          filesBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            filesDropdown.classList.toggle('hidden')
+            if (!filesDropdown.classList.contains('hidden')) {
+              loadFiles()
+            }
+          })
+
+          newFileBtn.addEventListener('click', () => {
+            // Save current file before creating new
+            if (currentFileId) {
+              codeDB.update(currentFileId, editor.getValue())
+            } else {
+              const currentCode = editor.getValue()
+              if (currentCode.trim()) {
+                codeDB.save(currentCode, (result) => {
+                  console.log('Previous file saved before new:', result)
+                })
+              }
+            }
+
+            // Create new file
+            currentFileId = null
+            currentFileName = 'untitled.ts'
+            selectedFile.textContent = currentFileName
+            editor.setValue(`/**
+ * @file untitled.ts
+ * @date ${new Date().toLocaleDateString('en-US', { dateStyle: 'short' })}
+ */
+
+console.log('Hello, world!')
+`)
+            filesDropdown.classList.add('hidden')
+          })
+
+          // Initial load of files
+          loadFiles()
+
+          // Save button handler
+          function saveCurrentFile() {
+            const code = editor.getValue()
+
+            if (currentFileId) {
+              // Update existing file
+              codeDB.update(currentFileId, code, (result) => {
+                currentFileName = result.name
+                selectedFile.textContent = result.name
+                console.log('File updated:', result)
+                loadFiles() // Refresh the files list to show updated name
+
+                // Show visual feedback
+                saveBtn.style.color = '#2ea043'
+                setTimeout(() => {
+                  saveBtn.style.color = ''
+                }, 500)
+              })
+            } else {
+              // Save new file
+              codeDB.save(code, (result) => {
+                currentFileId = result.id
+                currentFileName = result.name
+                selectedFile.textContent = result.name
+                console.log('New file saved:', result)
+                loadFiles() // Refresh the files list
+
+                // Show visual feedback
+                saveBtn.style.color = '#2ea043'
+                setTimeout(() => {
+                  saveBtn.style.color = ''
+                }, 500)
+              })
+            }
+          }
+
+          saveBtn.addEventListener('click', () => {
+            saveCurrentFile()
+          })
+
+          // Keyboard shortcut for save (Ctrl+S / Cmd+S)
+          editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+            saveCurrentFile()
           })
 
           // Settings modal handlers
