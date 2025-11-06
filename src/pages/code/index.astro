@@ -202,14 +202,43 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
   </head>
   <body class="h-full m-0 flex flex-col overflow-hidden bg-gh-canvas">
     <!-- Toolbar -->
-    <div id="toolbar" class="bg-gh-darker border-b border-gh flex items-center h-12 px-4 pr-2 gap-4 shrink-0">
+    <div id="toolbar" class="bg-gh-darker border-b border-gh flex items-center h-12 px-4 pr-2 gap-2 shrink-0 z-50">
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-gh-primary tracking-wide">TypeScript</span>
-        <span id="ts-version" class="text-xs text-gh-secondary font-mono"></span>
+        <span id="ts-version" class="text-xs text-gh-secondary font-mono">v5.9.3</span>
+      </div>
+
+      <!-- Version Dropdown -->
+      <div class="relative ml-2">
+        <button
+          id="version-btn"
+          class="flex items-center gap-1.5 px-3 pl-3.5 py-1.5 text-xs leading-4 text-indigo-400 *:hover:text-indigo-500 border border-neutral-800 hover:border-indigo-400 rounded transition-colors"
+        >
+          <span id="selected-version" class="tracking-wide">ES2022</span>
+          <div class="h-4 w-[1px] bg-neutral-800 mx-0.5"></div>
+          <ChevronDown className="text-neutral-500" size={14} />
+        </button>
+        <div
+          id="version-dropdown"
+          class="hidden absolute top-full mt-1 left-0 bg-gh-default border border-gh rounded shadow-lg z-50 min-w-[120px] text-blue-400 tracking-wide *:hover:bg-neutral-800"
+        >
+          {
+            ['ES5', 'ES2015', 'ES2020', 'ES2022', 'ESNext'].map((tsVersion) => {
+              return (
+                <button
+                  class="version-option w-full px-3 py-2 text-xs text-left text-gh-primary hover:text-orange-400 transition-colors"
+                  data-version={tsVersion}
+                >
+                  {tsVersion}
+                </button>
+              )
+            })
+          }
+        </div>
       </div>
 
       <!-- Files Dropdown -->
-      <div class="relative">
+      <div class="relative mr-2">
         <button
           id="files-btn"
           class="flex items-center gap-1.5 px-3 pl-3.5 py-1.5 text-xs leading-4 text-gh-primary border border-neutral-800 hover:border-gh-accent rounded transition-colors"
@@ -232,36 +261,7 @@ console.log(\`2 + 3 = \${add(2, 3)}\`)
             <span>New File</span>
           </button>
           <!-- Files will be populated here dynamically -->
-          <div id="files-list"></div>
-        </div>
-      </div>
-
-      <!-- Version Dropdown -->
-      <div class="relative">
-        <button
-          id="version-btn"
-          class="flex items-center gap-1.5 px-3 pl-3.5 py-1.5 text-xs leading-4 text-indigo-400 *:hover:text-indigo-500 border border-neutral-800 hover:border-indigo-400 rounded transition-colors"
-        >
-          <span id="selected-version" class="tracking-wide">ES2022</span>
-          <div class="h-4 w-[1px] bg-neutral-800 mx-0.5"></div>
-          <ChevronDown className="text-neutral-500" size={14} />
-        </button>
-        <div
-          id="version-dropdown"
-          class="hidden absolute top-full mt-1 left-0 bg-gh-default border border-gh rounded shadow-lg z-50 min-w-[120px]"
-        >
-          {
-            ['ES5', 'ES2015', 'ES2020', 'ES2022', 'ESNext'].map((tsVersion) => {
-              return (
-                <button
-                  class="version-option w-full px-3 py-2 text-xs text-left text-gh-primary hover:bg-gh-secondary transition-colors"
-                  data-version={tsVersion}
-                >
-                  {tsVersion}
-                </button>
-              )
-            })
-          }
+          <div id="files-list" class="text-blue-400 tracking-wide *:hover:text-orange-400 *:hover:bg-neutral-800"></div>
         </div>
       </div>
 
@@ -1113,10 +1113,10 @@ console.log('Hello, world!')
 
             // Create new file
             currentFileId = null
-            currentFileName = 'untitled.ts'
+            currentFileName = 'snippet.ts'
             selectedFile.textContent = currentFileName
             editor.setValue(`/**
- * @file untitled.ts
+ * @file ${currentFileName}
  * @date ${new Date().toLocaleDateString('en-US', { dateStyle: 'short' })}
  */
 
