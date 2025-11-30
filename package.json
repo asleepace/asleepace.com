@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@asleepace/exception": "^0.99.5",
+    "@asleepace/mutex": "^1.0.2",
     "@asleepace/try": "^0.2.1",
     "@astrojs/check": "^0.9.5",
     "@astrojs/db": "^0.15.1",
