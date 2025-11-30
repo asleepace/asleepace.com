@@ -28,16 +28,9 @@ const {
 <!doctype html>
 <html lang="en" transition:name="root" transition:animate="initial">
   <head>
-    <BaseHead
-      title={title}
-      description={description}
-      image={image}
-      htmx={htmx}
-    />
+    <BaseHead title={title} description={description} image={image} htmx={htmx} />
   </head>
-  <body
-    class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden"
-  >
+  <body class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden">
     <PageNavigation />
     <main
       class={clsx('w-full flex flex-col items-center', className)}

@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-echo "DEPLOYMENT: ${whoami} @ ${pwd}"
+echo "DEPLOYMENT: $(whoami) @ $(pwd)"
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Ensure Bun is in the PATH
+export PATH="$HOME/.bun/bin:$PATH"
 
 # Change to project directory
 cd "$PROJECT_DIR" || exit 1
