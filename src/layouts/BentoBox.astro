@@ -80,9 +80,9 @@ export type LinkItem = {
     </div>
 
     <!-- Wide Box (spans full width) -->
-    <div class="col-span-1 md:col-span-3 h-64 flex items-center gap-4 justify-center">
+    <div class="col-span-1 md:col-span-3 md:h-64 flex flex-col md:flex-row items-center gap-4 justify-center">
       <!-- widget card -->
-      <HoverCard href="/code" alt="Online Code Editor" class:list="basis-1/3">
+      <HoverCard href="/code" alt="Online Code Editor" class:list="basis-1/3 col-span-1">
         <div
           class="p-6 flex flex-col flex-1 h-full bg-sky-400 scale-100 hover:scale-110 transition-transform duration-500"
         >
@@ -104,8 +104,8 @@ export type LinkItem = {
         </div>
       </HoverCard>
       <!-- about me card -->
-      <HoverCard href="/about" alt="About Colin Teahan" image="/images/about-me.jpeg" class:list="basis-1/3">
-        <p class="p-6 from-black/10 via-black/0 to-transparent bg-gradient-to-br">About</p>
+      <HoverCard href="/about" alt="About Colin Teahan" image="/images/about-me.jpeg" class:list="basis-1/3 aspect-square">
+        <p class="p-6 from-black/10 via-black/0 to-transparent bg-linear-to-br">About</p>
       </HoverCard>
     </div>
   </div>
