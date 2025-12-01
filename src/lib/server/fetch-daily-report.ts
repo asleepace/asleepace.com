@@ -36,6 +36,7 @@ ${JSON.stringify(params.comments, null, 2)}
 `.trim()
 
 export type DailyReportOptions = {
+  refresh?: boolean
   limit?: number
 }
 
@@ -45,15 +46,7 @@ export type DailyReportOutput = {
   html: string
 }
 
-/**
- * ## Fetch Daily Report
- *
- * Fetches comments from the Wall Street Bets discussion thread and performs an analysis
- * with Grok 4 fast non-reasoning.
- *
- * @see https://www.reddit.com/r/wallstreetbets/
- */
-export async function fetchDailyReport({ limit = 250 }: DailyReportOptions): Promise<DailyReportOutput> {
+async function fetchWsbWithGrok({ limit = 250 }: DailyReportOptions): Promise<DailyReportOutput> {
   const { json: comments, html } = await fetchWallStreetBetsComments({ limit })
 
   const prompt = GROK_TEMPLATE({ limit, comments })
@@ -64,4 +57,24 @@ export async function fetchDailyReport({ limit = 250 }: DailyReportOptions): Pro
     summary,
     html,
   }
+}
+
+/**
+ * ## Fetch Daily Report
+ *
+ * Fetches comments from the Wall Street Bets discussion thread and performs an analysis
+ * with Grok 4 fast non-reasoning.
+ *
+ * @see https://www.reddit.com/r/wallstreetbets/
+ */
+export async function fetchDailyReport({ limit = 250, refresh = false }): Promise<DailyReportOutput> {
+  const today = new Date().toISOString().split('T')[0]
+  const filePath = `public/daily/report-${today}.json`
+  const file = Bun.file(filePath, { type: 'application/json' })
+  if (refresh === false && (await file.exists())) {
+    return await file.json()
+  }
+  const report = await fetchWsbWithGrok({ limit })
+  await file.write(JSON.stringify({ ...report, limit }, null, 2))
+  return report
 }
