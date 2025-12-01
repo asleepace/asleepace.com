@@ -37,19 +37,36 @@ export async function downloadToPDF(markdownContent: string) {
   </style>
 </head>
 <body>
-${markdownContent
-  .split('\n')
-  .map((line) => {
-    if (line.startsWith('# ')) return `<h1>${line.slice(2)}</h1>`
-    if (line.startsWith('## ')) return `<h2>${line.slice(3)}</h2>`
-    if (line.startsWith('### ')) return `<h3>${line.slice(4)}</h3>`
-    if (line.startsWith('#### ')) return `<h4>${line.slice(5)}</h4>` // Fixed missing space
-    if (line.startsWith('---')) return '<hr>'
-    if (line.startsWith('- ')) return `<li>${line.slice(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</li>`
-    if (line.trim() === '') return '<br>'
-    return `<p>${line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`
-  })
-  .join('\n')}
+${
+  (() => {
+    const lines = markdownContent.split('\n');
+    let htmlParts: string[] = [];
+    let listItems: string[] = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.startsWith('- ')) {
+        listItems.push(`<li>${line.slice(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</li>`);
+      } else {
+        if (listItems.length > 0) {
+          htmlParts.push(`<ul>\n${listItems.join('\n')}\n</ul>`);
+          listItems = [];
+        }
+        if (line.startsWith('# ')) htmlParts.push(`<h1>${line.slice(2)}</h1>`);
+        else if (line.startsWith('## ')) htmlParts.push(`<h2>${line.slice(3)}</h2>`);
+        else if (line.startsWith('### ')) htmlParts.push(`<h3>${line.slice(4)}</h3>`);
+        else if (line.startsWith('#### ')) htmlParts.push(`<h4>${line.slice(5)}</h4>`);
+        else if (line.startsWith('---')) htmlParts.push('<hr>');
+        else if (line.trim() === '') htmlParts.push('<br>');
+        else htmlParts.push(`<p>${line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
+      }
+    }
+    // If the last lines were list items, flush them
+    if (listItems.length > 0) {
+      htmlParts.push(`<ul>\n${listItems.join('\n')}\n</ul>`);
+    }
+    return htmlParts.join('\n');
+  })()
+}
 </body>
 </html>
 `
