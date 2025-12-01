@@ -15,6 +15,9 @@ src/styles/output.css
 # dependencies
 node_modules/
 
+# Daily report files
+public/daily/
+
 # SQLite database
 db.sqlite
 
