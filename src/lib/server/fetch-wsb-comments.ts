@@ -110,7 +110,10 @@ export async function fetchWallStreetBetsComments(options: { limit?: number }) {
   await page.setUserAgent(config.userAgent)
   await page.goto('https://www.reddit.com/r/wallstreetbets/')
   const discussionLink = await findDailyDiscussionLink(page)
-  if (!discussionLink) throw new Error('Failed to find discussion link.')
+  if (!discussionLink) {
+    const content = await page.content()
+    throw new Error(`Failed to find discussion link:\n\n${content}`)
+  }
   // swap url with old reddit api for ssr rendering
   const oldReddit = new URL(discussionLink.replace('www.reddit.com', 'old.reddit.com'))
   oldReddit.searchParams.set('limit', String(options.limit ?? 200))
