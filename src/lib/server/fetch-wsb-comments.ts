@@ -105,22 +105,29 @@ export async function fetchWallStreetBetsComments(options: { limit?: number }) {
     width: config.width,
     height: config.height,
   })
-  await page.setUserAgent(config.userAgent)
-  await page.goto('https://old.reddit.com/r/wallstreetbets/')
+  // await page.setUserAgent(config.userAgent)
+  // Extra headers
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-US,en;q=0.9',
+    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    Referer: 'https://www.google.com/',
+  })
+  await page.goto('https://old.reddit.com/r/wallstreetbets/', { waitUntil: 'networkidle2', timeout: 30_000 })
   const discussionLink = await findDailyDiscussionLink(page)
   if (!discussionLink) {
     const content = await page.content()
-    if (content.includes('blocked by network security')) {
-      throw new Error('Reddit blocked the request.')
-    }
     console.warn('[wall-steet-bets] missing link:\n\n', content)
+    if (content.includes('blocked by network security')) {
+      throw new Error(`Reddit blocked the request:\n\n${content}`)
+    }
     throw new Error(`Failed to find discussion link:\n\n${content}`)
   }
   // swap url with old reddit api for ssr rendering
   const oldReddit = new URL(discussionLink.replace('www.reddit.com', 'old.reddit.com'))
   oldReddit.searchParams.set('limit', String(options.limit ?? 200))
-  await page.goto(oldReddit.href)
+  await page.goto(oldReddit.href, { waitUntil: 'networkidle2', timeout: 30_000 })
   const json = await extractNestedPageComments(page)
   const html = await page.content()
+  await browser.close()
   return { json, html }
 }
