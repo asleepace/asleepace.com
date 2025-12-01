@@ -2,7 +2,9 @@
  * @file src/lib/server/fetch-wsb-comments.ts
  * @description fetch the daily discussion thread on wall street bets and extract the comments as json.
  */
-import puppeteer, { Page } from 'puppeteer'
+import { Page } from 'puppeteer'
+import puppeteer from 'puppeteer-extra'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
 /**
  * Shared configuration.
@@ -91,15 +93,11 @@ export type WallStreetBetsData = {
 }
 
 export async function fetchWallStreetBetsComments(options: { limit?: number }) {
+  puppeteer.use(StealthPlugin())
+
   const browser = await puppeteer.launch({
     executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
-    args: [
-      `--window-size=${config.width},${config.height}`,
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-    ],
+    args: [`--window-size=${config.width},${config.height}`, '--no-sandbox', '--disable-setuid-sandbox'],
     headless: true,
   })
   const page = await browser.newPage()
@@ -108,10 +106,13 @@ export async function fetchWallStreetBetsComments(options: { limit?: number }) {
     height: config.height,
   })
   await page.setUserAgent(config.userAgent)
-  await page.goto('https://www.reddit.com/r/wallstreetbets/')
+  await page.goto('https://old.reddit.com/r/wallstreetbets/')
   const discussionLink = await findDailyDiscussionLink(page)
   if (!discussionLink) {
     const content = await page.content()
+    if (content.includes('blocked by network security')) {
+      throw new Error('Reddit blocked the request.')
+    }
     console.warn('[wall-steet-bets] missing link:\n\n', content)
     throw new Error(`Failed to find discussion link:\n\n${content}`)
   }
