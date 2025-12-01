@@ -16,7 +16,7 @@ src/styles/output.css
 node_modules/
 
 # Daily report files
-public/daily/
+public/daily/*
 
 # SQLite database
 db.sqlite
