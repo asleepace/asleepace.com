@@ -3,7 +3,8 @@ import { fetchDailyReport } from '@/lib/server/fetch-daily-report'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import { marked } from 'marked'
 
-const filePath = `${import.meta.dir}/today.md`
+const today = new Date().toISOString().split('T')[0]
+const filePath = `public/daily/report-${today}.md`
 const file = Bun.file(filePath)
 
 async function getOrCreateDailyReport() {
