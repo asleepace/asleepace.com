@@ -12,11 +12,11 @@ async function handlePDFResponse(content: string) {
   })
 }
 
-async function getOrCreateDailyReport({ limit = 250 }) {
+async function getOrCreateDailyReport({ limit = 250, refresh = false }) {
   const today = new Date().toISOString().split('T')[0]
   const filePath = `public/daily/report-${today}.json`
   const file = Bun.file(filePath, { type: 'application/json' })
-  if (await file.exists()) {
+  if (refresh === false && (await file.exists())) {
     return file.json()
   }
   const report = await fetchDailyReport({ limit })
@@ -31,11 +31,12 @@ async function getOrCreateDailyReport({ limit = 250 }) {
  */
 export const GET: APIRoute = async ({ url }) => {
   try {
-    const DEFAULT_LIMIT = 500
+    const DEFAULT_LIMIT = 300
     const DEFAULT_TYPE = 'json'
     const limit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT)
     const type = url.searchParams.get('type') ?? DEFAULT_TYPE
-    const report = await getOrCreateDailyReport({ limit })
+    const refresh = !!url.searchParams.get('refresh')
+    const report = await getOrCreateDailyReport({ limit, refresh })
 
     switch (type) {
       case 'html':
