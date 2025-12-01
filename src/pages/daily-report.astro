@@ -5,6 +5,7 @@ import { marked } from 'marked'
 import HeroImage from '@/components/astro/HeroImage.astro'
 import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
+import { PageMetrics } from '@/components/blog/PageMetrics'
 
 const DEFAULT_LIMIT = 300
 const url = new URL(Astro.url)
@@ -16,15 +17,16 @@ const refresh = refreshStr === 'true' || Number(refreshStr) > 0
 const report = await fetchDailyReport({ limit, refresh })
 const content = marked(report.summary)
 
-const title = 'The Daily Report'
 const bgImage = '/images/bolsnbers4.png'
 
 const today = new Date()
+const title = 'The Daily Report'
+
 const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
 const description = `Daily analysis of WSB's hottest stock picks, market sentiment, and options plays for ${currentDate}. SPY predictions, trending tickers, and what traders are watching.`
 ---
 
-<SiteLayout title={title} description={description} image={bgImage}>
+<SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage}>
   <article class="flex flex-col max-w-3xl gap-y-4 mx-auto px-4 py-16">
     <HeroImage src={bgImage} alt={`Daily Report | ${currentDate}`} />
     <HeroTitle title={title} pubDate={today} />
@@ -54,6 +56,7 @@ const description = `Daily analysis of WSB's hottest stock picks, market sentime
     >
       Download as PDF
     </button>
+    <PageMetrics className="mb-8 no-print mx-auto shrink" client:only="react" />
   </article>
 </SiteLayout>
 
