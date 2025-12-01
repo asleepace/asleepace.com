@@ -2,6 +2,9 @@
 import { fetchDailyReport } from '@/lib/server/fetch-daily-report'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import { marked } from 'marked'
+import HeroImage from '@/components/astro/HeroImage.astro'
+import HeroTitle from '@/components/astro/HeroTitle.astro'
+import Prose from '@/components/astro/Prose.astro'
 
 const DEFAULT_LIMIT = 300
 const url = new URL(Astro.url)
@@ -12,10 +15,40 @@ const refresh = refreshStr === 'true' || Number(refreshStr) > 0
 
 const report = await fetchDailyReport({ limit, refresh })
 const content = marked(report.summary)
+
+const title = 'The Daily Report'
+const bgImage = '/images/bolsnbers4.png'
+
+const today = new Date()
+const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
+const description = `Daily analysis of WSB's hottest stock picks, market sentiment, and options plays for ${currentDate}. SPY predictions, trending tickers, and what traders are watching.`
 ---
 
-<SiteLayout>
-  <article class="flex flex-col max-w-3xl gap-y-4 mx-auto px-4 py-16" set:html={content} />
+<SiteLayout title={title} description={description} image={bgImage}>
+  <article class="flex flex-col max-w-3xl gap-y-4 mx-auto px-4 py-16">
+    <HeroImage src={bgImage} alt={`Daily Report | ${currentDate}`} />
+    <HeroTitle title={title} pubDate={today} />
+
+    <Prose>
+      <Fragment set:html={content} />
+    </Prose>
+
+    <div class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+      <p class="text-sm text-gray-700 leading-relaxed">
+        <strong class="font-semibold text-gray-900">⚠️ Disclaimer:</strong>
+        Data sourced from
+        <a
+          href="https://www.reddit.com/r/wallstreetbets/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-600 hover:text-blue-800 underline font-medium"
+        >
+          r/WallStreetBets
+        </a>
+        and analyzed with Grok AI. Not financial advice. Information is subject to change. Trade at your own risk.
+      </p>
+    </div>
+  </article>
 </SiteLayout>
 
 <style is:global>
