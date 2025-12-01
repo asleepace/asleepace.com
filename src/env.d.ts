@@ -21,6 +21,7 @@ interface Env {
   WEBAUTHN_RP_ORIGIN: string
   CHROME_EXECUTABLE_PATH: string
   GROK_API_KEY: string
+  CHROME_COOKIE_REDDIT: string
 }
 
 declare global {

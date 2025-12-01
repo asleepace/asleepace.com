@@ -6,6 +6,23 @@ import { Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
+// NOTE: Use stealth mode
+puppeteer.use(StealthPlugin())
+
+function parseCookies(cookieString: string) {
+  return cookieString.split('; ').map((cookie) => {
+    const [name, ...valueParts] = cookie.split('=')
+    return {
+      name: name.trim(),
+      value: valueParts.join('='),
+      domain: '.reddit.com',
+      path: '/',
+      httpOnly: true,
+      secure: true,
+    }
+  })
+}
+
 /**
  * Shared configuration.
  */
@@ -93,20 +110,30 @@ export type WallStreetBetsData = {
 }
 
 export async function fetchWallStreetBetsComments(options: { limit?: number }) {
-  puppeteer.use(StealthPlugin())
-
   const browser = await puppeteer.launch({
     executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
-    args: [`--window-size=${config.width},${config.height}`, '--no-sandbox', '--disable-setuid-sandbox'],
+    args: [
+      `--window-size=${config.width},${config.height}`,
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--incognito', // Start in incognito
+    ],
     headless: true,
   })
+
+  // NOTE: Make sure to update this if needed
+  if (!import.meta.env.CHROME_COOKIE_REDDIT) {
+    throw new Error('Missing (.env) variable CHROME_COOKIE_REDDIT')
+  }
+
+  const cookies = parseCookies(import.meta.env.CHROME_COOKIE_REDDIT)
+  await browser.setCookie(...cookies)
   const page = await browser.newPage()
   await page.setViewport({
     width: config.width,
     height: config.height,
   })
-  // await page.setUserAgent(config.userAgent)
-  // Extra headers
+
   await page.setExtraHTTPHeaders({
     'Accept-Language': 'en-US,en;q=0.9',
     Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
