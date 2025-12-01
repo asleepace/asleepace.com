@@ -112,6 +112,7 @@ export async function fetchWallStreetBetsComments(options: { limit?: number }) {
   const discussionLink = await findDailyDiscussionLink(page)
   if (!discussionLink) {
     const content = await page.content()
+    console.warn('[wall-steet-bets] missing link:\n\n', content)
     throw new Error(`Failed to find discussion link:\n\n${content}`)
   }
   // swap url with old reddit api for ssr rendering
