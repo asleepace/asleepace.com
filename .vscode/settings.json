@@ -17,5 +17,6 @@
   "prettier.singleQuote": true,
   "prettier.semi": false,
   "editor.formatOnSave": true,
-  "prettier.tabWidth": 2
+  "prettier.tabWidth": 2,
+  "editor.tabSize": 2
 }

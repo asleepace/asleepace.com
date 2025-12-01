@@ -58,16 +58,11 @@ async function extractNestedPageComments(page: Page) {
   })
 }
 
-export async function fetchRemoteWebPage(options: { url: string }) {
-  const page = await browser.newPage()
-  await page.setViewport({
-    width: 1920,
-    height: 1080,
-  })
-  await page.setUserAgent(config.userAgent)
-  await page.goto(options.url)
-
-  const discussionLink = await page.evaluate(() => {
+/**
+ * Helper function to find the daily discussion link from the WSB homepage.
+ */
+async function findDailyDiscussionLink(page: Page) {
+  return page.evaluate(() => {
     const links: HTMLLinkElement[] = Array.from(document.querySelectorAll('a[href]'))
 
     return links.find((link) => {
@@ -83,17 +78,25 @@ export async function fetchRemoteWebPage(options: { url: string }) {
       )
     })?.href
   })
+}
 
+export async function fetchDailyDiscussionComments(options: { limit?: number }) {
+  const page = await browser.newPage()
+  await page.setViewport({
+    width: config.width,
+    height: config.height,
+  })
+  await page.setUserAgent(config.userAgent)
+  await page.goto('https://www.reddit.com/r/wallstreetbets/')
+  const discussionLink = await findDailyDiscussionLink(page)
   if (!discussionLink) throw new Error('Failed to find discussion link.')
-
+  // swap url with old reddit api for ssr rendering
   const oldReddit = new URL(discussionLink.replace('www.reddit.com', 'old.reddit.com'))
-  oldReddit.searchParams.set('limit', '500')
+  oldReddit.searchParams.set('limit', String(options.limit ?? 200))
   await page.goto(oldReddit.href)
-
-  const comments = await extractNestedPageComments(page)
+  const json = await extractNestedPageComments(page)
   const html = await page.content()
-
-  return { comments, html }
+  return { json, html }
 }
 
 /**
@@ -107,7 +110,8 @@ export async function fetchRemoteWebPage(options: { url: string }) {
  */
 export const GET: APIRoute = async (ctx) => {
   const isHtmlOnly = !!ctx.url.searchParams.get('html')
-  const wallStreetBets = await fetchRemoteWebPage({ url: 'https://www.reddit.com/r/wallstreetbets/' })
+  const limit = Number(ctx.url.searchParams.get('limit') ?? '200')
+  const wallStreetBets = await fetchDailyDiscussionComments({ limit })
   if (isHtmlOnly) return new Response(wallStreetBets.html)
-  return Response.json(wallStreetBets.comments)
+  return Response.json(wallStreetBets.json)
 }
