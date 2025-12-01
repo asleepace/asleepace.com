@@ -18,7 +18,7 @@ export async function fetchGrokBasic({ prompt = '', temperature = 0.7 }): Promis
       model: 'grok-4-fast-non-reasoning',
       messages: [{ role: 'user', content: prompt }],
       stream: false,
-      temperature: 0.7,
+      temperature,
     }),
   })
   if (!response.ok) {
