@@ -48,6 +48,12 @@ const description = `Daily analysis of WSB's hottest stock picks, market sentime
         and analyzed with Grok AI. Not financial advice. Information is subject to change. Trade at your own risk.
       </p>
     </div>
+    <button
+      onclick="window.print()"
+      class="no-print px-4 py-2 mt-8 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+    >
+      Download as PDF
+    </button>
   </article>
 </SiteLayout>
 
@@ -72,5 +78,57 @@ const description = `Daily analysis of WSB's hottest stock picks, market sentime
 
   article a:hover {
     @apply text-green-500!;
+  }
+
+  /* Print styles */
+  @media print {
+    /* Hide elements not needed in PDF */
+    nav,
+    button,
+    header,
+    .no-print {
+      display: none !important;
+    }
+
+    /* Remove URL/date headers and footers */
+    @page {
+      margin: 0.5in;
+    }
+
+    /* Hide link URLs that appear after links */
+    a[href]::after {
+      content: none !important;
+    }
+
+    /* Optimize article for print */
+    article {
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Remove background colors for better printing */
+    body {
+      background: white !important;
+    }
+
+    /* Ensure links are visible */
+    a {
+      color: #2563eb !important;
+      text-decoration: underline !important;
+    }
+
+    /* Page breaks */
+    h1,
+    h2,
+    h3 {
+      page-break-after: avoid;
+    }
+
+    /* Keep images reasonable size */
+    img {
+      max-width: 100%;
+      page-break-inside: avoid;
+    }
   }
 </style>
