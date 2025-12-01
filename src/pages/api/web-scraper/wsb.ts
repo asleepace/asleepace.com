@@ -1,117 +1,80 @@
 import type { APIRoute } from 'astro'
-import puppeteer, { Page } from 'puppeteer'
+import { fetchWallStreetBetsComments } from '@/lib/server/fetch-wsb-comments'
+import { downloadToPDF } from '@/lib/server/download-to-pdf'
+import { fetchGrokBasic } from '@/lib/server/fetch-grok'
 
-/**
- * Shared configuration.
- */
-const config = {
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-  width: 1920,
-  height: 1080,
-} as const
+const GROK_TEMPLATE = (params: { limit: number; json: any }) => `
+Title: Daily Market Analysis
+Date: ${new Date().toISOString()}
 
-/**
- * Single browser instance which will be re-used.
- */
-const browser = await puppeteer.launch({
-  args: [`--window-size=${config.width},${config.height}`],
-  headless: true,
-})
+Analyze the first ${params.limit} comments from WSB daily discussion. Provide:
+1. Macro events summary
+2. SPY outlook (green/red prediction)
+3. Trending stocks (with sentiment)
+4. Possible plays
+5. Critical analysis
 
-/**
- * Helper for extracting comments from wallstreetbets.
- */
-async function extractNestedPageComments(page: Page) {
-  return await page.evaluate(() => {
-    function parseComment(commentEl: Element): any {
-      const author = commentEl.querySelector('.author')?.textContent || null
-      const score = commentEl.querySelector('.score.unvoted')?.getAttribute('title') || '0'
-      const time = commentEl.querySelector('time')?.getAttribute('datetime') || null
-      const body = commentEl.querySelector('.usertext-body .md')?.textContent?.trim() || ''
-      const permalink = commentEl.querySelector('.bylink')?.getAttribute('href') || null
-      const id = commentEl.getAttribute('data-fullname') || null
-      const flair = commentEl.querySelector('.flair')?.textContent?.trim() || null
+Guidelines:
+- Higher score comments = more reliable
+- High reply counts = trending topics
+- Filter obvious nonsense/spam
+- Terms: "Bol" = bull, "Mango" = Trump, "JPow" = Jerome Powell
+- Format tickers as markdown links: [TICKER](/ticker)
+- Be concise, draw critical conclusions
+- Infer witching days, sentiment, key items to watch
+- Don't repeat instructions (unless very good reason to do so)
+- Be on alert for any and all macro events (none may exist too)
 
-      // Navigate: .child > .sitetable.listing > .thing.comment (direct children only)
-      const sitetable = commentEl.querySelector(':scope > .child > .sitetable.listing')
-      const replies = sitetable
-        ? Array.from(sitetable.querySelectorAll(':scope > .thing.comment')).map((reply) => parseComment(reply))
-        : []
+This relates to the U.S. stock market, so please also infer what you know about the market,
 
-      return {
-        id,
-        author,
-        score: parseInt(score),
-        timestamp: time,
-        flair,
-        body,
-        permalink: permalink ? `https://old.reddit.com${permalink}` : null,
-        replies,
-      }
-    }
+time of year, recurring trends, and geopolitical knowledge to infer valuable insights.
 
-    // Top-level: .sitetable.nestedlisting > .thing.comment
-    return Array.from(document.querySelectorAll('.sitetable.nestedlisting > .thing.comment')).map((comment) =>
-      parseComment(comment)
-    )
+Be sure to double check your work and look over everything twice to draw additional conclusions or insights.
+
+Assume a high level of technical trading knowledge, but also don't be afraid to be a WSB bear or bull.
+
+Comments:
+${JSON.stringify(params.json, null, 2)}
+`
+
+async function handlePDFResponse(content: string) {
+  const pdfBuffer = await downloadToPDF(content)
+  return new Response(pdfBuffer as any, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="wsb-${new Date().toISOString().split('T')[0]}.pdf"`,
+    },
   })
 }
 
-/**
- * Helper function to find the daily discussion link from the WSB homepage.
- */
-async function findDailyDiscussionLink(page: Page) {
-  return page.evaluate(() => {
-    const links: HTMLLinkElement[] = Array.from(document.querySelectorAll('a[href]'))
-
-    return links.find((link) => {
-      const text = link.textContent?.toLowerCase() || ''
-      const href = link.getAttribute('href') || ''
-
-      // Match "Daily Discussion Thread" variations
-      return (
-        (text.includes('daily discussion') ||
-          text.includes('daily thread') ||
-          text.includes('what are your moves tomorrow')) &&
-        href.includes('/comments/')
-      )
-    })?.href
-  })
-}
-
-export async function fetchDailyDiscussionComments(options: { limit?: number }) {
-  const page = await browser.newPage()
-  await page.setViewport({
-    width: config.width,
-    height: config.height,
-  })
-  await page.setUserAgent(config.userAgent)
-  await page.goto('https://www.reddit.com/r/wallstreetbets/')
-  const discussionLink = await findDailyDiscussionLink(page)
-  if (!discussionLink) throw new Error('Failed to find discussion link.')
-  // swap url with old reddit api for ssr rendering
-  const oldReddit = new URL(discussionLink.replace('www.reddit.com', 'old.reddit.com'))
-  oldReddit.searchParams.set('limit', String(options.limit ?? 200))
-  await page.goto(oldReddit.href)
-  const json = await extractNestedPageComments(page)
-  const html = await page.content()
-  return { json, html }
-}
+const DEFAULT_LIMIT = 500
+const DEFAULT_FORMAT = 'json'
 
 /**
- * GET /api/web-scraper/wsb
+ * GET /api/web-scraper/wsb?type=pdf
  *
- * This Astro endpoint returns a JSON array of comments from the wall street bets
- * daily discussion thread.
- *
- * Takes an optional url param `?html` which will just return the contents of the
- * page instead.
+ * Takes an optional url param
  */
 export const GET: APIRoute = async (ctx) => {
-  const isHtmlOnly = !!ctx.url.searchParams.get('html')
-  const limit = Number(ctx.url.searchParams.get('limit') ?? '200')
-  const wallStreetBets = await fetchDailyDiscussionComments({ limit })
-  if (isHtmlOnly) return new Response(wallStreetBets.html)
-  return Response.json(wallStreetBets.json)
+  try {
+    const outputType = ctx.url.searchParams.get('type') ?? DEFAULT_FORMAT
+    const limit = Number(ctx.url.searchParams.get('limit') ?? DEFAULT_LIMIT)
+
+    const { json, html } = await fetchWallStreetBetsComments({ limit })
+    const summary = await fetchGrokBasic({ prompt: GROK_TEMPLATE({ limit, json }) })
+
+    switch (outputType) {
+      case 'html':
+        return new Response(html)
+      case 'pdf':
+        return handlePDFResponse(summary)
+      case 'json':
+      default:
+        return Response.json({ summary, limit, comments: json })
+    }
+  } catch (error) {
+    const e = error instanceof Error ? error : new Error(String(error))
+    console.error('[api/wsb] error:', error)
+    return Response.json({ error: e.message })
+  }
 }
