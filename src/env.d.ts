@@ -19,6 +19,8 @@ interface Env {
   COOKIE_DOMAIN: string
   WEBAUTHN_RP_ID: string
   WEBAUTHN_RP_ORIGIN: string
+  CHROME_EXECUTABLE_PATH: string
+  GROK_API_KEY: string
 }
 
 declare global {

@@ -92,7 +92,14 @@ export type WallStreetBetsData = {
 
 export async function fetchWallStreetBetsComments(options: { limit?: number }) {
   const browser = await puppeteer.launch({
-    args: [`--window-size=${config.width},${config.height}`],
+    executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
+    args: [
+      `--window-size=${config.width},${config.height}`,
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+    ],
     headless: true,
   })
   const page = await browser.newPage()

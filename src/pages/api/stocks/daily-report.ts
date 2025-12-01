@@ -35,7 +35,8 @@ export const GET: APIRoute = async ({ url }) => {
     const DEFAULT_TYPE = 'json'
     const limit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT)
     const type = url.searchParams.get('type') ?? DEFAULT_TYPE
-    const refresh = !!url.searchParams.get('refresh')
+    const refreshStr = url.searchParams.get('refresh')
+    const refresh = refreshStr === 'true' || Number(refreshStr) > 0
     const report = await getOrCreateDailyReport({ limit, refresh })
 
     switch (type) {
