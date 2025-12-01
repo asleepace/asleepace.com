@@ -16,6 +16,7 @@ const whitelist = [
   '/api/webauthn/register-start',
   '/api/webauthn/register-complete',
   '/api/webauthn/challenge',
+  '/api/stocks/',
   '/api/metrics',
   '/_actions/',
 ]
