@@ -20,7 +20,7 @@ async function getOrCreateDailyReport({ limit = 250, refresh = false }) {
     return file.json()
   }
   const report = await fetchDailyReport({ limit })
-  await file.write(report)
+  await file.write(JSON.stringify({ ...report, limit }, null, 2))
   return report
 }
 
