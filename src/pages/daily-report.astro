@@ -1,0 +1,40 @@
+---
+import { fetchDailyReport } from '@/lib/server/fetch-daily-report'
+import SiteLayout from '@/layouts/SiteLayout.astro'
+import { marked } from 'marked'
+
+const filePath = `${import.meta.dir}/today.md`
+const file = Bun.file(filePath)
+
+async function getOrCreateDailyReport() {
+  if (await file.exists()) {
+    return await file.text()
+  }
+  const report = await fetchDailyReport({ limit: 500 })
+  await file.write(report.summary)
+  return report.summary
+}
+
+const report = await getOrCreateDailyReport()
+const content = marked(report)
+---
+
+<SiteLayout>
+  <article class="flex flex-col max-w-3xl gap-y-4 mx-auto px-4 py-16" set:html={content} />
+</SiteLayout>
+
+<style is:global>
+  @import 'tailwindcss';
+  h1 {
+    @apply text-6xl font-black tracking-tight pb-4;
+  }
+  h2 {
+    @apply text-3xl font-bold;
+  }
+  h3 {
+    @apply text-2xl font-bold;
+  }
+  h4 {
+    @apply text-xl font-bold;
+  }
+</style>
