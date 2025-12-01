@@ -35,25 +35,10 @@ export type LinkItem = {
 const DailyFeed: FeedItem = {
   date: new Date(),
   href: '/daily-report',
-  name: 'The Daily Report',
+  name: `The Daily Report | ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}`,
 }
 
 feed.unshift(DailyFeed)
-
-// const pages: LinkItem[] = [
-//   {
-//     name: 'Apps',
-//     icon: BoxIcon,
-//     tint: 'oklch(92.5% 0.084 155.995)',
-//     href: '/tools',
-//   },
-//   {
-//     name: 'Links',
-//     icon: LinkIcon,
-//     tint: 'oklch(76.9% 0.188 70.08)',
-//     href: '/tools',
-//   },
-// ]
 ---
 
 <div class={clsx('p-4', classList)}>
