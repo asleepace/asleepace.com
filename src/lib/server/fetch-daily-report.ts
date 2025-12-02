@@ -117,7 +117,7 @@ export type DailyReportOptions = {
   limit: number
 }
 
-async function fetchWsbWithGrok({ date, limit, previous }: Omit<DailyReportOptions, 'refresh'>) {
+async function handleReportGeneration({ date, limit, previous }: Omit<DailyReportOptions, 'refresh'>) {
   // metrics for timing
   const startTime = performance.now()
   const getTimeInSeconds = () => ((performance.now() - startTime) / 1_000).toFixed(2)
@@ -161,18 +161,28 @@ async function fetchWsbWithGrok({ date, limit, previous }: Omit<DailyReportOptio
  * @see https://www.reddit.com/r/wallstreetbets/
  */
 export async function fetchDailyReport({ date = new Date(), limit = 250, refresh = false }): Promise<DailyReport & {}> {
+  // load previous report data
   const previous = await getDailyReport({ date })
+  const previousData: Record<string, any> = previous?.data ?? {}
+  const history: string[] = previousData.history ?? []
 
   if (refresh === false && previous) return previous
 
-  console.log('[fetch-daily-report] has preivous:', !!previous)
+  const { text, ...data } = await handleReportGeneration({ date, limit, previous })
 
-  const dailyReport = await fetchWsbWithGrok({ date, limit, previous })
+  // append previous text to history
+  if (previous) {
+    history.push(previous.text)
+  }
 
   return await upsertDailyReport({
     accuracy: 0,
-    text: dailyReport.text,
-    data: dailyReport,
+    text,
+    data: {
+      ...previousData,
+      ...data,
+      history,
+    },
     date,
   })
 }
