@@ -27,7 +27,7 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
     Provide a short summary of major things to look out for today or this week (2-3 sentances).
 
     Provide a formatted as a table with Event Name,  Date / Time (Premarket, Today, 2:00PM EST, Post-market, Tomorrow, Next Week), and Summary (short note on expectations or impact).
-    and the Date/Time should be a rough estimate (DO NOT INCLUDE AMC, KEEP BRIEF AND CONCISE)
+    and the Date/Time should be a rough estimate (DO NOT INCLUDE AMC, KEEP BRIEF AND CONCISE) (MAX 6 ENTRIES - Most important)
 
     (e.g. here is a good example:
       | Event Name | Date / Time | Summary        |
@@ -40,9 +40,13 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
     )
     
 
-    <a class="font-normal! text-blue-500! underline!" href="https://finance.yahoo.com/calendar/economic/">📅 Click to view full calendar</a>
+    <a class="font-normal! text-blue-500! underline!" href="https://finance.yahoo.com/calendar/economic/">📅 View full calendar</a>
 
   ### Possible Plays
+
+    Provide a short paragraph summary of the macro play and what you like.
+    Provide a bulleted list of possible plays you like and why
+
 
   ### Bull vs. Bear thesis
 
