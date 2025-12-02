@@ -4,7 +4,11 @@
  * Simple function which fetches a response from the Grok api and returns
  * the first message content.
  */
-export async function fetchGrokBasic({ prompt = '', temperature = 0.7 }): Promise<string> {
+export async function fetchGrokBasic({
+  prompt = '',
+  temperature = 0.7,
+  model = 'grok-4-1-fast-reasoning',
+}): Promise<string> {
   if (!import.meta.env.GROK_API_KEY) {
     throw new Error('[fetch-grok] missing (.env) api for GROK_API_KEY')
   }
@@ -15,7 +19,7 @@ export async function fetchGrokBasic({ prompt = '', temperature = 0.7 }): Promis
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'grok-4-fast-non-reasoning',
+      model,
       messages: [{ role: 'user', content: prompt }],
       stream: false,
       temperature,

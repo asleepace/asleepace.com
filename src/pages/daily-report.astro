@@ -7,6 +7,8 @@ import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
 
+export const prerender = false
+
 const DEFAULT_LIMIT = 300
 const url = new URL(Astro.url)
 
@@ -15,7 +17,7 @@ const refreshStr = url.searchParams.get('refresh')
 const refresh = refreshStr === 'true' || Number(refreshStr) > 0
 
 const report = await fetchDailyReport({ limit, refresh })
-const content = marked(report.summary)
+const content = await marked(report.summary)
 
 const bgImage = '/images/bolsnbers4.png'
 
@@ -23,7 +25,21 @@ const today = new Date()
 const title = 'The Daily Report'
 
 const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
-const description = `Daily analysis of WSB's hottest stock picks, market sentiment, and options plays for ${currentDate}. SPY predictions, trending tickers, and what traders are watching.`
+
+function getDetailedSummary() {
+  try {
+    const pageTitle = report.summary.slice(4, report.summary.indexOf('**') - 2)
+    const indexOfSummary = report.summary.indexOf('Macro')
+    const macro = report.summary.slice(indexOfSummary)
+    const description = macro.slice(macro.indexOf('\n') + 1, macro.indexOf('###') - 2)
+    const ogDescription = `${pageTitle} • ${description}`
+    return ogDescription
+  } catch (e) {
+    return report.summary.slice(4, Math.min(600, report.summary.length))
+  }
+}
+
+const description = getDetailedSummary()
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage}>
