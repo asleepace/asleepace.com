@@ -90,19 +90,3 @@ export const siteConfig: SiteConfig = {
     default: 'bg-slate-500',
   },
 }
-
-Object.entries(siteConfig).forEach(([key, value]) => {
-  if (key === 'hashTagColors') return
-  if (key === 'path') return
-  if (value instanceof URL) {
-    print(chalk.gray(`${key}:`), chalk.cyan(value.toString()))
-  } else if (typeof value === 'string') {
-    print(chalk.gray(`${key}:`), chalk.green(`"${value}"`))
-  } else if (typeof value === 'number') {
-    print(chalk.gray(`${key}:`), chalk.yellow(value))
-  } else if (typeof value === 'boolean') {
-    print(chalk.gray(`${key}:`), chalk.yellow(value))
-  } else {
-    print(chalk.gray(`${key}:`), value)
-  }
-})
