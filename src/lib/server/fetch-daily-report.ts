@@ -1,11 +1,12 @@
-import { fetchCalendar } from './fetch-calendar'
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
+import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 
 const GROK_TEMPLATE = (params: {
   limit: number
   comments: WallStreetBetsComment[]
   previous?: string
+  meta?: Record<string, any>
   calendar: any
 }) =>
   `
@@ -23,6 +24,24 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
 
   ### Calendar Events
 
+    Provide a short summary of major things to look out for today or this week (2-3 sentances).
+
+    Provide a formatted as a table with Event Name,  Date / Time (Premarket, Today, 2:00PM EST, Post-market, Tomorrow, Next Week), and Summary (short note on expectations or impact).
+    and the Date/Time should be a rough estimate (DO NOT INCLUDE AMC, KEEP BRIEF AND CONCISE)
+
+    (e.g. here is a good example:
+      | Event Name | Date / Time | Summary        |
+      | ---------- | ----------- | -------------- |
+      | [CRWD](#href) Earnings | Today    | Q3 exp 0.94 EPS; cybersecurity beat potential |
+      | [MRVL](#href) Earnings | Today    | Q3 exp 0.74 EPS; AI M&A buzz |
+      | [AEO](#href) Earnings  | Today    | Q3 exp 0.46 EPS; holiday retail gauge |
+      | PPI Release   | Tomorrow | 	Inflation check; core >2.5% risks hawkish Fed |
+      | FOMC Meeting  | Next Week | Rate hold expected; dovish dots bullish |
+    )
+    
+
+    <a class="font-normal! text-blue-500! underline!" href="https://finance.yahoo.com/calendar/economic/">📅 Click to view full calendar</a>
+
   ### Possible Plays
 
   ### Bull vs. Bear thesis
@@ -31,18 +50,23 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
 
   ### The Unknown Unknowns
 
-  Draw a conclusion based on the data above, reason about what we can realistically expect,
-  hidden patterns, helpful insights and any relevent information you would like to inclide.
+  ### AI Analysis
 
-  End with a firm, confident take on SPY calls or puts and which strike you would pick and why.
+  Draw a conclusion based on the data above, reason about what we can realistically expect,
+  hidden patterns, helpful insights and any relevent information you would like to include.
+
+  End with a firm, confident take on SPY calls or puts and which strike you would pick and why. Should be able to fit in a tweet and be
+  optimized for sharing on X.
 
   Final sentance will be some variation of "**The bears have it today**" or "**The bulls have it today**" or something like that.
 
 Guidelines:
+- Do Not Use Emojis
+- Avoid using em-dashes for sentances
 - Higher score comments = more reliable
 - High reply counts = trending topics
 - Filter obvious nonsense/spam
-- Terms: "Bol" = bull, "Mango" = Trump, "JPow" = Jerome Powell
+- Translate WSB Terms to Plain English: "Bol" = bull, "Mango" = Trump, "JPow" = Jerome Powell
 - Format tickers as markdown links: [TICKER](#ticker)
 - Be concise, draw critical conclusions
 - If previous analysis is included use new data to revise, update and expand
@@ -50,7 +74,9 @@ Guidelines:
 - Don't repeat instructions (unless very good reason to do so)
 - Be on alert for any and all macro events (none may exist too)
 - Be smart, clever and think outside the box to gain key insights
-
+- Title should read like a sentance (No punctuations or Emojis)
+- Prices should be prefixed with currency symbol
+- Tickers should be hyperlinked
 
 This relates to the U.S. stock market, so also infer what you know about the market,
 time of year, recurring trends, geopolitical knowledge and other misc factors to infer valuable insights.
@@ -79,20 +105,43 @@ export type DailyReportOptions = {
 export type DailyReportOutput = {
   comments: WallStreetBetsComment[]
   summary: string
-  calendar?: Record<string, any>
+  calendar?: any
   html: string
+  meta?: Record<string, any>
 }
 
 async function fetchWsbWithGrok({ limit = 250, previous }: DailyReportOptions): Promise<DailyReportOutput> {
-  const calendarPromise = fetchCalendar().catch(() => '')
+  // metrics for timing
+  const startTime = performance.now()
+  const getTimeInSeconds = () => ((performance.now() - startTime) / 1_000).toFixed(2)
+
+  console.log('[fetch-daily-report] fetching daily report...')
+  // start yahoo calendar promise
+  const calendarPromise = fetchYahooCalendar({}).catch((err) => {
+    console.warn('[fetch-daily-report] fetching calendar failed:', err)
+    return undefined
+  })
+
+  // fetch wall street bets comments
   const { json: comments, html } = await fetchWallStreetBetsComments({ limit })
+  console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) loaded wsb comments:`, comments.length)
+
+  // wait for calendar promise to resolve
   const calendar = await calendarPromise
-  const prompt = GROK_TEMPLATE({ limit, comments, previous, calendar })
+  console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) loaded yahoo calendar: `, !!calendar)
+
+  // construct prompt and analyze with grok
+  const prompt = GROK_TEMPLATE({ limit, comments, previous, calendar: await calendarPromise })
   const summary = await fetchGrokBasic({ prompt })
+  console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) loaded grok analysis: `, !!summary)
+
   return {
     comments,
     summary,
     calendar,
+    meta: {
+      totalTime: getTimeInSeconds(),
+    },
     html,
   }
 }

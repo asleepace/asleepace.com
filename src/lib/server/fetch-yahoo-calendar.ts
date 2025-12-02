@@ -19,7 +19,7 @@ STRICTLY follow this JSON schema — no extra fields, no deviations, no explanat
     }
   >,
   "sentiment": "bearish" | "neutral" | "bullish",   // Overall market tone implied by the week's events
-  "notes": string[],                   // Bullet-point observations (max 4)
+  "notes": Array<string>,              // Array of Bullet-point observations strings (max 4)
   "analysis": string,                  // 2-4 sentence big-picture interpretation
   "indexes": Array<{                   // Major US indexes — extract current values if visible in page
     "name": "S&P 500" | "Dow Jones" | "Nasdaq" | "Russell 2000" | etc.,
@@ -69,14 +69,64 @@ export const CalendarSchema = z
   .object({
     title: z.string().default('Calendar Summary'),
     date: z.coerce.date(),
-    sentiment: z.string(),
+    sentiment: z.string().optional(),
     events: z.array(z.record(z.string(), z.any())),
-    notes: z.array(z.string()),
-    analysis: z.string(),
+    notes: z.array(z.string()).or(z.string()).default([]),
+    analysis: z.string().optional(),
   })
   .passthrough()
 
 export type CalendarSummary = z.infer<typeof CalendarSchema>
+
+/**
+ * ## Fetch Yahoo Calendar
+ *
+ * This endpoint fetchs the raw HTML from the Yahoo calendar and removes some fluff
+ * and returns as a string.
+ *
+ * @note this does not perform analysis.
+ */
+export async function fetchYahooCalendar({ date = new Date() }: { date?: Date }): Promise<string> {
+  const dateParam = date.toISOString().split('T')[0]
+
+  const url = `https://finance.yahoo.com/calendar/earnings?day=${dateParam}`
+
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+    },
+  })
+
+  let html = await response.text()
+
+  // Match only the body
+  const bodyMatch = html.match(/<body[\s\S]*?<\/body>/i)
+  html = bodyMatch ? bodyMatch[0] : html
+
+  // Remove scripts, styles, comments, SVGs
+  html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+  html = html.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+  html = html.replace(/<!--[\s\S]*?-->/g, '')
+  html = html.replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '')
+
+  // Remove common noise
+  html = html.replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, '')
+  html = html.replace(/<header\b[^>]*>[\s\S]*?<\/header>/gi, '')
+  html = html.replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '')
+  html = html.replace(/<aside\b[^>]*>[\s\S]*?<\/aside>/gi, '')
+
+  // Remove noisy attributes (optional - saves more tokens)
+  html = html.replace(/\s(data-ylk|aria-label|aria-hidden|fetchpriority|loading|srcset|sizes)="[^"]*"/gi, '')
+
+  // Remove extra whitespace and newlines
+  html = html.replace(/\s+/g, ' ')
+  html = html.replace(/>\s+</g, '><')
+  html = html.trim()
+
+  console.log(html)
+
+  return html
+}
 
 /**
  * ## Fetch Yahoo Calendar
@@ -86,7 +136,7 @@ export type CalendarSummary = z.infer<typeof CalendarSchema>
  *
  * @param {Date} date - optional date to check.
  */
-export async function fetchYahooCalendar({ date = new Date() }: { date?: Date }): Promise<CalendarSummary> {
+export async function fetchCalendarAnalysis({ date = new Date() }: { date?: Date }): Promise<CalendarSummary> {
   const dateParam = date.toISOString().split('T')[0]
 
   // Format: YYYY-MM-DD
