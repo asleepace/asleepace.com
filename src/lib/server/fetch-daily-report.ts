@@ -25,7 +25,7 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
 
   ### Calendar Events
 
-    Provide a short summary of major things to look out for today or this week (2-3 sentances).
+    Provide a short summary of major things to look out for today or this week (2-4 sentences).
 
     Provide a formatted as a table with Event Name,  Date / Time (Premarket, Today, 2:00PM EST, Post-market, Tomorrow, Next Week), and Summary (short note on expectations or impact).
     and the Date/Time should be a rough estimate (DO NOT INCLUDE AMC, KEEP BRIEF AND CONCISE) (MAX 6 ENTRIES - Most important)
@@ -36,7 +36,7 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
       | [CRWD](#href) Earnings | Today    | Q3 exp 0.94 EPS; cybersecurity beat potential |
       | [MRVL](#href) Earnings | Today    | Q3 exp 0.74 EPS; AI M&A buzz |
       | [AEO](#href) Earnings  | Today    | Q3 exp 0.46 EPS; holiday retail gauge |
-      | PPI Release   | Tomorrow | 	Inflation check; core >2.5% risks hawkish Fed |
+      | PPI Release   | Tomorrow | Inflation check; core >2.5% risks hawkish Fed |
       | FOMC Meeting  | Next Week | Rate hold expected; dovish dots bullish |
     )
     
@@ -87,7 +87,7 @@ Guidelines:
 - Don't repeat instructions (unless very good reason to do so)
 - Be on alert for any and all macro events (none may exist too)
 - Be smart, clever and think outside the box to gain key insights
-- Title should read like a sentance (No punctuations or Emojis)
+- Title should read like a sentance (No punctuation or Emojis)
 - Prices should be prefixed with currency symbol
 - Tickers should be hyperlinked
 

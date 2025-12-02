@@ -81,7 +81,7 @@ export type CalendarSummary = z.infer<typeof CalendarSchema>
 /**
  * ## Fetch Yahoo Calendar
  *
- * This endpoint fetchs the raw HTML from the Yahoo calendar and removes some fluff
+ * This endpoint fetches the raw HTML from the Yahoo calendar and removes some fluff
  * and returns as a string.
  *
  * @note this does not perform analysis.
@@ -127,32 +127,19 @@ export async function fetchYahooCalendar({ date = new Date() }: { date?: Date })
 }
 
 /**
- * ## Fetch Yahoo Calendar
+ * ## Fetch Yahoo Calendar HTML
  *
- * Fetches the yahoo calendar for the specified date and then performs
- * an AI analysis with Grok into structured data.
+ * Fetches the raw HTML from the Yahoo Finance calendar page for the given date,
+ * removes some extraneous content, and returns the cleaned HTML as a string.
  *
- * @param {Date} date - optional date to check.
+ * @note This function does NOT perform any analysis or summarization. It only fetches and cleans the HTML.
  */
 export async function fetchCalendarAnalysis({ date = new Date() }: { date?: Date }): Promise<CalendarSummary> {
-  const dateParam = date.toISOString().split('T')[0]
-
-  // Format: YYYY-MM-DD
-  const url = `https://finance.yahoo.com/calendar/earnings?day=${dateParam}`
-
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-    },
-  })
-
-  const html = await response.text()
-
+  const html = await fetchYahooCalendar({ date })
   const calendarSummaryJson = await fetchGrokBasic({
-    prompt: PROMPT_CALENDAR({ html, date: dateParam }),
+    prompt: PROMPT_CALENDAR({ html, date: date.toISOString() }),
     model: 'grok-4-fast-non-reasoning',
     temperature: 0.0,
   })
-
   return CalendarSchema.parse(JSON.parse(calendarSummaryJson))
 }
