@@ -1,7 +1,13 @@
+import { fetchCalendar } from './fetch-calendar'
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 
-const GROK_TEMPLATE = (params: { limit: number; comments: WallStreetBetsComment[]; previous?: string }) =>
+const GROK_TEMPLATE = (params: {
+  limit: number
+  comments: WallStreetBetsComment[]
+  previous?: string
+  calendar: any
+}) =>
   `
 Analyze the first ${params.limit} comments from WSB daily discussion. Provide the following markdown:
 
@@ -9,13 +15,15 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
 
   Write a brief synopsis of your analysis, be concise, highlight key sections.
 
-  ### Macro events summary
+  ### Macro Summary
   
-  ### SPY outlook
+  ### SPY Outlook
 
-  ### Trending stocks
+  ### Trending Stocks
 
-  ### Possible plays
+  ### Calendar Events
+
+  ### Possible Plays
 
   ### Bull vs. Bear thesis
 
@@ -55,6 +63,9 @@ Assume a high level of technical trading knowledge, but also don't be afraid to 
 ===========[ previous analysis ]===========
 ${params.previous ?? 'N/A'}
 
+===========[ calendar / events ]===========
+${params.calendar}
+
 ===========[ latest comments ]===========
 ${JSON.stringify(params.comments, null, 2)}
 `.trim()
@@ -68,16 +79,20 @@ export type DailyReportOptions = {
 export type DailyReportOutput = {
   comments: WallStreetBetsComment[]
   summary: string
+  calendar?: Record<string, any>
   html: string
 }
 
 async function fetchWsbWithGrok({ limit = 250, previous }: DailyReportOptions): Promise<DailyReportOutput> {
+  const calendarPromise = fetchCalendar().catch(() => '')
   const { json: comments, html } = await fetchWallStreetBetsComments({ limit })
-  const prompt = GROK_TEMPLATE({ limit, comments, previous })
+  const calendar = await calendarPromise
+  const prompt = GROK_TEMPLATE({ limit, comments, previous, calendar })
   const summary = await fetchGrokBasic({ prompt })
   return {
     comments,
     summary,
+    calendar,
     html,
   }
 }

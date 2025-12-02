@@ -65,15 +65,19 @@ const YAHOO_HEADERS = Object.fromEntries(
 export async function fetchCalendar() {
   const { page, browser } = await fetchPuppet({ headers: YAHOO_HEADERS })
   try {
-    await page.goto('https://finance.yahoo.com/calendar/economic/', { timeout: 60_000 })
-    console.log('[fetch-calendar] navigated to page!')
+    await page.goto('https://finance.yahoo.com/calendar/economic/', { timeout: 80_000 })
+    console.log('[fetch-calendar] navigating to:', page.url())
+
     const mainContent = await page.evaluate(() => {
       return document.querySelector('main')?.outerHTML
     })
 
+    await browser.close()
+
     if (!mainContent) {
       throw new Error('Failed to find content on Yahoo Calendar.')
     }
+
     console.log('[fetch-calendar] loaded main content, processing with ai...')
     const summary = await fetchGrokBasic({
       prompt: `
@@ -140,8 +144,8 @@ export async function fetchCalendar() {
   `.trim(),
     })
     console.log('[fetch-calendar] parsing response ...')
-    const jsonSummary = JSON.parse(summary)
-    return EconomicResponseSchema.parse(jsonSummary)
+    // TODO: handle parsing here...
+    return JSON.parse(summary)
   } catch (e) {
     console.warn('[fetch-calendar] failed:', e)
     if (e instanceof Error) throw e
