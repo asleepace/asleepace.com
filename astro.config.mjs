@@ -17,7 +17,6 @@ import tailwindcss from '@tailwindcss/vite'
  *  @see https://lucia-auth.com/sessions/cookies/astro for cookies
  *  @see https://docs.astro.build/en/guides/environment-variables/ for environment variables
  */
-
 export default defineConfig({
   output: 'server',
   site: 'https://asleepace.com',
