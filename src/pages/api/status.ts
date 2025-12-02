@@ -15,7 +15,7 @@ export const GET: APIRoute = async () => {
   // quick check how many services are online
   const allServices = Object.values(services)
   const totalOnline = allServices.filter(Boolean).length
-  const status = totalOnline === totalOnline ? 'online' : totalOnline === 0 ? 'offline' : 'degraded'
+  const status = totalOnline === allServices.length ? 'online' : totalOnline === 0 ? 'offline' : 'degraded'
 
   return Response.json({
     status,
