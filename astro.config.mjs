@@ -4,7 +4,6 @@ import sitemap from '@astrojs/sitemap'
 import react from '@astrojs/react'
 import node from '@astrojs/node'
 import mdx from '@astrojs/mdx'
-
 import tailwindcss from '@tailwindcss/vite'
 
 /**
@@ -18,25 +17,9 @@ import tailwindcss from '@tailwindcss/vite'
  *  @see https://lucia-auth.com/sessions/cookies/astro for cookies
  *  @see https://docs.astro.build/en/guides/environment-variables/ for environment variables
  */
-
 export default defineConfig({
   output: 'server',
   site: 'https://asleepace.com',
-  env: {
-    schema: {
-      HOST: envField.enum({ context: 'server', access: 'public', values: ['localhost', 'asleepace.com'], default: 'localhost' }),
-      PORT: envField.number({ context: 'server', access: 'public', default: 4321 }),
-      PROTOCOL: envField.enum({ context: 'server', access: 'public', values: ['http', 'https'], default: 'http' }),
-      WEBAUTHN_RP_ORIGIN: envField.string({ context: 'server', access: 'secret' }),
-      WEBAUTHN_RP_ID: envField.string({ context: 'server', access: 'secret' }),
-      MONGODB_URI: envField.string({ context: 'server', access: 'secret' }),
-      SMTP_HOST: envField.string({ context: 'server', access: 'secret' }),
-      SMTP_PORT: envField.number({ context: 'server', access: 'secret' }),
-      SMTP_USER: envField.string({ context: 'server', access: 'secret' }),
-      SMTP_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
-      SMTP_FROM: envField.string({ context: 'server', access: 'secret' }),
-    }
-  },
   integrations: [
     mdx({
       optimize: {
@@ -83,5 +66,88 @@ export default defineConfig({
   },
   devToolbar: {
     enabled: false,
+  },
+  env: {
+    schema: {
+      // Postgres (all server secrets)
+      POSTGRES_CONNECTION_STRING: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      POSTGRES_PASSWORD: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      POSTGRES_USERNAME: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      POSTGRES_DATABASE: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      POSTGRES_HOST: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      POSTGRES_PORT: envField.number({
+        context: 'server', 
+        access: 'secret' 
+      }),
+
+      // Mongo (deprecated) - server secret
+      MONGODB_URI: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+
+      // SMTP (all server secrets, except FROM if used client-side)
+      SMTP_HOST: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      SMTP_PORT: envField.number({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      SMTP_USER: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      SMTP_PASSWORD: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      SMTP_FROM: envField.string({ 
+        context: 'server', 
+        access: 'secret'  // Change to 'public' + context: 'client' if needed client-side
+      }),
+
+      // API Keys (server secret)
+      GROK_API_KEY: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+
+      // System (server secrets)
+      CHROME_EXECUTABLE_PATH: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+      CHROME_COOKIE_REDDIT: envField.string({ 
+        context: 'server', 
+        access: 'secret' 
+      }),
+
+      // WebAuthN (often public/client for browser use)
+      WEBAUTHN_RP_ID: envField.string({ 
+        context: 'client', 
+        access: 'public' 
+      }),
+      WEBAUTHN_RP_ORIGIN: envField.string({ 
+        context: 'client', 
+        access: 'public' 
+      }),
+    },
   }
 })

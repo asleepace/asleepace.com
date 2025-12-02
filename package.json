@@ -3,7 +3,7 @@
   "description": "a collection of me by me.",
   "license": "MIT",
   "type": "module",
-  "version": "1.1.1",
+  "version": "2.0.1",
   "scripts": {
     "check": "bun --bun astro check",
     "dev": "bunx --bun astro dev",
@@ -44,6 +44,7 @@
     "highlight.js": "^11.11.1",
     "lucide-react": "^0.525.0",
     "marked": "^17.0.1",
+    "postgres": "^3.4.7",
     "puppeteer": "^24.31.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",

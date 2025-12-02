@@ -132,6 +132,31 @@ bun run build
 bun run preview
 ```
 
+# Postgres Setup
+
+To install the database on Mac:
+
+```bash
+# install Postgres on Mac
+brew install postgres@18
+brew services start postgresql@18
+```
+
+To install the database on Linux:
+
+```bash
+# Install PostgreSQL (Ubuntu/Debian)
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+
+# Start service
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Switch to postgres user and create database
+sudo -u postgres psql
+```
+
 # Troubleshooting
 
 Server-Side Events (SSE) works in development, but not in production, then this is most likely the issue because of the nginx configuration.
