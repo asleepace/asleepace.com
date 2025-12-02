@@ -123,8 +123,6 @@ export async function fetchYahooCalendar({ date = new Date() }: { date?: Date })
   html = html.replace(/>\s+</g, '><')
   html = html.trim()
 
-  console.log(html)
-
   return html
 }
 
