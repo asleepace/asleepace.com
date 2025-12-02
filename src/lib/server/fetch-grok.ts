@@ -7,7 +7,7 @@
 export async function fetchGrokBasic({
   prompt = '',
   temperature = 0.7,
-  model = 'grok-4-1-fast-reasoning',
+  model = 'grok-4-1-fast-non-reasoning',
 }): Promise<string> {
   if (!import.meta.env.GROK_API_KEY) {
     throw new Error('[fetch-grok] missing (.env) api for GROK_API_KEY')

@@ -11,7 +11,7 @@ const GROK_TEMPLATE = (params: {
   `
 Analyze the first ${params.limit} comments from WSB daily discussion. Provide the following markdown:
 
-  ### <CATCHY TITLE>
+  ### <INFORMATIVE AND ENTICING TITLE>
 
   Write a brief synopsis of your analysis, be concise, highlight key sections.
 

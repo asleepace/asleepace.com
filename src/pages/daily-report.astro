@@ -7,6 +7,10 @@ import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
 
+Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
+// Astro.response.headers.set('Pragma', 'no-cache')
+// Astro.response.headers.set('Expires', '0')
+
 export const prerender = false
 
 const DEFAULT_LIMIT = 300

@@ -58,6 +58,8 @@ const YAHOO_HEADERS = Object.fromEntries(
   ].map((item) => item.split(': ') as [string, string])
 )
 
+let lastContent: any | undefined
+
 /**
  * ## fetchCalendar()
  *
@@ -144,10 +146,14 @@ export async function fetchCalendar() {
   `.trim(),
     })
     console.log('[fetch-calendar] parsing response ...')
+    const openTag = summary.indexOf('{')
+    const closeTag = summary.lastIndexOf('}')
     // TODO: handle parsing here...
-    return JSON.parse(summary)
+    lastContent = JSON.parse(summary.slice(openTag, closeTag + 1))
+    return lastContent
   } catch (e) {
     console.warn('[fetch-calendar] failed:', e)
+    if (lastContent) return lastContent
     if (e instanceof Error) throw e
     throw new Error(String(e))
   } finally {
