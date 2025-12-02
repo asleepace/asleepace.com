@@ -1,0 +1,102 @@
+import { z } from 'zod'
+import { sql } from './db'
+
+export const DailyReportSchema = z.object({
+  id: z.number().int().positive().optional(),
+  date: z.coerce.date(), // Accepts Date or string, coerces to Date
+  text: z.string().min(1),
+  data: z.union([z.record(z.unknown()), z.string().transform((str) => JSON.parse(str))]).default({}),
+  accuracy: z.coerce.number().optional().default(0),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
+})
+
+// For inserts (without auto-generated fields)
+export const CreateDailyReportSchema = DailyReportSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+})
+
+// For updates (all fields optional except id)
+export const UpdateDailyReportSchema = DailyReportSchema.partial().required({ id: true })
+export type DailyReport = z.infer<typeof DailyReportSchema>
+export type CreateDailyReport = z.infer<typeof CreateDailyReportSchema>
+export type UpdateDailyReport = z.infer<typeof UpdateDailyReportSchema>
+
+/**
+ * Fetch a daily report by date
+ */
+export async function getDailyReport({ date }: { date: Date | string }): Promise<DailyReport | null> {
+  const reportDate = typeof date === 'string' ? new Date(date) : date
+  const results = await sql`
+    SELECT * FROM daily_reports 
+    WHERE date = ${reportDate.toISOString().split('T')[0]}
+    LIMIT 1
+  `
+  console.log({ results })
+  if (results.length === 0) return null
+  return DailyReportSchema.parse(results[0])
+}
+
+/**
+ * Fetch daily reports within a date range
+ */
+export async function getDailyReports({
+  startDate,
+  endDate,
+}: {
+  startDate: Date | string
+  endDate: Date | string
+}): Promise<DailyReport[]> {
+  const start = typeof startDate === 'string' ? new Date(startDate) : startDate
+  const end = typeof endDate === 'string' ? new Date(endDate) : endDate
+  const results = await sql`
+    SELECT * FROM daily_reports 
+    WHERE date BETWEEN ${start.toISOString().split('T')[0]} 
+              AND ${end.toISOString().split('T')[0]}
+    ORDER BY date DESC
+  `
+  return results.map((r) => DailyReportSchema.parse(r))
+}
+
+/**
+ * Fetch the most recent N reports
+ */
+export async function getRecentReports({ limit = 10 }): Promise<DailyReport[]> {
+  const results = await sql`
+    SELECT * FROM daily_reports 
+    ORDER BY date DESC 
+    LIMIT ${limit}
+  `
+  return results.map((r) => DailyReportSchema.parse(r))
+}
+
+/**
+ * Upsert a daily report (insert or update if exists)
+ */
+export async function upsertDailyReport(report: CreateDailyReport): Promise<DailyReport> {
+  console.log('[upset] report:', { report })
+  const validated = CreateDailyReportSchema.parse(report)
+
+  const reportDate = typeof validated.date === 'string' ? validated.date : validated.date.toISOString().split('T')[0]
+
+  const results = await sql`
+    INSERT INTO daily_reports (date, text, data, accuracy)
+    VALUES (
+      ${reportDate},
+      ${validated.text},
+      ${JSON.stringify(validated.data)},
+      ${validated.accuracy}
+    )
+    ON CONFLICT (date) DO UPDATE 
+    SET 
+      text = EXCLUDED.text,
+      data = EXCLUDED.data,
+      accuracy = EXCLUDED.accuracy,
+      updated_at = CURRENT_TIMESTAMP
+    RETURNING *
+  `
+
+  return DailyReportSchema.parse(results[0])
+}

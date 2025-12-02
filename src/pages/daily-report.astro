@@ -17,29 +17,33 @@ const DEFAULT_LIMIT = 300
 const url = new URL(Astro.url)
 
 const limit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT)
+const paramDate = url.searchParams.get('date') ?? undefined
+const date = paramDate ? new Date(paramDate) : new Date()
+
 const refreshStr = url.searchParams.get('refresh')
 const refresh = refreshStr === 'true' || Number(refreshStr) > 0
 
-const report = await fetchDailyReport({ limit, refresh })
-const content = await marked(report.summary)
+const report = await fetchDailyReport({ date, limit, refresh })
+const content = await marked(report.text)
 
 const bgImage = '/images/bolsnbers4.png'
 
-const today = new Date()
+const today = date
 const title = 'The Daily Report'
 
 const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
 
 function getDetailedSummary() {
+  const summary = report.text
   try {
-    const pageTitle = report.summary.slice(4, report.summary.indexOf('**') - 2)
-    const indexOfSummary = report.summary.indexOf('Macro')
-    const macro = report.summary.slice(indexOfSummary)
+    const pageTitle = summary.slice(4, summary.indexOf('**') - 2)
+    const indexOfSummary = summary.indexOf('Macro')
+    const macro = summary.slice(indexOfSummary)
     const description = macro.slice(macro.indexOf('\n') + 1, macro.indexOf('###') - 2)
     const ogDescription = `${pageTitle} • ${description}`
     return ogDescription
   } catch (e) {
-    return report.summary.slice(4, Math.min(600, report.summary.length))
+    return summary.slice(4, Math.min(600, summary.length))
   }
 }
 

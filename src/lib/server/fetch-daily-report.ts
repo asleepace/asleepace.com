@@ -1,3 +1,4 @@
+import { getDailyReport, upsertDailyReport, type DailyReport } from '../db/daily-reports'
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
@@ -5,7 +6,7 @@ import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 const GROK_TEMPLATE = (params: {
   limit: number
   comments: WallStreetBetsComment[]
-  previous?: string
+  previous?: any
   meta?: Record<string, any>
   calendar: any
 }) =>
@@ -101,20 +102,12 @@ ${JSON.stringify(params.comments, null, 2)}
 `.trim()
 
 export type DailyReportOptions = {
-  previous?: string
+  previous?: any
   refresh?: boolean
   limit?: number
 }
 
-export type DailyReportOutput = {
-  comments: WallStreetBetsComment[]
-  summary: string
-  calendar?: any
-  html: string
-  meta?: Record<string, any>
-}
-
-async function fetchWsbWithGrok({ limit = 250, previous }: DailyReportOptions): Promise<DailyReportOutput> {
+async function fetchWsbWithGrok({ limit = 250, previous }: DailyReportOptions) {
   // metrics for timing
   const startTime = performance.now()
   const getTimeInSeconds = () => ((performance.now() - startTime) / 1_000).toFixed(2)
@@ -158,16 +151,20 @@ async function fetchWsbWithGrok({ limit = 250, previous }: DailyReportOptions): 
  *
  * @see https://www.reddit.com/r/wallstreetbets/
  */
-export async function fetchDailyReport({ limit = 250, refresh = false }): Promise<DailyReportOutput> {
-  const today = new Date().toISOString().split('T')[0]
-  const filePath = `public/daily/report-${today}.json`
-  const file = Bun.file(filePath, { type: 'application/json' })
-  const previous = (await file.exists()) ? await file.json() : undefined
-  // use cached version here
-  if (refresh === false && previous) {
-    return previous
-  }
-  const report = await fetchWsbWithGrok({ limit, previous })
-  await file.write(JSON.stringify({ ...report, limit }, null, 2))
+export async function fetchDailyReport({ date = new Date(), limit = 250, refresh = false }): Promise<DailyReport> {
+  const previous = await getDailyReport({ date })
+
+  if (refresh === false && previous) return previous
+
+  const dailyReport = await fetchWsbWithGrok({ limit, previous })
+
+  console.log('upserting report...')
+  const report = await upsertDailyReport({
+    accuracy: previous?.accuracy ?? 0,
+    text: dailyReport.summary,
+    data: dailyReport,
+    date,
+  })
+
   return report
 }
