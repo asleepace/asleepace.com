@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro'
-import { fetchCalendar } from '@/lib/server/fetch-calendar'
+import { fetchYahooCalendar } from '@/lib/server/fetch-yahoo-calendar'
 
 /**
  * GET /api/stocks/calendar
  */
-export const GET: APIRoute = async () => {
-  const calendar = await fetchCalendar()
-  console.log({ calendar })
-  return Response.json(calendar)
+export const GET: APIRoute = async ({ url }) => {
+  const dateParam = url.searchParams.get('date')
+  const date = dateParam ? new Date(dateParam) : undefined
+  const page = await fetchYahooCalendar({ date })
+  return Response.json(page)
 }

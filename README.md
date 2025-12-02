@@ -157,6 +157,12 @@ sudo systemctl enable postgresql
 sudo -u postgres psql
 ```
 
+Initialize the tables:
+
+```bash
+psql -h 192.241.216.26 -p 5433 -U asleepace_user -d asleepace -f db/schema.sql
+```
+
 # Troubleshooting
 
 Server-Side Events (SSE) works in development, but not in production, then this is most likely the issue because of the nginx configuration.
