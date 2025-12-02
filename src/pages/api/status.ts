@@ -8,18 +8,18 @@ import type { APIRoute } from 'astro'
  */
 export const GET: APIRoute = async () => {
   const postgres = await db.checkIfConnected()
-
   const services = {
     postgres,
   }
 
-  const totalServices = Object.keys(services).length
-  const totalServicesOnline = Object.values(services).reduce((count, isOnline) => count + (isOnline ? 1 : 0), 0)
-  const status = totalServices === totalServicesOnline ? 'online' : totalServicesOnline === 0 ? 'offline' : 'degraded'
+  // quick check how many services are online
+  const allServices = Object.values(services)
+  const totalOnline = allServices.filter(Boolean).length
+  const status = totalOnline === totalOnline ? 'online' : totalOnline === 0 ? 'offline' : 'degraded'
 
   return Response.json({
     status,
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
     services,
   })
 }

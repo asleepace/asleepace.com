@@ -4,24 +4,37 @@
  */
 import postgres from 'postgres'
 
-console.log(
-  `[db] connecting to db "${import.meta.env.POSTGRES_DATABASE}" on ${import.meta.env.POSTGRES_HOST}:${
-    import.meta.env.POSTGRES_PORT
-  }`
-)
+/**
+ * NOTE: These are set in astro.config.mjs
+ */
+import { POSTGRES_PASSWORD, POSTGRES_USERNAME, POSTGRES_DATABASE, POSTGRES_PORT, POSTGRES_HOST } from 'astro:env/server'
+
+console.log(`[db] connecting to db "${POSTGRES_DATABASE}" on ${POSTGRES_HOST}:${POSTGRES_PORT}`)
 
 /**
  * Postgres SQL Instance for asleepace.com
  */
 export const sql = postgres({
-  host: import.meta.env.POSTGRES_HOST,
-  port: import.meta.env.POSTGRES_PORT,
-  database: import.meta.env.POSTGRES_DATABASE,
-  username: import.meta.env.POSTGRES_USERNAME,
-  password: import.meta.env.POSTGRES_PASSWORD,
+  host: POSTGRES_HOST,
+  port: POSTGRES_PORT,
+  database: POSTGRES_DATABASE,
+  username: POSTGRES_USERNAME,
+  password: POSTGRES_PASSWORD,
   max: 10, // max connections
   idle_timeout: 20,
 })
+
+/**
+ * Shutdown the Postgres connection. Should be called when application terminates.
+ */
+export async function shutdown(): Promise<void> {
+  try {
+    console.log('[db] shutting down...')
+    await sql.end()
+  } catch (e) {
+    console.warn('[db] shutdown failed:', e)
+  }
+}
 
 /**
  * Checks if the Postgres database is connected.

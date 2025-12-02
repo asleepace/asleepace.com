@@ -6,27 +6,40 @@ import type { User, Metric } from './db'
 
 export type PageMetrics = Metric
 
-interface Env {
+interface ImportMetaEnv {
+  // Postgres
+  POSTGRES_CONNECTION_STRING: string
+  POSTGRES_PASSWORD: string
+  POSTGRES_USERNAME: string
+  POSTGRES_DATABASE: string
+  POSTGRES_HOST: string
+  POSTGRES_PORT: string
+  // Mongo (deprecated)
+  MONGODB_URI: string
+  // SMTP
   SMTP_HOST: string
-  SMTP_PORT: number
+  SMTP_PORT: string
   SMTP_USER: string
   SMTP_PASSWORD: string
   SMTP_FROM: string
-  MONGODB_URI: string
-  HOST: string
-  PORT: number
-  PROTOCOL: string
-  COOKIE_DOMAIN: string
+  // API Keys
+  GROK_API_KEY: string
+  // System
+  CHROME_EXECUTABLE_PATH: string
+  CHROME_COOKIE_REDDIT: string
+  // WebAuthN
   WEBAUTHN_RP_ID: string
   WEBAUTHN_RP_ORIGIN: string
-  CHROME_EXECUTABLE_PATH: string
-  GROK_API_KEY: string
-  CHROME_COOKIE_REDDIT: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }
 
 declare global {
   type ToString = { toString(): string }
   type Blog = CollectionEntry<'blog'>
+
   namespace App {
     export interface Locals {
       isLoggedIn: boolean
