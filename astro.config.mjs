@@ -106,7 +106,7 @@ export default defineConfig({
         context: 'server', 
         access: 'secret' 
       }),
-      SMTP_PORT: envField.string({ 
+      SMTP_PORT: envField.number({ 
         context: 'server', 
         access: 'secret' 
       }),
