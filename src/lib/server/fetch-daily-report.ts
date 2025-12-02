@@ -40,7 +40,7 @@ Analyze the first ${params.limit} comments from WSB daily discussion. Provide th
     )
     
 
-    <a class="font-normal! text-blue-500! underline!" href="https://finance.yahoo.com/calendar/economic/">📅 View full calendar</a>
+    <a class="font-normal! text-blue-500! underline!" href="https://finance.yahoo.com/calendar/economic/">📅 Click to view full calendar</a>
 
   ### Possible Plays
 
