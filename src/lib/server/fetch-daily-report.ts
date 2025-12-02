@@ -151,14 +151,13 @@ async function fetchWsbWithGrok({ limit = 250, previous }: DailyReportOptions) {
  *
  * @see https://www.reddit.com/r/wallstreetbets/
  */
-export async function fetchDailyReport({ date = new Date(), limit = 250, refresh = false }): Promise<DailyReport> {
+export async function fetchDailyReport({ date = new Date(), limit = 250, refresh = false }): Promise<DailyReport & {}> {
   const previous = await getDailyReport({ date })
 
   if (refresh === false && previous) return previous
 
   const dailyReport = await fetchWsbWithGrok({ limit, previous })
 
-  console.log('upserting report...')
   const report = await upsertDailyReport({
     accuracy: previous?.accuracy ?? 0,
     text: dailyReport.summary,

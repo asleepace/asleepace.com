@@ -14,25 +14,26 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
 export const prerender = false
 
 const DEFAULT_LIMIT = 300
-const url = new URL(Astro.url)
 
+// parse url parameters
+const url = new URL(Astro.url)
 const limit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT)
 const paramDate = url.searchParams.get('date') ?? undefined
 const date = paramDate ? new Date(paramDate) : new Date()
-
 const refreshStr = url.searchParams.get('refresh')
 const refresh = refreshStr === 'true' || Number(refreshStr) > 0
 
+// fetch or generate the report
 const report = await fetchDailyReport({ date, limit, refresh })
+
+// process content for meta tags, html, etc.
 const content = await marked(report.text)
-
 const bgImage = '/images/bolsnbers4.png'
-
 const today = date
 const title = 'The Daily Report'
-
 const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
 
+// extract useful information from markdown
 function getDetailedSummary() {
   const summary = report.text
   try {

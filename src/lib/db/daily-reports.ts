@@ -34,7 +34,6 @@ export async function getDailyReport({ date }: { date: Date | string }): Promise
     WHERE date = ${reportDate.toISOString().split('T')[0]}
     LIMIT 1
   `
-  console.log({ results })
   if (results.length === 0) return null
   return DailyReportSchema.parse(results[0])
 }
@@ -76,9 +75,7 @@ export async function getRecentReports({ limit = 10 }): Promise<DailyReport[]> {
  * Upsert a daily report (insert or update if exists)
  */
 export async function upsertDailyReport(report: CreateDailyReport): Promise<DailyReport> {
-  console.log('[upset] report:', { report })
   const validated = CreateDailyReportSchema.parse(report)
-
   const reportDate = typeof validated.date === 'string' ? validated.date : validated.date.toISOString().split('T')[0]
 
   const results = await sql`
