@@ -8,12 +8,15 @@ import { triggerDailyReportRefreshInBackground } from '@/lib/server/fetch-daily-
  * running in pm2 and should be used to schedule background tasks.
  */
 export const GET: APIRoute = async () => {
+  const now = new Date()
   try {
     // refresh daily report for today
-    void triggerDailyReportRefreshInBackground({ date: new Date() })
-
+    void triggerDailyReportRefreshInBackground({ date: now })
     return Response.json({ ok: true })
   } catch (e) {
+    console.warn('[background-sync] error:', e)
     return Response.json({ ok: false })
+  } finally {
+    console.log('[background-sync] finished:', now.toLocaleDateString('en-US', { timeStyle: 'full' }))
   }
 }
