@@ -274,6 +274,8 @@ async function handleReportGeneration({
     text: nextReportText,
     data: {
       model: 'grok-4-1-fast',
+      // NOTE: Keep the initial report for comparison.
+      openReportText: prevReport?.data?.openReportText ?? nextReportText,
       comments: allComments,
       calendar: calendarHtml,
       spy: spyData,
