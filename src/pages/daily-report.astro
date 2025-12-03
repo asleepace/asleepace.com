@@ -42,7 +42,7 @@ if (!report) {
 // calculate staleness (~15mins)
 const lastUpdated = report.updated_at ? new Date(report.updated_at) : new Date(report.date)
 const elapsed = stockMarket.getElapsedTimeSince(lastUpdated)
-const isStale = elapsed.mins > 15
+// const isStale = elapsed.mins > 15
 
 // process content for meta tags, html, etc.
 const content = await marked(report.text)
@@ -72,7 +72,7 @@ const description = getDetailedSummary()
 function getElapsedDetail() {
   if (elapsed.secs === 0) return 'now'
   if (elapsed.mins === 0) return `${elapsed.secs} secs ago`
-  if (elapsed.hours === 0) return `${elapsed.secs} mins ago`
+  if (elapsed.hours === 0) return `${elapsed.mins} mins ago`
   if (elapsed.days === 0) return `${elapsed.hours} hours ago`
   return stockMarket.getDateString(date)
 }
