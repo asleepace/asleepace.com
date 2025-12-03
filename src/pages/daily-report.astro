@@ -7,6 +7,8 @@ import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import BlogDisclaimer from '@/components/astro/BlogDisclaimer.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
+import { getDailyReport, type DailyReport } from '@/lib/db/daily-reports'
+import { sleep } from 'bun'
 
 // set page cache for ~1 min
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
@@ -25,8 +27,17 @@ const refreshStr = url.searchParams.get('refresh')
 const refresh = Boolean(refreshStr && ['null', 'undefined', '0', 'false'].every((str) => refreshStr !== str))
 const hardRefresh = refreshStr === 'hard'
 
-// fetch or generate the report
-const report = await fetchDailyReport({ date, limit, refresh, hardRefresh })
+async function fetchCachedBeforeTimeout(): Promise<DailyReport> {
+  await sleep(10_000) // client times out ~60s
+  console.warn('[daily-report] falling back on cached version before dealine...')
+  return await getDailyReport({ date })
+}
+
+// fetch or generate the report (fallback on cache before timeout)
+const report: DailyReport = await Promise.race([
+  fetchDailyReport({ date, limit, refresh, hardRefresh }),
+  fetchCachedBeforeTimeout(),
+])
 
 // process content for meta tags, html, etc.
 const content = await marked(report.text)
@@ -59,11 +70,9 @@ const description = getDetailedSummary()
   >
     <HeroImage src={bgImage} alt={`Daily Report | ${currentDate}`} />
     <HeroTitle title={title} pubDate={today} />
-
     <Prose>
       <Fragment set:html={content} />
     </Prose>
-
     <BlogDisclaimer>
       Data sourced from
       <a
@@ -78,6 +87,7 @@ const description = getDetailedSummary()
     </BlogDisclaimer>
     <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
   </article>
+  <!-- we giving back to the community -->
   <script define:vars={{ report }}>
     console.log('❤️ for all you scrapers out there (window.dailyReport)...')
     window.dailyReport = report
@@ -126,20 +136,34 @@ const description = getDetailedSummary()
   }
 
   .spy-eod-container {
-    @apply flex flex-col gap-4 items-center justify-center bg-neutral-100 rounded-2xl px-4 py-6;
+    @apply flex flex-col gap-4 items-center justify-center bg-neutral-100 border border-neutral-200 px-4 py-8 mx-4 hover:animate-pulse;
   }
 
   .spy-eod-label {
-    @apply text-xs! font-semibold! text-neutral-400! tracking-wide!;
+    @apply text-xs! font-mono font-semibold! text-neutral-400! tracking-wide!;
     font-size: 0.8rem !important;
   }
 
   .spy-eod-confidence {
-    @apply text-xs! font-thin! font-mono! text-neutral-300! uppercase -mt-1 tracking-tight!;
+    @apply text-xs! font-light! font-mono! text-neutral-300! uppercase -mt-1 tracking-tight!;
+  }
+
+  .spy-eod-summary {
+    @apply font-normal! text-neutral-800! text-pretty! mx-5 leading-5;
+    font-size: 0.84rem !important;
   }
 
   .spy-eod {
     @apply text-5xl! font-black;
+  }
+
+  .revisions-table-wrapper {
+    @apply overflow-y-auto overflow-x-hidden max-h-96;
+  }
+
+  .final-word {
+    @apply italic text-center text-sm font-bold mx-4 text-pretty;
+    font-size: 0.75rem;
   }
 
   table {

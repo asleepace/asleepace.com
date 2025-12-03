@@ -9,8 +9,11 @@ import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 import YahooFinance from 'yahoo-finance2'
+import { Mutex } from '@asleepace/mutex'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
+
+const mutex = Mutex.shared()
 
 /**
  * Get the previous date (day before)
@@ -162,27 +165,38 @@ Response Format:
     include a numbered list of key data points in middle and keep paragraphs more readable, 
     infer from the data and your own best judgment.
 
-  ### Summary
-
-    Provide a short summary of your analysis in 280 Characters or less which can be shared to X
-    and uses layman's terms / trendy speak to elegantly paint a picture of the day.
-
-    <div class="spy-eod-container">
-      <p class="spy-eod-label">END OF DAY PREDICTION</p>
-      <p class="spy-eod (text-green-500|text-red-500)>Provide SPY EOD price prediction to nearest dollar (e.g. "SPY $900")</a>
-      <p class="spy-eod-confidence">Provide confidence percentage (e.g. Confidence 80%)</p>
+    <div class="spy-eod-container squircle">
+      <p class="spy-eod-label" data-example="EOD PREDICTION • Wed Dec 03" data-format="EOD Prediction • $date">
+        Provide header with date (e.g. "EOD Prediction • Mon Jan 05")
+      </p>
+      <p class="spy-eod (text-green-500|text-red-500)" data-format="TICKER $XXX (%%%)" data-example="SPY $900">
+        Provide SPY EOD price prediction to nearest dollar (e.g. "SPY $900 (+0.5%)")
+      </a>
+      <div>
+        <p>
+          <span class="final-word">
+            Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)
+          </span>
+          <span class="spy-eod-summary" data-instructions="No links, No Hash Tags, Laymen language, Focus on big picture">
+              Provide a short summary of your analysis in 280 Characters or less which can be shared to X and uses layman's terms / trendy speak to elegantly paint a picture of the day.
+          </span>
+        </p>
+        <p class="spy-eod-confidence" data-format="Cofidence 80% | Sentiment Bullish | Current Price">
+          Provide confidence percentage (e.g. Confidence 80%) | Provide sentiment (e.g. Extreme Fear) | Provide current price (Current $850)
+        </p>
+      </div>
     </div>
 
-    **Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)**
-
-    (optional) Provide a table of market analysis revisions over time from revision data below,
-    Example table:
-      | Revisions       | Time        |
-      | --------------- | ----------- |
-      | e.g. BTC revised to +7% surge vs prior reject | 10:00am |
-      | e.g. Sentiment +3% bull on filtered calls print | 2:00am |
-      | e.g. Plays add DLTR; targets from $682 base | 5:00pm |
-      | e.g. Momentum sours on tariff rumors | 7:00pm |
+    <div class="revisions-table-wrapper">
+      (optional) Provide a table of market analysis revisions over time from revision data below,
+      Example table:
+        | Revisions       | Time        |
+        | --------------- | ----------- |
+        | e.g. BTC revised to +7% surge vs prior reject | 10:00am |
+        | e.g. Sentiment +3% bull on filtered calls print | 2:00am |
+        | e.g. Plays add DLTR; targets from $682 base | 5:00pm |
+        | e.g. Momentum sours on tariff rumors | 7:00pm |
+    </div>
 
     Revision Data:
       {{${params.revisions.join('\n')}}}}
@@ -190,7 +204,7 @@ Response Format:
     <div class="daily-report-links">
       <a href="/daily-report?date=${getPreviousDate(params.date)}">Yesterday</a>
       <div class="daily-report-links-div"></div>
-      <a href="/daily-report?refresh=${+new Date()}">Refresh</a>
+      <a href="/daily-report?key=${+new Date()}">Refresh</a>
       <div class="daily-report-links-div"></div>
       <a href="/daily-report?date=${getNextDate(params.date)}">Tomorrow</a>
     </div>
@@ -364,6 +378,19 @@ export async function fetchDailyReport({
 
   // Check cache first
   const prevReport = await getDailyReport({ date })
+
+  // Cancel new requests if there is a current lock
+  let mutexLock = mutex.acquireLock({ timeout: 5_000 })
+  try {
+    await mutexLock
+  } catch (e) {
+    if (prevReport) {
+      console.log('[fetch-daily-report] failed to aquire mutex, returning cached...')
+      return prevReport
+    }
+  } finally {
+    ;(await mutexLock).releaseLock()
+  }
 
   if (!refresh && prevReport) {
     console.log(`[fetch-daily-report] (${timer.elapsed}s) using cached report`)
