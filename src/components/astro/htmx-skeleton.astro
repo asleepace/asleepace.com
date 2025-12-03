@@ -1,37 +1,14 @@
 ---
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/cn'
 
 /**
  * @file src/components/astro/htmx-skeleton.astro
  * @description a generic div which can be used with htmx.
  *
  * ```html
-<!-- Basic auto-refresh -->
-<Skeleton 
-  url="/partials/spy-price" 
-  trigger="every 30s" 
-/>
-
-<!-- Load into different target -->
-<div id="price-container"></div>
-<Skeleton 
-  url="/partials/spy-price"
-  target="#price-container"
-  swap="innerHTML"
-/>
-
-<!-- Custom loading state -->
-<Skeleton 
-  url="/partials/spy-price"
-  loadingClass="bg-blue-100 rounded-lg p-4"
-  loadingText="Fetching stock data..."
-/>
-
-<!-- With loading indicator -->
-<Skeleton 
-  url="/partials/spy-price"
-  indicator="#loading-spinner"
-/>
+ *  <Skeleton url="/partials/spy-price" trigger="every 30s">
+ *    <p>Hello world</p>
+ *  </Skeleton>
  * ```
  */
 interface Props {
@@ -43,8 +20,6 @@ interface Props {
   class?: string
   loadingClass?: string
   loadingText?: string
-  width?: number
-  height?: number
 }
 
 const {
@@ -56,7 +31,6 @@ const {
   class: className,
   loadingClass = 'animate-pulse bg-gray-200 h-full',
   loadingText = 'Loading...',
-  width,
 } = Astro.props
 
 const hasSlot = Astro.slots.has('default')
