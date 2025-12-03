@@ -86,16 +86,14 @@ export function PageMetrics(props: { className?: string; enableDownload?: boolea
         <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(data.likes)} />
       )}
       <MetricButton icon="💬" text={'0'} />
-      {props.enableDownload ? (
-        <MetricButton
-          icon="🖨️"
-          text={'PDF'}
-          onClick={() => {
-            console.log('Printing!')
-            window.print()
-          }}
-        />
-      ) : null}
+      <MetricButton
+        icon="🖨️"
+        text={'PDF'}
+        onClick={() => {
+          console.log('Printing!')
+          window.print()
+        }}
+      />
     </div>
   )
 }

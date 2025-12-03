@@ -62,6 +62,7 @@ Guidelines:
 - Filter obvious nonsense/spam
 - Translate WSB Terms to Plain English: "Bol" = bull, "Mango" = Trump, "JPow" = Jerome Powell, "Corn" = "Bitcoin"
 - Format tickers as markdown links: [TICKER](#ticker)
+- Newer comments and analysis should superced PREVIOUS_ANALYSIS
 - If previous analysis is included use new data to revise, update and expand
 - If a price is above $1,000 write as $1k, $1.5K, etc.
 - If a price is used in a header rounds to nearest dollar
