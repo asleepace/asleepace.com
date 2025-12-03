@@ -97,3 +97,88 @@ export async function upsertDailyReport(report: CreateDailyReport): Promise<Dail
 
   return DailyReportSchema.parse(results[0])
 }
+
+/**
+ * Update a daily report by date with partial data
+ */
+export async function updateDailyReport({
+  date,
+  updates,
+}: {
+  date: Date | string
+  updates: Partial<Omit<CreateDailyReport, 'date'>>
+}): Promise<DailyReport | null> {
+  const reportDate =
+    typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
+
+  // Build dynamic SET clause
+  const setClauses: string[] = []
+  const values: any[] = []
+
+  if (updates.text !== undefined) {
+    setClauses.push(`text = $${values.length + 1}`)
+    values.push(updates.text)
+  }
+
+  if (updates.data !== undefined) {
+    setClauses.push(`data = $${values.length + 1}`)
+    values.push(JSON.stringify(updates.data))
+  }
+
+  if (updates.accuracy !== undefined) {
+    setClauses.push(`accuracy = $${values.length + 1}`)
+    values.push(updates.accuracy)
+  }
+
+  // Always update updated_at
+  setClauses.push('updated_at = CURRENT_TIMESTAMP')
+
+  if (setClauses.length === 1) {
+    // Only updated_at, nothing to update
+    return getDailyReport({ date })
+  }
+
+  const results = await sql.unsafe(
+    `UPDATE daily_reports 
+     SET ${setClauses.join(', ')}
+     WHERE date = $${values.length + 1}
+     RETURNING *`,
+    [...values, reportDate]
+  )
+
+  if (results.length === 0) return null
+
+  return DailyReportSchema.parse(results[0])
+}
+
+/**
+ * Get the next and previous reports relative to a given date
+ */
+export async function getAdjacentReports({ date }: { date: Date | string }): Promise<{
+  previous: DailyReport | null
+  next: DailyReport | null
+}> {
+  const reportDate =
+    typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
+
+  // Get previous report
+  const previousResults = await sql`
+    SELECT * FROM daily_reports 
+    WHERE date < ${reportDate}
+    ORDER BY date DESC 
+    LIMIT 1
+  `
+
+  // Get next report
+  const nextResults = await sql`
+    SELECT * FROM daily_reports 
+    WHERE date > ${reportDate}
+    ORDER BY date ASC 
+    LIMIT 1
+  `
+
+  return {
+    previous: previousResults.length > 0 ? DailyReportSchema.parse(previousResults[0]) : null,
+    next: nextResults.length > 0 ? DailyReportSchema.parse(nextResults[0]) : null,
+  }
+}

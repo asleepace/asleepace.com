@@ -1,5 +1,5 @@
-import type { APIRoute } from 'astro'
 import { fetchDailyReport } from '@/lib/server/fetch-daily-report'
+import type { APIRoute } from 'astro'
 
 const DEFAULT_LIMIT = 300
 
@@ -14,8 +14,8 @@ export const GET: APIRoute = async ({ url }) => {
   try {
     const limit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT)
     const refreshStr = url.searchParams.get('refresh')
-    const refresh = refreshStr === 'true' || Number(refreshStr) > 0
-    const report = await fetchDailyReport({ limit, refresh })
+    const refresh = refreshStr !== 'false' || Number(refreshStr) > 0
+    const report = await fetchDailyReport({ limit, refresh, hardRefresh: refreshStr === 'hard' })
     return Response.json(report)
   } catch (error) {
     const e = error instanceof Error ? error : new Error(String(error))
