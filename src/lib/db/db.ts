@@ -20,7 +20,7 @@ export const sql = postgres({
   database: POSTGRES_DATABASE,
   username: POSTGRES_USERNAME,
   password: POSTGRES_PASSWORD,
-  max: 10, // max connections
+  max: 25, // max connections
   idle_timeout: 20,
 })
 

@@ -124,8 +124,9 @@ Response Format:
 
     Provide a simple table predicting SPY's closing price today for both bulls and bears
     based on market sentiment, current levels, realistic outcomes, upcoming events, etc.
-    Keep moves reasonable for daily action (0-5% max). Replace "%%%" with  sentiment analysis (e.g. 68%). 
-    Current SPY: ${params.spy?.price || 'N/A'}
+    Keep moves reasonable for daily action (0-5% max). Replace "%%%" with  sentiment analysis (e.g. 68%). Current SPY: ${
+      params.spy?.price || 'N/A'
+    }
 
     Example Table: (e.g. generate this table with estimated closing price of SPY:
       | <span class="table-header-centered">Bull SPY Predictions (%%%)</span> | <span class="table-header-centered">Bear SPY Predictions (%%%)</span> |
@@ -166,15 +167,13 @@ Response Format:
     Provide a short summary of your analysis in 280 Characters or less which can be shared to X
     and uses layman's terms / trendy speak to elegantly paint a picture of the day.
 
-    **Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)**
-
-    <div class="daily-report-links">
-      <a href="/daily-report?date=${getPreviousDate(params.date)}">← Yesterday's report</a>
-      <div class="mx-2 w-[0.5px] h-6 bg-neutral-200"></div>
-      <a class="text-blue-500" href="/daily-report?refresh=${+new Date()}">↻ Refresh Report</a>
-      <div class="mx-2 w-[0.5px] h-6 bg-neutral-200"></div>
-      <a href="/daily-report?date=${getNextDate(params.date)}">Tomorrow's report →</a>
+    <div class="spy-eod-container">
+      <p class="spy-eod-label">END OF DAY PREDICTION</p>
+      <p class="spy-eod (text-green-500|text-red-500)>Provide SPY EOD price prediction to nearest dollar (e.g. "SPY $900")</a>
+      <p class="spy-eod-confidence">Provide confidence percentage (e.g. Confidence 80%)</p>
     </div>
+
+    **Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)**
 
     (optional) Provide a table of market analysis revisions over time from revision data below,
     Example table:
@@ -187,6 +186,14 @@ Response Format:
 
     Revision Data:
       {{${params.revisions.join('\n')}}}}
+
+    <div class="daily-report-links">
+      <a href="/daily-report?date=${getPreviousDate(params.date)}">Yesterday</a>
+      <div class="daily-report-links-div"></div>
+      <a href="/daily-report?refresh=${+new Date()}">Refresh</a>
+      <div class="daily-report-links-div"></div>
+      <a href="/daily-report?date=${getNextDate(params.date)}">Tomorrow</a>
+    </div>
 
 `.trim()
 
