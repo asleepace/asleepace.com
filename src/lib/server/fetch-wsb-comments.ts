@@ -82,7 +82,6 @@ async function extractNestedPageComments(page: Page): Promise<WallStreetBetsComm
         timestamp: time,
         flair,
         body,
-        // permalink: permalink ? `https://old.reddit.com${permalink}` : null,
         replies,
       }
     }
