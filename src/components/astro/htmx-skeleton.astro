@@ -1,4 +1,6 @@
 ---
+import { cn } from '@/lib/utils'
+
 /**
  * @file src/components/astro/htmx-skeleton.astro
  * @description a generic div which can be used with htmx.
@@ -41,22 +43,33 @@ interface Props {
   class?: string
   loadingClass?: string
   loadingText?: string
+  width?: number
+  height?: number
 }
 
 const {
   url,
   trigger = 'load',
-  swap = 'outerHTML',
+  swap = 'innerHTML',
   target,
   indicator,
   class: className,
-  loadingClass = 'animate-pulse bg-gray-200 rounded-2xl px-4 py-1.5',
+  loadingClass = 'animate-pulse bg-gray-200 h-full',
   loadingText = 'Loading...',
+  width,
 } = Astro.props
+
+const hasSlot = Astro.slots.has('default')
 ---
 
 <div hx-get={url} hx-trigger={trigger} hx-swap={swap} hx-target={target} hx-indicator={indicator} class={className}>
-  <div class={loadingClass}>
-    <p class="text-transparent">{loadingText}</p>
-  </div>
+  {
+    hasSlot ? (
+      <slot />
+    ) : (
+      <div class={cn('animate-pulse bg-gray-200 h-full', loadingClass)}>
+        <p class="text-transparent">{loadingText}</p>
+      </div>
+    )
+  }
 </div>

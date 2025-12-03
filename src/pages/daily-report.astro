@@ -9,6 +9,8 @@ import BlogDisclaimer from '@/components/astro/BlogDisclaimer.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
 import { type DailyReport } from '@/lib/db/daily-reports'
 import { stockMarket } from '@/lib/utils/stock-market'
+import Skeleton from '@/components/astro/htmx-skeleton.astro'
+import StockBadge from './partials/stock-badge.astro'
 
 // set page cache for ~1 min
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
@@ -78,15 +80,23 @@ function getElapsedDetail() {
 }
 ---
 
-<SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage}>
+<SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage} htmx>
   <article
     class="flex flex-col overflow-x-hidden items-center w-full max-w-full md:max-w-3xl text-gray-800 md:pt-16 pb-8"
   >
+    <!-- Daily Report Header -->
     <HeroImage src={bgImage} alt={`Daily Report | ${currentDate}`} />
-    <HeroTitle title={title} pubDate={today} />
+    <HeroTitle title={title} pubDate={today} class="gap-y-2" dividerClass="my-1 md:my-3">
+      <!-- dynamic stock prices in header -->
+      <div aria-label="Stock Prices" class="flex items-center justify-center pb-2">
+        <StockBadge ticker="SPY" format="advanced" />
+      </div>
+    </HeroTitle>
+    <!-- Daily Report Content -->
     <Prose>
       <Fragment set:html={content} />
     </Prose>
+    <!-- Daily Report Footer -->
     <BlogDisclaimer>
       Data sourced from
       <a
@@ -114,7 +124,7 @@ function getElapsedDetail() {
 <style is:global>
   @import 'tailwindcss';
   h1 {
-    @apply text-6xl font-black tracking-tight pb-4;
+    @apply text-4xl md:text-5xl font-black tracking-tight pb-4;
   }
   h2 {
     @apply text-3xl font-bold;

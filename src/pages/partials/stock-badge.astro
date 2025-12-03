@@ -1,16 +1,82 @@
 ---
+/**
+ * This component is both a partial route and Astro component which will
+ * fetch itself via htmx to reload data.
+ */
 import { stockMarket } from '@/lib/utils/stock-market'
 import clsx from 'clsx'
 import YahooFinance from 'yahoo-finance2'
+import { TrendingUp, TrendingDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+interface Props {
+  ticker: string
+  format?: 'simple' | 'advanced'
+}
+
+// Merge URL params with Astro props (URL params take precedence for htmx refreshes)
+const urlParams = Object.fromEntries(Astro.url.searchParams)
+const props = { ...Astro.props, ...urlParams } as Props
+
+const ticker = props.ticker ?? 'SPY'
+const format = props.format ?? 'simple'
+const isSimpleDisplay = format === 'simple'
+
+const currentFormat = isSimpleDisplay ? 'simple' : 'advanced'
 
 export const prerender = false
-
-const yahooFinance = new YahooFinance({})
+const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 const isMarketOpen = stockMarket.isMarketOpen()
-const spy = await yahooFinance.quoteSummary('SPY')
+const spy = await yahooFinance.quoteSummary(ticker)
 const price = spy.price?.regularMarketPrice ?? 0
+const openPrice = spy.price?.regularMarketOpen ?? 0
+const change = price - openPrice
+const changePercent = (change / openPrice) * 100
+const isPositive = change >= 0
 ---
 
-<div class={clsx('rounded-2xl px-4 py-1.5', isMarketOpen ? 'bg-green-500' : 'bg-red-500')}>
-  <p>SPY ${price.toFixed(2)}</p>
+<div
+  hx-get={`/partials/stock-badge?ticker=${ticker}&format=${format}`}
+  hx-trigger="click, mouseenter delay:1s, every 10s"
+  hx-swap="outerHTML"
+  data-name="stock-badge"
+  data-info={ticker}
+  data-json={JSON.stringify(spy)}
+  class="bg-zinc-900 text-white px-4 py-2.5 squircle border hover:animate-pulse border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+>
+  <!-- Format: Advanced Display -->
+  <div class={cn('flex items-center gap-3', isSimpleDisplay && 'hidden')}>
+    <span class="font-semibold text-sm">{ticker.toUpperCase()}</span>
+    <span class="font-medium text-base">${price.toFixed(2)}</span>
+    <div class={clsx('flex items-center gap-1 text-xs font-medium', isPositive ? 'text-green-400' : 'text-red-400')}>
+      {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+      <span>{isPositive ? '+' : ''}{change.toFixed(2)} ({isPositive ? '+' : ''}{changePercent.toFixed(2)}%)</span>
+    </div>
+    {!isMarketOpen && <span class="text-[0.65rem] text-zinc-500 uppercase tracking-wide">Closed</span>}
+  </div>
+
+  <!-- Format: Simple Display -->
+  <div
+    class={cn('flex items-center justify-center gap-x-1.5 text-[0.80rem] font-normal', !isSimpleDisplay && 'hidden')}
+  >
+    <span>{ticker.toUpperCase()}</span>
+    <span>${price.toFixed(2)}</span>
+  </div>
 </div>
+
+<style is:global>
+  :root {
+    --brm: 1;
+  }
+
+  @supports (corner-shape: squircle) {
+    :root {
+      --brm: 2;
+    }
+  }
+
+  .squircle {
+    border-radius: calc(16px * var(--brm));
+    corner-shape: squircle;
+  }
+</style>
