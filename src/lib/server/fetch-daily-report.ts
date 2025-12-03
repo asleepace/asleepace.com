@@ -1,10 +1,36 @@
-import { getDailyReport, updateDailyReport, upsertDailyReport, type DailyReport } from '../db/daily-reports'
+import {
+  getAdjacentReports,
+  getDailyReport,
+  updateDailyReport,
+  upsertDailyReport,
+  type DailyReport,
+} from '../db/daily-reports'
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 import YahooFinance from 'yahoo-finance2'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
+
+/**
+ * Get the previous date (day before)
+ */
+export function getPreviousDate(date: Date | string): Date {
+  const current = typeof date === 'string' ? new Date(date) : new Date(date)
+  const previous = new Date(current)
+  previous.setDate(previous.getDate() - 1)
+  return previous
+}
+
+/**
+ * Get the next date (day after)
+ */
+export function getNextDate(date: Date | string): Date {
+  const current = typeof date === 'string' ? new Date(date) : new Date(date)
+  const next = new Date(current)
+  next.setDate(next.getDate() + 1)
+  return next
+}
 
 const GROK_TEMPLATE = (params: {
   date: Date | string
@@ -15,6 +41,7 @@ const GROK_TEMPLATE = (params: {
   revisions: string[]
   comments: WallStreetBetsComment[]
   calendar: string | undefined
+  links: { name: string; href: string }[]
 }) =>
   `
 Goal: you are an experienced stock/options trader, experienced in the ways of wallstreetbets, providing a daily analysis
@@ -59,7 +86,7 @@ Sources:
   CALENDAR: ${params.calendar || 'Not available'}
 
 Response Format:
-  ### Title (Provide single English sentance which is geared towards SEO and marketing, no numbers, no symbols, overview of day.)
+  ### Title (Provide single English headline which is geared towards SEO and marketing, no numbers, no symbols, overview of day.)
 
   Write a brief synopsis of your analysis, be concise, highlight key sections.
 
@@ -86,30 +113,31 @@ Response Format:
       | FOMC Meeting  | Next Week | Rate hold expected; dovish dots bullish |
       | [Full Calendar](https://finance.yahoo.com/calendar/economic/) | | View all events |
 
-  ### Possible Plays
+  ### Playbook
 
     Provide a short paragraph summary of the macro play and what you like.
     Provide a bulleted list of possible plays you like and why
     Provide a YOLO play (1-2 sentences.)
 
-  ### Bull vs. Bear Thesis
+  ### Bulls vs. Bears
 
     Provide a simple table predicting SPY's closing price today for both bulls and bears
     based on market sentiment, current levels, realistic outcomes, upcoming events, etc.
     Keep moves reasonable for daily action (0-5% max). Current SPY: ${params.spy?.price || 'N/A'}
 
     Example Table: (e.g. generate this table with estimated closing price of SPY:
-      | **Bull Predictions** | **Bear Predictions** |
-      | --------- | --------- |
-      | <h3 class="text-green-500">SPY $700 (+5.0%)</h3> | <h3 class="text-red-500">SPY $600 (-5.0%)</h3> |
+      | <span class="table-header-centered ">Bull SPY Predictions (% sentiment)</span> | <span class="table-header-centered>Bear SPY Predictions (% sentiment)</span> |
+      | ------------------------------ | ------------------------ |
+      | <span class="bull">$700</span> | <span class="bear">$600</span> |
     )
 
     **Bull Thesis**: Provide 3-4 sentences for the bull thesis (% sentiment)
+
     **Bear Thesis**: Provide 3-4 sentences for the bear thesis (% sentiment)
 
     Provide 2-3 sentences on which direction the overall sentiment is leaning and why.
 
-  ### The Unknown Unknowns
+  ### Unknown Unknowns
 
     Provide 3-5 sentences on stuff to watch out for when making trades that could directly
     impact your trades.
@@ -131,12 +159,18 @@ Response Format:
     include a numbered list of key data points in middle and keep paragraphs more readable, 
     infer from the data and your own best judgment.
 
-  ## Summary
+  ### Summary
 
     Provide a short summary of your analysis in 280 Characters or less which can be shared to X
     and uses lamen terms / trendy speak to elegantly paint a picture of the day.
 
     **Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)**
+
+    <div class="daily-report-links">
+      <a href="/daily-report?date=${getPreviousDate(params.date)}">← Yesterday's report</a>
+      <div class="mx-2 w-[0.2px] h-6 bg-neutral-400"></div>
+      <a href="/daily-report?date=${getNextDate(params.date)}">Tomorrow's report →</a>
+    </div>
 
     (optional) Provide a table of market analysis revisions over time from revision data below,
     Example table:
@@ -207,6 +241,8 @@ async function handleReportGeneration({
 
   console.log(`[fetch-daily-report] (${timer.elapsed}s) processing ${allComments.length} comments`)
 
+  const links = await getAdjacentReports({ date })
+
   // Generate report with Grok
   const nextReportText = await fetchGrokBasic({
     model: 'grok-4-1-fast',
@@ -219,6 +255,10 @@ async function handleReportGeneration({
       calendar: calendarHtml,
       openReportText,
       revisions: prevReport?.data?.revisions ?? [],
+      links: [
+        { name: 'Prev Report', href: `/daily-report?date=${links.previous?.date}` },
+        { name: 'Next Report', href: `/daily-report?date=${links.next?.date}` },
+      ],
     }),
   })
 
@@ -237,6 +277,7 @@ async function handleReportGeneration({
       revisions: prevRevisions,
       generationTime: timer.elapsed,
       timestamp: new Date().toISOString(),
+      links,
     },
   }
 }
@@ -249,16 +290,10 @@ export type FetchDailyReportOptions = {
 }
 
 /**
- * @note we should only ever be generating on report at any given time.
- */
-let reportGenerationPromise: Promise<DailyReport> | undefined
-
-/**
  * Handle parsing revisions between report generations in the background as it can
  * take a while to parse.
  */
 async function handleRevisionsInBackground(nextDailyReport: DailyReport) {
-  if (reportGenerationPromise !== undefined) return // skip: newer generation will trigger this again
   if (!nextDailyReport.data?.openReportText) return
   if (nextDailyReport.data?.openReportText === nextDailyReport.text) return
 
@@ -323,13 +358,7 @@ export async function fetchDailyReport({
   }
 
   // Generate new report
-  if (!reportGenerationPromise) {
-    reportGenerationPromise = handleReportGeneration({ date, limit, prevReport: hardRefresh ? undefined : prevReport })
-  } else {
-    console.log('[fetch-daily-report] currently generating previous version!')
-  }
-
-  const nextReport = await reportGenerationPromise
+  const nextReport = await handleReportGeneration({ date, limit, prevReport: hardRefresh ? undefined : prevReport })
 
   // Save to database
   const savedReport = await upsertDailyReport(nextReport)

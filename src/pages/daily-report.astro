@@ -22,7 +22,7 @@ const limit = Number(url.searchParams.get('limit') ?? DEFAULT_LIMIT)
 const paramDate = url.searchParams.get('date') ?? undefined
 const date = paramDate ? new Date(paramDate) : new Date()
 const refreshStr = url.searchParams.get('refresh')
-const refresh = refreshStr === 'true' || Number(refreshStr) > 0
+const refresh = Boolean(refreshStr && ['null', 'undefined', '0', 'false'].every((str) => refreshStr !== str))
 const hardRefresh = refreshStr === 'hard'
 
 // fetch or generate the report
@@ -54,7 +54,9 @@ const description = getDetailedSummary()
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage}>
-  <article class="flex flex-col items-center w-full max-w-3xl text-gray-800 md:pt-16 pb-8">
+  <article
+    class="flex flex-col overflow-x-hidden items-center w-full max-w-full md:max-w-3xl text-gray-800 md:pt-16 pb-8"
+  >
     <HeroImage src={bgImage} alt={`Daily Report | ${currentDate}`} />
     <HeroTitle title={title} pubDate={today} />
 
@@ -86,6 +88,10 @@ const description = getDetailedSummary()
     </button>
     <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
   </article>
+  <script define:vars={{ report }}>
+    console.log('❤️ for all you scrapers out there...')
+    console.log({ report })
+  </script>
 </SiteLayout>
 
 <style is:global>
@@ -111,11 +117,24 @@ const description = getDetailedSummary()
     @apply text-green-500!;
   }
 
+  .daily-report-links {
+    @apply flex items-center justify-center gap-x-1 py-2 border-t border-b border-t-neutral-50 border-b-neutral-50;
+  }
+
+  .daily-report-links a {
+    @apply text-green-500! hover:scale-105 duration-300 transition-all text-sm!;
+  }
+
+  .table-header-centered {
+    @apply font-black block mx-auto text-center;
+  }
+
   table {
-    width: 100%;
+    width: calc(100% - 1rem);
     border-collapse: collapse;
     font-size: 0.875rem;
     border: 1px solid #e5e7eb;
+    margin-right: 1rem;
   }
 
   thead tr {
@@ -159,6 +178,13 @@ const description = getDetailedSummary()
 
   td a:hover {
     text-decoration: underline;
+  }
+
+  td .bear {
+    @apply text-red-500 mx-auto block text-3xl font-bold text-center;
+  }
+  td .bull {
+    @apply text-green-500 mx-auto block text-3xl font-bold text-center;
   }
 
   ul,

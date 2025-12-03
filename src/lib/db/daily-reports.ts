@@ -98,7 +98,6 @@ export async function upsertDailyReport(report: CreateDailyReport): Promise<Dail
   return DailyReportSchema.parse(results[0])
 }
 
-
 /**
  * Update a daily report by date with partial data
  */
@@ -109,7 +108,8 @@ export async function updateDailyReport({
   date: Date | string
   updates: Partial<Omit<CreateDailyReport, 'date'>>
 }): Promise<DailyReport | null> {
-  const reportDate = typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
+  const reportDate =
+    typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
 
   // Build dynamic SET clause
   const setClauses: string[] = []
@@ -149,4 +149,36 @@ export async function updateDailyReport({
   if (results.length === 0) return null
 
   return DailyReportSchema.parse(results[0])
+}
+
+/**
+ * Get the next and previous reports relative to a given date
+ */
+export async function getAdjacentReports({ date }: { date: Date | string }): Promise<{
+  previous: DailyReport | null
+  next: DailyReport | null
+}> {
+  const reportDate =
+    typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
+
+  // Get previous report
+  const previousResults = await sql`
+    SELECT * FROM daily_reports 
+    WHERE date < ${reportDate}
+    ORDER BY date DESC 
+    LIMIT 1
+  `
+
+  // Get next report
+  const nextResults = await sql`
+    SELECT * FROM daily_reports 
+    WHERE date > ${reportDate}
+    ORDER BY date ASC 
+    LIMIT 1
+  `
+
+  return {
+    previous: previousResults.length > 0 ? DailyReportSchema.parse(previousResults[0]) : null,
+    next: nextResults.length > 0 ? DailyReportSchema.parse(nextResults[0]) : null,
+  }
 }
