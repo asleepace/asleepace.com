@@ -434,6 +434,9 @@ export async function fetchDailyReport({
   return savedReport
 }
 
+/**
+ * Simple flag to avoid duplicating refreshes.
+ */
 let isRefreshing = false
 
 /**
