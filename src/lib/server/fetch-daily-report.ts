@@ -2,9 +2,11 @@ import { getDailyReport, upsertDailyReport, type DailyReport } from '../db/daily
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
+import yahooFinance from 'yahoo-finance2'
 
 const GROK_TEMPLATE = (params: {
   limit: number
+  spy: Record<string, any> | undefined | null
   comments: WallStreetBetsComment[]
   previous: Record<string, any> | undefined | null
   meta?: Record<string, any>
@@ -12,8 +14,11 @@ const GROK_TEMPLATE = (params: {
 }) =>
   `
 You are an experienced stock/options trader, experienced in the ways of wallstreetbets, providing a daily analysis
-of market trends, sentiment, upcoming events, catalysts, and how they all fit together. You will be analyzing wallstreet bets
-comments, yahoo finance calendar, and previous analysis to generate this summary:
+of market trends, sentiment, upcoming events, catalysts, and how they all fit together.
+
+  CURRENT SPY SUMMARY: ${JSON.stringify(params.spy ?? {}, null, 2)}
+
+You will be analyzing wallstreet bets comments, yahoo finance calendar, and previous analysis to generate this summary:
 
   ### <INFORMATIVE AND ENTICING TITLE>
 
@@ -51,7 +56,20 @@ comments, yahoo finance calendar, and previous analysis to generate this summary
 
   ### Bull vs. Bear thesis
 
-  ### Historical Information
+    Provide a simple table which predicts the closing price of SPY today for both bulls and bears
+    based on market sentiment, current levels, realistic outcomes, upcoming events, etc. Keep these
+    reasonable for a daily move (between 0-5% daily move max.) current SPY PRICE: 
+
+    (e.g. generate this table with your best estimates:
+      | **🐂 Bull Says** | **🐻 Bear Says** |
+      | --------- | --------- |
+      | <h2 class="text-green-500">PROVIDE EST. SPY % CHANGE BY CLOSE</h2> | <h2 class="text-red-500">PROVIDE EST. SPY % CHANGE BY CLOSE</h2> |
+    )
+
+    **Bull Thesis**: Provide 3-4 Sentances for the bull thesis
+    **Bear Thesis**: Provide 3-4 Sentances for the bear thesis
+
+    Provide 2-3 sentance on which direction the overall sentiment is leaning and why.
 
   ### The Unknown Unknowns
 
@@ -63,7 +81,9 @@ comments, yahoo finance calendar, and previous analysis to generate this summary
     - What to watch out for if you are a bull
     - What to watch out for if you are a bear
     - (optional) Major macro, global, political, random catalysts
+    - (optional) Historical information, trends, patterns.
     - (optional) Upcoming holidays, witching days, foreign holidays, etc.
+    - (optional) Anything else you think is important.
 
     Provide 1-2 sentances on what to watch for the rest of this week or next week.
 
@@ -136,6 +156,9 @@ async function handleReportGeneration({ date, limit, previous }: Omit<DailyRepor
   const getTimeInSeconds = () => ((performance.now() - startTime) / 1_000).toFixed(2)
   console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) fetching daily report...`)
 
+  const market = new yahooFinance({})
+  const spyPrice = market.quoteSummary('SPY')
+
   // start yahoo calendar promise
   const calendarPromise = fetchYahooCalendar({ date }).catch((err) => {
     console.warn('[fetch-daily-report] fetching calendar failed:', err)
@@ -150,8 +173,11 @@ async function handleReportGeneration({ date, limit, previous }: Omit<DailyRepor
   const calendar = await calendarPromise
   console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) loaded yahoo calendar: `, !!calendar)
 
+  const spy = await spyPrice
+  console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) loaded spy price: `, !!spy)
+
   // construct prompt and analyze with grok
-  const summary = await fetchGrokBasic({ prompt: GROK_TEMPLATE({ limit, comments, previous, calendar }) })
+  const summary = await fetchGrokBasic({ prompt: GROK_TEMPLATE({ spy, limit, comments, previous, calendar }) })
   console.log(`[fetch-daily-report] (${getTimeInSeconds()}s) loaded grok analysis: `, !!summary)
 
   return {
