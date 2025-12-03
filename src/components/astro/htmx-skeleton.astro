@@ -1,0 +1,62 @@
+---
+/**
+ * @file src/components/astro/htmx-skeleton.astro
+ * @description a generic div which can be used with htmx.
+ *
+ * ```html
+<!-- Basic auto-refresh -->
+<Skeleton 
+  url="/partials/spy-price" 
+  trigger="every 30s" 
+/>
+
+<!-- Load into different target -->
+<div id="price-container"></div>
+<Skeleton 
+  url="/partials/spy-price"
+  target="#price-container"
+  swap="innerHTML"
+/>
+
+<!-- Custom loading state -->
+<Skeleton 
+  url="/partials/spy-price"
+  loadingClass="bg-blue-100 rounded-lg p-4"
+  loadingText="Fetching stock data..."
+/>
+
+<!-- With loading indicator -->
+<Skeleton 
+  url="/partials/spy-price"
+  indicator="#loading-spinner"
+/>
+ * ```
+ */
+interface Props {
+  url: string
+  trigger?: string
+  swap?: string
+  target?: string
+  indicator?: string
+  class?: string
+  loadingClass?: string
+  loadingText?: string
+}
+
+const {
+  url,
+  trigger = 'load',
+  swap = 'outerHTML',
+  target,
+  indicator,
+  class: className,
+  loadingClass = 'animate-pulse bg-gray-200 rounded-2xl px-4 py-1.5',
+  loadingText = 'Loading...',
+} = Astro.props
+---
+
+<div hx-get={url} hx-trigger={trigger} hx-swap={swap} hx-target={target} hx-indicator={indicator} class={className}>
+  <div class={loadingClass}>
+    <p class="text-transparent">{loadingText}</p>
+  </div>
+</div>
