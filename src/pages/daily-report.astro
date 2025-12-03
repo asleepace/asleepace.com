@@ -108,6 +108,68 @@ const description = getDetailedSummary()
     @apply text-green-500!;
   }
 
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    border: 1px solid #e5e7eb;
+  }
+
+  thead tr {
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  th {
+    padding: 0.5rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  tbody tr:hover {
+    background-color: #f3f4f6;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    color: #4b5563;
+  }
+
+  td a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  td a:hover {
+    text-decoration: underline;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    table {
+      font-size: 0.8125rem;
+    }
+
+    th,
+    td {
+      padding: 0.5rem 0.75rem;
+    }
+  }
+
   /* Print styles */
   @media print {
     /* Hide elements not needed in PDF */
