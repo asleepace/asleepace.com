@@ -6,6 +6,7 @@ import HeroImage from '@/components/astro/HeroImage.astro'
 import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
+import { Download } from 'lucide-react'
 
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
 // Astro.response.headers.set('Pragma', 'no-cache')
@@ -22,9 +23,10 @@ const paramDate = url.searchParams.get('date') ?? undefined
 const date = paramDate ? new Date(paramDate) : new Date()
 const refreshStr = url.searchParams.get('refresh')
 const refresh = refreshStr === 'true' || Number(refreshStr) > 0
+const hardRefresh = refreshStr === 'hard'
 
 // fetch or generate the report
-const report = await fetchDailyReport({ date, limit, refresh })
+const report = await fetchDailyReport({ date, limit, refresh, hardRefresh })
 
 // process content for meta tags, html, etc.
 const content = await marked(report.text)
@@ -77,11 +79,12 @@ const description = getDetailedSummary()
     </div>
     <button
       onclick="window.print()"
-      class="no-print mx-2 md:mx-0 px-4 py-2 my-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+      class="no-print hidden mx-2 md:mx-0 px-8 flex flec-row gap-x-4 py-1.5 squircle my-4 bg-blue-500 text-white text-sm hover:bg-blue-600"
     >
-      Download as PDF
+      <Download size={16} />
+      <span class="test-sm font-mono">Download as PDF</span>
     </button>
-    <PageMetrics className="mb-4 no-print mx-auto shrink" client:only="react" />
+    <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
   </article>
 </SiteLayout>
 
@@ -156,6 +159,12 @@ const description = getDetailedSummary()
 
   td a:hover {
     text-decoration: underline;
+  }
+
+  ul,
+  ol {
+    margin: 0px 0px !important;
+    font-size: 1rem !important;
   }
 
   .table-wrapper {

@@ -97,3 +97,56 @@ export async function upsertDailyReport(report: CreateDailyReport): Promise<Dail
 
   return DailyReportSchema.parse(results[0])
 }
+
+
+/**
+ * Update a daily report by date with partial data
+ */
+export async function updateDailyReport({
+  date,
+  updates,
+}: {
+  date: Date | string
+  updates: Partial<Omit<CreateDailyReport, 'date'>>
+}): Promise<DailyReport | null> {
+  const reportDate = typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
+
+  // Build dynamic SET clause
+  const setClauses: string[] = []
+  const values: any[] = []
+
+  if (updates.text !== undefined) {
+    setClauses.push(`text = $${values.length + 1}`)
+    values.push(updates.text)
+  }
+
+  if (updates.data !== undefined) {
+    setClauses.push(`data = $${values.length + 1}`)
+    values.push(JSON.stringify(updates.data))
+  }
+
+  if (updates.accuracy !== undefined) {
+    setClauses.push(`accuracy = $${values.length + 1}`)
+    values.push(updates.accuracy)
+  }
+
+  // Always update updated_at
+  setClauses.push('updated_at = CURRENT_TIMESTAMP')
+
+  if (setClauses.length === 1) {
+    // Only updated_at, nothing to update
+    return getDailyReport({ date })
+  }
+
+  const results = await sql.unsafe(
+    `UPDATE daily_reports 
+     SET ${setClauses.join(', ')}
+     WHERE date = $${values.length + 1}
+     RETURNING *`,
+    [...values, reportDate]
+  )
+
+  if (results.length === 0) return null
+
+  return DailyReportSchema.parse(results[0])
+}

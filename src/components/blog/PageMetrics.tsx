@@ -1,13 +1,23 @@
 import { useCallback, useEffect, useState } from 'react'
 import { actions } from 'astro:actions'
 import { cn } from '@/lib/utils/cn'
+import clsx from 'clsx'
 
-const MetricButton = (props: { onClick?: () => void; icon: string; hoverIcon?: string; text: string }) => {
+const MetricButton = (props: {
+  onClick?: () => void
+  icon: string
+  hoverIcon?: string
+  text: string
+  className?: string
+}) => {
   const [isHovered, setIsHovered] = useState(false)
   const { hoverIcon = props.icon, icon } = props
   return (
     <button
-      className="flex grow line-clamp-1 text-ellipsis gap-x-1.5 *:leading-8 justify-center items-center transition-all duration-100 text-gray-700 tracking-wide hover:scale-110 transform"
+      className={clsx(
+        'flex grow line-clamp-1 text-ellipsis gap-x-1.5 *:leading-8 justify-center items-center transition-all duration-100 text-gray-700 tracking-wide hover:scale-110 transform',
+        props.className
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => {
@@ -21,7 +31,7 @@ const MetricButton = (props: { onClick?: () => void; icon: string; hoverIcon?: s
   )
 }
 
-export function PageMetrics(props: { className?: string }) {
+export function PageMetrics(props: { className?: string; enableDownload?: boolean }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
   const [data, setData] = useState<Partial<{ likes: number; views: number }>>({
@@ -76,6 +86,16 @@ export function PageMetrics(props: { className?: string }) {
         <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(data.likes)} />
       )}
       <MetricButton icon="💬" text={'0'} />
+      {props.enableDownload ? (
+        <MetricButton
+          icon="🖨️"
+          text={'PDF'}
+          onClick={() => {
+            console.log('Printing!')
+            window.print()
+          }}
+        />
+      ) : null}
     </div>
   )
 }
