@@ -9,6 +9,8 @@ import YahooFinance from 'yahoo-finance2'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+export const prerender = false
+
 interface Props {
   ticker: string
   format?: 'simple' | 'advanced'
@@ -18,13 +20,12 @@ interface Props {
 const urlParams = Object.fromEntries(Astro.url.searchParams)
 const props = { ...Astro.props, ...urlParams } as Props
 
+// Parse and set default props
 const ticker = props.ticker ?? 'SPY'
 const format = props.format ?? 'simple'
 const isSimpleDisplay = format === 'simple'
 
-const currentFormat = isSimpleDisplay ? 'simple' : 'advanced'
-
-export const prerender = false
+// Fetch ticker information
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 const isMarketOpen = stockMarket.isMarketOpen()
 const spy = await yahooFinance.quoteSummary(ticker)
