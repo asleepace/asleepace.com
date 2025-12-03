@@ -17,6 +17,6 @@ export const GET: APIRoute = async () => {
     console.warn('[background-sync] error:', e)
     return Response.json({ ok: false })
   } finally {
-    console.log('[background-sync] finished:', now.toLocaleDateString('en-US', { timeStyle: 'full' }))
+    console.log('[background-sync] finished:', now.toLocaleTimeString('en-US', { timeStyle: 'full' }))
   }
 }
