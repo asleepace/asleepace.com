@@ -27,9 +27,12 @@ const refreshStr = url.searchParams.get('refresh')
 const refresh = Boolean(refreshStr && ['null', 'undefined', '0', 'false'].every((str) => refreshStr !== str))
 const hardRefresh = refreshStr === 'hard'
 
+let hasPendingUpdates = false
+
 async function fetchCachedBeforeTimeout(): Promise<DailyReport> {
   await sleep(10_000) // client times out ~60s
   console.warn('[daily-report] falling back on cached version before dealine...')
+  hasPendingUpdates = true
   return await getDailyReport({ date })
 }
 
@@ -88,10 +91,16 @@ const description = getDetailedSummary()
     <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
   </article>
   <!-- we giving back to the community -->
-  <script define:vars={{ report }}>
+  <script define:vars={{ report, hasPendingUpdates }}>
     console.log('❤️ for all you scrapers out there (window.dailyReport)...')
     window.dailyReport = report
     console.log(report)
+
+    if (hasPendingUpdates) {
+      setTimeout(() => {
+        window.location.reload()
+      }, 60_000)
+    }
   </script>
 </SiteLayout>
 

@@ -32,6 +32,7 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     return response
   } catch (e) {
+    console.warn('[middleware] caught:', e)
     const message = e instanceof Error ? e.message : 'Internal Server Error'
 
     print(chalk.redBright('error:'), e?.message ?? e)
