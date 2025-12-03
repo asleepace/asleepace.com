@@ -169,7 +169,9 @@ Response Format:
 
     <div class="daily-report-links">
       <a href="/daily-report?date=${getPreviousDate(params.date)}">← Yesterday's report</a>
-      <div class="mx-2 w-[0.2px] h-6 bg-neutral-200"></div>
+      <div class="mx-2 w-[0.5px] h-6 bg-neutral-200"></div>
+      <a class="text-neutral-400!" href="/daily-report?refresh=true">Refresh Report</a>
+      <div class="mx-2 w-[0.5px] h-6 bg-neutral-200"></div>
       <a href="/daily-report?date=${getNextDate(params.date)}">Tomorrow's report →</a>
     </div>
 
