@@ -1,0 +1,21 @@
+---
+import clsx from 'clsx'
+
+interface Props {
+  className?: string
+  title?: string
+  message?: string
+}
+
+const disclaimerTitle = Astro.props.title ?? 'Disclaimer'
+const disclaimerMessage = Astro.props.message
+const className = Astro.props.className
+---
+
+<div class={clsx('my-4 mx-2 md:mx-0 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded', className)}>
+  <p class="text-sm text-gray-700 leading-relaxed">
+    <strong class="font-semibold text-gray-900">⚠️ {disclaimerTitle}:</strong>
+    {disclaimerMessage ? <div>{disclaimerMessage}</div> : undefined}
+    <slot />
+  </p>
+</div>
