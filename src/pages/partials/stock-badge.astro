@@ -28,9 +28,9 @@ const isSimpleDisplay = format === 'simple'
 // Fetch ticker information
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 const isMarketOpen = stockMarket.isMarketOpen()
-const spy = await yahooFinance.quoteSummary(ticker)
-const price = spy.price?.regularMarketPrice ?? 0
-const openPrice = spy.price?.regularMarketOpen ?? 0
+const stock = await yahooFinance.quoteSummary(ticker)
+const price = stock.price?.regularMarketPrice ?? 0
+const openPrice = stock.price?.regularMarketOpen ?? 0
 const change = price - openPrice
 const changePercent = (change / openPrice) * 100
 const isPositive = change >= 0
@@ -42,7 +42,7 @@ const isPositive = change >= 0
   hx-swap="outerHTML"
   data-name="stock-badge"
   data-info={ticker}
-  data-json={JSON.stringify(spy)}
+  data-json={JSON.stringify(stock)}
   class="bg-zinc-900 text-white px-4 py-2.5 squircle border hover:animate-pulse border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
 >
   <!-- Format: Advanced Display -->
