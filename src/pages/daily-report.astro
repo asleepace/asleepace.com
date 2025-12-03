@@ -1,5 +1,5 @@
 ---
-import { fetchDailyReport } from '@/lib/server/fetch-daily-report'
+import { fetchDailyReport, triggerDailyReportRefreshInBackground } from '@/lib/server/fetch-daily-report'
 import SiteLayout from '@/layouts/SiteLayout.astro'
 import { marked } from 'marked'
 import HeroImage from '@/components/astro/HeroImage.astro'
@@ -8,7 +8,7 @@ import Prose from '@/components/astro/Prose.astro'
 import BlogDisclaimer from '@/components/astro/BlogDisclaimer.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
 import { getDailyReport, type DailyReport } from '@/lib/db/daily-reports'
-import { sleep } from 'bun'
+import { stockMarket } from '@/lib/utils/stock-market'
 
 // set page cache for ~1 min
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
@@ -27,20 +27,22 @@ const refreshStr = url.searchParams.get('refresh')
 const refresh = Boolean(refreshStr && ['null', 'undefined', '0', 'false'].every((str) => refreshStr !== str))
 const hardRefresh = refreshStr === 'hard'
 
-let hasPendingUpdates = false
-
-async function fetchCachedBeforeTimeout(): Promise<DailyReport> {
-  await sleep(10_000) // client times out ~60s
-  console.warn('[daily-report] falling back on cached version before dealine...')
-  hasPendingUpdates = true
-  return await getDailyReport({ date })
+// start a refresh in background
+if (!refresh && !hardRefresh) {
+  void triggerDailyReportRefreshInBackground({ date })
 }
 
-// fetch or generate the report (fallback on cache before timeout)
-const report: DailyReport = await Promise.race([
-  fetchDailyReport({ date, limit, refresh, hardRefresh }),
-  fetchCachedBeforeTimeout(),
-])
+// get latest version of daily report from database
+const report = await fetchDailyReport({ date, limit, refresh, hardRefresh })
+
+if (!report) {
+  return Astro.redirect('/404')
+}
+
+// calculate staleness (~15mins)
+const lastUpdated = report.updated_at ? new Date(report.updated_at) : new Date(report.date)
+const elapsed = stockMarket.getElapsedTimeSince(lastUpdated)
+// const isStale = elapsed.mins > 15
 
 // process content for meta tags, html, etc.
 const content = await marked(report.text)
@@ -51,6 +53,7 @@ const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
 
 // extract useful information from markdown
 function getDetailedSummary() {
+  if (!report) throw new Error('Missing daily report!')
   const summary = report.text
   try {
     const pageTitle = summary.slice(4, summary.indexOf('**') - 2)
@@ -65,6 +68,14 @@ function getDetailedSummary() {
 }
 
 const description = getDetailedSummary()
+
+function getElapsedDetail() {
+  if (elapsed.secs === 0) return 'now'
+  if (elapsed.mins === 0) return `${elapsed.secs} secs ago`
+  if (elapsed.hours === 0) return `${elapsed.mins} mins ago`
+  if (elapsed.days === 0) return `${elapsed.hours} hours ago`
+  return stockMarket.getDateString(date)
+}
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage}>
@@ -87,20 +98,16 @@ const description = getDetailedSummary()
         r/WallStreetBets
       </a>
       and analyzed with Grok AI. Not financial advice. Information is subject to change. Trade at your own risk.
+      <p class="text-sm text-[10px] mt-1 text-gray-700 text-right">
+        Last updated {getElapsedDetail()}.
+      </p>
     </BlogDisclaimer>
     <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
   </article>
   <!-- we giving back to the community -->
-  <script define:vars={{ report, hasPendingUpdates }}>
-    console.log('❤️ for all you scrapers out there (window.dailyReport)...')
+  <script define:vars={{ report }}>
     window.dailyReport = report
     console.log(report)
-
-    if (hasPendingUpdates) {
-      setTimeout(() => {
-        window.location.reload()
-      }, 60_000)
-    }
   </script>
 </SiteLayout>
 
@@ -154,7 +161,7 @@ const description = getDetailedSummary()
   }
 
   .spy-eod-confidence {
-    @apply text-xs! font-light! font-mono! text-neutral-300! uppercase -mt-1 tracking-tight!;
+    @apply text-xs! font-light font-mono! text-gray-400! uppercase -mt-1 tracking-tight!;
   }
 
   .spy-eod-summary {

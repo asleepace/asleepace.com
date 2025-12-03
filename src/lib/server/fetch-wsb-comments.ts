@@ -2,7 +2,7 @@
  * @file src/lib/server/fetch-wsb-comments.ts
  * @description fetch the daily discussion thread on wall street bets and extract the comments as json.
  */
-import { Page } from 'puppeteer'
+import { type Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
@@ -82,7 +82,6 @@ async function extractNestedPageComments(page: Page): Promise<WallStreetBetsComm
         timestamp: time,
         flair,
         body,
-        // permalink: permalink ? `https://old.reddit.com${permalink}` : null,
         replies,
       }
     }

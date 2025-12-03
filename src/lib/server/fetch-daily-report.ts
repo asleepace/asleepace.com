@@ -10,8 +10,11 @@ import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 import YahooFinance from 'yahoo-finance2'
 import { Mutex } from '@asleepace/mutex'
+import { stockMarket } from '../utils/stock-market'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
+
+const DEFAULT_LIMIT = 300
 
 const mutex = Mutex.shared()
 
@@ -316,46 +319,78 @@ export type FetchDailyReportOptions = {
   hardRefresh?: boolean
 }
 
+let isFetchingRevisions = false
+
 /**
  * Handle parsing revisions between report generations in the background as it can
  * take a while to parse.
+ *
+ * @note this function does not throw.
  */
-async function handleRevisionsInBackground(nextDailyReport: DailyReport) {
-  if (!nextDailyReport.data?.openReportText) return
-  if (nextDailyReport.data?.openReportText === nextDailyReport.text) return
+async function handleRevisionsInBackground(report: DailyReport) {
+  if (isFetchingRevisions) return
+  isFetchingRevisions = true
+  // get initial report generation text which is saved in data object
+  const openReportText = report.data?.openReportText
+  const prevRevisions: string[] = report.data?.revisions ?? []
+  const shortDate = stockMarket.getDateString(report.date)
+  try {
+    if (!openReportText) throw 'ERR_MISSING_OPEN_REPORT_TEXT'
+    if (openReportText === report.text) throw 'ERR_SAME_OPEN_REPORT_TEXT'
 
-  // Generate revision notes if previous report exists
-  const prevRevisions = (nextDailyReport.data?.revisions as string[]) ?? []
+    // Generate revision notes if previous report exists
+    const revisionText = await fetchGrokBasic({
+      model: 'grok-4-1-fast-non-reasoning',
+      prompt: `Compare these two reports and list 3-5 key changes as concise bullet points:
+        PREVIOUS:
+          ${report.data.openReportText}...
 
-  const revisionText = await fetchGrokBasic({
-    model: 'grok-4-1-fast-non-reasoning',
-    prompt: `Compare these two reports and list 3-5 key changes as concise bullet points:
+        CURRENT:
+          ${report.text}...
 
-PREVIOUS:
-${nextDailyReport.data.openReportText}...
+        Output only bullet points of meaningful changes (sentiment shifts, new data, revised outlooks).`,
+    })
 
-CURRENT:
-${nextDailyReport.text}...
+    // process results as timestamped strings
+    const newRevisions = revisionText
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => `[${new Date().toISOString()}] ${line}`)
 
-Output only bullet points of meaningful changes (sentiment shifts, new data, revised outlooks).`,
-  })
+    // merge with previous revisions
+    const allRevisions = [...prevRevisions, ...newRevisions]
 
-  const newRevisions = revisionText
-    .split('\n')
-    .filter((line) => line.trim())
-    .map((line) => `[${new Date().toISOString()}] ${line}`)
-
-  const allRevisions = [...prevRevisions, ...newRevisions]
-
-  await updateDailyReport({
-    date: nextDailyReport.date,
-    updates: {
+    // persist change to database
+    await updateDailyReport(report.date, {
       data: {
-        ...nextDailyReport.data,
+        ...report.data,
         revisions: allRevisions,
       },
-    },
-  })
+    })
+  } catch (e) {
+    console.warn(`[fetch-daily-report] background revisions job failed for "${shortDate}"`, e)
+  } finally {
+    console.log(`[fetch-daily-report] background revisions job finished for "${shortDate}".`)
+    isFetchingRevisions = false
+  }
+}
+
+/**
+ * ## Get or Create Daily Report
+ *
+ * Get current daily report in databaes or attempt to generate and persist if within
+ * valid T+0 or T+1 date range.
+ */
+export async function getOrCreateDailyReport({ date }: { date: Date }): Promise<DailyReport> {
+  const persistedReport = await getDailyReport({ date })
+  if (persistedReport) return persistedReport
+  if (!stockMarket.isUpcomingOrCurrentTradingDay(date)) {
+    const info = stockMarket.getDateString(date)
+    throw new Error(`Invalid date range for daily report "${info}" (must be T+0 or T+1)`)
+  }
+  const dailyReport = await handleReportGeneration({ date, limit: DEFAULT_LIMIT, prevReport: undefined })
+  const savedReport = await upsertDailyReport(dailyReport)
+  return savedReport
 }
 
 /**
@@ -364,51 +399,88 @@ Output only bullet points of meaningful changes (sentiment shifts, new data, rev
  * Fetches comments from Wall Street Bets and performs analysis with Grok.
  * Results are cached in PostgreSQL by date.
  *
+ * @note does not automatically refresh unless specified.
+ *
  * @param options.date - Target date for report (defaults to today)
  * @param options.limit - Max WSB comments to fetch (default: 250)
- * @param options.refresh - Force regenerate even if cached (default: false)
+ * @param options.refresh - Regenerate even if cached (default: false)
+ * @param options.hardRefresh - Regenerate without previous report data (default: false)
  */
 export async function fetchDailyReport({
   date = new Date(),
-  limit = 250,
+  limit = 300,
   refresh = false,
   hardRefresh = false,
 }: FetchDailyReportOptions = {}): Promise<DailyReport> {
   const timer = createTimer()
 
-  // Check cache first
-  const prevReport = await getDailyReport({ date })
+  // get existing report from database
+  const existingReport = await getOrCreateDailyReport({ date })
 
-  // Cancel new requests if there is a current lock
-  let mutexLock = mutex.acquireLock({ timeout: 5_000 })
-  try {
-    await mutexLock
-  } catch (e) {
-    if (prevReport) {
-      console.log('[fetch-daily-report] failed to aquire mutex, returning cached...')
-      return prevReport
-    }
-  } finally {
-    ;(await mutexLock).releaseLock()
-  }
-
-  if (!refresh && prevReport) {
-    console.log(`[fetch-daily-report] (${timer.elapsed}s) using cached report`)
-    return prevReport
-  }
+  // skip regenerating unless a refresh is requested
+  if (!refresh && !hardRefresh) return existingReport
 
   // Generate new report
-  const nextReport = await handleReportGeneration({ date, limit, prevReport: hardRefresh ? undefined : prevReport })
+  const prevReport = hardRefresh ? undefined : existingReport
+  const nextReport = await handleReportGeneration({ date, limit, prevReport })
 
   // Save to database
   const savedReport = await upsertDailyReport(nextReport)
-
-  console.log(`[fetch-daily-report] (${timer.elapsed}s) report saved`)
+  console.log(`[fetch-daily-report] (${timer.elapsed}s) report saved!`)
 
   // Schedule parsing revisions in background
-  void handleRevisionsInBackground(savedReport).catch((err) => {
-    console.warn('failed to get revisions:', err)
-  })
+  void handleRevisionsInBackground(savedReport)
 
   return savedReport
+}
+
+/**
+ * Simple flag to avoid duplicating refreshes.
+ */
+let isRefreshing = false
+
+/**
+ * Triggers a refresh of the specified daily report if:
+ *
+ *  1. Not currently refreshing
+ *  2. Previous report exists
+ *  3. Previous report is for T+0 or T+1 trading days
+ *  4. Last refresh was more than 15mins ago
+ *
+ * @note this function does not throw.
+ */
+export async function triggerDailyReportRefreshInBackground({ date }: { date: Date }) {
+  if (isRefreshing) return // skip if already refreshing...
+  isRefreshing = true
+  const shortDate = stockMarket.getDateString(date)
+  console.log('[fetch-daily-report] scheduling background refresh...')
+  try {
+    // get current report saved in database
+    const existingReport = await getDailyReport({ date })
+
+    // verify a report exists to refresh and is in valid date range
+    if (!existingReport) throw new Error('ERR_DAILY_REPORT_MISSING')
+    if (!stockMarket.isUpcomingOrCurrentTradingDay(date)) throw new Error('ERR_DAILY_REPORT_RANGE')
+
+    // get last updated or created at time
+    const lastGenerationDate = existingReport.updated_at
+    if (!lastGenerationDate) throw new Error('ERR_DAILY_REPORT_MISSING_UPDATED_AT')
+
+    // check how much time has elapsed since last generation
+    const elapsedTime = stockMarket.getElapsedTimeSince(lastGenerationDate)
+    if (elapsedTime.mins <= 15) throw new Error('ERR_DAILY_REPORT_REFRESH_TOO_SOON')
+
+    // handle refreshing report, saving to database & checking revisions
+    const dailyReport = await handleReportGeneration({ date, limit: DEFAULT_LIMIT, prevReport: existingReport })
+    const savedReport = await upsertDailyReport(dailyReport)
+    await handleRevisionsInBackground(savedReport)
+
+    // log message when finished
+    console.log('[fetch-daily-report] background refresh finished!')
+  } catch (e) {
+    const err = e instanceof Error ? e : new Error(String(e))
+    console.warn(`[fetch-daily-report] skipping background refresh for "${shortDate}":`, err.message)
+  } finally {
+    isRefreshing = false
+  }
 }

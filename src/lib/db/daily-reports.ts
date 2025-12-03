@@ -101,13 +101,7 @@ export async function upsertDailyReport(report: CreateDailyReport): Promise<Dail
 /**
  * Update a daily report by date with partial data
  */
-export async function updateDailyReport({
-  date,
-  updates,
-}: {
-  date: Date | string
-  updates: Partial<Omit<CreateDailyReport, 'date'>>
-}): Promise<DailyReport | null> {
+export async function updateDailyReport(date: Date, updates: Partial<DailyReport>): Promise<DailyReport | null> {
   const reportDate =
     typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
 
