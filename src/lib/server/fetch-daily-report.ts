@@ -124,17 +124,18 @@ Response Format:
 
     Provide a simple table predicting SPY's closing price today for both bulls and bears
     based on market sentiment, current levels, realistic outcomes, upcoming events, etc.
-    Keep moves reasonable for daily action (0-5% max). Current SPY: ${params.spy?.price || 'N/A'}
+    Keep moves reasonable for daily action (0-5% max). Replace "%%%" with  sentiment analysis (e.g. 68%). 
+    Current SPY: ${params.spy?.price || 'N/A'}
 
     Example Table: (e.g. generate this table with estimated closing price of SPY:
-      | <span class="table-header-centered ">Bull SPY Predictions (% sentiment)</span> | <span class="table-header-centered>Bear SPY Predictions (% sentiment)</span> |
+      | <span class="table-header-centered">Bull SPY Predictions (%%%)</span> | <span class="table-header-centered">Bear SPY Predictions (%%%)</span> |
       | ------------------------------ | ------------------------ |
       | <span class="bull">$700</span> | <span class="bear">$600</span> |
     )
 
-    **Bull Thesis**: Provide 3-4 sentences for the bull thesis (% sentiment)
+    **Bull Thesis**: Provide 3-4 sentences for the bull thesis (%%%)
 
-    **Bear Thesis**: Provide 3-4 sentences for the bear thesis (% sentiment)
+    **Bear Thesis**: Provide 3-4 sentences for the bear thesis (%%%)
 
     Provide 2-3 sentences on which direction the overall sentiment is leaning and why.
 
