@@ -79,18 +79,12 @@ const description = getDetailedSummary()
         and analyzed with Grok AI. Not financial advice. Information is subject to change. Trade at your own risk.
       </p>
     </div>
-    <button
-      onclick="window.print()"
-      class="no-print hidden mx-2 md:mx-0 px-8 flex flec-row gap-x-4 py-1.5 squircle my-4 bg-blue-500 text-white text-sm hover:bg-blue-600"
-    >
-      <Download size={16} />
-      <span class="test-sm font-mono">Download as PDF</span>
-    </button>
     <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
   </article>
   <script define:vars={{ report }}>
-    console.log('❤️ for all you scrapers out there...')
-    console.log({ report })
+    console.log('❤️ for all you scrapers out there (window.dailyReport)...')
+    window.dailyReport = report
+    console.log(report)
   </script>
 </SiteLayout>
 

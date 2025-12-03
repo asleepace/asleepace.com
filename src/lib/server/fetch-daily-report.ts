@@ -163,7 +163,7 @@ Response Format:
   ### Summary
 
     Provide a short summary of your analysis in 280 Characters or less which can be shared to X
-    and uses lamen terms / trendy speak to elegantly paint a picture of the day.
+    and uses layman's terms / trendy speak to elegantly paint a picture of the day.
 
     **Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)**
 
