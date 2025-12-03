@@ -2,7 +2,7 @@
  * @file src/lib/server/fetch-wsb-comments.ts
  * @description fetch the daily discussion thread on wall street bets and extract the comments as json.
  */
-import { Page } from 'puppeteer'
+import { type Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
