@@ -11,7 +11,6 @@ import { type DailyReport } from '@/lib/db/daily-reports'
 import { stockMarket } from '@/lib/utils/stock-market'
 import StockBadge from './partials/stock-badge.astro'
 import DailyReportCard from '@/components/astro/DailyReportCard.astro'
-import { fetchReportCard } from '@/lib/server/fetch-report-card'
 
 // set page cache for ~1 min
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
