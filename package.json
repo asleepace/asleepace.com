@@ -3,7 +3,7 @@
   "description": "a collection of me by me.",
   "license": "MIT",
   "type": "module",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "scripts": {
     "check": "bun --bun astro check",
     "dev": "bunx --bun astro dev",
