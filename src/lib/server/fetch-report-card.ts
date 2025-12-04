@@ -1,4 +1,6 @@
 import { fetchGrokBasic } from '@/lib/server/fetch-grok'
+import { parseJsonSafe } from '@/lib/utils/safe-json'
+import { z } from 'zod'
 
 export async function fetchReportCard(params: { date: Date; meta: Record<string, any>; dailyReportText: string }) {
   try {
@@ -72,9 +74,14 @@ Return the data as JSON following the specified format.`
       prompt: REPORT_CARD_PROMPT,
       temperature: 0,
     })
-    const reportCard = JSON.parse(outputText)
-    console.log('[fetch-report-card] data:', { reportCard })
-    return { ...reportCard, date: params.date }
+    const [safeJson, err] = parseJsonSafe<any>(outputText)
+
+    if (err) {
+      return undefined
+    }
+
+    console.log('[fetch-report-card] data:', { reportCard: safeJson })
+    return { ...safeJson, date: params.date }
   } catch (e) {
     console.warn('[fetch-report-card] failed:', e)
     return undefined
