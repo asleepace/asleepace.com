@@ -100,7 +100,7 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
     </Prose>
 
     <!-- Display Report Card If Present -->
-    {reportCard && <DailyReportCard client:load {...reportCard} date={reportDate} />}
+    {reportCard && <DailyReportCard {...reportCard} date={reportDate} />}
 
     <!-- Daily Report Footer -->
     <BlogDisclaimer>
