@@ -80,7 +80,7 @@ function getElapsedDetail() {
   return stockMarket.getDateString(date)
 }
 
-const reportData = await fetchReportCard()
+const reportCard = report.data?.reportCard
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage} htmx>
@@ -94,12 +94,14 @@ const reportData = await fetchReportCard()
       </div>
     </HeroTitle>
 
-    <DailyReportCard client:load {...reportData} />
-
     <!-- Daily Report Content -->
     <Prose>
       <Fragment set:html={content} />
     </Prose>
+
+    <!-- Display Report Card If Present -->
+    {reportCard && <DailyReportCard client:load {...reportCard} />}
+
     <!-- Daily Report Footer -->
     <BlogDisclaimer>
       Data sourced from

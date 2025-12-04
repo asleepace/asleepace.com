@@ -1,10 +1,8 @@
-import { getDailyReport } from '@/lib/db/daily-reports'
 import { fetchGrokBasic } from '@/lib/server/fetch-grok'
 
-export async function fetchReportCard() {
-  const REPORT_CARD_PROMPT = (params: {
-    dailyReportText: string
-  }) => `You are a data extraction assistant. Your job is to parse daily market reports and extract structured data in JSON format.
+export async function fetchReportCard(params: { dailyReportText: string }) {
+  try {
+    const REPORT_CARD_PROMPT = `You are a data extraction assistant. Your job is to parse daily market reports and extract structured data in JSON format.
 
 Given a daily market report text, extract the following information and return ONLY valid JSON (no markdown, no explanation):
 
@@ -67,14 +65,15 @@ ${params.dailyReportText}
 
 Return the data as JSON following the specified format.`
 
-  const currentReport = await getDailyReport({ date: new Date() })
-  const outputText = await fetchGrokBasic({
-    prompt: REPORT_CARD_PROMPT({
-      dailyReportText: currentReport!.text,
-    }),
-    temperature: 0,
-  })
-  const reportCard = JSON.parse(outputText)
-  console.log('[fetch-report-card] data:', { reportCard })
-  return reportCard
+    const outputText = await fetchGrokBasic({
+      prompt: REPORT_CARD_PROMPT,
+      temperature: 0,
+    })
+    const reportCard = JSON.parse(outputText)
+    console.log('[fetch-report-card] data:', { reportCard })
+    return reportCard
+  } catch (e) {
+    console.warn('[fetch-report-card] failed:', e)
+    return undefined
+  }
 }
