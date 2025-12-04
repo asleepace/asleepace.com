@@ -108,7 +108,7 @@ Response Format:
     Provide a short summary of major things to look out for today or this week (2-4 sentences).
 
     Provide formatted as a table with Event Name, Date / Time (Premarket, Today, 2:00PM EST, Post-market, Tomorrow, Next Week), and Summary (short note on expectations or impact).
-    The Date/Time should be a rough estimate (MAX 6 ENTRIES - Most important)
+    The Date/Time should be a rough estimate (MAX 6 ENTRIES - Most important). Add "⋆" after event name for pivotal events like FOMC, NVIDIA Earnings, macro movers, etc.
 
     Example table:
       | Event Name | Date / Time | Summary        |
@@ -117,7 +117,7 @@ Response Format:
       | [MRVL](#mrvl) Earnings | Today    | Q3 exp 0.74 EPS; AI M&A buzz |
       | [AEO](#aeo) Earnings  | Today    | Q3 exp 0.46 EPS; holiday retail gauge |
       | PPI Release   | Tomorrow | Inflation check; core >2.5% risks hawkish Fed |
-      | FOMC Meeting  | Next Week | Rate hold expected; dovish dots bullish |
+      | FOMC Meeting ⋆| Next Week | Rate hold expected; dovish dots bullish |
       | [Full Calendar](https://finance.yahoo.com/calendar/economic/) | | View all events |
 
   ### Playbook
