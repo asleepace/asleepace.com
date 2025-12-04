@@ -42,8 +42,7 @@ const DailyFeed: FeedItem = {
 
 feed.unshift(DailyFeed)
 
-const today = new Date()
-const tradingDay = stockMarket.isMarketOpen(today) ? today : stockMarket.getNextTradingDay()
+const tradingDay = stockMarket.getCurrentOrUpcomingTradingDay()
 ---
 
 <div class={clsx('p-4', classList)}>

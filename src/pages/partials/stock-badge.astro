@@ -21,7 +21,7 @@ const urlParams = Object.fromEntries(Astro.url.searchParams)
 const props = { ...Astro.props, ...urlParams } as Props
 
 // Parse and set default props
-const ticker = props.ticker ?? 'SPY'
+const ticker = stockMarket.isValidTicker(props.ticker) ? props.ticker : 'SPY'
 const format = props.format ?? 'simple'
 const isSimpleDisplay = format === 'simple'
 
@@ -32,7 +32,7 @@ const stock = await yahooFinance.quoteSummary(ticker)
 const price = stock.price?.regularMarketPrice ?? 0
 const openPrice = stock.price?.regularMarketOpen ?? 0
 const change = price - openPrice
-const changePercent = (change / openPrice) * 100
+const changePercent = openPrice && Number.isFinite(openPrice) ? (change / openPrice) * 100 : 0
 const isPositive = change >= 0
 
 // Encode next props into URL for HTMX refresh

@@ -78,6 +78,15 @@ export function isTodayET(date: Date): boolean {
 }
 
 /**
+ * Return the current date if stock market currently open, otherwise return next T+1 trading day.
+ * Defaults to current date.
+ */
+export function getCurrentOrUpcomingTradingDay() {
+  if (isMarketOpen()) return new Date()
+  return getNextTradingDay()
+}
+
+/**
  * Checks if a given date is for a past trading day.
  * Returns true if the date is before today, or if it's today but past market close (4:00 PM ET).
  *
@@ -141,6 +150,13 @@ export function getElapsedTimeSince(date: Date): ElapsedTimes {
 }
 
 /**
+ * Validate ticker format: alphanumeric, dashes, dots, max length 10
+ */
+export function isValidTicker(ticker: string): boolean {
+  return /^[A-Za-z0-9.-]{1,10}$/.test(ticker)
+}
+
+/**
  * Shared stock market utilities for date/time validation.
  */
 export const stockMarket = {
@@ -148,9 +164,11 @@ export const stockMarket = {
   isPastTradingDay,
   isDuringOrBeforeNextTradingDay,
   isUpcomingOrCurrentTradingDay,
+  isValidTicker,
   isTodayET,
   getDateString,
   getNextTradingDay,
   getPrevTradingDay,
   getElapsedTimeSince,
+  getCurrentOrUpcomingTradingDay,
 }
