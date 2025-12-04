@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-#   NOTE: This is the latest deploy script which should be called manualy
-#   and not from CI/CD.
+# NOTE: This is the latest deploy script which should be called manualy
+# and not from CI/CD.
 #
-#     bun run deploy:fast
+#   bun run deploy:fast
 #
 
 set -e  # Exit on any error
