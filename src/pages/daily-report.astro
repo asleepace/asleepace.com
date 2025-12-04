@@ -10,6 +10,7 @@ import { PageMetrics } from '@/components/blog/PageMetrics'
 import { type DailyReport } from '@/lib/db/daily-reports'
 import { stockMarket } from '@/lib/utils/stock-market'
 import StockBadge from './partials/stock-badge.astro'
+import ReportCard from '@/components/astro/ReportCard.astro'
 
 // set page cache for ~1 min
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
@@ -77,6 +78,36 @@ function getElapsedDetail() {
   if (elapsed.days === 0) return `${elapsed.hours} hours ago`
   return stockMarket.getDateString(date)
 }
+
+const reportData = {
+  date: 'Dec. 4th, 2025',
+  eodTarget: 686,
+  currentPrice: 684,
+  percentChange: 0.3,
+  sentiment: 'bullish' as const,
+  volume: 'thin' as const,
+  confidence: 78,
+  bullPercentage: 68,
+  bearPercentage: 32,
+  marketStatus: 'closed' as const,
+  keyFactors: [
+    {
+      icon: 'briefcase',
+      text: 'ADP Jobs Report preview - soft print expected',
+      color: 'blue' as const,
+    },
+    {
+      icon: 'trending-up',
+      text: 'NVDA China license tailwinds under Trump policy',
+      color: 'purple' as const,
+    },
+    {
+      icon: 'store',
+      text: 'Retail earnings (DG, KR) test consumer strength',
+      color: 'amber' as const,
+    },
+  ],
+}
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage} htmx>
@@ -89,6 +120,9 @@ function getElapsedDetail() {
         <StockBadge ticker="SPY" format="advanced" />
       </div>
     </HeroTitle>
+
+    <ReportCard client:load {...reportData} />
+
     <!-- Daily Report Content -->
     <Prose>
       <Fragment set:html={content} />
