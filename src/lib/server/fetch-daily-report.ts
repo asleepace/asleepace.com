@@ -323,7 +323,6 @@ async function handleRevisionsInBackground(report: DailyReport) {
   const shortDate = stockMarket.getDateString(report.date)
   try {
     if (!openReportText) throw 'ERR_MISSING_OPEN_REPORT_TEXT'
-    if (openReportText === report.text) throw 'ERR_SAME_OPEN_REPORT_TEXT'
 
     // Generate revision notes if previous report exists
     const revisionText = await fetchGrokBasic({
