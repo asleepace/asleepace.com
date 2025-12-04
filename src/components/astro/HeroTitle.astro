@@ -1,4 +1,5 @@
 ---
+import { cn } from '@/lib/utils/cn'
 import FormattedDate from './FormattedDate.astro'
 import HashTags from './HashTags.astro'
 // =====================================
@@ -8,14 +9,18 @@ import HashTags from './HashTags.astro'
 interface Props {
   title: string
   pubDate: Date
+  class?: string
   updatedDate?: Date
   hashTags?: string
+  titleClass?: string
+  dividerClass?: string
 }
 
-const { title, pubDate, updatedDate, hashTags } = Astro.props
+const { title, pubDate, updatedDate, hashTags, dividerClass, titleClass, class: className } = Astro.props
+const hasSlot = Astro.slots.has('default')
 ---
 
-<div class="text-center self-stretch px-4 flex flex-col gap-y-6 pt-4 md:pt-8">
+<div class={cn('text-center self-stretch px-4 flex flex-col gap-y-6 pt-4 md:pt-8', className)}>
   <div class="date text-gray-500">
     <FormattedDate date={pubDate} />
     {
@@ -26,9 +31,8 @@ const { title, pubDate, updatedDate, hashTags } = Astro.props
       )
     }
   </div>
-  <p class="text-5xl text-balance font-black mb-2">{title}</p>
+  <p class={cn('text-5xl text-balance font-black mb-2', titleClass)}>{title}</p>
   {hashTags && <HashTags hashTags={hashTags} className="" />}
-  <hr
-    class="border-b-none border-t-[1px] w-full border-t-gray-200 my-4 mb-8 md:my-6"
-  />
+  {hasSlot && <slot />}
+  <hr class={cn('border-b-none border-t w-full border-t-gray-200 my-4 mb-8 md:my-6', dividerClass)} />
 </div>
