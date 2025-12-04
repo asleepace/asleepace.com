@@ -16,7 +16,7 @@ git fetch origin
 git pull origin $(git branch --show-current)  # Pull current branch explicitly
 
 # Build
-bun install --frozen-lockfile  # Use lockfile for reproducible builds
+bun install
 bun run build
 
 # Zero-downtime restart
