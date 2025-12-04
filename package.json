@@ -12,11 +12,8 @@
     "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
     "preview": "bunx --bun astro preview --host 0.0.0.0 --port 4321",
     "background:jobs": "pm2 start scripts/background-sync.sh --name stock-background-sync --cron \"*/15 * * * *\" --no-autorestart",
-    "astro:upgrade": "npx @astrojs/upgrade",
-    "build:tailwind": "npx @tailwindcss/cli -i ./src/styles/global.css -o ./src/styles/output.css",
-    "watch:tailwind": "npx @tailwindcss/cli -i ./src/styles/global.css -o ./src/styles/output.css --watch",
     "deploy": "./scripts/deploy.sh",
-    "util:upgrade": "bun upgrade",
+    "deploy:fast": "./scripts/deploy-fast.sh",
     "util:check": "bunx --bun astro check",
     "run:server": "bun ./dist/server/entry.mjs"
   },
