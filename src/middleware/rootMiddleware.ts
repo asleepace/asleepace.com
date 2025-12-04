@@ -20,10 +20,12 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
     if (context.isPrerendered) return next()
 
     // --- handle tracking ---
-    const ipAddress = getIpAddressFromHeaders(context.request.headers)
-    const pathName = context.url.pathname
-    const method = context.request.method
-    logMessage(`${method} ${pathName} ${ipAddress}`)
+    if (import.meta.env.PROD) {
+      const ipAddress = getIpAddressFromHeaders(context.request.headers) ?? 'localhost'
+      const pathName = context.url.pathname
+      const method = context.request.method
+      logMessage(`${method} ${pathName} ${ipAddress}`)
+    }
 
     // --- pre-processing ---
 
