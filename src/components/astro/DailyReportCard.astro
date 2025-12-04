@@ -147,8 +147,7 @@ const iconColorMap = {
           <span class="text-slate-400 font-semibold">{confidence}%</span>
         </div>
         <div class="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
-          <div class={`h-full bg-gradient-to-r ${confidenceGradient} rounded-full`} style={`width: ${confidence}%`}>
-          </div>
+          <div class={`h-full bg-linear-to-r ${confidenceGradient} rounded-full`} style={`width: ${confidence}%`}></div>
         </div>
       </div>
     </div>
@@ -166,7 +165,7 @@ const iconColorMap = {
         return (
           <div class="flex items-center gap-3 text-slate-200 group hover:text-white transition-colors">
             <div
-              class={`flex-shrink-0 w-8 h-8 rounded-lg ${colors.bg} flex items-center justify-center ${colors.hover} transition-colors`}
+              class={`shrink-0 w-8 h-8 rounded-lg ${colors.bg} flex items-center justify-center ${colors.hover} transition-colors`}
             >
               <i data-lucide={safeIcon} class={`w-4 h-4 ${colors.icon}`} />
             </div>
@@ -211,7 +210,7 @@ const iconColorMap = {
         if (card.dataset.downloading === 'true') return
         card.dataset.downloading = 'true'
 
-        await downloadCardAsImage('report-card')
+        await downloadCardAsImage('report-card', `daily-report-card-${+new Date()}`)
 
         card.dataset.downloading = 'false'
       } catch (error) {

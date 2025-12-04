@@ -13,12 +13,12 @@ export async function downloadCardAsImage(elementId: string, filename?: string, 
       format === 'png'
         ? await toPng(element, {
             quality: 1,
-            pixelRatio: 2,
+            pixelRatio: 4,
             cacheBust: true,
           })
         : await toJpeg(element, {
             quality: 0.95,
-            pixelRatio: 2,
+            pixelRatio: 4,
             cacheBust: true,
           })
 
