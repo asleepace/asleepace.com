@@ -1,4 +1,6 @@
 import { Analytics } from '@/db/'
+import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
+import { logError, logMessage } from '@/lib/db/logs'
 import { consoleTag } from '@/lib/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'
@@ -17,6 +19,12 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
   try {
     if (context.isPrerendered) return next()
 
+    // --- handle tracking ---
+    const ipAddress = getIpAddressFromHeaders(context.request.headers)
+    const pathName = context.url.pathname
+    const method = context.request.method
+    logMessage(`${method} ${pathName} ${ipAddress}`)
+
     // --- pre-processing ---
 
     const response = await next()
@@ -32,6 +40,7 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     return response
   } catch (e) {
+    logError(e, 'rootMiddleware')
     console.warn('[middleware] caught:', e)
     const message = e instanceof Error ? e.message : 'Internal Server Error'
 

@@ -1,3 +1,8 @@
+/**
+ * @file src/lib/db/daily-reports.ts
+ * @description logic for daily reports database.
+ */
+
 import { z } from 'zod'
 import { sql } from './db'
 
