@@ -49,7 +49,7 @@ const nextProps = new URLSearchParams([
   data-name="stock-badge"
   data-info={ticker}
   data-json={JSON.stringify(stock)}
-  class="bg-zinc-900 text-white px-4 py-2.5 squircle border hover:animate-pulse border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+  class="stock-badge bg-zinc-900 text-white px-4 py-2.5 squircle border hover:animate-pulse border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
   aria-label={`Refresh ${ticker.toUpperCase()} price`}
 >
   <!-- Format: Advanced Display -->
@@ -81,6 +81,10 @@ const nextProps = new URLSearchParams([
     :root {
       --brm: 2;
     }
+  }
+
+  .stock-badge {
+    @apply bg-zinc-900 border-zinc-800 text-white;
   }
 
   .squircle {
