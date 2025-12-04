@@ -27,6 +27,8 @@ pm2 reload stock-background-sync
 pm2 status
 
 # Print last commit
+echo "+ --------------------[ Last Commit ]----------------------- +"
 git log | head
+echo "+ ---------------------------------------------------------- +"
 
 echo "✅ Deploy complete!"
