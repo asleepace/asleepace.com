@@ -11,6 +11,7 @@ import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 import YahooFinance from 'yahoo-finance2'
 import { Mutex } from '@asleepace/mutex'
 import { stockMarket } from '../utils/stock-market'
+import { fetchReportCard } from './fetch-report-card'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 
@@ -168,27 +169,12 @@ Response Format:
     include a numbered list of key data points in middle and keep paragraphs more readable, 
     infer from the data and your own best judgment.
 
-    <div class="spy-eod-container squircle">
-      <p class="spy-eod-label" data-example="EOD PREDICTION • Wed Dec 03" data-format="EOD Prediction • $date">
-        Provide header with date (e.g. "EOD Prediction • Mon Jan 05")
-      </p>
-      <p class="spy-eod (text-green-500|text-red-500)" data-format="TICKER $XXX (%%%)" data-example="SPY $900">
-        Provide SPY EOD price prediction to nearest dollar (e.g. "SPY $900 (+0.5%)")
-      </a>
-      <div>
-        <p>
-          <span class="final-word">
-            Provide a final sentence on who will win and why (bears or bulls) in WSB jargon. (emojis ok)
-          </span>
-          <span class="spy-eod-summary" data-instructions="No links, No Hash Tags, Laymen language, Focus on big picture">
-              Provide a short summary of your analysis in 280 Characters or less which can be shared to X and uses layman's terms / trendy speak to elegantly paint a picture of the day.
-          </span>
-        </p>
-        <p class="spy-eod-confidence" data-format="Cofidence 80% | Sentiment Bullish | Current Price">
-          Provide confidence percentage (e.g. Confidence 80%) | Provide sentiment (e.g. Extreme Fear) | Provide current price (Current $850)
-        </p>
-      </div>
-    </div>
+  ### Summary
+
+    Provide a brief summary of the most important aspects of the day, keep this as plain english, full text
+    sentance focused on sentiment, macro catalysts, what to expect in the week ahead, and your overall take
+    on market conditions. Output should not contain price info, symbols, emojis, and should break it down
+    so anyone can understand.
 
     <div class="revisions-table-wrapper">
       (optional) Provide a table of market analysis revisions over time from revision data below,
@@ -203,14 +189,6 @@ Response Format:
 
     Revision Data:
       {{${params.revisions.join('\n')}}}}
-
-    <div class="daily-report-links">
-      <a href="/daily-report?date=${getPreviousDate(params.date)}">Yesterday</a>
-      <div class="daily-report-links-div"></div>
-      <a href="/daily-report?key=${+new Date()}">Refresh</a>
-      <div class="daily-report-links-div"></div>
-      <a href="/daily-report?date=${getNextDate(params.date)}">Tomorrow</a>
-    </div>
 
 `.trim()
 
@@ -292,6 +270,14 @@ async function handleReportGeneration({
 
   console.log(`[fetch-daily-report] (${timer.elapsed}s) report generated`)
 
+  const reportCard = await fetchReportCard({
+    date,
+    dailyReportText: nextReportText,
+    meta: {
+      spyData,
+    },
+  })
+
   return {
     date,
     accuracy: 0,
@@ -307,6 +293,7 @@ async function handleReportGeneration({
       revisions: prevRevisions,
       generationTime: timer.elapsed,
       timestamp: new Date().toISOString(),
+      reportCard,
       links,
     },
   }

@@ -10,6 +10,7 @@ import { PageMetrics } from '@/components/blog/PageMetrics'
 import { type DailyReport } from '@/lib/db/daily-reports'
 import { stockMarket } from '@/lib/utils/stock-market'
 import StockBadge from './partials/stock-badge.astro'
+import DailyReportCard from '@/components/astro/DailyReportCard.astro'
 
 // set page cache for ~1 min
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
@@ -77,6 +78,9 @@ function getElapsedDetail() {
   if (elapsed.days === 0) return `${elapsed.hours} hours ago`
   return stockMarket.getDateString(date)
 }
+
+const reportCard = report.data?.reportCard
+const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage} htmx>
@@ -89,10 +93,15 @@ function getElapsedDetail() {
         <StockBadge ticker="SPY" format="advanced" />
       </div>
     </HeroTitle>
+
     <!-- Daily Report Content -->
     <Prose>
       <Fragment set:html={content} />
     </Prose>
+
+    <!-- Display Report Card If Present -->
+    {reportCard && <DailyReportCard client:load {...reportCard} date={reportDate} />}
+
     <!-- Daily Report Footer -->
     <BlogDisclaimer>
       Data sourced from
