@@ -26,4 +26,7 @@ pm2 reload stock-background-sync
 # Verify processes are running
 pm2 status
 
+# Print last commit
+git log | head
+
 echo "✅ Deploy complete!"
