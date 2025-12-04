@@ -81,6 +81,7 @@ function getElapsedDetail() {
 }
 
 const reportCard = report.data?.reportCard
+const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
 ---
 
 <SiteLayout title={`${title} | ${currentDate}`} description={description} image={bgImage} htmx>
@@ -100,7 +101,7 @@ const reportCard = report.data?.reportCard
     </Prose>
 
     <!-- Display Report Card If Present -->
-    {reportCard && <DailyReportCard client:load {...reportCard} />}
+    {reportCard && <DailyReportCard client:load {...reportCard} date={reportDate} />}
 
     <!-- Daily Report Footer -->
     <BlogDisclaimer>

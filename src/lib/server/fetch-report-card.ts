@@ -1,13 +1,13 @@
 import { fetchGrokBasic } from '@/lib/server/fetch-grok'
 
-export async function fetchReportCard(params: { dailyReportText: string }) {
+export async function fetchReportCard(params: { date: Date; meta: Record<string, any>; dailyReportText: string }) {
   try {
     const REPORT_CARD_PROMPT = `You are a data extraction assistant. Your job is to parse daily market reports and extract structured data in JSON format.
 
 Given a daily market report text, extract the following information and return ONLY valid JSON (no markdown, no explanation):
 
 {
-  "date": "Dec. 4th, 2025",  // Format as "Mon. Dth, YYYY"
+  "date": "Dec. 4th, 2025",   // Format as "Mon. Dth, YYYY"
   "eodTarget": 686,           // End of day SPY price target (number)
   "currentPrice": 684,        // Current SPY price (number)
   "percentChange": 0.3,       // Percentage change (number, can be negative)
@@ -60,6 +60,9 @@ COLOR SELECTION GUIDE:
 Return ONLY the JSON object, no additional text. Extract structured data from this daily market report:
 
 ---
+current_date: ${params.date.toISOString()}
+metadata: ${JSON.stringify(params.meta, null, 2)}
+
 ${params.dailyReportText}
 ---
 
@@ -71,7 +74,7 @@ Return the data as JSON following the specified format.`
     })
     const reportCard = JSON.parse(outputText)
     console.log('[fetch-report-card] data:', { reportCard })
-    return reportCard
+    return { ...reportCard, date: params.date }
   } catch (e) {
     console.warn('[fetch-report-card] failed:', e)
     return undefined

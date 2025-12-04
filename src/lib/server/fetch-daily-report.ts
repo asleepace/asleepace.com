@@ -270,7 +270,13 @@ async function handleReportGeneration({
 
   console.log(`[fetch-daily-report] (${timer.elapsed}s) report generated`)
 
-  const reportCard = await fetchReportCard({ dailyReportText: nextReportText })
+  const reportCard = await fetchReportCard({
+    date,
+    dailyReportText: nextReportText,
+    meta: {
+      spyData,
+    },
+  })
 
   return {
     date,
