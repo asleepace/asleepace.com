@@ -47,7 +47,7 @@ ICON SELECTION GUIDE (choose appropriate lucide icon names):
 - Policy/Government: "landmark", "shield", "file-text"
 - Market movements: "trending-up", "trending-down", "activity"
 - Manufacturing: "factory", "package", "truck"
-- Banking/Finance: "landmark", "credit-card", "dollar-sign"
+- Banking/Finance: "landmark", "credit-card", "dollar-sign" (note: use "landmark" for banks)
 
 COLOR SELECTION GUIDE:
 - blue: Jobs, employment, general economic data
