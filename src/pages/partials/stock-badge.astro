@@ -7,7 +7,7 @@ import { stockMarket } from '@/lib/utils/stock-market'
 import clsx from 'clsx'
 import YahooFinance from 'yahoo-finance2'
 import { TrendingUp, TrendingDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/cn'
 
 export const prerender = false
 
@@ -34,10 +34,15 @@ const openPrice = stock.price?.regularMarketOpen ?? 0
 const change = price - openPrice
 const changePercent = (change / openPrice) * 100
 const isPositive = change >= 0
+
+const nextProps = new URLSearchParams([
+  ['ticker', ticker],
+  ['format', format],
+])
 ---
 
 <div
-  hx-get={`/partials/stock-badge?ticker=${ticker}&format=${format}`}
+  hx-get={`/partials/stock-badge?${nextProps.toString()}`}
   hx-trigger="click, mouseenter delay:1s, every 10s"
   hx-swap="outerHTML"
   data-name="stock-badge"
