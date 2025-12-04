@@ -1,11 +1,15 @@
 ---
 import FeaturedCard from '@/components/astro/FeaturedCard.astro'
 import HoverCard from '@/components/astro/HoverCard.astro'
-import { stockMarket } from '@/lib/utils/stock-market'
-import DailyReport from '@/pages/daily-report.astro'
+import { getRecentReports } from '@/lib/db/daily-reports'
 import clsx from 'clsx'
-import { BoxIcon, LinkIcon, RssIcon, CodeXml, GalleryThumbnails } from 'lucide-react'
+import { BoxIcon, LinkIcon, RssIcon, CodeXml } from 'lucide-react'
 import { TrendingUp } from 'lucide-react'
+
+export const prerender = false
+
+// set page cache for ~1 min
+Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
 
 export type FeedItem = {
   href: string
@@ -34,15 +38,19 @@ export type LinkItem = {
   href: string
 }
 
-const DailyFeed: FeedItem = {
-  date: new Date(),
-  href: '/daily-report',
-  name: `The Daily Report | ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}`,
-}
+const dailyReports = await getRecentReports({ limit: 2 })
 
-feed.unshift(DailyFeed)
+const dailyReportFeed: FeedItem[] = dailyReports.map((report): FeedItem => {
+  const shortDate = report.date.toLocaleDateString('en-US', { timeZone: 'America/New_York', dateStyle: 'short' })
+  const titleDate = report.date.toLocaleDateString('en-US', { timeZone: 'America/New_York', dateStyle: 'medium' })
+  return {
+    date: new Date(report.date),
+    href: `/daily-report?date=${shortDate}`,
+    name: `The Daily Report • ${titleDate}`,
+  }
+})
 
-const tradingDay = stockMarket.getCurrentOrUpcomingTradingDay()
+feed.unshift(...dailyReportFeed)
 ---
 
 <div class={clsx('p-4', classList)}>
@@ -91,11 +99,7 @@ const tradingDay = stockMarket.getCurrentOrUpcomingTradingDay()
         </div>
       </HoverCard>
       <!-- Daily Report Card -->
-      <HoverCard
-        href={`/daily-report?date=${tradingDay.toISOString()}`}
-        alt="Daily Report"
-        class:list="md:basis-1/3 aspect-video"
-      >
+      <HoverCard href={`/daily-report`} alt="Daily Report" class:list="md:basis-1/3 aspect-video">
         <div
           class="p-6 flex flex-col flex-1 h-full bg-indigo-400 scale-100 hover:scale-110 transition-transform duration-500"
         >

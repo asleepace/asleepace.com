@@ -78,15 +78,6 @@ export function isTodayET(date: Date): boolean {
 }
 
 /**
- * Return the current date if stock market currently open, otherwise return next T+1 trading day.
- * Defaults to current date.
- */
-export function getCurrentOrUpcomingTradingDay() {
-  if (isMarketOpen()) return new Date()
-  return getNextTradingDay()
-}
-
-/**
  * Checks if a given date is for a past trading day.
  * Returns true if the date is before today, or if it's today but past market close (4:00 PM ET).
  *
@@ -115,6 +106,34 @@ export function isPastTradingDay(reportDate: Date): boolean {
 export function isDuringOrBeforeNextTradingDay(date: Date): boolean {
   const nextTradingDay = getNextTradingDay()
   return date <= nextTradingDay
+}
+
+/**
+ * Returns the current date if market is open OR if today is a trading day before market close.
+ * Otherwise returns the next trading day.
+ *
+ * Use this to determine which trading day's data to show.
+ */
+export function getCurrentOrUpcomingTradingDay(date = new Date()): Date {
+  const etTime = new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }))
+  const day = etTime.getDay()
+
+  // If weekend, return next trading day
+  if (day === 0 || day === 6) {
+    return getNextTradingDay(date)
+  }
+
+  // Weekday - check if past market close (4:00 PM ET)
+  const currentMinutes = etTime.getHours() * 60 + etTime.getMinutes()
+  const marketClose = 16 * 60 // 4:00 PM
+
+  // If past market close, return next trading day
+  if (currentMinutes >= marketClose) {
+    return getNextTradingDay(date)
+  }
+
+  // Market day, before close - return current date
+  return date
 }
 
 /**
