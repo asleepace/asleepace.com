@@ -35,6 +35,7 @@ const change = price - openPrice
 const changePercent = (change / openPrice) * 100
 const isPositive = change >= 0
 
+// Encode next props into URL for HTMX refresh
 const nextProps = new URLSearchParams([
   ['ticker', ticker],
   ['format', format],
@@ -49,6 +50,7 @@ const nextProps = new URLSearchParams([
   data-info={ticker}
   data-json={JSON.stringify(stock)}
   class="bg-zinc-900 text-white px-4 py-2.5 squircle border hover:animate-pulse border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+  aria-label={`Refresh ${ticker.toUpperCase()} price`}
 >
   <!-- Format: Advanced Display -->
   <div class={cn('flex items-center gap-3', isSimpleDisplay && 'hidden')}>
