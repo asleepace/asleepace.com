@@ -7,9 +7,9 @@ import { z } from 'zod'
 import { sql } from './db'
 
 export const DailyWSBCommentSchema = z.object({
-  id: z.string(),
+  id: z.string().nullable().default(crypto.randomUUID()),
   market_date: z.coerce.date(),
-  author: z.string().default('anonymous'),
+  author: z.string().nullable().default('anonymous'),
   score: z.number().int(),
   timestamp: z.coerce.date(),
   flair: z.string().nullable(),
@@ -153,6 +153,8 @@ export async function upsertComment(comment: CreateDailyWSBComment): Promise<Dai
  */
 export async function bulkUpsertComments(comments: CreateDailyWSBComment[]): Promise<number> {
   if (comments.length === 0) return 0
+
+  console.log({ commnets_preview: comments.slice(0, 1) })
 
   const validated = comments.map((c) => CreateDailyWSBCommentSchema.parse(c))
 
