@@ -2,7 +2,6 @@ import {
   getAdjacentReports,
   getDailyReport,
   updateDailyReport,
-  getDailyReports,
   type DailyReport,
   createDailyReport,
 } from '../db/daily-reports'
@@ -10,7 +9,6 @@ import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 import YahooFinance from 'yahoo-finance2'
-import { Mutex } from '@asleepace/mutex'
 import { stockMarket } from '../utils/stock-market'
 import { fetchReportCard } from './fetch-report-card'
 import { bulkUpsertComments } from '../db/daily-wsb-comments'
@@ -18,8 +16,6 @@ import { bulkUpsertComments } from '../db/daily-wsb-comments'
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 
 const DEFAULT_LIMIT = 300
-
-const mutex = Mutex.shared()
 
 /**
  * Get the previous date (day before)
