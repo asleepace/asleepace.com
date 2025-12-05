@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
-import { ShellProcessManager } from '@/lib/linux/ShellProcessManager'
-import { createBufferedStream } from '@/lib/linux/createBufferedStream'
+import { ShellProcessManager } from '@/lib/server/linux/ShellProcessManager'
+import { createBufferedStream } from '@/lib/server/linux/createBufferedStream'
 import { sleep } from '@/lib/utils/sleep'
 import chalk from 'chalk'
 
@@ -148,10 +148,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
       // setup an abort signal
       request.signal.onabort = () => {
-        console.warn(
-          STREAM_TAG,
-          chalk.red('request aborted, closing stream...')
-        )
+        console.warn(STREAM_TAG, chalk.red('request aborted, closing stream...'))
         controller.close()
       }
 
@@ -241,13 +238,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const { childProcess } = shell
 
     // handle various errors
-    if (!command || typeof command !== 'string')
-      throw new Error('Invalid command')
+    if (!command || typeof command !== 'string') throw new Error('Invalid command')
     if (!childProcess) throw new Error('Shell not initialized')
     if (childProcess.killed) throw new Error('Shell killed')
     if (!childProcess.stdin) throw new Error('Shell is not writable')
-    if (typeof childProcess.stdin.write !== 'function')
-      throw new Error('Shell stdin is not writable')
+    if (typeof childProcess.stdin.write !== 'function') throw new Error('Shell stdin is not writable')
 
     console.log('[shell/stream] writing command:', command)
 

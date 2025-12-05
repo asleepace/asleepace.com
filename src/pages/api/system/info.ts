@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { endpoint } from '../'
 import { http } from '@/lib/web'
-import { getProcessInfo } from '@/lib/linux/getProcessInfo'
+import { getProcessInfo } from '@/lib/server/linux/getProcessInfo'
 
 export const prerender = false
 

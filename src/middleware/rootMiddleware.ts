@@ -21,10 +21,12 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     // --- handle tracking ---
     if (import.meta.env.PROD) {
-      const ipAddress = getIpAddressFromHeaders(context.request.headers) ?? 'localhost'
-      const pathName = context.url.pathname
-      const method = context.request.method
-      logMessage(`${method} ${pathName} ${ipAddress}`)
+      const ipAddress = getIpAddressFromHeaders(context.request.headers)
+      if (ipAddress) {
+        const pathName = context.url.pathname
+        const method = context.request.method
+        logMessage(`${method} ${pathName} ${ipAddress}`)
+      }
     }
 
     // --- pre-processing ---
