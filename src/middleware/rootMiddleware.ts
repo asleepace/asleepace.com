@@ -1,5 +1,5 @@
 import { Analytics } from '@/db/'
-import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
+import { getIpAddressFromHeaders } from '@/lib/server/ipAddress'
 import { logError, logMessage } from '@/lib/db/logs'
 import { consoleTag } from '@/lib/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
@@ -21,10 +21,12 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
 
     // --- handle tracking ---
     if (import.meta.env.PROD) {
-      const ipAddress = getIpAddressFromHeaders(context.request.headers) ?? 'localhost'
-      const pathName = context.url.pathname
-      const method = context.request.method
-      logMessage(`${method} ${pathName} ${ipAddress}`)
+      const ipAddress = getIpAddressFromHeaders(context.request.headers)
+      if (ipAddress !== 'localhost' && ipAddress !== '') {
+        const pathName = context.url.pathname
+        const method = context.request.method
+        logMessage(`${method} ${pathName} ${ipAddress}`)
+      }
     }
 
     // --- pre-processing ---
@@ -43,10 +45,8 @@ export const rootMiddleware = defineMiddleware(async (context, next) => {
     return response
   } catch (e) {
     logError(e, 'rootMiddleware')
-    console.warn('[middleware] caught:', e)
     const message = e instanceof Error ? e.message : 'Internal Server Error'
-
-    print(chalk.redBright('error:'), e?.message ?? e)
+    console.warn('[middleware] caught:', message)
 
     Analytics.trackEvent({
       request: context.request,

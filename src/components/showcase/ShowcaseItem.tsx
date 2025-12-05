@@ -1,4 +1,4 @@
-import useMetaTags from '@/hooks/useMetaTags'
+import useMetaTags from '@/lib/client/hooks/useMetaTags'
 import { memo } from 'react'
 
 type ShowcaseItemProps = {
@@ -15,10 +15,7 @@ function ShowcaseItem(props: ShowcaseItemProps) {
   const backgroundColor = meta.themeColor || '#ededed'
 
   return (
-    <a
-      href={props.url}
-      className="aspect-square relative overflow-hidden w-full h-64"
-    >
+    <a href={props.url} className="aspect-square relative overflow-hidden w-full h-64">
       <div
         className="absolute inset-0 transform scale-120 transition-transform duration-700 
               group-hover:scale-125 group-hover:animate-pulse"
@@ -34,9 +31,7 @@ function ShowcaseItem(props: ShowcaseItemProps) {
 
       <div className="relative z-10 flex w-full h-full p-4 flex-col">
         <div className="flex flex-1 gap-y-1"></div>
-        <p className="text-2xl font-black text-white text-shadow">
-          {meta.title}
-        </p>
+        <p className="text-2xl font-black text-white text-shadow">{meta.title}</p>
       </div>
     </a>
   )

@@ -2,8 +2,9 @@ import {
   getAdjacentReports,
   getDailyReport,
   updateDailyReport,
-  upsertDailyReport,
+  getDailyReports,
   type DailyReport,
+  createDailyReport,
 } from '../db/daily-reports'
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
@@ -12,6 +13,7 @@ import YahooFinance from 'yahoo-finance2'
 import { Mutex } from '@asleepace/mutex'
 import { stockMarket } from '../utils/stock-market'
 import { fetchReportCard } from './fetch-report-card'
+import { bulkUpsertComments } from '../db/daily-wsb-comments'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 
@@ -209,12 +211,12 @@ async function handleReportGeneration({
   date: Date
   limit: number
   prevReport: DailyReport | null | undefined
-}): Promise<Pick<DailyReport, 'date' | 'text' | 'data' | 'accuracy'>> {
+}): Promise<Pick<DailyReport, 'market_date' | 'summary' | 'initial' | 'data'>> {
   const timer = createTimer()
   console.log(`[fetch-daily-report] (${timer.elapsed}s) fetching daily report...`)
 
   // Extract previous report data
-  const openReportText = prevReport?.text
+  const openReportText = prevReport?.summary
   const prevComments = (prevReport?.data?.comments as WallStreetBetsComment[]) ?? []
   const prevRevisions = (prevReport?.data?.revisions as string[]) ?? []
 
@@ -247,6 +249,20 @@ async function handleReportGeneration({
 
   console.log(`[fetch-daily-report] (${timer.elapsed}s) processing ${allComments.length} comments`)
 
+  // Persist WSB Comments to table:
+  bulkUpsertComments(
+    allComments.map((comment) => {
+      return {
+        market_date: date,
+        parent_id: null,
+        ...comment,
+        timestamp: new Date(comment.timestamp),
+      }
+    })
+  ).catch((err) => {
+    console.warn('[fetch-daily-report] failed to upsert comments:', err)
+  })
+
   const links = await getAdjacentReports({ date })
 
   // Generate report with Grok
@@ -262,8 +278,8 @@ async function handleReportGeneration({
       openReportText,
       revisions: prevReport?.data?.revisions ?? [],
       links: [
-        { name: 'Prev Report', href: `/daily-report?date=${links.previous?.date}` },
-        { name: 'Next Report', href: `/daily-report?date=${links.next?.date}` },
+        { name: 'Prev Report', href: `/daily-report?date=${links.previous?.market_date}` },
+        { name: 'Next Report', href: `/daily-report?date=${links.next?.market_date}` },
       ],
     }),
   })
@@ -279,9 +295,9 @@ async function handleReportGeneration({
   })
 
   return {
-    date,
-    accuracy: 0,
-    text: nextReportText,
+    market_date: date,
+    summary: nextReportText,
+    initial: prevReport?.summary ?? '',
     data: {
       model: 'grok-4-1-fast',
       // NOTE: Keep the initial report for comparison.
@@ -320,7 +336,7 @@ async function handleRevisionsInBackground(report: DailyReport) {
   // get initial report generation text which is saved in data object
   const openReportText = report.data?.openReportText
   const prevRevisions: string[] = report.data?.revisions ?? []
-  const shortDate = stockMarket.getDateString(report.date)
+  const shortDate = stockMarket.getDateString(report.market_date)
   try {
     if (!openReportText) throw 'ERR_MISSING_OPEN_REPORT_TEXT'
 
@@ -328,11 +344,11 @@ async function handleRevisionsInBackground(report: DailyReport) {
     const revisionText = await fetchGrokBasic({
       model: 'grok-4-1-fast-non-reasoning',
       prompt: `Compare these two reports and list 3-5 key changes as concise bullet points:
-        PREVIOUS:
-          ${report.data.openReportText}...
+        INITIAL:
+          ${report.initial}...
 
         CURRENT:
-          ${report.text}...
+          ${report.summary}...
 
         Output only bullet points of meaningful changes (sentiment shifts, new data, revised outlooks).`,
     })
@@ -347,7 +363,7 @@ async function handleRevisionsInBackground(report: DailyReport) {
     const allRevisions = [...prevRevisions, ...newRevisions]
 
     // persist change to database
-    await updateDailyReport(report.date, {
+    await updateDailyReport(report.id!, {
       data: {
         ...report.data,
         revisions: allRevisions,
@@ -375,7 +391,7 @@ export async function getOrCreateDailyReport({ date }: { date: Date }): Promise<
     throw new Error(`Invalid date range for daily report "${info}" (must be T+0 or T+1)`)
   }
   const dailyReport = await handleReportGeneration({ date, limit: DEFAULT_LIMIT, prevReport: undefined })
-  const savedReport = await upsertDailyReport(dailyReport)
+  const savedReport = await createDailyReport(dailyReport)
   return savedReport
 }
 
@@ -411,7 +427,7 @@ export async function fetchDailyReport({
   const nextReport = await handleReportGeneration({ date, limit, prevReport })
 
   // Save to database
-  const savedReport = await upsertDailyReport(nextReport)
+  const savedReport = await createDailyReport(nextReport)
   console.log(`[fetch-daily-report] (${timer.elapsed}s) report saved!`)
 
   // Schedule parsing revisions in background
@@ -458,7 +474,7 @@ export async function triggerDailyReportRefreshInBackground({ date }: { date: Da
 
     // handle refreshing report, saving to database & checking revisions
     const dailyReport = await handleReportGeneration({ date, limit: DEFAULT_LIMIT, prevReport: existingReport })
-    const savedReport = await upsertDailyReport(dailyReport)
+    const savedReport = await createDailyReport(dailyReport)
     await handleRevisionsInBackground(savedReport)
 
     // log message when finished

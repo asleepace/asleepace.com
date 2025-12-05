@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import {
-  makeJSRuntimeWorker,
-  type JSRuntimeOutput,
-} from '@/lib/frontend/jsRuntimeWorker'
+import { makeJSRuntimeWorker, type JSRuntimeOutput } from '@/lib/client/jsRuntimeWorker'
 
 /**
  * ## useJSRuntime(code)

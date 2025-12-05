@@ -1,9 +1,9 @@
 import { memo, Suspense, useCallback, useEffect } from 'react'
 import { Code } from './Code'
 
-import { useTypescript } from '@/hooks/useTypescript'
-import { useJSRuntime } from '@/hooks/useJSRuntime'
-import { useStore } from '@/hooks/useStore'
+import { useTypescript } from '@/lib/client/hooks/useTypescript'
+import { useJSRuntime } from '@/lib/client/hooks/useJSRuntime'
+import { useStore } from '@/lib/client/hooks/useStore'
 import { CodeToolbar } from './CodeToolbar'
 import { DEFAULT_COMPILER_OPTIONS } from '@/lib/utils/typescript-loader'
 
@@ -11,7 +11,6 @@ export type CodeEditorProps = {
   persist?: boolean
   code: string
 }
-
 
 /**
  * # Code Editor
@@ -38,7 +37,6 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
 
   const [output, execute] = useJSRuntime(ts.javascript || undefined)
   console.log(output)
-
 
   const onSave = useCallback(() => {
     console.log('save code')
@@ -104,21 +102,19 @@ function CodeEditor({ code: defaultCode }: CodeEditorProps) {
       />
 
       {/* Show compilation errors */}
-      {
-        ts.errors.length > 0 && (
-          <div className="bg-red-900/20 border-t border-red-800 p-4">
-            <h4 className="text-red-400 font-medium mb-2">TypeScript Errors:</h4>
-            <ul className="text-red-300 text-sm space-y-1">
-              {ts.errors.map((error, index) => (
-                <li key={index} className="font-mono">
-                  {error}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )
-      }
-    </div >
+      {ts.errors.length > 0 && (
+        <div className="bg-red-900/20 border-t border-red-800 p-4">
+          <h4 className="text-red-400 font-medium mb-2">TypeScript Errors:</h4>
+          <ul className="text-red-300 text-sm space-y-1">
+            {ts.errors.map((error, index) => (
+              <li key={index} className="font-mono">
+                {error}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   )
 }
 

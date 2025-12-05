@@ -1,9 +1,9 @@
 import { consoleTag } from '@/lib/utils/tagTime'
-import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
+import { getIpAddressFromHeaders } from '@/lib/server/ipAddress'
 import Database from 'bun:sqlite'
 import chalk from 'chalk'
 import type { AstroCookies } from 'astro'
-import { Cookies } from '@/lib/backend'
+import { Cookies } from '@/lib/server'
 
 const print = consoleTag('db:analytics', chalk.magentaBright)
 

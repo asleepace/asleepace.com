@@ -1,6 +1,6 @@
 import { Sessions } from '@/db'
-import { Cookies } from '@/lib/backend/cookies'
-import { completeSignInChallenge } from '@/lib/webauthn/signIn'
+import { Cookies } from '@/lib/server/cookies'
+import { completeSignInChallenge } from '@/lib/server/webauthn/signIn'
 import { consoleTag } from '@/lib/utils/tagTime'
 import type { APIRoute } from 'astro'
 

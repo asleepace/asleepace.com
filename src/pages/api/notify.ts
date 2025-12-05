@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { Try } from '@asleepace/try'
-import { sendEmailNotification } from '@/lib/mail/sendNotification'
+import { sendEmailNotification } from '@/lib/server/mail/sendNotification'
 
 export const prerender = false
 

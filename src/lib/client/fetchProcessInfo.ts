@@ -1,4 +1,4 @@
-import type { ProcessInfo } from '../linux/getProcessInfo'
+import type { ProcessInfo } from '../server/linux/getProcessInfo'
 
 /**
  * ## fetchProcessInfo()

@@ -42,12 +42,12 @@ if (!report) {
 }
 
 // calculate staleness (~15mins)
-const lastUpdated = report.updated_at ? new Date(report.updated_at) : new Date(report.date)
+const lastUpdated = report.updated_at ? new Date(report.updated_at) : new Date(report.market_date)
 const elapsed = stockMarket.getElapsedTimeSince(lastUpdated)
 // const isStale = elapsed.mins > 15
 
 // process content for meta tags, html, etc.
-const content = await marked(report.text)
+const content = await marked(report.summary)
 const bgImage = '/images/bolsnbers4.png'
 const today = date
 const title = 'The Daily Report'
@@ -56,7 +56,7 @@ const currentDate = today.toLocaleDateString('en-US', { dateStyle: 'full' })
 // extract useful information from markdown
 function getDetailedSummary() {
   if (!report) throw new Error('Missing daily report!')
-  const summary = report.text
+  const summary = report.summary
   try {
     const pageTitle = summary.slice(4, summary.indexOf('**') - 2)
     const indexOfSummary = summary.indexOf('Macro')

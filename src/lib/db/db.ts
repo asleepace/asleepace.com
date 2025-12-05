@@ -11,18 +11,31 @@ import { POSTGRES_PASSWORD, POSTGRES_USERNAME, POSTGRES_DATABASE, POSTGRES_PORT,
 
 console.log(`[db] connecting to db "${POSTGRES_DATABASE}" on ${POSTGRES_HOST}:${POSTGRES_PORT}`)
 
+const globalForDb = globalThis as unknown as {
+  sql: postgres.Sql | undefined
+}
+
 /**
  * Postgres SQL Instance for asleepace.com
  */
-export const sql = postgres({
-  host: POSTGRES_HOST,
-  port: POSTGRES_PORT,
-  database: POSTGRES_DATABASE,
-  username: POSTGRES_USERNAME,
-  password: POSTGRES_PASSWORD,
-  max: 25, // max connections
-  idle_timeout: 20,
-})
+export const sql =
+  globalForDb.sql ??
+  postgres({
+    host: POSTGRES_HOST,
+    port: POSTGRES_PORT,
+    database: POSTGRES_DATABASE,
+    username: POSTGRES_USERNAME,
+    password: POSTGRES_PASSWORD,
+    max: 25, // max connections
+    idle_timeout: 20,
+  })
+
+/**
+ * Prevent reconnecting during development + hot reloads.
+ */
+if (!import.meta.env.PROD) {
+  globalForDb.sql = sql
+}
 
 /**
  * Shutdown the Postgres connection. Should be called when application terminates.

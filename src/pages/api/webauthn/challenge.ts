@@ -1,4 +1,4 @@
-import { startSignInChallenge } from '@/lib/webauthn/signIn'
+import { startSignInChallenge } from '@/lib/server/webauthn/signIn'
 import type { APIRoute } from 'astro'
 
 const ErrorResponse = (e: unknown) => {

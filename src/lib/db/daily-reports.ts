@@ -8,35 +8,36 @@ import { sql } from './db'
 
 export const DailyReportSchema = z.object({
   id: z.number().int().positive().optional(),
-  date: z.coerce.date(), // Accepts Date or string, coerces to Date
-  text: z.string().min(1),
+  market_date: z.coerce.date(),
+  summary: z.string().min(1),
+  initial: z.string().optional().default(''),
   data: z.union([z.record(z.unknown()), z.string().transform((str) => JSON.parse(str))]).default({}),
-  accuracy: z.coerce.number().optional().default(0),
+  meta: z.union([z.record(z.unknown()), z.string().transform((str) => JSON.parse(str))]).default({}),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 })
 
-// For inserts (without auto-generated fields)
 export const CreateDailyReportSchema = DailyReportSchema.omit({
   id: true,
   created_at: true,
   updated_at: true,
 })
 
-// For updates (all fields optional except id)
 export const UpdateDailyReportSchema = DailyReportSchema.partial().required({ id: true })
+
 export type DailyReport = z.infer<typeof DailyReportSchema>
 export type CreateDailyReport = z.infer<typeof CreateDailyReportSchema>
 export type UpdateDailyReport = z.infer<typeof UpdateDailyReportSchema>
 
 /**
- * Fetch a daily report by date
+ * Fetch the most recent daily report for a given date
  */
 export async function getDailyReport({ date }: { date: Date | string }): Promise<DailyReport | null> {
   const reportDate = typeof date === 'string' ? new Date(date) : date
   const results = await sql`
     SELECT * FROM daily_reports 
-    WHERE date = ${reportDate.toISOString().split('T')[0]}
+    WHERE market_date = ${reportDate.toISOString().split('T')[0]}
+    ORDER BY created_at DESC
     LIMIT 1
   `
   if (results.length === 0) return null
@@ -44,7 +45,20 @@ export async function getDailyReport({ date }: { date: Date | string }): Promise
 }
 
 /**
- * Fetch daily reports within a date range
+ * Fetch all daily reports for a given date (including history)
+ */
+export async function getAllDailyReports({ date }: { date: Date | string }): Promise<DailyReport[]> {
+  const reportDate = typeof date === 'string' ? new Date(date) : date
+  const results = await sql`
+    SELECT * FROM daily_reports 
+    WHERE market_date = ${reportDate.toISOString().split('T')[0]}
+    ORDER BY created_at DESC
+  `
+  return results.map((r) => DailyReportSchema.parse(r))
+}
+
+/**
+ * Fetch daily reports within a date range (most recent per date)
  */
 export async function getDailyReports({
   startDate,
@@ -56,47 +70,45 @@ export async function getDailyReports({
   const start = typeof startDate === 'string' ? new Date(startDate) : startDate
   const end = typeof endDate === 'string' ? new Date(endDate) : endDate
   const results = await sql`
-    SELECT * FROM daily_reports 
-    WHERE date BETWEEN ${start.toISOString().split('T')[0]} 
+    SELECT DISTINCT ON (market_date) * FROM daily_reports 
+    WHERE market_date BETWEEN ${start.toISOString().split('T')[0]} 
               AND ${end.toISOString().split('T')[0]}
-    ORDER BY date DESC
+    ORDER BY market_date DESC, created_at DESC
   `
   return results.map((r) => DailyReportSchema.parse(r))
 }
 
 /**
- * Fetch the most recent N reports
+ * Fetch the most recent N reports (latest per market_date)
  */
 export async function getRecentReports({ limit = 10 }): Promise<DailyReport[]> {
   const results = await sql`
-    SELECT * FROM daily_reports 
-    ORDER BY date DESC 
+    SELECT DISTINCT ON (market_date) * FROM daily_reports 
+    ORDER BY market_date DESC, created_at DESC
     LIMIT ${limit}
   `
   return results.map((r) => DailyReportSchema.parse(r))
 }
 
 /**
- * Upsert a daily report (insert or update if exists)
+ * Create a new daily report (always inserts, allows multiple per date)
  */
-export async function upsertDailyReport(report: CreateDailyReport): Promise<DailyReport> {
+export async function createDailyReport(report: CreateDailyReport): Promise<DailyReport> {
   const validated = CreateDailyReportSchema.parse(report)
-  const reportDate = typeof validated.date === 'string' ? validated.date : validated.date.toISOString().split('T')[0]
+  const reportDate =
+    typeof validated.market_date === 'string'
+      ? validated.market_date
+      : validated.market_date.toISOString().split('T')[0]
 
   const results = await sql`
-    INSERT INTO daily_reports (date, text, data, accuracy)
+    INSERT INTO daily_reports (market_date, summary, initial, data, meta)
     VALUES (
       ${reportDate},
-      ${validated.text},
+      ${validated.summary},
+      ${validated.initial},
       ${JSON.stringify(validated.data)},
-      ${validated.accuracy}
+      ${JSON.stringify(validated.meta)}
     )
-    ON CONFLICT (date) DO UPDATE 
-    SET 
-      text = EXCLUDED.text,
-      data = EXCLUDED.data,
-      accuracy = EXCLUDED.accuracy,
-      updated_at = CURRENT_TIMESTAMP
     RETURNING *
   `
 
@@ -104,19 +116,23 @@ export async function upsertDailyReport(report: CreateDailyReport): Promise<Dail
 }
 
 /**
- * Update a daily report by date with partial data
+ * Update a specific daily report by id
  */
-export async function updateDailyReport(date: Date, updates: Partial<DailyReport>): Promise<DailyReport | null> {
-  const reportDate =
-    typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
-
-  // Build dynamic SET clause
+export async function updateDailyReport(
+  id: number,
+  updates: Partial<Omit<DailyReport, 'id'>>
+): Promise<DailyReport | null> {
   const setClauses: string[] = []
   const values: any[] = []
 
-  if (updates.text !== undefined) {
-    setClauses.push(`text = $${values.length + 1}`)
-    values.push(updates.text)
+  if (updates.summary !== undefined) {
+    setClauses.push(`summary = $${values.length + 1}`)
+    values.push(updates.summary)
+  }
+
+  if (updates.initial !== undefined) {
+    setClauses.push(`initial = $${values.length + 1}`)
+    values.push(updates.initial)
   }
 
   if (updates.data !== undefined) {
@@ -124,29 +140,26 @@ export async function updateDailyReport(date: Date, updates: Partial<DailyReport
     values.push(JSON.stringify(updates.data))
   }
 
-  if (updates.accuracy !== undefined) {
-    setClauses.push(`accuracy = $${values.length + 1}`)
-    values.push(updates.accuracy)
+  if (updates.meta !== undefined) {
+    setClauses.push(`meta = $${values.length + 1}`)
+    values.push(JSON.stringify(updates.meta))
   }
 
-  // Always update updated_at
-  setClauses.push('updated_at = CURRENT_TIMESTAMP')
-
-  if (setClauses.length === 1) {
-    // Only updated_at, nothing to update
-    return getDailyReport({ date })
+  if (setClauses.length === 0) {
+    // Nothing to update
+    const results = await sql`SELECT * FROM daily_reports WHERE id = ${id}`
+    return results.length > 0 ? DailyReportSchema.parse(results[0]) : null
   }
 
   const results = await sql.unsafe(
     `UPDATE daily_reports 
      SET ${setClauses.join(', ')}
-     WHERE date = $${values.length + 1}
+     WHERE id = $${values.length + 1}
      RETURNING *`,
-    [...values, reportDate]
+    [...values, id]
   )
 
   if (results.length === 0) return null
-
   return DailyReportSchema.parse(results[0])
 }
 
@@ -160,19 +173,17 @@ export async function getAdjacentReports({ date }: { date: Date | string }): Pro
   const reportDate =
     typeof date === 'string' ? new Date(date).toISOString().split('T')[0] : date.toISOString().split('T')[0]
 
-  // Get previous report
   const previousResults = await sql`
-    SELECT * FROM daily_reports 
-    WHERE date < ${reportDate}
-    ORDER BY date DESC 
+    SELECT DISTINCT ON (market_date) * FROM daily_reports 
+    WHERE market_date < ${reportDate}
+    ORDER BY market_date DESC, created_at DESC
     LIMIT 1
   `
 
-  // Get next report
   const nextResults = await sql`
-    SELECT * FROM daily_reports 
-    WHERE date > ${reportDate}
-    ORDER BY date ASC 
+    SELECT DISTINCT ON (market_date) * FROM daily_reports 
+    WHERE market_date > ${reportDate}
+    ORDER BY market_date ASC, created_at DESC
     LIMIT 1
   `
 

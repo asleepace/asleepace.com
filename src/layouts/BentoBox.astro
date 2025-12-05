@@ -41,11 +41,13 @@ export type LinkItem = {
 const dailyReports = await getRecentReports({ limit: 2 })
 
 const dailyReportFeed: FeedItem[] = dailyReports.map((report): FeedItem => {
-  const shortDate = report.date.toLocaleDateString('en-US', { timeZone: 'America/New_York', dateStyle: 'short' })
-  const titleDate = report.date.toLocaleDateString('en-US', { timeZone: 'America/New_York', dateStyle: 'medium' })
+  const titleDate = report.market_date.toLocaleDateString('en-US', {
+    timeZone: 'America/New_York',
+    dateStyle: 'medium',
+  })
   return {
-    date: new Date(report.date),
-    href: `/daily-report?date=${shortDate}`,
+    date: new Date(report.market_date),
+    href: `/daily-report?date=${report.market_date.toISOString().split('T')[0]}`,
     name: `The Daily Report • ${titleDate}`,
   }
 })

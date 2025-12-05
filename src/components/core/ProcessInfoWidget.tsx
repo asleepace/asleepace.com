@@ -1,8 +1,8 @@
-import { fetchProcessInfo } from '@/lib/frontend/fetchProcessInfo'
+import { fetchProcessInfo } from '@/lib/client/fetchProcessInfo'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import DataTable from './DataTable'
-import type { ProcessInfo } from '@/lib/linux/getProcessInfo'
+import type { ProcessInfo } from '@/lib/server/linux/getProcessInfo'
 
 type Props = {
   refreshInterval?: number
