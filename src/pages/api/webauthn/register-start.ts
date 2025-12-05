@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { registerStart } from '@/lib/webauthn/register'
+import { registerStart } from '@/lib/server/webauthn/register'
 
 export const POST: APIRoute = async (ctx) => {
   const { user } = ctx.locals

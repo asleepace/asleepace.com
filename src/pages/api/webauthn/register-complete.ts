@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { registerComplete } from '@/lib/webauthn/register'
+import { registerComplete } from '@/lib/server/webauthn/register'
 
 export class MissingWebAuthNCredentials extends Error {
   name = 'MissingWebAuthNCredentials'

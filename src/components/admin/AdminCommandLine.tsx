@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react'
 import AdminCommandOutput from './AdminCommandOutput'
-import { useShellStream } from '@/lib/shell/hooks/useShellStream'
+import { useShellStream } from '@/lib/server/shell/hooks/useShellStream'
 
 export type CommandResult = {
   type?: 'command' | 'error'
@@ -47,24 +47,19 @@ export default function AdminCommandLine() {
    * a new shell when the input is focused. This is called to prevent the useEffect
    * hook from double mounting and deadlocking the stream.
    */
-  const onInitializeShell = useCallback(
-    (htmlInput: HTMLInputElement | null) => {
-      if (inputRef.current) return
-      if (!htmlInput) return
-      inputRef.current = htmlInput
-      htmlInput.focus()
-      onRegisterShell()
-    },
-    []
-  )
+  const onInitializeShell = useCallback((htmlInput: HTMLInputElement | null) => {
+    if (inputRef.current) return
+    if (!htmlInput) return
+    inputRef.current = htmlInput
+    htmlInput.focus()
+    onRegisterShell()
+  }, [])
 
   return (
     <div className="bg-black rounded-2xl flex-1 p-1 self-stretch max-w-screen-lg max-h-[500px] flex flex-col">
       <AdminCommandOutput data={output} />
       <div className="flex flex-row px-2 py-1">
-        <p className="text-green-500 font-mono text-sm self-center font-bold">
-          $
-        </p>
+        <p className="text-green-500 font-mono text-sm self-center font-bold">$</p>
         <input
           ref={onInitializeShell}
           id="cli-input"

@@ -116,7 +116,7 @@ const sanitized = userPasskeys
 </AdminPanel>
 
 <script>
-  import { webAuthnClient } from '@/lib/webauthn/client'
+  import { webAuthnClient } from '@/lib/server/webauthn/client'
 
   async function deletePasskey(id: string) {
     if (!window.confirm('Permanently delete this passkey?')) return

@@ -1,5 +1,5 @@
 import { siteConfig } from '@/consts'
-import { Cookies } from '@/lib/backend/cookies'
+import { Cookies } from '@/lib/server/cookies'
 import type { APIRoute } from 'astro'
 
 export const prerender = false

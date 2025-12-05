@@ -1,7 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 import { Sessions } from '@/db'
 import { consoleTag } from '@/lib/utils/tagTime'
-import { Cookies } from '@/lib/backend/cookies'
+import { Cookies } from '@/lib/server/cookies'
 
 const print = consoleTag('session')
 

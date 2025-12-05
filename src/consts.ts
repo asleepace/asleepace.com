@@ -1,8 +1,4 @@
-import chalk from 'chalk'
 import packageJson from '../package.json'
-import { consoleTag } from './lib/utils/tagTime'
-
-const print = consoleTag('config', chalk.magenta)
 
 export type SiteCookieDomain = `.${string}` // example: ".asleepace.com"
 export type SiteCookiePath = `/${string}` // example: "/"

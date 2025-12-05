@@ -1,4 +1,4 @@
-import { Responses } from '@/lib/backend'
+import { Responses } from '@/lib/server'
 import { consoleTag } from '@/lib/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'
 import chalk from 'chalk'

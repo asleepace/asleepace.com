@@ -1,5 +1,5 @@
 import { Analytics } from '@/db/'
-import { getIpAddressFromHeaders } from '@/lib/backend/ipAddress'
+import { getIpAddressFromHeaders } from '@/lib/server/ipAddress'
 import { logError, logMessage } from '@/lib/db/logs'
 import { consoleTag } from '@/lib/utils/tagTime'
 import { defineMiddleware } from 'astro:middleware'

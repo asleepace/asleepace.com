@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { Users, Sessions } from '@/db'
 import { siteConfig } from '@/consts'
-import { Cookies } from '@/lib/backend/cookies'
+import { Cookies } from '@/lib/server/cookies'
 
 export const prerender = false
 export const route = '/api/auth'
