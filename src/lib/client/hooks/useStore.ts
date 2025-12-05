@@ -1,5 +1,5 @@
 import { useRef, useSyncExternalStore } from 'react'
-import { createStore } from '@/lib/frontend/'
+import { createStore } from '@/lib/client/'
 
 export const DEEFAULT_CODE_STORE = {
   lang: 'typescript',
