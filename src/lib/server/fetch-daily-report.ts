@@ -4,14 +4,14 @@ import {
   updateDailyReport,
   type DailyReport,
   createDailyReport,
-} from '../db/daily-reports'
+} from '@/lib/db/daily-reports'
 import { fetchGrokBasic } from './fetch-grok'
 import { fetchWallStreetBetsComments, type WallStreetBetsComment } from './fetch-wsb-comments'
 import { fetchYahooCalendar } from './fetch-yahoo-calendar'
 import YahooFinance from 'yahoo-finance2'
-import { stockMarket } from '../utils/stock-market'
+import { stockMarket } from '@/lib/utils/stock-market'
 import { fetchReportCard } from './fetch-report-card'
-import { bulkUpsertComments } from '../db/daily-wsb-comments'
+import { bulkUpsertComments } from '@/lib/db/daily-wsb-comments'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 
