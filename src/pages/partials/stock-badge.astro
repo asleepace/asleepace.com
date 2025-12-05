@@ -1,6 +1,7 @@
 ---
 /**
- * This component is both a partial route and Astro component which will
+ * @file src/pages/partials/stock-badge.astro
+ * @description this component is both a partial route and Astro component which will
  * fetch itself via htmx to reload data.
  */
 import { stockMarket } from '@/lib/utils/stock-market'
@@ -10,6 +11,8 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 export const prerender = false
+
+console.log('[stock-badge] rendering ...')
 
 interface Props {
   ticker: string
