@@ -13,6 +13,7 @@ import YahooFinance from 'yahoo-finance2'
 import { Mutex } from '@asleepace/mutex'
 import { stockMarket } from '../utils/stock-market'
 import { fetchReportCard } from './fetch-report-card'
+import { bulkUpsertComments } from '../db/daily-wsb-comments'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 
@@ -247,6 +248,20 @@ async function handleReportGeneration({
   const allComments = Array.from(uniqueComments.values())
 
   console.log(`[fetch-daily-report] (${timer.elapsed}s) processing ${allComments.length} comments`)
+
+  // Persist WSB Comments to table:
+  bulkUpsertComments(
+    allComments.map((comment) => {
+      return {
+        market_date: date,
+        parent_id: null,
+        ...comment,
+        timestamp: new Date(comment.timestamp),
+      }
+    })
+  ).catch((err) => {
+    console.warn('[fetch-daily-report] failed to upsert comments:', err)
+  })
 
   const links = await getAdjacentReports({ date })
 
