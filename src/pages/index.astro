@@ -1,7 +1,10 @@
 ---
 import { getCollection } from 'astro:content'
 import SiteLayout from '@/layouts/SiteLayout.astro'
-import BentoBox from '@/layouts/BentoBox.astro'
+import BentoBox, { type FeedItem } from '@/layouts/BentoBox.astro'
+import { getRecentReports } from '@/lib/db/daily-reports'
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
 
 export const prerender = false
 
@@ -20,8 +23,22 @@ const feed = posts.slice(1).map(({ data, id }) => ({
   date: data.updatedDate ?? data.pubDate,
   href: `/blog/${id}`,
 }))
+
+const dailyReports = await getRecentReports({ limit: 2 })
+
+const dailyReportFeed: FeedItem[] = dailyReports.map((report): FeedItem => {
+  const titleDate = report.market_date.toLocaleDateString('en-US', {
+    timeZone: 'America/New_York',
+    dateStyle: 'medium',
+  })
+  return {
+    date: new Date(report.market_date),
+    href: `/daily-report?date=${report.market_date.toISOString().split('T')[0]}`,
+    name: `The Daily Report • ${titleDate}`,
+  }
+})
 ---
 
 <SiteLayout title="Home" className="justify-center grow" transition:animate="none" htmx>
-  <BentoBox className="lg:max-w-7xl" featured={featured} feed={feed} />
+  <BentoBox className="lg:max-w-7xl" featured={featured} feed={[...dailyReportFeed, ...feed]} />
 </SiteLayout>

@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
-import { actions } from 'astro:actions'
-import { cn } from '@/lib/utils/cn'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 
 const MetricButton = (props: {
@@ -9,11 +7,13 @@ const MetricButton = (props: {
   hoverIcon?: string
   text: string
   className?: string
+  ariaLabel?: string
 }) => {
   const [isHovered, setIsHovered] = useState(false)
   const { hoverIcon = props.icon, icon } = props
   return (
     <button
+      aria-label={props.ariaLabel}
       className={clsx(
         'flex grow line-clamp-1 text-ellipsis gap-x-1.5 *:leading-8 justify-center items-center transition-all duration-100 text-gray-700 tracking-wide hover:scale-110 transform',
         props.className
@@ -31,31 +31,66 @@ const MetricButton = (props: {
   )
 }
 
-export function PageMetrics(props: { className?: string; enableDownload?: boolean }) {
+type PageStats = {
+  path: string
+  page_views: number
+  page_likes: number
+  comments?: any
+  meta?: any
+  created_at?: Date | undefined
+  updated_at?: Date | undefined
+}
+
+async function onPageView(): Promise<PageStats> {
+  const resp = await fetch(`/api/metrics`)
+  const data = await resp.json()
+  return data
+}
+
+async function onPageLike({ isLiked = true }): Promise<PageStats> {
+  const resp = await fetch(`/api/metrics`, { method: 'POST', body: JSON.stringify({ isLiked }) })
+  const data = await resp.json()
+  return data
+}
+
+function formatSocialCount(num: number): string {
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
+  }
+  if (num >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
+  }
+  return num.toString()
+}
+
+/**
+ * ## Page Metrics
+ *
+ * This is the row of icons and buttons that appears beneath articles and blog posts and provides
+ * information about page views, likes, comments and export features.
+ */
+export function PageMetrics(props: { className?: string }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
-  const [data, setData] = useState<Partial<{ likes: number; views: number }>>({
-    likes: 0,
-    views: 0,
-  })
+  const [likes, setLikes] = useState<string>('0')
+  const [views, setViews] = useState<string>('0')
+
+  const lastLikedDebouce = useRef(+new Date())
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    onPageView()
+      .then((metrics) => {
+        setLikes(formatSocialCount(metrics.page_likes))
+        setViews(formatSocialCount(metrics.page_views))
+      })
+      .catch((e) => console.warn('[PageMetrics] err:', e))
     if (typeof window.localStorage === 'undefined') return
-    // const referer = window.location.href
     const path = window.location.pathname
     const likedKey = `liked:${path}`
     const hasLiked = window.localStorage.getItem(likedKey)
     setStorageKey(likedKey)
     setIsLiked(hasLiked === 'true')
-    actions
-      .onPageView({})
-      .then((metrics) => {
-        if (metrics.data) setData(metrics.data)
-      })
-      .catch((err) => {
-        console.error('[PageMetrics] failed to fetch metrics', err)
-      })
   }, [])
 
   useEffect(() => {
@@ -65,35 +100,37 @@ export function PageMetrics(props: { className?: string; enableDownload?: boolea
   }, [isLiked, storageKey])
 
   const onClickLike = useCallback(() => {
-    const unliked = isLiked
-    setIsLiked(!unliked)
-    actions.onPageLike({ referer: window.location.href, unliked }).then((metrics) => {
-      if (metrics.data) setData(metrics.data)
-    })
+    // simple debounce, better than nothing lmao...
+    const currentTimeStamp = +new Date()
+    const timeDiff = currentTimeStamp - lastLikedDebouce.current
+    if (timeDiff <= 1_000) return
+    lastLikedDebouce.current = currentTimeStamp
+    const nextLikeState = !isLiked
+    setIsLiked(nextLikeState)
+    onPageLike({ isLiked: nextLikeState })
+      .then((metrics) => {
+        setLikes(formatSocialCount(metrics.page_likes))
+        setViews(formatSocialCount(metrics.page_views))
+      })
+      .catch((e) => console.warn('[PageMetrics] err:', e))
   }, [isLiked])
 
   return (
     <div
-      className={cn(
-        'flex items-center shrink border-[1px] rounded-2xl px-5 pb-2 pt-2.5 gap-x-4 border-neutral-200',
+      aria-label="Page Metrics"
+      className={clsx(
+        'flex items-center shrink border rounded-2xl px-5 pb-2 pt-2.5 gap-x-4 border-neutral-200',
         props.className
       )}
     >
-      <MetricButton icon="👀" text={String(data.views)} />
+      <MetricButton ariaLabel="Views" icon="👀" text={views} />
       {isLiked ? (
-        <MetricButton icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(data.likes)} />
+        <MetricButton ariaLabel="Like Page" icon="❤️" hoverIcon="💔" onClick={onClickLike} text={likes} />
       ) : (
-        <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(data.likes)} />
+        <MetricButton ariaLabel="Un-like Page" icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={likes} />
       )}
-      <MetricButton icon="💬" text={'0'} />
-      <MetricButton
-        icon="🖨️"
-        text={'PDF'}
-        onClick={() => {
-          console.log('Printing!')
-          window.print()
-        }}
-      />
+      <MetricButton ariaLabel="Comments" icon="💬" text={'0'} />
+      <MetricButton ariaLabel="Download PDF" icon="🖨️" text={'PDF'} onClick={() => window.print()} />
     </div>
   )
 }
