@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { cn } from '@/lib/utils/cn'
+import clsx from 'clsx'
 
 const MetricButton = (props: {
   onClick?: () => void
@@ -14,7 +14,7 @@ const MetricButton = (props: {
   return (
     <button
       aria-label={props.ariaLabel}
-      className={cn(
+      className={clsx(
         'flex grow line-clamp-1 text-ellipsis gap-x-1.5 *:leading-8 justify-center items-center transition-all duration-100 text-gray-700 tracking-wide hover:scale-110 transform',
         props.className
       )}
@@ -53,6 +53,16 @@ async function onPageLike({ isLiked = true }): Promise<PageStats> {
   return data
 }
 
+function formatSocialCount(num: number): string {
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
+  }
+  if (num >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
+  }
+  return num.toString()
+}
+
 /**
  * ## Page Metrics
  *
@@ -62,8 +72,8 @@ async function onPageLike({ isLiked = true }): Promise<PageStats> {
 export function PageMetrics(props: { className?: string }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
-  const [likes, setLikes] = useState(0)
-  const [views, setViews] = useState(0)
+  const [likes, setLikes] = useState<string>('0')
+  const [views, setViews] = useState<string>('0')
 
   const lastLikedDebouce = useRef(+new Date())
 
@@ -71,8 +81,8 @@ export function PageMetrics(props: { className?: string }) {
     if (typeof window === 'undefined') return
     onPageView()
       .then((metrics) => {
-        setLikes(metrics.page_likes)
-        setViews(metrics.page_views)
+        setLikes(formatSocialCount(metrics.page_likes))
+        setViews(formatSocialCount(metrics.page_views))
       })
       .catch((e) => console.warn('[PageMetrics] err:', e))
     if (typeof window.localStorage === 'undefined') return
@@ -99,8 +109,8 @@ export function PageMetrics(props: { className?: string }) {
     setIsLiked(nextLikeState)
     onPageLike({ isLiked: nextLikeState })
       .then((metrics) => {
-        setLikes(metrics.page_likes)
-        setViews(metrics.page_views)
+        setLikes(formatSocialCount(metrics.page_likes))
+        setViews(formatSocialCount(metrics.page_views))
       })
       .catch((e) => console.warn('[PageMetrics] err:', e))
   }, [isLiked])
@@ -108,16 +118,16 @@ export function PageMetrics(props: { className?: string }) {
   return (
     <div
       aria-label="Page Metrics"
-      className={cn(
+      className={clsx(
         'flex items-center shrink border rounded-2xl px-5 pb-2 pt-2.5 gap-x-4 border-neutral-200',
         props.className
       )}
     >
-      <MetricButton ariaLabel="Views" icon="👀" text={String(views)} />
+      <MetricButton ariaLabel="Views" icon="👀" text={views} />
       {isLiked ? (
-        <MetricButton ariaLabel="Like Page" icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(likes)} />
+        <MetricButton ariaLabel="Like Page" icon="❤️" hoverIcon="💔" onClick={onClickLike} text={likes} />
       ) : (
-        <MetricButton ariaLabel="Un-like Page" icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(likes)} />
+        <MetricButton ariaLabel="Un-like Page" icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={likes} />
       )}
       <MetricButton ariaLabel="Comments" icon="💬" text={'0'} />
       <MetricButton ariaLabel="Download PDF" icon="🖨️" text={'PDF'} onClick={() => window.print()} />
