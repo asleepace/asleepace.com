@@ -41,8 +41,15 @@ type PageStats = {
   updated_at?: Date | undefined
 }
 
-async function fetchMetrics(params: { href: string; action: 'liked' | 'unliked' | 'viewed' }): Promise<PageStats> {
-  const resp = await fetch(`/api/metrics`, { method: 'POST', body: JSON.stringify(params) })
+async function fetchMetrics(params: { action: 'liked' | 'unliked' | 'viewed' }): Promise<PageStats> {
+  if (typeof window === 'undefined') throw new Error('Page metrics can only be called on the client.')
+  const resp = await fetch(`/api/metrics`, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: params.action,
+      href: window.location.href,
+    }),
+  })
   const data = await resp.json()
   return data
 }
@@ -73,7 +80,7 @@ export function PageMetrics(props: { className?: string }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    fetchMetrics({ action: 'viewed', href: window.location.href })
+    fetchMetrics({ action: 'viewed' })
       .then((metrics) => {
         setLikes(formatSocialCount(metrics.page_likes))
         setViews(formatSocialCount(metrics.page_views))
@@ -101,7 +108,7 @@ export function PageMetrics(props: { className?: string }) {
     lastLikedDebouce.current = currentTimeStamp
     const nextLikeState = !isLiked
     setIsLiked(nextLikeState)
-    fetchMetrics({ href: window.location.href, action: nextLikeState ? 'liked' : 'unliked' })
+    fetchMetrics({ action: nextLikeState ? 'liked' : 'unliked' })
       .then((metrics) => {
         setLikes(formatSocialCount(metrics.page_likes))
         setViews(formatSocialCount(metrics.page_views))
