@@ -235,82 +235,106 @@ body {
 }
 
 /* ============================================
-      7. BLOG / PROSE STYLES
-      ============================================ */
+   BLOG / PROSE STYLES - IMPROVED
+   ============================================ */
 #prose {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
   width: var(--max-width-article);
   max-width: 100%;
   background-color: white;
 
+  /* Base font size for the article */
+  font-size: 1.125rem; /* 18px base */
+  line-height: 1.75;
+  color: rgb(var(--gray-dark));
+
   /* Dividers */
   hr {
-    margin: 1.25rem auto;
-    width: 80%;
+    margin: 0.5rem auto;
+    width: 100%;
+    border: none;
+    border-top: 1px solid #e5e7eb;
   }
 
-  /* Headings */
+  /* ========== HEADINGS ========== */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    padding-left: var(--padding-sm);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.3;
     text-wrap: balance;
-    margin: 0 0 0.75rem 0;
+    color: black;
+    padding: 0 var(--padding-sm);
   }
 
   h1 {
-    font-size: 2.5em;
-    margin-top: 1.5rem;
+    font-size: 2.25rem;
+    margin: 2rem 0 1.25rem 0;
   }
+
   h2 {
-    font-size: 2em;
-    margin-top: 1.75rem;
+    font-size: 1.75rem;
+    margin: 2.5rem 0 1rem 0;
   }
+
   h3 {
-    font-size: 1.5em;
-    margin-top: 1.25rem;
+    font-size: 1.375rem;
+    margin: 2rem 0 0.75rem 0;
   }
+
   h4 {
-    font-size: 1.25em;
-    margin-top: 1rem;
+    font-size: 1.125rem;
+    margin: 1.5rem 0 0.5rem 0;
   }
 
-  /* Paragraphs */
+  /* First heading shouldn't have top margin */
+  h1:first-child,
+  > h2:first-child,
+  > h3:first-child {
+    margin-top: 0;
+  }
+
+  /* ========== PARAGRAPHS ========== */
   p {
-    font-size: 18px;
-    line-height: 1.7;
     padding: 0 var(--padding-sm);
-    margin: 0;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+    margin: 0 0 1.0rem 0;
   }
 
-  /* Links */
+  /* Remove margin from last paragraph */
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Paragraph after heading needs less top space */
+  h1 + p,
+  h2 + p,
+  h3 + p,
+  h4 + p {
+    margin-top: 0;
+  }
+
+  /* ========== LINKS ========== */
   a {
-    color: black;
+    color: inherit;
     text-decoration: none;
     border-bottom: 2px solid var(--accent);
-    transition: color 0.2s ease-in-out;
+    transition: color 0.15s ease;
 
     &:hover {
-      color: var(--accent);
+      color: var(--accent-dark);
     }
   }
 
-  /* Emphasis */
+  /* ========== EMPHASIS ========== */
   strong,
   b {
     font-weight: 700;
     color: black;
+    margin: 0;
   }
 
   em,
@@ -318,67 +342,77 @@ body {
     font-style: italic;
   }
 
-  /* Blockquotes */
+  /* ========== BLOCKQUOTES ========== */
   blockquote {
     border-left: 4px solid var(--accent);
-    padding: 0.75rem 1rem 0.75rem 1.25rem;
-    margin: 1rem 0;
-    font-size: 1rem;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem var(--padding-sm);
+    background-color: #fafafa;
     border-radius: 0 8px 8px 0;
-    background-color: white;
-    box-shadow: var(--shadow-sm);
 
     > p {
       margin: 0;
       padding: 0;
+      font-size: 1rem;
+      color: rgb(var(--gray-dark));
+    }
+
+    > p + p {
+      margin-top: 0.75rem;
     }
   }
 
-  /* Lists */
+  /* ========== LISTS ========== */
   ul,
   ol {
-    padding-left: 2rem;
-    margin: 0 0 0.75rem 0;
-    line-height: 1.7;
-    font-size: 18px;
+    margin: 0 0 1.25rem 0;
+    padding: 0 var(--padding-sm) 0 calc(var(--padding-sm) + 1.5rem);
   }
 
+  /* Unordered lists */
   ul {
-    list-style-type: none;
+    list-style: none;
 
-    li {
+    > li {
       position: relative;
-      padding-left: 1.25rem;
-      color: black;
+      padding-left: 0.25rem;
+      margin-bottom: 0.5rem;
 
       &::before {
         content: '';
         position: absolute;
-        left: 0;
-        top: 0.65rem;
+        left: -1.25rem;
+        top: 0.6em;
         height: 6px;
         width: 6px;
         border-radius: 50%;
-        background-color: black;
+        background-color: currentColor;
+        opacity: 0.7;
       }
     }
 
-    /* Nested bullet opacity */
-    ul li::before {
-      opacity: 0.7;
-    }
-    ul ul li::before {
+    /* Nested bullets get smaller and lighter */
+    ul > li::before {
+      height: 5px;
+      width: 5px;
       opacity: 0.5;
+    }
+
+    ul ul > li::before {
+      height: 4px;
+      width: 4px;
+      opacity: 0.4;
     }
   }
 
+  /* Ordered lists */
   ol {
-    list-style-type: decimal;
-    padding-left: 2.5rem;
+    list-style: decimal;
+    padding-left: calc(var(--padding-sm) + 1.75rem);
 
-    li {
-      padding-left: 0.5rem;
-      color: black;
+    > li {
+      padding-left: 0.25rem;
+      margin-bottom: 0.5rem;
     }
   }
 
@@ -387,38 +421,59 @@ body {
   ul ol,
   ol ul,
   ol ol {
-    margin: 0.4rem 0 0 0;
+    margin: 0.5rem 0 0.5rem 0;
     padding-left: 1.5rem;
   }
 
-  /* List item content */
+  /* List items */
   li {
+    line-height: 1.65;
+
     &:last-child {
       margin-bottom: 0;
     }
 
-    p {
+    > p {
       padding: 0;
       margin: 0;
     }
+
+    > p + p {
+      margin-top: 0.5rem;
+    }
   }
 
-  /* Images */
+  /* List followed by code block - tighten spacing */
+  ul:has(+ .code-container),
+  ol:has(+ .code-container),
+  p:has(+ .code-container) {
+    margin-bottom: 0;
+  }
+
+  /* Also reduce top margin on code block after list */
+  ul + .code-container,
+  ol + .code-container,
+  p + .code-container {
+    margin-top: 0;
+  }
+
+  /* ========== IMAGES ========== */
   img {
     max-width: 100%;
     height: auto;
-    margin: 1rem 0;
-    border-radius: 4px;
-    overflow: hidden;
+    margin: 1.5rem 0;
+    border-radius: 6px;
   }
 
-  /* Tables */
+  /* ========== TABLES ========== */
   table {
-    width: calc(100% - 1rem);
-    margin-right: 1rem;
+    width: calc(100% - 2 * var(--padding-sm));
+    margin: 1.5rem var(--padding-sm);
     border-collapse: collapse;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
   }
 
   thead tr {
@@ -427,30 +482,35 @@ body {
   }
 
   th {
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     text-align: left;
     font-weight: 600;
     color: #374151;
+    font-size: 0.875rem;
   }
 
   tbody tr {
     border-bottom: 1px solid #f3f4f6;
-    transition: background-color 0.2s;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &:nth-child(odd) {
       background-color: #ffffff;
     }
     &:nth-child(even) {
-      background-color: #f9fafb;
+      background-color: #fafafa;
     }
     &:hover {
-      background-color: #f3f4f6;
+      background-color: #f5f5f5;
     }
   }
 
   td {
     padding: 0.75rem 1rem;
     color: #4b5563;
+    vertical-align: top;
 
     a {
       color: #2563eb;
@@ -462,43 +522,62 @@ body {
     }
   }
 
-  /* Form elements */
+  /* ========== INLINE CODE ========== */
+  :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    padding: 0.2em 0.4em;
+    background-color: #f3f4f6;
+    border-radius: 4px;
+    color: #1f2937;
+  }
+
+  /* ========== FORM ELEMENTS ========== */
   textarea,
   input {
-    font-size: 16px;
+    font-size: 16px; /* Prevents iOS zoom */
   }
 
   textarea {
     width: 100%;
   }
 
-  /* Mobile adjustments */
+  /* ========== MOBILE ========== */
   @media (max-width: 768px) {
+    font-size: 1rem; /* 16px on mobile */
+
     h1 {
-      font-size: 2em;
+      font-size: 1.875rem;
     }
     h2 {
-      font-size: 1.75em;
+      font-size: 1.5rem;
     }
     h3 {
-      font-size: 1.5em;
+      font-size: 1.25rem;
     }
     h4 {
-      font-size: 1.25em;
+      font-size: 1.125rem;
     }
-    p {
-      font-size: 16px;
+
+    h2 {
+      margin-top: 2rem;
+    }
+    h3 {
+      margin-top: 1.5rem;
     }
 
     ul,
     ol {
-      padding-left: 1.5rem;
+      padding-left: calc(var(--padding-sm) + 1.25rem);
     }
-    ul li {
-      padding-left: 1rem;
+
+    ul > li::before {
+      left: -1rem;
     }
-    ol li {
-      padding-left: 0.25rem;
+
+    blockquote {
+      margin-left: 0;
+      margin-right: 0;
     }
   }
 }
