@@ -154,7 +154,13 @@ export async function upsertComment(comment: CreateDailyWSBComment): Promise<Dai
 export async function bulkUpsertComments(comments: CreateDailyWSBComment[]): Promise<number> {
   if (comments.length === 0) return 0
 
-  const validated = comments.map((c) => CreateDailyWSBCommentSchema.parse(c)).filter((comment) => comment.id != null)
+  const validated = comments
+    .map((c) => CreateDailyWSBCommentSchema.parse(c))
+    .filter((comment) => comment && comment.id != null)
+    .map((comment) => ({
+      ...comment,
+      author: comment.author ?? 'anonymous',
+    }))
 
   for (const comment of validated) {
     await upsertComment(comment)
