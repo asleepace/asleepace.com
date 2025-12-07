@@ -11,6 +11,9 @@ import { POSTGRES_PASSWORD, POSTGRES_USERNAME, POSTGRES_DATABASE, POSTGRES_PORT,
 
 console.log(`[db] connecting to db "${POSTGRES_DATABASE}" on ${POSTGRES_HOST}:${POSTGRES_PORT}`)
 
+/**
+ * Set global db for hot reloads
+ */
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined
 }
@@ -36,6 +39,18 @@ export const sql =
 if (!import.meta.env.PROD) {
   globalForDb.sql = sql
 }
+
+/**
+ * Setup insert event hooks.
+ */
+sql.listen('data_inserted', async (payload) => {
+  try {
+    const json = JSON.parse(payload)
+    console.log('[db::hook] json:', json)
+  } catch (e) {
+    console.warn('[db::hook] error:', e)
+  }
+})
 
 /**
  * Shutdown the Postgres connection. Should be called when application terminates.

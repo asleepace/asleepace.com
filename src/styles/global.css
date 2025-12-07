@@ -274,108 +274,96 @@ body {
   display: flex;
   flex-direction: column;
   background-color: white;
-  row-gap: 1rem;
-
-  width: var(--max-width-article); /* ARTICLE MAX WIDTH  */
+  row-gap: 0.25rem;
+  width: var(--max-width-article);
   max-width: calc(100%);
 
   hr {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 1.25rem auto;
     width: 80%;
   }
 
+  /* Typography Hierarchy */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    /* font-family: Atkinson, sans-serif; */
     padding-left: var(--padding-sm);
     font-weight: 700;
-    display: block;
-    line-height: 1;
+    line-height: 1.2;
     text-wrap: balance;
+    margin: 0 0 0.75rem 0;
   }
 
   h1 {
-    font-size: 3em;
+    font-size: 2.5em;
+    margin-top: 1.5rem;
   }
 
   h2 {
-    font-size: 2.5em;
-    padding: 0 8px;
+    font-size: 2em;
+    margin-top: 1.75rem;
   }
 
   h3 {
-    font-size: 2em;
-    padding-top: 1em;
+    font-size: 1.5em;
+    margin-top: 1.25rem;
   }
 
   h4 {
-    font-size: 1.5em;
-    margin-top: var(--padding-sm);
-    margin-bottom: -0.8rem;
+    font-size: 1.25em;
+    margin-top: 1rem;
   }
 
+  /* Body Text */
   p {
     font-size: 18px;
     padding: 0 var(--padding-sm);
     margin: 0;
+    line-height: 1.7;
+  }
+
+  /* Last paragraph in a section shouldn't have bottom margin */
+  p:last-child {
+    margin-bottom: 0;
   }
 
   a {
     color: black;
     text-decoration: none;
-    border-bottom: 2px solid var(--accent);
-    transition: border-bottom 0.2s ease-in-out;
+    border-bottom: 2px solid var(--color-accent);
+    transition: all 0.2s ease-in-out;
   }
 
   a:hover {
-    color: var(--accent);
-    transition: color 0.2s ease-in-out;
+    color: var(--color-accent);
   }
 
-  strong {
-    font-weight: 550;
+  strong,
+  b {
+    font-weight: 700;
+    color: var(--black-100);
   }
 
-  /* stock chart */
-  .stock-chart {
-    box-shadow: var(--box-shadow);
-    background-color: #000;
-    /* overflow: hidden; */
-    margin-top: var(--padding-sm);
-    margin-bottom: var(--padding-lg);
-    border-radius: 0px;
+  em,
+  i {
+    font-style: italic;
   }
 
-  textarea {
-    width: 100%;
-    font-size: 16px;
-  }
-  input {
-    font-size: 16px;
-  }
-
-  table {
-    margin-left: var(--padding-sm);
-  }
-
-  img {
-    overflow: hidden;
-    border-radius: 4px;
-  }
+  /* code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  } */
 
   blockquote {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    border-left: 4px solid var(--accent);
-    padding-right: 1rem;
-    padding-bottom: 1rem;
-    margin: 0;
+    border-left: 4px solid var(--color-accent);
+    padding: 0.75rem 1rem 0.75rem 1.25rem;
+    margin: 1rem 0;
     font-size: 1rem;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -384,28 +372,28 @@ body {
   }
 
   blockquote > p {
-    margin-bottom: 0em;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    margin: 0;
+    padding: 0;
   }
 
-  /* Base list styling */
+  /* Lists - consistent with paragraph spacing */
   ul,
   ol {
-    padding-left: 1.5rem;
-    margin: 1.5rem 0;
-    line-height: 1.6;
+    padding-left: 2rem;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.7;
+    font-size: 18px;
   }
 
-  /* Unordered list (ul) */
   ul {
     list-style-type: none;
   }
 
   ul li {
     position: relative;
-    padding-left: 1.5rem;
-    margin-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    font-size: 18px;
+    margin-bottom: 0;
     color: black;
   }
 
@@ -413,47 +401,167 @@ body {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.7rem;
-    height: 8px;
-    width: 8px;
+    top: 0.65rem;
+    height: 6px;
+    width: 6px;
     border-radius: 50%;
     background-color: var(--black-100);
   }
 
-  /* Nested unordered lists */
+  /* Nested list bullets */
   ul ul li::before {
-    background-color: var(--black-100);
-    opacity: 0.8;
+    opacity: 0.7;
   }
 
   ul ul ul li::before {
-    background-color: var(--black-100);
-    opacity: 0.6;
+    opacity: 0.5;
   }
 
-  /* Ordered list (ol) */
   ol {
-    /* counter-reset: item; */
     list-style-type: decimal;
-    padding-left: 2.5em;
+    padding-left: 2.5rem;
   }
 
   ol li {
-    /* position: relative; */
-    padding-left: 1em;
-    margin-bottom: 0.75rem;
-    counter-increment: item;
+    padding-left: 0.5rem;
+    margin-bottom: 0;
     color: var(--black-100);
   }
 
-  ol li p {
-    padding: 0;
+  /* Remove bottom margin from last list item */
+  ul li:last-child,
+  ol li:last-child {
+    margin-bottom: 0;
   }
 
-  ol ul {
-    padding-left: 0;
+  /* Paragraphs and other elements inside list items */
+  ol li p,
+  ul li p {
+    padding: 0;
+    margin: 0;
+  }
+
+  ol li p:first-child,
+  ul li p:first-child {
+    margin-top: 0;
+  }
+
+  ol li p:last-child,
+  ul li p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Nested lists */
+  ol ul,
+  ul ul,
+  ul ol,
+  ol ol {
+    margin: 0.4rem 0 0 0;
+    padding-left: 1.5rem;
+  }
+
+  /* Media */
+  img {
+    overflow: hidden;
+    border-radius: 4px;
+    margin: 1rem 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    width: calc(100% - 1rem);
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    border: 1px solid #e5e7eb;
+    margin-right: 1rem;
+  }
+
+  thead tr {
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  th {
+    padding: 0.5rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  tbody tr:hover {
+    background-color: #f3f4f6;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    color: #4b5563;
+  }
+
+  td a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  td a:hover {
+    text-decoration: underline;
+  }
+
+  textarea,
+  input {
+    font-size: 16px;
+  }
+
+  textarea {
+    width: 100%;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2em;
+    }
+    h2 {
+      font-size: 1.75em;
+    }
+    h3 {
+      font-size: 1.5em;
+    }
+    h4 {
+      font-size: 1.25em;
+    }
+    p {
+      font-size: 16px;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.5rem;
+    }
+
+    ul li {
+      padding-left: 1rem;
+    }
+
+    ol li {
+      padding-left: 0.25rem;
+    }
   }
 }
+
 /*---break--- */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
