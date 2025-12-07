@@ -154,8 +154,6 @@ You can find common scripts for managing memory, disk, logs, etc. in our `packag
   "build": "bunx --bun astro build",
   "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
   "preview": "bunx --bun astro preview",
-  "build:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css",
-  "watch:tailwind": "npx tailwindcss -i ./src/styles/global.css -o ./src/styles/output.css --watch",
   "deploy": "./scripts/deploy.sh",
   "astro": "bunx --bun astro",
   "util:upgrade": "bun upgrade",

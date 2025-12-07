@@ -9,9 +9,6 @@ local.db-*
 *.sqlite
 *.sqlite3
 
-# Generated files
-src/styles/output.css
-
 # dependencies
 node_modules/
 
@@ -41,6 +38,3 @@ src/env.d.ts
 # backend files
 backend/target/
 backend/Cargo.lock
-
-# generated files
-# src/styles/output.css
