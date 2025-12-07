@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils/cn'
-import clsx from 'clsx'
 
 const MetricButton = (props: {
   onClick?: () => void
@@ -15,7 +14,7 @@ const MetricButton = (props: {
   return (
     <button
       aria-label={props.ariaLabel}
-      className={clsx(
+      className={cn(
         'flex grow line-clamp-1 text-ellipsis gap-x-1.5 *:leading-8 justify-center items-center transition-all duration-100 text-gray-700 tracking-wide hover:scale-110 transform',
         props.className
       )}
@@ -70,16 +69,13 @@ export function PageMetrics(props: { className?: string }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-
     onPageView()
       .then((metrics) => {
         setLikes(metrics.page_likes)
         setViews(metrics.page_views)
       })
       .catch((e) => console.warn('[PageMetrics] err:', e))
-
     if (typeof window.localStorage === 'undefined') return
-    // const referer = window.location.href
     const path = window.location.pathname
     const likedKey = `liked:${path}`
     const hasLiked = window.localStorage.getItem(likedKey)
