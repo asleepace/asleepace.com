@@ -2,9 +2,10 @@
  * @file src/lib/server/fetch-wsb-comments.ts
  * @description fetch the daily discussion thread on wall street bets and extract the comments as json.
  */
-import { type Page } from 'puppeteer'
+import { Browser, type Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import { rm } from 'fs/promises'
 
 // NOTE: Use stealth mode
 puppeteer.use(StealthPlugin())
@@ -109,51 +110,63 @@ export type WallStreetBetsData = {
 }
 
 export async function fetchWallStreetBetsComments(options: { limit?: number }) {
-  const browser = await puppeteer.launch({
-    executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
-    args: [
-      `--window-size=${config.width},${config.height}`,
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--incognito', // Start in incognito
-    ],
-    headless: true,
-  })
+  const userDataDir = `/tmp/puppeteer_wsb_${Date.now()}`
+  let browser: Browser | undefined
+  try {
+    browser = await puppeteer.launch({
+      executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
+      userDataDir,
+      args: [
+        `--window-size=${config.width},${config.height}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--incognito', // Start in incognito
+      ],
+      headless: true,
+    })
 
-  // NOTE: Make sure to update this if needed
-  if (!import.meta.env.CHROME_COOKIE_REDDIT) {
-    throw new Error('Missing (.env) variable CHROME_COOKIE_REDDIT')
-  }
-
-  const cookies = parseCookies(import.meta.env.CHROME_COOKIE_REDDIT)
-  await browser.setCookie(...cookies)
-  const page = await browser.newPage()
-  await page.setViewport({
-    width: config.width,
-    height: config.height,
-  })
-
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'en-US,en;q=0.9',
-    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    Referer: 'https://www.google.com/',
-  })
-  await page.goto('https://old.reddit.com/r/wallstreetbets/', { waitUntil: 'networkidle2', timeout: 30_000 })
-  const discussionLink = await findDailyDiscussionLink(page)
-  if (!discussionLink) {
-    const content = await page.content()
-    console.warn('[wall-steet-bets] missing link:\n\n', content)
-    if (content.includes('blocked by network security')) {
-      throw new Error(`Reddit blocked the request:\n\n${content}`)
+    // NOTE: Make sure to update this if needed
+    if (!import.meta.env.CHROME_COOKIE_REDDIT) {
+      throw new Error('Missing (.env) variable CHROME_COOKIE_REDDIT')
     }
-    throw new Error(`Failed to find discussion link:\n\n${content}`)
+
+    const cookies = parseCookies(import.meta.env.CHROME_COOKIE_REDDIT)
+    await browser.setCookie(...cookies)
+    const page = await browser.newPage()
+    await page.setViewport({
+      width: config.width,
+      height: config.height,
+    })
+
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'en-US,en;q=0.9',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      Referer: 'https://www.google.com/',
+    })
+    await page.goto('https://old.reddit.com/r/wallstreetbets/', { waitUntil: 'networkidle2', timeout: 30_000 })
+    const discussionLink = await findDailyDiscussionLink(page)
+    if (!discussionLink) {
+      const content = await page.content()
+      console.warn('[wall-steet-bets] missing link:\n\n', content)
+      if (content.includes('blocked by network security')) {
+        throw new Error(`Reddit blocked the request:\n\n${content}`)
+      }
+      throw new Error(`Failed to find discussion link:\n\n${content}`)
+    }
+    // swap url with old reddit api for ssr rendering
+    const oldReddit = new URL(discussionLink.replace('www.reddit.com', 'old.reddit.com'))
+    oldReddit.searchParams.set('limit', String(options.limit ?? 200))
+    await page.goto(oldReddit.href, { waitUntil: 'networkidle2', timeout: 30_000 })
+    const json = await extractNestedPageComments(page)
+    const html = await page.content()
+    return { json, html }
+  } catch (e) {
+    console.warn('[puppeteer] error:', e)
+    throw e
+  } finally {
+    browser?.close().catch((e) => console.warn('[pupeteer] failed to close browser:', e))
+    await rm(userDataDir, { recursive: true, force: true }).catch((e) =>
+      console.warn('[pupeteer] failed to delete dir:', e)
+    )
   }
-  // swap url with old reddit api for ssr rendering
-  const oldReddit = new URL(discussionLink.replace('www.reddit.com', 'old.reddit.com'))
-  oldReddit.searchParams.set('limit', String(options.limit ?? 200))
-  await page.goto(oldReddit.href, { waitUntil: 'networkidle2', timeout: 30_000 })
-  const json = await extractNestedPageComments(page)
-  const html = await page.content()
-  await browser.close()
-  return { json, html }
 }
