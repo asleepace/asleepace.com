@@ -1,6 +1,14 @@
+/**
+ * @file src/page/api/metrics.ts
+ * @description API endpoint for page views, likes and statistics.
+ */
 import type { APIRoute } from 'astro'
 import { incrementPageViews, incrementPageLikes, decrementPageLikes } from '@/lib/db/page-statistics'
-import { z } from 'astro:content'
+import { z } from 'zod'
+
+const PageLikePayload = z.object({
+  isLiked: z.boolean(),
+})
 
 /**
  * GET /api/metrics
@@ -18,13 +26,9 @@ export const GET: APIRoute = async ({ url }) => {
   }
 }
 
-const PageLikePayload = z.object({
-  isLiked: z.boolean(),
-})
-
 /**
  * POST /api/metrics
- * {
+ * JSON {
  *  isLiked: boolean
  * }
  *
