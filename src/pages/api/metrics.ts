@@ -3,27 +3,13 @@ import { incrementPageViews, incrementPageLikes, decrementPageLikes } from '@/li
 import { z } from 'astro:content'
 
 /**
- *  Returns the metrics for a given path as a JSON object.
+ * GET /api/metrics
+ *
+ * Increment page views and return page statistics.
  */
 export const GET: APIRoute = async ({ url }) => {
-  const isLiked = url.searchParams.get('liked')
   const path = url.pathname
   try {
-    // handle on like:
-    if (isLiked === '1' || isLiked === 'true') {
-      const stats = await incrementPageLikes({ path })
-      if (!stats) throw new Error(`Missing stats for path "${path}"`)
-      return Response.json(stats)
-    }
-
-    // handle un-like:
-    if (isLiked === '0' || isLiked === 'false') {
-      const stats = await decrementPageLikes({ path })
-      if (!stats) throw new Error(`Missing stats for path "${path}"`)
-      return Response.json(stats)
-    }
-
-    // handle normal page view:
     const stats = await incrementPageViews({ path })
     if (!stats) throw new Error(`Missing stats for path "${path}"`)
     return Response.json(stats)
@@ -37,7 +23,14 @@ const PageLikePayload = z.object({
 })
 
 /**
- *  Returns the metrics for a given path as a JSON object.
+ * POST /api/metrics
+ * {
+ *  isLiked: boolean
+ * }
+ *
+ * Increment or decrement page likes for the specified page and return
+ * page statistics.
+ *
  */
 export const POST: APIRoute = async ({ url, request }) => {
   const path = url.pathname
