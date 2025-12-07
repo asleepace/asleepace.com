@@ -10,28 +10,42 @@ interface Props {
   hashTags?: string | undefined
 }
 
-const {
-  title,
-  anchorTag,
-  description,
-  hashTags = undefined,
-  icon: SectionIcon = Lucide.FileWarning,
-} = Astro.props
+const { title, anchorTag, description, hashTags = undefined, icon: SectionIcon = Lucide.FileWarning } = Astro.props
 ---
 
-<section class="flex flex-col gap-y-16 pt-16" id={anchorTag}>
-  <div class="text-center flex flex-col items-center">
-    <SectionIcon className="text-7xl text-gray-300" size={96} />
-    <h1 class="text-7xl font-bold my-4">{title}</h1>
-    <p class="text-lg text-gray-500">
+<section class="py-16" id={anchorTag}>
+  <!-- Header -->
+  <header class="max-w-3xl mx-auto px-4 text-center mb-4">
+    <SectionIcon className="mx-auto text-neutral-300 mb-6" size={96} strokeWidth={1.5} />
+
+    <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+      {title}
+    </h1>
+
+    <p class="mt-2 text-gray-500 text-lg max-w-xl mx-auto">
       {description}
     </p>
-    { hashTags && <HashTags hashTags={hashTags} className='pt-6' /> }
-    { hashTags && <a class="text-gray-300 hover:text-sky-400 font-bold py-4" href="/blog">Clear Filters</a> }
-  </div>
-  <div
-    class="flex flex-col py-8 md:py-16 border-thin border-gray-200 border-r-transparent border-l-transparent grow bg-[radial-gradient(circle,rgba(0,0,0,0.04),rgba(255,255,255,1))] after:blur-[20px]"
-  >
+
+    {
+      hashTags && (
+        <div class="mt-4 flex flex-col items-center gap-4">
+          <HashTags hashTags={hashTags} className="justify-center" />
+          <a
+            href="/blog"
+            class="text-sm text-gray-400 hover:text-accent transition-colors underline underline-offset-4"
+          >
+            Clear filters
+          </a>
+        </div>
+      )
+    }
+  </header>
+
+  <!-- Divider -->
+  <div class="w-24 h-1 text-neutral-300 mx-auto mb-4"></div>
+
+  <!-- Content -->
+  <div class="py-4 border-y border-gray-100">
     <slot />
   </div>
 </section>

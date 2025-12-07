@@ -10,6 +10,6 @@ interface Props {
 const { posts, className } = Astro.props
 ---
 
-<ul class={clsx('flex flex-1 gap-8', className)}>
+<ul class={clsx('flex flex-1 gap-4', className)}>
   {posts.map(({ data, id }) => <BlogItem data={data} slug={id} />)}
 </ul>

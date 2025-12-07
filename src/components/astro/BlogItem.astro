@@ -1,15 +1,6 @@
 ---
 import FormattedDate from '@/components/astro/FormattedDate.astro'
 
-// ==============================
-//
-//  BlogPreviewItem.astro
-//
-//  This component is used to render a preview of a blog post in the blog index page.
-//  components should be stack horizontally in full screen and vertically in smaller screens.
-//
-// ==============================
-
 interface Props {
   data: Blog['data']
   slug: string
@@ -21,25 +12,59 @@ const bgImage = data?.heroImage || '/images/placeholder-5.jpg'
 const blogTitle = data?.title || 'Blog 404'
 const blogDescription = data?.description || 'This blog post does not exist.'
 const blogDate = data?.pubDate || new Date()
+const readingTime = data?.hashTags?.split(',').at(0) || 'Misc.'
 ---
 
-<li
-  class="w-full min-w-xs rounded-2xl hover:pop hover:shadow-lg bg-white hover:shadow-gray-300 hover:from-white transition-all duration-300 shadow-xl border-[1px] hover:border-transparent border-solid border-gray-100 overflow-clip"
->
-  <a href={`/blog/${slug}/`} class="flex flex-col h-full">
-    <div
-      class="flex w-full bg-cover bg-center aspect-video"
-      style=`background-image: url('${bgImage}')`
-    >
-    </div>
-    <div class="py-8 pl-8 pr-3 flex flex-col justify-between w-full">
-      <p class="font-bold text-3xl xl:text-4xl">{blogTitle}</p>
-      <div class="flex flex-col grow flex-1 py-4">
-        <p class="text-gray-500 text-base">{blogDescription}</p>
+<li class="group">
+  <a
+    href={`/blog/${slug}`}
+    class="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-200 hover:-translate-y-1"
+  >
+    <!-- Image Container -->
+    <div class="relative aspect-video overflow-hidden">
+      <div
+        class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+        style={`background-image: url('${bgImage}')`}
+      >
       </div>
-      <p class="text-gray-400 text-sm flex items-center">
-        <FormattedDate date={blogDate} />
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col flex-1 p-6">
+      <!-- Title -->
+      <h3
+        class="font-bold text-xl lg:text-2xl text-gray-900 leading-tight line-clamp-2 group-hover:text-accent transition-colors duration-200"
+      >
+        {blogTitle}
+      </h3>
+
+      <!-- Description -->
+      <p class="mt-3 text-gray-600 text-sm lg:text-base leading-relaxed line-clamp-2 flex-1">
+        {blogDescription}
       </p>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+        <span class="text-gray-400 text-sm">
+          <FormattedDate date={blogDate} />
+        </span>
+        <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          {readingTime}
+        </span>
+      </div>
     </div>
   </a>
 </li>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
