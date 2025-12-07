@@ -5,7 +5,6 @@
 import { Browser, type Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
-import { rm } from 'fs/promises'
 
 // NOTE: Use stealth mode
 puppeteer.use(StealthPlugin())
@@ -109,21 +108,25 @@ export type WallStreetBetsData = {
   html: string
 }
 
+let browser: Browser | undefined
+
 export async function fetchWallStreetBetsComments(options: { limit?: number }) {
   const userDataDir = `/tmp/puppeteer_wsb_${Date.now()}`
-  let browser: Browser | undefined
   try {
-    browser = await puppeteer.launch({
-      executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
-      userDataDir,
-      args: [
-        `--window-size=${config.width},${config.height}`,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--incognito', // Start in incognito
-      ],
-      headless: true,
-    })
+    if (!browser) {
+      console.log('[fetch-wsb] starting browser...')
+      browser = await puppeteer.launch({
+        executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
+        userDataDir,
+        args: [
+          `--window-size=${config.width},${config.height}`,
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--incognito', // Start in incognito
+        ],
+        headless: true,
+      })
+    }
 
     // NOTE: Make sure to update this if needed
     if (!import.meta.env.CHROME_COOKIE_REDDIT) {
@@ -159,14 +162,10 @@ export async function fetchWallStreetBetsComments(options: { limit?: number }) {
     await page.goto(oldReddit.href, { waitUntil: 'networkidle2', timeout: 30_000 })
     const json = await extractNestedPageComments(page)
     const html = await page.content()
+    await page.close()
     return { json, html }
   } catch (e) {
     console.warn('[puppeteer] error:', e)
     throw e
-  } finally {
-    browser?.close().catch((e) => console.warn('[pupeteer] failed to close browser:', e))
-    await rm(userDataDir, { recursive: true, force: true }).catch((e) =>
-      console.warn('[pupeteer] failed to delete dir:', e)
-    )
   }
 }
