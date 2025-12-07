@@ -3,7 +3,7 @@
  * @description API endpoint for page views, likes and statistics.
  */
 import type { APIRoute } from 'astro'
-import { incrementPageViews, incrementPageLikes, decrementPageLikes } from '@/lib/db/page-statistics'
+import { incrementPageViews, incrementPageLikes, decrementPageLikes, getPageStats } from '@/lib/db/page-statistics'
 import { z } from 'zod'
 
 const PageLikePayload = z.object({
@@ -15,14 +15,23 @@ const PageLikePayload = z.object({
  *
  * Increment page views and return page statistics.
  */
-export const GET: APIRoute = async ({ url }) => {
-  const path = url.pathname
+export const GET: APIRoute = async ({ request }) => {
+  const referer = request.headers.get('referer')
+  const host = request.headers.get('host')
   try {
+    if (!referer) throw new Error(`[api] metrics missing referer "${host}"`)
+    const path = new URL(referer).pathname
+
+    if (import.meta.env.DEV) {
+      const stats = await getPageStats({ path })
+      if (stats) return Response.json(stats)
+    }
+
     const stats = await incrementPageViews({ path })
-    if (!stats) throw new Error(`Missing stats for path "${path}"`)
+    if (!stats) throw new Error(`[api] missing stats for path "${referer}"`)
     return Response.json(stats)
   } catch (e) {
-    return Response.json({ error: `Missing stats for "${path}".` }, { status: 500 })
+    return Response.json({ error: `Missing stats for "${host}".` }, { status: 500 })
   }
 }
 
@@ -36,9 +45,12 @@ export const GET: APIRoute = async ({ url }) => {
  * page statistics.
  *
  */
-export const POST: APIRoute = async ({ url, request }) => {
-  const path = url.pathname
+export const POST: APIRoute = async ({ request }) => {
+  const referer = request.headers.get('referer')
+  const host = request.headers.get('host')
   try {
+    if (!referer) throw new Error(`[api] metrics missing referer "${host}"`)
+    const path = new URL(referer).pathname
     const bodyJson = await request.json()
     const payload = PageLikePayload.parse(bodyJson)
 
@@ -50,6 +62,6 @@ export const POST: APIRoute = async ({ url, request }) => {
       return Response.json(stats)
     }
   } catch (e) {
-    return Response.json({ error: `Missing stats for "${path}".` }, { status: 500 })
+    return Response.json({ error: `Missing stats for "${host}".` }, { status: 500 })
   }
 }

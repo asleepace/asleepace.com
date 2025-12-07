@@ -126,7 +126,7 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
         Last updated {getElapsedDetail()}.
       </p>
     </BlogDisclaimer>
-    <PageMetrics className="mb-4 no-print mx-auto shrink" enableDownload client:only="react" />
+    <PageMetrics className="mb-4 no-print mx-auto shrink" client:load />
   </article>
   <!-- we giving back to the community -->
   <script define:vars={{ report }}>
