@@ -20,6 +20,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   output: 'server',
   site: 'https://asleepace.com',
+  trailingSlash: 'never',
   integrations: [
     mdx({
       optimize: {

@@ -1,15 +1,11 @@
 ---
 import FeaturedCard from '@/components/astro/FeaturedCard.astro'
 import HoverCard from '@/components/astro/HoverCard.astro'
-import { getRecentReports } from '@/lib/db/daily-reports'
 import clsx from 'clsx'
 import { BoxIcon, LinkIcon, RssIcon, CodeXml } from 'lucide-react'
 import { TrendingUp } from 'lucide-react'
 
 export const prerender = false
-
-// set page cache for ~1 min
-Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
 
 export type FeedItem = {
   href: string
@@ -27,10 +23,6 @@ interface Props {
   feed: FeedItem[]
 }
 
-const { featured, feed, className: classList } = Astro.props
-
-const featuredImage = featured.data.heroImage
-
 export type LinkItem = {
   name: string
   icon: typeof BoxIcon | typeof LinkIcon | typeof RssIcon
@@ -38,21 +30,9 @@ export type LinkItem = {
   href: string
 }
 
-const dailyReports = await getRecentReports({ limit: 2 })
+const { featured, feed, className: classList } = Astro.props
 
-const dailyReportFeed: FeedItem[] = dailyReports.map((report): FeedItem => {
-  const titleDate = report.market_date.toLocaleDateString('en-US', {
-    timeZone: 'America/New_York',
-    dateStyle: 'medium',
-  })
-  return {
-    date: new Date(report.market_date),
-    href: `/daily-report?date=${report.market_date.toISOString().split('T')[0]}`,
-    name: `The Daily Report • ${titleDate}`,
-  }
-})
-
-feed.unshift(...dailyReportFeed)
+const featuredImage = featured.data.heroImage
 ---
 
 <div class={clsx('p-4', classList)}>
