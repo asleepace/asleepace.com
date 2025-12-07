@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
-import { actions } from 'astro:actions'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils/cn'
 import clsx from 'clsx'
 
@@ -31,16 +30,52 @@ const MetricButton = (props: {
   )
 }
 
+type PageStats = {
+  path: string
+  page_views: number
+  page_likes: number
+  comments?: any
+  meta?: any
+  created_at?: Date | undefined
+  updated_at?: Date | undefined
+}
+
+async function onPageView(): Promise<PageStats> {
+  const resp = await fetch(`/api/metrics`)
+  const data = await resp.json()
+  return data
+}
+
+async function onPageLike({ isLiked = true }): Promise<PageStats> {
+  const resp = await fetch(`/api/metrics`, { method: 'POST', body: JSON.stringify({ isLiked }) })
+  const data = await resp.json()
+  return data
+}
+
+/**
+ * ## Page Metrics
+ *
+ * This is the row of icons and buttons that appears beneath articles and blog posts and provides
+ * information about page views, likes, comments and export features.
+ */
 export function PageMetrics(props: { className?: string; enableDownload?: boolean }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
-  const [data, setData] = useState<Partial<{ likes: number; views: number }>>({
-    likes: 0,
-    views: 0,
-  })
+  const [likes, setLikes] = useState(0)
+  const [views, setViews] = useState(0)
+
+  const lastLikedDebouce = useRef(+new Date())
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    onPageView()
+      .then((metrics) => {
+        setLikes(metrics.page_likes)
+        setViews(metrics.page_views)
+      })
+      .catch((e) => console.warn('[PageMetrics] err:', e))
+
     if (typeof window.localStorage === 'undefined') return
     // const referer = window.location.href
     const path = window.location.pathname
@@ -48,14 +83,6 @@ export function PageMetrics(props: { className?: string; enableDownload?: boolea
     const hasLiked = window.localStorage.getItem(likedKey)
     setStorageKey(likedKey)
     setIsLiked(hasLiked === 'true')
-    actions
-      .onPageView({})
-      .then((metrics) => {
-        if (metrics.data) setData(metrics.data)
-      })
-      .catch((err) => {
-        console.error('[PageMetrics] failed to fetch metrics', err)
-      })
   }, [])
 
   useEffect(() => {
@@ -65,35 +92,36 @@ export function PageMetrics(props: { className?: string; enableDownload?: boolea
   }, [isLiked, storageKey])
 
   const onClickLike = useCallback(() => {
-    const unliked = isLiked
-    setIsLiked(!unliked)
-    actions.onPageLike({ referer: window.location.href, unliked }).then((metrics) => {
-      if (metrics.data) setData(metrics.data)
-    })
+    // simple debounce, better than nothing lmao...
+    const currentTimeStamp = +new Date()
+    const timeDiff = currentTimeStamp - lastLikedDebouce.current
+    if (timeDiff <= 1_000) return
+    lastLikedDebouce.current = currentTimeStamp
+    const nextLikeState = !isLiked
+    setIsLiked(nextLikeState)
+    onPageLike({ isLiked: nextLikeState })
+      .then((metrics) => {
+        setLikes(metrics.page_likes)
+        setViews(metrics.page_views)
+      })
+      .catch((e) => console.warn('[PageMetrics] err:', e))
   }, [isLiked])
 
   return (
     <div
       className={cn(
-        'flex items-center shrink border-[1px] rounded-2xl px-5 pb-2 pt-2.5 gap-x-4 border-neutral-200',
+        'flex items-center shrink border rounded-2xl px-5 pb-2 pt-2.5 gap-x-4 border-neutral-200',
         props.className
       )}
     >
-      <MetricButton icon="👀" text={String(data.views)} />
+      <MetricButton icon="👀" text={String(views)} />
       {isLiked ? (
-        <MetricButton icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(data.likes)} />
+        <MetricButton icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(likes)} />
       ) : (
-        <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(data.likes)} />
+        <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(likes)} />
       )}
       <MetricButton icon="💬" text={'0'} />
-      <MetricButton
-        icon="🖨️"
-        text={'PDF'}
-        onClick={() => {
-          console.log('Printing!')
-          window.print()
-        }}
-      />
+      <MetricButton icon="🖨️" text={'PDF'} onClick={() => window.print()} />
     </div>
   )
 }

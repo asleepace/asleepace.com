@@ -1,56 +1,58 @@
 import type { APIRoute } from 'astro'
-
-import { Metrics } from '@/db'
-
-// --- helpers ---
-
-function isValidPath(path?: string | null): path is string {
-  return Boolean(path && typeof path === 'string' && path.startsWith('/'))
-}
-
-function MetricResponse(path: string) {
-  const metrics = Metrics.getPageMetrics(path)
-  return Response.json(metrics)
-}
-
-function ErrorResponse(message: string) {
-  return Response.json({ error: message }, { status: 400 })
-}
-
-// --- routes ---
+import { incrementPageViews, incrementPageLikes, decrementPageLikes } from '@/lib/db/page-statistics'
+import { z } from 'astro:content'
 
 /**
  *  Returns the metrics for a given path as a JSON object.
  */
-export const GET: APIRoute = async (ctx) => {
-  const referer = ctx.request.headers.get('referer')
-  if (!referer) return ErrorResponse('No referer provided!')
-  const path = new URL(referer).pathname
-  if (!isValidPath(path)) return ErrorResponse('Invalid path')
-  Metrics.incrementPageViews(path)
-  return MetricResponse(path)
+export const GET: APIRoute = async ({ url }) => {
+  const isLiked = url.searchParams.get('liked')
+  const path = url.pathname
+  try {
+    // handle on like:
+    if (isLiked === '1' || isLiked === 'true') {
+      const stats = await incrementPageLikes({ path })
+      if (!stats) throw new Error(`Missing stats for path "${path}"`)
+      return Response.json(stats)
+    }
+
+    // handle un-like:
+    if (isLiked === '0' || isLiked === 'false') {
+      const stats = await decrementPageLikes({ path })
+      if (!stats) throw new Error(`Missing stats for path "${path}"`)
+      return Response.json(stats)
+    }
+
+    // handle normal page view:
+    const stats = await incrementPageViews({ path })
+    if (!stats) throw new Error(`Missing stats for path "${path}"`)
+    return Response.json(stats)
+  } catch (e) {
+    return Response.json({ error: `Missing stats for "${path}".` }, { status: 500 })
+  }
 }
 
-/**
- *  Increments the likes for a given path.
- */
-export const PUT: APIRoute = async (ctx) => {
-  const referer = ctx.request.headers.get('referer')
-  if (!referer) return ErrorResponse('No referer provided!')
-  const path = new URL(referer).pathname
-  if (!isValidPath(path)) return ErrorResponse('Invalid path')
-  Metrics.incrementPageLikes(path)
-  return MetricResponse(path)
-}
+const PageLikePayload = z.object({
+  isLiked: z.boolean(),
+})
 
 /**
- *  Decrements the likes for a given path.
+ *  Returns the metrics for a given path as a JSON object.
  */
-export const DELETE: APIRoute = async (ctx) => {
-  const referer = ctx.request.headers.get('referer')
-  if (!referer) return ErrorResponse('No referer provided!')
-  const path = new URL(referer).pathname
-  if (!isValidPath(path)) return ErrorResponse('Invalid path')
-  Metrics.decrementPageLikes(path)
-  return MetricResponse(path)
+export const POST: APIRoute = async ({ url, request }) => {
+  const path = url.pathname
+  try {
+    const bodyJson = await request.json()
+    const payload = PageLikePayload.parse(bodyJson)
+
+    if (payload.isLiked) {
+      const stats = await incrementPageLikes({ path })
+      return Response.json(stats)
+    } else {
+      const stats = await decrementPageLikes({ path })
+      return Response.json(stats)
+    }
+  } catch (e) {
+    return Response.json({ error: `Missing stats for "${path}".` }, { status: 500 })
+  }
 }
