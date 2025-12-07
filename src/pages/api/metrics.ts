@@ -6,34 +6,12 @@ import type { APIRoute } from 'astro'
 import { incrementPageViews, incrementPageLikes, decrementPageLikes, getPageStats } from '@/lib/db/page-statistics'
 import { z } from 'zod'
 
-const PageLikePayload = z.object({
-  isLiked: z.boolean(),
-})
-
-/**
- * GET /api/metrics
- *
- * Increment page views and return page statistics.
- */
-export const GET: APIRoute = async ({ request }) => {
-  const referer = request.headers.get('referer')
-  const host = request.headers.get('host')
-  try {
-    if (!referer) throw new Error(`[api] metrics missing referer "${host}"`)
-    const path = new URL(referer).pathname
-
-    if (import.meta.env.DEV) {
-      const stats = await getPageStats({ path })
-      if (stats) return Response.json(stats)
-    }
-
-    const stats = await incrementPageViews({ path })
-    if (!stats) throw new Error(`[api] missing stats for path "${referer}"`)
-    return Response.json(stats)
-  } catch (e) {
-    return Response.json({ error: `Missing stats for "${host}".` }, { status: 500 })
-  }
-}
+const MetricsPayload = z
+  .object({
+    action: z.enum(['liked', 'unliked', 'viewed']),
+    href: z.string(),
+  })
+  .passthrough()
 
 /**
  * POST /api/metrics
@@ -46,22 +24,21 @@ export const GET: APIRoute = async ({ request }) => {
  *
  */
 export const POST: APIRoute = async ({ request }) => {
-  const referer = request.headers.get('referer')
-  const host = request.headers.get('host')
   try {
-    if (!referer) throw new Error(`[api] metrics missing referer "${host}"`)
-    const path = new URL(referer).pathname
-    const bodyJson = await request.json()
-    const payload = PageLikePayload.parse(bodyJson)
+    const metrics = MetricsPayload.parse(await request.json())
+    const path = new URL(metrics.href).pathname
 
-    if (payload.isLiked) {
-      const stats = await incrementPageLikes({ path })
-      return Response.json(stats)
-    } else {
-      const stats = await decrementPageLikes({ path })
-      return Response.json(stats)
+    switch (metrics.action) {
+      case 'liked':
+        return Response.json(await incrementPageLikes({ path }))
+      case 'unliked':
+        return Response.json(await decrementPageLikes({ path }))
+      default:
+        return Response.json(await incrementPageViews({ path }))
     }
   } catch (e) {
-    return Response.json({ error: `Missing stats for "${host}".` }, { status: 500 })
+    console.warn('[api/metrcis] err:', e)
+    const error = e instanceof Error ? e : new Error(String(e))
+    return Response.json({ error: error.message }, { status: 500 })
   }
 }

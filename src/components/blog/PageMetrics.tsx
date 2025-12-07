@@ -41,14 +41,8 @@ type PageStats = {
   updated_at?: Date | undefined
 }
 
-async function onPageView(): Promise<PageStats> {
-  const resp = await fetch(`/api/metrics`)
-  const data = await resp.json()
-  return data
-}
-
-async function onPageLike({ isLiked = true }): Promise<PageStats> {
-  const resp = await fetch(`/api/metrics`, { method: 'POST', body: JSON.stringify({ isLiked }) })
+async function fetchMetrics(params: { href: string; action: 'liked' | 'unliked' | 'viewed' }): Promise<PageStats> {
+  const resp = await fetch(`/api/metrics`, { method: 'POST', body: JSON.stringify(params) })
   const data = await resp.json()
   return data
 }
@@ -79,7 +73,7 @@ export function PageMetrics(props: { className?: string }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    onPageView()
+    fetchMetrics({ action: 'viewed', href: window.location.href })
       .then((metrics) => {
         setLikes(formatSocialCount(metrics.page_likes))
         setViews(formatSocialCount(metrics.page_views))
@@ -107,7 +101,7 @@ export function PageMetrics(props: { className?: string }) {
     lastLikedDebouce.current = currentTimeStamp
     const nextLikeState = !isLiked
     setIsLiked(nextLikeState)
-    onPageLike({ isLiked: nextLikeState })
+    fetchMetrics({ href: window.location.href, action: nextLikeState ? 'liked' : 'unliked' })
       .then((metrics) => {
         setLikes(formatSocialCount(metrics.page_likes))
         setViews(formatSocialCount(metrics.page_views))
