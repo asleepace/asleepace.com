@@ -8,11 +8,13 @@ const MetricButton = (props: {
   hoverIcon?: string
   text: string
   className?: string
+  ariaLabel?: string
 }) => {
   const [isHovered, setIsHovered] = useState(false)
   const { hoverIcon = props.icon, icon } = props
   return (
     <button
+      aria-label={props.ariaLabel}
       className={clsx(
         'flex grow line-clamp-1 text-ellipsis gap-x-1.5 *:leading-8 justify-center items-center transition-all duration-100 text-gray-700 tracking-wide hover:scale-110 transform',
         props.className
@@ -58,7 +60,7 @@ async function onPageLike({ isLiked = true }): Promise<PageStats> {
  * This is the row of icons and buttons that appears beneath articles and blog posts and provides
  * information about page views, likes, comments and export features.
  */
-export function PageMetrics(props: { className?: string; enableDownload?: boolean }) {
+export function PageMetrics(props: { className?: string }) {
   const [storageKey, setStorageKey] = useState<string | undefined>()
   const [isLiked, setIsLiked] = useState(false)
   const [likes, setLikes] = useState(0)
@@ -109,19 +111,20 @@ export function PageMetrics(props: { className?: string; enableDownload?: boolea
 
   return (
     <div
+      aria-label="Page Metrics"
       className={cn(
         'flex items-center shrink border rounded-2xl px-5 pb-2 pt-2.5 gap-x-4 border-neutral-200',
         props.className
       )}
     >
-      <MetricButton icon="👀" text={String(views)} />
+      <MetricButton ariaLabel="Views" icon="👀" text={String(views)} />
       {isLiked ? (
-        <MetricButton icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(likes)} />
+        <MetricButton ariaLabel="Like Page" icon="❤️" hoverIcon="💔" onClick={onClickLike} text={String(likes)} />
       ) : (
-        <MetricButton icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(likes)} />
+        <MetricButton ariaLabel="Un-like Page" icon="🤍" hoverIcon="❤️" onClick={onClickLike} text={String(likes)} />
       )}
-      <MetricButton icon="💬" text={'0'} />
-      <MetricButton icon="🖨️" text={'PDF'} onClick={() => window.print()} />
+      <MetricButton ariaLabel="Comments" icon="💬" text={'0'} />
+      <MetricButton ariaLabel="Download PDF" icon="🖨️" text={'PDF'} onClick={() => window.print()} />
     </div>
   )
 }
