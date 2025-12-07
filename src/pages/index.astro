@@ -6,6 +6,18 @@ import { getRecentReports } from '@/lib/db/daily-reports'
 
 Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60')
 
+const cached = {
+  lastCachedAt: undefined,
+  dailyReports: [] as FeedItem[],
+  clearCached() {
+    this.lastCachedAt = undefined
+    this.dailyReports = []
+  },
+  minsAgo() {
+    return (Date.now() - this.lastCachedAt) / 1_000
+  },
+}
+
 export const prerender = false
 
 // =====================================
@@ -24,21 +36,28 @@ const feed = posts.slice(1).map(({ data, id }) => ({
   href: `/blog/${id}`,
 }))
 
-const dailyReports = await getRecentReports({ limit: 2 })
+if (cached.minsAgo() >= 10) {
+  cached.clearCached()
+}
 
-const dailyReportFeed: FeedItem[] = dailyReports.map((report): FeedItem => {
-  const titleDate = report.market_date.toLocaleDateString('en-US', {
-    timeZone: 'America/New_York',
-    dateStyle: 'medium',
+if (!cached.dailyReports) {
+  console.log('[home] fetching recent reports...')
+  const dailyReports = await getRecentReports({ limit: 2 })
+  console.log('[home] finished!')
+  cached.dailyReports = dailyReports.map((report): FeedItem => {
+    const titleDate = report.market_date.toLocaleDateString('en-US', {
+      timeZone: 'America/New_York',
+      dateStyle: 'medium',
+    })
+    return {
+      date: new Date(report.market_date),
+      href: `/daily-report?date=${report.market_date.toISOString().split('T')[0]}`,
+      name: `The Daily Report • ${titleDate}`,
+    }
   })
-  return {
-    date: new Date(report.market_date),
-    href: `/daily-report?date=${report.market_date.toISOString().split('T')[0]}`,
-    name: `The Daily Report • ${titleDate}`,
-  }
-})
+}
 ---
 
 <SiteLayout title="Home" className="justify-center grow" transition:animate="none" htmx>
-  <BentoBox className="lg:max-w-7xl" featured={featured} feed={[...dailyReportFeed, ...feed]} />
+  <BentoBox className="lg:max-w-7xl" featured={featured} feed={[...cached.dailyReports, ...feed]} />
 </SiteLayout>
