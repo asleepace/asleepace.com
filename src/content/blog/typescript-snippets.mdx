@@ -2,6 +2,7 @@
 title: 'Typescript Snippets'
 description: 'Useful TypeScript snippets for everyday use which can be easily copied and pasted.'
 pubDate: 'May 14 2024'
+author: 'Colin Teahan'
 heroImage: '/images/typescript-banner.png'
 hashTags: 'Technical, Snippets, Typescript'
 slug: 'typescript-snippets'
@@ -12,9 +13,6 @@ This document contains a collection of useful, interesting and sometimes quirky 
 ### SQL Template String w/ Types
 
 ```ts
-
-
-
 // Extract parameter name between {{ and }}
 type ExtractParam<S extends string> = 
   S extends `${infer Param}}${infer _}` ? Param : never
