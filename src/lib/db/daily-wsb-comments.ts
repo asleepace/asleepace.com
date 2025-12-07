@@ -162,11 +162,11 @@ export async function bulkUpsertComments(comments: CreateDailyWSBComment[]): Pro
       author: comment.author ?? 'anonymous',
     }))
 
-  for (const comment of validated) {
-    await upsertComment(comment)
-  }
+  const allCommentPromises = (await Promise.allSettled(validated.map((comment) => upsertComment(comment)))).filter(
+    (result) => result.status === 'fulfilled'
+  )
 
-  return validated.length
+  return allCommentPromises.length
 }
 
 /**
