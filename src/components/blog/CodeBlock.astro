@@ -59,14 +59,17 @@ const { title, filename, 'data-language': lang } = props
 </script>
 
 <style>
+  @import 'tailwindcss';
+
   .code-container pre > code {
     all: unset;
   }
 
   .code-container {
+
     background-color: oklab(0.29 0 -0.02) !important;
     overflow: hidden;
-    margin: 1.5rem 0;
+    @apply my-1;
   }
 
   .code-header {
