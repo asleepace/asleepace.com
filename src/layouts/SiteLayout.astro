@@ -30,13 +30,9 @@ const {
   <head>
     <BaseHead title={title} description={description} image={image} htmx={htmx} />
   </head>
-  <body class="min-h-screen min-w-full items-center self-stretch flex flex-col flex-1 overflow-x-hidden">
+  <body class="min-h-screen min-w-[320px] flex flex-col overflow-x-hidden">
     <PageNavigation />
-    <main
-      class={clsx('w-full flex flex-col items-center', className)}
-      transition:animate={transition}
-    >
-      <!-- dynamic content -->
+    <main class={clsx('flex-1 w-full flex flex-col items-center', className)} transition:animate={transition}>
       <slot />
     </main>
     <Footer />

@@ -13,22 +13,26 @@ interface Props {
 const { title, anchorTag, description, hashTags = undefined, icon: SectionIcon = Lucide.FileWarning } = Astro.props
 ---
 
-<section class="py-16" id={anchorTag}>
-  <!-- Header -->
-  <header class="max-w-3xl mx-auto px-4 text-center mb-4">
-    <SectionIcon className="mx-auto text-neutral-300 mb-6" size={96} strokeWidth={1.5} />
+<section class="pt-8 pb-4 md:pt-12 md:pb-6" id={anchorTag}>
+  <!-- Header - Always centered -->
+  <header class="text-center px-4 mb-8 md:mb-12">
+    <!-- Icon -->
+    <SectionIcon className="mx-auto text-gray-200 mb-2 md:mb-4" size={48} strokeWidth={2} />
 
-    <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+    <!-- Title -->
+    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
       {title}
     </h1>
 
-    <p class="mt-2 text-gray-500 text-lg max-w-xl mx-auto">
+    <!-- Description -->
+    <p class="mt-2 text-gray-400 text-base md:text-lg max-w-md mx-auto">
       {description}
     </p>
 
+    <!-- Filters -->
     {
       hashTags && (
-        <div class="mt-4 flex flex-col items-center gap-4">
+        <div class="mt-6 flex flex-col items-center gap-3">
           <HashTags hashTags={hashTags} className="justify-center" />
           <a
             href="/blog"
@@ -42,10 +46,10 @@ const { title, anchorTag, description, hashTags = undefined, icon: SectionIcon =
   </header>
 
   <!-- Divider -->
-  <div class="w-24 h-1 text-neutral-300 mx-auto mb-4"></div>
+  <hr class="border-b-none border-t w-full max-w-3xl mx-auto border-t-gray-200" />
 
   <!-- Content -->
-  <div class="py-4 border-y border-gray-100">
+  <div class="pt-6 md:pt-10">
     <slot />
   </div>
 </section>
