@@ -274,12 +274,12 @@ body {
   display: flex;
   flex-direction: column;
   background-color: white;
-  row-gap: 0.75rem;
+  row-gap: 0.25rem;
   width: var(--max-width-article);
   max-width: calc(100%);
 
   hr {
-    margin: 1.5rem auto;
+    margin: 1.25rem auto;
     width: 80%;
   }
 
@@ -382,6 +382,7 @@ body {
     padding-left: 2rem;
     margin: 0 0 0.75rem 0;
     line-height: 1.7;
+    font-size: 18px;
   }
 
   ul {
