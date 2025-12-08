@@ -10,6 +10,7 @@ import { triggerDailyReportRefreshInBackground } from '@/lib/server/fetch-daily-
 export const GET: APIRoute = async () => {
   const now = new Date()
   try {
+    console.log('[background-sync] started ...')
     // refresh daily report for today
     void triggerDailyReportRefreshInBackground({ date: now })
       .catch((err) => console.warn('[background-sync] err:', err))
