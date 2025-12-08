@@ -12,6 +12,8 @@ export const GET: APIRoute = async () => {
   try {
     // refresh daily report for today
     void triggerDailyReportRefreshInBackground({ date: now })
+      .catch((err) => console.warn('[background-sync] err:', err))
+      .finally(() => console.log('[background-sync] finished!'))
     return Response.json({ ok: true })
   } catch (e) {
     console.warn('[background-sync] error:', e)

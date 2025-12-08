@@ -105,7 +105,7 @@ export async function createDailyReport(report: CreateDailyReport): Promise<Dail
     VALUES (
       ${reportDate},
       ${validated.summary},
-      ${validated.initial},
+      ${validated.initial ?? validated.summary},
       ${JSON.stringify(validated.data)},
       ${JSON.stringify(validated.meta)}
     )

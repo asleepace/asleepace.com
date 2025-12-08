@@ -259,8 +259,6 @@ async function handleReportGeneration({
     console.warn('[fetch-daily-report] failed to upsert comments:', err)
   })
 
-  const links = await getAdjacentReports({ date })
-
   // Generate report with Grok
   const nextReportText = await fetchGrokBasic({
     model: 'grok-4-1-fast',
@@ -274,8 +272,8 @@ async function handleReportGeneration({
       openReportText,
       revisions: prevReport?.data?.revisions ?? [],
       links: [
-        { name: 'Prev Report', href: `/daily-report?date=${links.previous?.market_date}` },
-        { name: 'Next Report', href: `/daily-report?date=${links.next?.market_date}` },
+        { name: 'Prev Report', href: `/daily-report` },
+        { name: 'Next Report', href: `/daily-report` },
       ],
     }),
   })
@@ -306,7 +304,6 @@ async function handleReportGeneration({
       generationTime: timer.elapsed,
       timestamp: new Date().toISOString(),
       reportCard,
-      links,
     },
   }
 }
@@ -458,7 +455,13 @@ export async function triggerDailyReportRefreshInBackground({ date }: { date: Da
     const existingReport = await getDailyReport({ date })
 
     // verify a report exists to refresh and is in valid date range
-    if (!existingReport) throw new Error('ERR_DAILY_REPORT_MISSING')
+    if (!existingReport) {
+      console.log('[fetch-daily-report] generating report for ', date)
+      const dailyReport = await handleReportGeneration({ date, limit: DEFAULT_LIMIT, prevReport: undefined })
+      await createDailyReport(dailyReport)
+      return
+    }
+
     if (!stockMarket.isUpcomingOrCurrentTradingDay(date)) throw new Error('ERR_DAILY_REPORT_RANGE')
 
     // get last updated or created at time
