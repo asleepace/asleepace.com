@@ -22,7 +22,7 @@ const { title, filename, 'data-language': lang } = props
   id="code-container"
   class={cn(
     'code-container inset-shadow-2xs border-transparent ring-0 transition-all duration-400 ease-in-out md:rounded rounded-none',
-    '[&[data-copied]]:scale-[1.01] [&[data-copied]]:opacity-80 [&[data-copied]]:ring-4 [&[data-copied]]:ring-amber-300 [&[data-copied]]:shadow-lg'
+    'data-copied:scale-[1.01] data-copied:opacity-80 data-copied:ring-4 data-copied:ring-amber-300 data-copied:shadow-lg'
   )}
 >
   {
@@ -94,7 +94,7 @@ const { title, filename, 'data-language': lang } = props
     background: rgba(255, 255, 255, 0.1);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
-    font-size: 0.70rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
