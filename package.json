@@ -12,6 +12,7 @@
     "build:debug": "DEBUG=astro:*,vite:* bunx --bun astro build --verbose",
     "deploy": "./scripts/deploy.sh",
     "preview": "bunx --bun astro preview --host 0.0.0.0 --port 4321",
+    "pm2:start": "pm2 start --interpreter ~/.bun/bin/bun dist/server/entry.mjs --name asleepace.com",
     "background:jobs": "pm2 start scripts/background-sync.sh --name stock-background-sync --cron \"*/15 * * * *\" --no-autorestart",
     "util:check": "bunx --bun astro check",
     "run:server": "bunx --bun ./dist/server/entry.mjs"
