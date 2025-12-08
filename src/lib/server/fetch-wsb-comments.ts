@@ -5,6 +5,7 @@
 import { Browser, type Page } from 'puppeteer'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import { Mutex } from '@asleepace/mutex'
 
 // NOTE: Use stealth mode
 puppeteer.use(StealthPlugin())
@@ -108,16 +109,28 @@ export type WallStreetBetsData = {
   html: string
 }
 
-let browser: Browser | undefined
+const mutex = new Mutex()
 
-export async function fetchWallStreetBetsComments(options: { limit?: number }) {
-  const userDataDir = `/tmp/puppeteer_wsb_${Date.now()}`
+export async function fetchWallStreetBetsComments() {
+  try {
+    console.log('[fetch-wsb-comments] syncing...')
+    const userDataDir = `/tmp/puppeteer_wsb_${crypto.randomUUID()}`
+    await mutex.withLock(async () => {
+      await syncWallStreetBetsComments({ userDataDir })
+    })
+  } catch (e) {
+    console.warn('[fetch-wsb-comments] error:', e)
+  }
+}
+
+export async function syncWallStreetBetsComments(options: { limit?: number; userDataDir: string }) {
+  let browser: Browser | undefined
   try {
     if (!browser) {
       console.log('[fetch-wsb] starting browser...')
       browser = await puppeteer.launch({
         executablePath: import.meta.env.CHROME_EXECUTABLE_PATH, // Use snap chromium
-        userDataDir,
+        userDataDir: options.userDataDir,
         args: [
           `--window-size=${config.width},${config.height}`,
           '--no-sandbox',
@@ -167,5 +180,7 @@ export async function fetchWallStreetBetsComments(options: { limit?: number }) {
   } catch (e) {
     console.warn('[puppeteer] error:', e)
     throw e
+  } finally {
+    browser?.close().catch((e) => console.warn('[fetch-wsb-comments] error:', e))
   }
 }

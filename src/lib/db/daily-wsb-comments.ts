@@ -179,27 +179,27 @@ export async function updateComment(
   const setClauses: string[] = []
   const values: any[] = []
 
-  if (updates.author !== undefined) {
+  if (updates.author != null) {
     setClauses.push(`author = $${values.length + 1}`)
     values.push(updates.author)
   }
 
-  if (updates.score !== undefined) {
+  if (typeof updates.score === 'number') {
     setClauses.push(`score = $${values.length + 1}`)
     values.push(updates.score)
   }
 
-  if (updates.flair !== undefined) {
+  if (updates.flair != null) {
     setClauses.push(`flair = $${values.length + 1}`)
     values.push(updates.flair)
   }
 
-  if (updates.body !== undefined) {
+  if (updates.body != null) {
     setClauses.push(`body = $${values.length + 1}`)
     values.push(updates.body)
   }
 
-  if (updates.meta !== undefined) {
+  if (updates.meta != null) {
     setClauses.push(`meta = $${values.length + 1}`)
     values.push(JSON.stringify(updates.meta))
   }
@@ -216,7 +216,7 @@ export async function updateComment(
     [...values, id]
   )
 
-  if (results.length === 0) return null
+  if (results.length == 0) return null
   return DailyWSBCommentSchema.parse(results[0])
 }
 
