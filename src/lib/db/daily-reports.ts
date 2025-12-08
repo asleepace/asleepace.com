@@ -34,9 +34,11 @@ export type UpdateDailyReport = z.infer<typeof UpdateDailyReportSchema>
  */
 export async function getDailyReport({ date }: { date: Date | string }): Promise<DailyReport | null> {
   const reportDate = typeof date === 'string' ? new Date(date) : date
+  const marketDate = reportDate.toISOString().split('T')[0]
+  console.log('[db] get daily report for:', marketDate)
   const results = await sql`
     SELECT * FROM daily_reports 
-    WHERE market_date = ${reportDate.toISOString().split('T')[0]}
+    WHERE market_date = ${marketDate}
     ORDER BY created_at DESC
     LIMIT 1
   `
