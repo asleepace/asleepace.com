@@ -298,7 +298,7 @@ async function handleReportGeneration({
       model: 'grok-4-1-fast',
       // NOTE: Keep the initial report for comparison.
       openReportText: prevReport?.data?.openReportText ?? nextReportText,
-      comments: allComments,
+      comments: allComments.map((item) => item.id),
       calendar: calendarHtml,
       spy: spyData,
       btc: btcData,
@@ -386,6 +386,7 @@ export async function getOrCreateDailyReport({ date }: { date: Date }): Promise<
     const info = stockMarket.getDateString(date)
     throw new Error(`Invalid date range for daily report "${info}" (must be T+0 or T+1)`)
   }
+  console.log('[fetch-daily-report] generating new report...')
   const dailyReport = await handleReportGeneration({ date, limit: DEFAULT_LIMIT, prevReport: undefined })
   const savedReport = await createDailyReport(dailyReport)
   return savedReport
