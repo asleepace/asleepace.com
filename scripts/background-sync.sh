@@ -14,8 +14,8 @@
 #   bun run background:jobs
 #
 
-# Background sync script - hits the API endpoint every 15 mins
-curl -s https://asleepace.com/api/stocks/background-sync
-
-# Optional: Log the result
-echo "[$(date)] Background sync triggered" >> /var/log/stock-sync.log
+while true; do
+  echo "[$(date)] background sync triggered"
+  curl -s https://asleepace.com/api/stocks/background-sync
+  sleep 900  # 15 minutes
+done
