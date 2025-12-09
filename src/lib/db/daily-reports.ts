@@ -32,6 +32,20 @@ export type UpdateDailyReport = z.infer<typeof UpdateDailyReportSchema>
 /**
  * Fetch the most recent daily report for a given date
  */
+export async function getLatestDailyReport(): Promise<DailyReport | null> {
+  console.log('[db] getting latest daily report ...')
+  const results = await sql`
+    SELECT * FROM daily_reports 
+    ORDER BY created_at DESC
+    LIMIT 1
+  `
+  if (results.length === 0) return null
+  return DailyReportSchema.parse(results[0])
+}
+
+/**
+ * Fetch the most recent daily report for a given date
+ */
 export async function getDailyReport({ date }: { date: Date | string }): Promise<DailyReport | null> {
   const reportDate = typeof date === 'string' ? new Date(date) : date
   const marketDate = reportDate.toISOString().split('T')[0]

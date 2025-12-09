@@ -7,7 +7,7 @@ import HeroTitle from '@/components/astro/HeroTitle.astro'
 import Prose from '@/components/astro/Prose.astro'
 import BlogDisclaimer from '@/components/astro/BlogDisclaimer.astro'
 import { PageMetrics } from '@/components/blog/PageMetrics'
-import { getDailyReport, type DailyReport } from '@/lib/db/daily-reports'
+import { getDailyReport, getLatestDailyReport, type DailyReport } from '@/lib/db/daily-reports'
 import { stockMarket } from '@/lib/utils/stock-market'
 import StockBadge from './partials/stock-badge.astro'
 import DailyReportCard from '@/components/astro/DailyReportCard.astro'
@@ -29,6 +29,10 @@ const refreshStr = url.searchParams.get('refresh')
 const refresh = Boolean(refreshStr && ['null', 'undefined', '0', 'false'].every((str) => refreshStr !== str))
 const hardRefresh = refreshStr === 'hard'
 
+if (refresh || hardRefresh) {
+  await fetchDailyReport({ date, limit, refresh, hardRefresh })
+}
+
 // start a refresh in background
 // if (!refresh && !hardRefresh) {
 //   void triggerDailyReportRefreshInBackground({ date })
@@ -36,7 +40,7 @@ const hardRefresh = refreshStr === 'hard'
 
 // get latest version of daily report from database
 // const report = await fetchDailyReport({ date, limit, refresh, hardRefresh })
-const report = await getDailyReport({ date })
+const report = (await getDailyReport({ date })) ?? (await getLatestDailyReport())
 
 if (!report) {
   return Astro.redirect('/404')
