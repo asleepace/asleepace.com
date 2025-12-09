@@ -34,6 +34,8 @@ export function getNextDate(date: Date | string): Date {
 const GROK_TEMPLATE = (params: {
   date: Date | string
   limit: number
+  marketStatus: string
+  marketTime: string
   spy: Record<string, any> | undefined | null
   btc: Record<string, any> | undefined | null
   openReportText: string | undefined
@@ -55,6 +57,8 @@ Guidelines:
 - Do Not Repeat Instructions
 - Do Not Use em-dashes for sentences
 - Do Not repeat limits (e.g. 180 chars, 300 comments, etc.)
+- Do Not say market closed if market status is "open"
+- Assume MARKET_STATUS and MARKET_TIME are the current time
 - Higher score comments = more reliable
 - High reply counts = trending topics
 - Items prefixed with (optional) can be omitted - use best judgement
@@ -79,6 +83,8 @@ Sources:
   TARGET_DATE: ${params.date.toString()}
   ${params.openReportText ? `PREVIOUS_ANALYSIS:\n${params.openReportText}` : ''}
   CURRENT_DATE: ${new Date().toISOString()}
+  CURRENT_TIME: ${params.marketStatus}
+  MARKET_STATUS: ${params.marketStatus}
   SPY_DATA: ${JSON.stringify(params.spy, null, 2)}
   BTC_DATA: ${JSON.stringify(params.btc, null, 2)}
   COMMENTS_COUNT: ${params.comments.length}
@@ -253,6 +259,16 @@ async function handleReportGeneration({
     console.warn('[fetch-daily-report] failed to upsert comments:', err)
   })
 
+  // convert mindnight UTC date string to date with current ET time
+  const etDate = stockMarket.setCurrentUTCTime(new Date(date))
+  const marketStatus = stockMarket.getMarketStatus(etDate)
+  const etTime = etDate.toLocaleTimeString('en-US', {
+    timeZone: 'America/New_York',
+    timeStyle: 'full',
+  })
+
+  const timezone = stockMarket.getTimezoneShortName(etDate)
+
   // Generate report with Grok
   const nextReportText = await fetchGrokBasic({
     model: 'grok-4-1-fast',
@@ -263,6 +279,8 @@ async function handleReportGeneration({
       limit,
       comments: allComments,
       calendar: calendarHtml,
+      marketStatus,
+      marketTime: etTime,
       openReportText,
       revisions: prevReport?.data?.revisions ?? [],
       links: [
