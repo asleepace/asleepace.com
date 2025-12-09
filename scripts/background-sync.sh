@@ -51,4 +51,4 @@ echo -e "  ${BG}LOAD:${NC} ${CYAN}$load${NC}"
 # done
 ELAPSED=$(($(date +%s) - START_TIME))
 echo -e "${BG}───────────────────────────────────────${NC}"
-echo -e "${GREEN}[done]${NC} ${BG}${ELAPSED}s${NC}"
+echo -e "${BG}[background-sync]${NC} finished ${BG}${ELAPSED}s${NC}"
