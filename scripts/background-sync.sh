@@ -26,11 +26,11 @@ echo -e "${BG}[background-sync]${NC} $(format_date)"
 echo -e "${BG}───────────────────────────────────────${NC}"
 
 # cleanup puppeteer files
-echo -e "${BG}[cleanup]${NC} deleting ${CYAN}/tmp/puppeteer_wsb_*${NC}"
+echo -e "${BG}[cleanup]${NC}${GRAY} deleting ${CYAN}/tmp/puppeteer_wsb_*${NC}"
 rm -rf /tmp/puppeteer_wsb_*
 
 # trigger background sync endpoint
-echo -e "${BG}[fetch]${NC} ${CYAN}${BG_SYNC_URL}${NC}"
+echo -e "${BG}[fetch]${NC}${GRAY} fetch ${CYAN}${BG_SYNC_URL}${NC}"
 response=$(curl -sf "$BG_SYNC_URL") || response="${RED}failed${NC}"
 echo -e "${BG}[response]${NC} $response"
 
