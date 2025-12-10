@@ -33,10 +33,14 @@ const capitalize = (tag: string) => {
 <Fragment>
   {
     hasHashTags ? (
-      <div class={cn('flex flex-row shrink items-center gap-4 justify-center', className)}>
+      <div
+        aria-label={`Tags ${hashTags}`}
+        class={cn('flex flex-row shrink items-center gap-4 justify-center', className)}
+      >
         {tags.map((tag) => {
           return (
             <a
+              aria-label={`View other ${tag} tags`}
               href={`/blog?tags=${tag}`}
               class={cn(
                 'px-4 py-2 flex max-w-44 shrink opacity-70 hover:opacity-100 transition-all duration-300 rounded-full',

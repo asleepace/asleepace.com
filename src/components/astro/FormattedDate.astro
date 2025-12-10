@@ -7,10 +7,9 @@ interface Props {
 const { date } = Astro.props
 
 const dateTime = new Date(date).toISOString()
-
 ---
 
-<time datetime={dateTime}>
+<time aria-label={dateTime} datetime={dateTime}>
   {
     new Date(date).toLocaleDateString('en-us', {
       year: 'numeric',

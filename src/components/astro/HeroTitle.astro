@@ -20,12 +20,12 @@ const { title, pubDate, updatedDate, hashTags, dividerClass, titleClass, class: 
 const hasSlot = Astro.slots.has('default')
 ---
 
-<div class={cn('text-center self-stretch px-4 flex flex-col gap-y-6 pt-4 md:pt-8', className)}>
+<div id="hero-title" class={cn('text-center self-stretch px-4 flex flex-col gap-y-6 pt-4 md:pt-8', className)}>
   <div class="date text-gray-500">
     <FormattedDate date={pubDate} />
     {
       updatedDate && (
-        <div class="italic">
+        <div aria-label={`Last updated on ${updatedDate}`} class="italic">
           Last updated on <FormattedDate date={updatedDate} />
         </div>
       )
