@@ -203,7 +203,9 @@ const marketStatusText = marketStatusLabels[marketStatus]
   </div>
 
   <!-- Footer stats -->
-  <div class="flex items-center justify-between text-[10px] md:text-xs text-slate-500 relative z-10 pt-1.5 md:pt-3 border-t border-slate-700/50">
+  <div
+    class="flex items-center justify-between text-[10px] md:text-xs text-slate-500 relative z-10 pt-1.5 md:pt-3 border-t border-slate-700/50"
+  >
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-1.5">
         <i data-lucide="clock" class="w-3 h-3"></i>
@@ -249,6 +251,7 @@ const marketStatusText = marketStatusLabels[marketStatus]
 </script>
 
 <style>
+  @import 'tailwindcss';
   [data-daily-report] {
     font-family:
       ui-sans-serif,
@@ -263,6 +266,10 @@ const marketStatusText = marketStatusLabels[marketStatus]
     -moz-osx-font-smoothing: grayscale;
   }
 
+  #report-card {
+    @apply bg-linear-to-br from-slate-900 to-slate-800;
+  }
+
   [data-daily-report] *,
   [data-daily-report] *::before,
   [data-daily-report] *::after {
@@ -272,5 +279,7 @@ const marketStatusText = marketStatusLabels[marketStatus]
 
 <script is:inline src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script is:inline>
-  lucide.createIcons()
+  window.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons()
+  })
 </script>

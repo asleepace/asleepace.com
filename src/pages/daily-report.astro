@@ -92,7 +92,7 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
   <article class="flex flex-col items-center w-full max-w-full lg:max-w-3xl text-gray-800 md:pt-16 pb-8">
     <!-- Daily Report Header -->
     <HeroImage src={bgImage} alt={`Daily Report | ${currentDate}`} />
-    <HeroTitle title={title} pubDate={today} class="gap-y-2" dividerClass="my-1 md:my-3">
+    <HeroTitle title={title} pubDate={today} class="gap-y-2 hero-title" dividerClass="my-1 md:my-3">
       <!-- dynamic stock prices in header -->
       <div aria-label="Stock Prices" class="flex items-center justify-center pb-2">
         <StockBadge ticker="SPY" format="advanced" />
@@ -153,6 +153,12 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
   }
   h4 {
     @apply text-xl font-bold;
+  }
+
+  h2:has(+ .summary-content),
+  /* or target by text if needed */
+  h2:nth-last-of-type(1) {
+    page-break-before: always;
   }
 
   article a {
@@ -293,6 +299,25 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
 
   /* Print styles */
   @media print {
+    @page {
+      margin: 0.5in 0.6in;
+      size: letter;
+    }
+
+    .stock-badge,
+    .spy-eod-container,
+    .disclaimer,
+    #report-card,
+    thead tr {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Hide all scrollbars */
+    * {
+      overflow: visible !important;
+    }
+
     /* Hide elements not needed in PDF */
     nav,
     footer,
@@ -302,9 +327,42 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
       display: none !important;
     }
 
-    /* Remove URL/date headers and footers */
-    @page {
-      margin: 0.5in;
+    /* Prevent orphaned headers/content */
+    h1,
+    h2,
+    h3,
+    h4 {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    #report-card {
+      page-break-inside: avoid;
+    }
+
+    p,
+    li,
+    tr {
+      orphans: 3;
+      widows: 3;
+    }
+
+    /* Keep tables together when possible */
+    table,
+    .spy-eod-container {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .hero-title {
+      margin: 0.5in auto;
+    }
+
+    /* Shrink hero image for print */
+    .hero-image {
+      max-height: 80px;
+      object-fit: cover;
+      margin-bottom: 24px;
     }
 
     /* Hide link URLs that appear after links */
@@ -312,11 +370,34 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
       content: none !important;
     }
 
-    /* Optimize article for print */
+    /* Tighten spacing */
     article {
       max-width: 100% !important;
-      padding: 0 !important;
-      margin: 0 !important;
+      font-size: 11pt;
+      line-height: 1.4;
+    }
+
+    /* Cleaner tables */
+    table {
+      font-size: 10pt;
+      width: 100%;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f3f4f6;
+      transition: background-color 0.2s;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #ffffff;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9fafb;
+    }
+
+    .stock-badge {
+      background-color: black !important;
     }
 
     /* Remove background colors for better printing */
@@ -339,8 +420,10 @@ const reportDate = date.toLocaleDateString('en-US', { dateStyle: 'long' })
 
     /* Keep images reasonable size */
     img {
+      border-radius: 8px;
       max-width: 100%;
       page-break-inside: avoid;
+      aspect-ratio: 16 / 9;
     }
   }
 </style>
