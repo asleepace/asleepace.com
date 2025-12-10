@@ -6,6 +6,7 @@ import YahooFinance from 'yahoo-finance2'
 import { stockMarket } from '@/lib/utils/stock-market'
 import { fetchReportCard } from './fetch-report-card'
 import { bulkUpsertComments } from '@/lib/db/daily-wsb-comments'
+import { fetchSpyOptions, type SPYOptionsAnalysis } from './fetch-spy-options'
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 
@@ -39,6 +40,7 @@ const GROK_TEMPLATE = (params: {
   spy: Record<string, any> | undefined | null
   btc: Record<string, any> | undefined | null
   openReportText: string | undefined
+  spyOptions: SPYOptionsAnalysis | undefined
   revisions: string[]
   comments: WallStreetBetsComment[]
   calendar: string | undefined
@@ -87,6 +89,7 @@ Sources:
   MARKET_STATUS: ${params.marketStatus}
   SPY_DATA: ${JSON.stringify(params.spy, null, 2)}
   BTC_DATA: ${JSON.stringify(params.btc, null, 2)}
+  SPY_OPTIONS: ${JSON.stringify({ analysis: params.spyOptions }, null, 2)}
   COMMENTS_COUNT: ${params.comments.length}
   TOP_COMMENTS: ${JSON.stringify(params.comments.slice(0, 20), null, 2)}
   CALENDAR: ${params.calendar || 'Not available'}
@@ -124,6 +127,12 @@ Response Format:
     Provide a short paragraph summary of the macro play and what you like.
     Provide a bulleted list of possible plays you like and why
     Provide a YOLO play (1-2 sentences.)
+
+  ### SPY Options
+
+    Provide a short paragraph summary of the SPY options chain analysis
+    Provide a bulleted list of bullish play, bearish play, personal favorite
+    Provide a short analysis of data and notes
 
   ### Bulls vs. Bears
 
@@ -269,11 +278,14 @@ async function handleReportGeneration({
 
   const timezone = stockMarket.getTimezoneShortName(etDate)
 
+  const spyOptions = await fetchSpyOptions()
+
   // Generate report with Grok
   const nextReportText = await fetchGrokBasic({
     model: 'grok-4-1-fast',
     prompt: GROK_TEMPLATE({
       date,
+      spyOptions,
       spy: spyData,
       btc: btcData,
       limit,

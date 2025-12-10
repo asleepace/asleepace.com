@@ -1,6 +1,5 @@
 import { fetchGrokBasic } from '@/lib/server/fetch-grok'
 import { parseJsonSafe } from '@/lib/utils/safe-json'
-import { z } from 'zod'
 
 export async function fetchReportCard(params: { date: Date; meta: Record<string, any>; dailyReportText: string }) {
   try {
