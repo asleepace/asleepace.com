@@ -132,7 +132,7 @@ Response Format:
 
     Provide a short paragraph summary of the SPY options chain analysis
     Provide a bulleted list of bullish play, bearish play, personal favorite
-    Provide a short analysis of data and notes
+    Provide a short paragraph analysis of SPY options data, and infer related insights to events & sentiment.
 
   ### Bulls vs. Bears
 
@@ -276,7 +276,7 @@ async function handleReportGeneration({
     timeStyle: 'full',
   })
 
-  const timezone = stockMarket.getTimezoneShortName(etDate)
+  // const timezone = stockMarket.getTimezoneShortName(etDate)
 
   const spyOptions = await fetchSpyOptions()
 
