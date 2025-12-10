@@ -7,10 +7,11 @@ interface Props {
 const { src, alt } = Astro.props
 ---
 
-<div class="flex flex-1 items-center justify-center w-full">
+<div id="hero-image" class="flex flex-1 items-center justify-center w-full">
   <img
     src={src}
     alt={alt}
-    class="md:rounded-3xl md:shadow-2xl object-cover aspect-video md:max-w-screen-md w-full"
+    aria-label={alt}
+    class="md:rounded-3xl md:shadow-2xl object-cover aspect-video md:max-w-3xl w-full hover:scale-101 active:scale-99 transition-transform duration-150"
   />
 </div>
