@@ -22,33 +22,33 @@ format_date() {
 }
 
 echo -e "${BG}───────────────────────────────────────${NC}"
-echo -e "${BG}[background-sync]${NC} $(format_date)"
+echo -e "${GREEN}[background-sync]${NC} $(format_date)"
 echo -e "${BG}───────────────────────────────────────${NC}"
 
 # cleanup puppeteer files
-echo -e "${BG}[cleanup]${NC}${GRAY} deleting ${CYAN}/tmp/puppeteer_wsb_*${NC}"
+echo -e "${BG}[cleanup] deleting ${CYAN}/tmp/puppeteer_wsb_*${NC}"
 rm -rf /tmp/puppeteer_wsb_*
 
 # trigger background sync endpoint
-echo -e "${BG}[fetch]${NC}${GRAY} fetch ${CYAN}${BG_SYNC_URL}${NC}"
+echo -e "${CYAN}[fetch]${NC}${GREEN} fetch ${YELLO}${BG_SYNC_URL}${NC}"
 response=$(curl -sf "$BG_SYNC_URL") || response="${RED}failed${NC}"
-echo -e "${BG}[response]${NC} $response"
+echo -e "${CYAN}[response]${GREEN} $response${NC}"
 
 # system stats
 echo -e "${BG}───────────────────────────────────────${NC}"
-echo -e "${BG}[stats]${NC}"
+echo -e "${CYAN}[stats]${NC}"
 
 cpu=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}')
 mem=$(free -m | awk '/Mem:/ {printf "%.1f%% (%dMB / %dMB)", $3/$2*100, $3, $2}')
 disk=$(df -h / | awk 'NR==2 {printf "%s (%s / %s)", $5, $3, $2}')
 load=$(uptime | awk -F'load average:' '{print $2}' | xargs)
 
-echo -e "  ${BG}CPU:${NC}  ${CYAN}$cpu%${NC}"
-echo -e "  ${BG}MEM:${NC}  ${CYAN}$mem${NC}"
-echo -e "  ${BG}DISK:${NC} ${CYAN}$disk${NC}"
-echo -e "  ${BG}LOAD:${NC} ${CYAN}$load${NC}"
+echo -e "  ${CYAN}CPU:${NC}  ${GREEN}$cpu%${NC}"
+echo -e "  ${CYAN}MEM:${NC}  ${GREEN}$mem${NC}"
+echo -e "  ${CYAN}DISK:${NC} ${GREEN}$disk${NC}"
+echo -e "  ${CYAN}LOAD:${NC} ${GREEN}$load${NC}"
 
 # done
 ELAPSED=$(($(date +%s) - START_TIME))
 echo -e "${BG}───────────────────────────────────────${NC}"
-echo -e "${BG}[background-sync]${NC} finished ${BG}${ELAPSED}s${NC}"
+echo -e "${CYAN}[background-sync]${GREEN} finished ${YELLOW}${ELAPSED}s${NC}"
