@@ -249,7 +249,8 @@ async function handleReportGeneration({
 
   // Merge and dedupe comments
   const uniqueComments = new Map<string, WallStreetBetsComment>()
-  ;[...comments, ...prevComments].forEach((comment) => uniqueComments.set(comment.id, comment))
+  const combinedComments = [...comments, ...(prevComments ?? [])].filter((comment) => comment && comment?.id)
+  combinedComments.forEach((comment) => comment?.id && uniqueComments.set(comment.id, comment))
   const allComments = Array.from(uniqueComments.values())
 
   console.log(`[fetch-daily-report] (${timer.elapsed}s) processing ${allComments.length} comments`)

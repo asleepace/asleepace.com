@@ -19,6 +19,7 @@ const whitelist = [
   '/api/stocks/',
   '/api/status',
   '/api/metrics',
+  '/api/sync',
   '/_actions/',
 ]
 
